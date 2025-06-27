@@ -86,7 +86,12 @@ The bookmarklet excludes certain axe-core rules that commonly produce false posi
 
 - `region` - "Ensures all page content is contained by landmarks"
 
-To modify which rules are excluded, edit the `axeConfig.rules` object in `accessibility-checker.js` and rebuild.
+The checker also automatically excludes its own UI elements from analysis:
+
+- `#uw-a11y-panel` - The accessibility checker's main panel
+- `.uw-a11y-highlight` - Temporarily highlighted elements
+
+To modify which rules or elements are excluded, edit the `axeConfig` object in `accessibility-checker.js` and rebuild.
 
 ## Contributing
 

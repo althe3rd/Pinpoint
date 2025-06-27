@@ -80,11 +80,14 @@
                     'region': { enabled: false }
                 },
                 tags: ['wcag2a', 'wcag2aa', 'wcag21aa'],
-                // Include experimental rules for broader coverage
-                // but prioritize established WCAG 2.1 AA rules
+                // Exclude the accessibility checker's own UI elements from analysis
+                exclude: [
+                    '#uw-a11y-panel',     // Main panel container
+                    '.uw-a11y-highlight'  // Highlighted elements (temporary styling)
+                ]
             };
             
-            // Run axe-core analysis
+            // Run axe-core analysis (excluding our own UI elements)
             window.axe.run(document, axeConfig, (err, results) => {
                 if (err) {
                     this.showError('Error running accessibility analysis: ' + err.message);

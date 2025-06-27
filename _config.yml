@@ -1,8 +1,8 @@
 # GitHub Pages Configuration
 title: Pinpoint Accessibility Checker
-description: A powerful accessibility testing bookmarklet powered by axe-core for digital accessibility testing
-author: Pinpoint Development Team
-email: support@pinpoint-a11y.dev
+description: A simple and convienent accessibility testing bookmarklet powered by axe-core for digital accessibility testing
+author: Center for User Experience
+email: centerforux@wisc.edu
 
 # GitHub Pages specific settings
 github:

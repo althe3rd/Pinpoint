@@ -1,6 +1,103 @@
-# Pinpoint Accessibility Checker Bookmarklet
+# TestMark - Pinpoint Accessibility Checker
 
-A powerful accessibility testing bookmarklet powered by axe-core. This tool provides comprehensive WCAG 2.1 AA compliance testing with a detailed sidebar interface.
+A bookmarklet-based accessibility testing tool powered by axe-core that provides comprehensive WCAG 2.1 AA compliance testing.
+
+## Features
+
+- **Accessibility Score**: 0-100 rating with color-coded visual indicator
+- **Detailed Analysis**: Technical information including HTML source, line numbers, and CSS selectors
+- **Click-to-Highlight**: Click any issue to highlight the problematic element
+- **WCAG 2.1 AA Compliance**: Industry-standard testing using axe-core
+- **Enhanced UI**: Professional sidebar with expandable details
+
+## Development Setup
+
+### Prerequisites
+- Node.js (version 14 or higher)
+- npm
+
+### Installation
+```bash
+npm install
+```
+
+### Build Process
+
+The project uses a build system to maintain clean, readable source code while generating minified bookmarklets:
+
+- **`accessibility-checker.js`** - Main source file (human-readable)
+- **`accessibility-checker.min.js`** - Minified output
+- **`index.html`** - Distribution page with embedded bookmarklet
+
+### Available Scripts
+
+```bash
+# Build once (minify and update files)
+npm run build
+
+# Watch mode (rebuild automatically on changes)
+npm run watch
+# or
+npm run dev
+
+# Serve locally for testing
+npm run serve
+```
+
+### Development Workflow
+
+1. **Edit** `accessibility-checker.js` with your changes
+2. **Run** `npm run watch` to automatically rebuild on changes
+3. **Test** by serving locally: `npm run serve`
+4. **Access** your test page at `http://localhost:8000`
+
+### Manual Build Steps
+
+If you prefer to build manually:
+
+1. Modify `accessibility-checker.js`
+2. Run `npm run build`
+3. The build process will:
+   - Minify your code (typically 70-80% size reduction)
+   - Update `accessibility-checker.min.js`
+   - Update the embedded code in `index.html`
+
+## File Structure
+
+```
+TestMark/
+├── accessibility-checker.js         # Source code (edit this)
+├── accessibility-checker.min.js     # Minified output
+├── index.html                       # Distribution page
+├── build.js                         # Build script
+├── package.json                     # Dependencies and scripts
+└── README.md                        # This file
+```
+
+## Usage
+
+1. Open `index.html` in a browser (or serve it locally)
+2. Drag the bookmarklet to your bookmarks bar
+3. Visit any webpage and click the bookmark to run accessibility tests
+
+## Configuration
+
+The bookmarklet excludes certain axe-core rules that commonly produce false positives:
+
+- `region` - "Ensures all page content is contained by landmarks"
+
+To modify which rules are excluded, edit the `axeConfig.rules` object in `accessibility-checker.js` and rebuild.
+
+## Contributing
+
+1. Make changes to `accessibility-checker.js`
+2. Run `npm run build` to update generated files
+3. Test your changes
+4. Submit a pull request
+
+## License
+
+MIT License
 
 **Live Demo**: [Visit Pinpoint Accessibility Checker](https://your-username.github.io/TestMark/)
 

@@ -74,7 +74,11 @@
             
             // Configure axe for WCAG 2.1 AA
             const axeConfig = {
-                rules: {},
+                rules: {
+                    // Disable the region rule which often creates false positives
+                    // for "Ensures all page content is contained by landmarks"
+                    'region': { enabled: false }
+                },
                 tags: ['wcag2a', 'wcag2aa', 'wcag21aa'],
                 // Include experimental rules for broader coverage
                 // but prioritize established WCAG 2.1 AA rules

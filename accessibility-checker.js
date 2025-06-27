@@ -7,10 +7,11 @@
         return;
     }
     
-    // Main accessibility checker object
-    window.uwAccessibilityChecker = {
-        issues: [],
-        axeLoaded: false,
+            // Main accessibility checker object
+        window.uwAccessibilityChecker = {
+            issues: [],
+            axeLoaded: false,
+            checkedItems: new Set(), // Track manually verified items
         
         // Initialize the checker
         init: function() {
@@ -103,6 +104,9 @@
         processAxeResults: function(results) {
             this.issues = [];
             
+            // Load previously checked items for this session
+            this.loadCheckedItems();
+            
             // Process violations (errors)
             results.violations.forEach(violation => {
                 violation.nodes.forEach(node => {
@@ -120,22 +124,25 @@
                 });
             });
             
-            // Process incomplete items (warnings)
-            results.incomplete.forEach(incomplete => {
-                incomplete.nodes.forEach(node => {
-                    this.addIssue(
-                        'warning',
-                        incomplete.description,
-                        'Manual review needed: ' + this.buildDescription(incomplete, node),
-                        this.getElementFromNode(node),
-                        this.buildRecommendation(incomplete),
-                        incomplete.helpUrl,
-                        incomplete.impact || 'moderate',
-                        incomplete.tags,
-                        this.buildDetailedInfo(incomplete, node)
-                    );
-                });
+                    // Process incomplete items (warnings) with unique IDs for tracking
+        results.incomplete.forEach((incomplete, incompleteIndex) => {
+            incomplete.nodes.forEach((node, nodeIndex) => {
+                const uniqueId = `incomplete-${incompleteIndex}-${nodeIndex}`;
+                this.addIssue(
+                    'warning',
+                    incomplete.description,
+                    'Manual review needed: ' + this.buildDescription(incomplete, node),
+                    this.getElementFromNode(node),
+                    this.buildRecommendation(incomplete),
+                    incomplete.helpUrl,
+                    incomplete.impact || 'moderate',
+                    incomplete.tags,
+                    this.buildDetailedInfo(incomplete, node)
+                );
+                // Store the unique ID for this manual review item
+                this.issues[this.issues.length - 1].uniqueId = uniqueId;
             });
+        });
             
             // Add summary information and calculate score
             this.axeResults = {
@@ -603,6 +610,38 @@
                 .count-error { background: #dc3545; }
                 .count-warning { background: #ffc107; color: #212529; }
                 .count-info { background: #17a2b8; }
+                .count-verified { background: #28a745; }
+                .uw-a11y-manual-check {
+                    margin: 8px 0;
+                    padding: 8px;
+                    background: #f8f9fa;
+                    border-radius: 4px;
+                    border: 1px solid #dee2e6;
+                }
+                .uw-a11y-checkbox {
+                    display: flex;
+                    align-items: center;
+                    cursor: pointer;
+                    font-size: 13px;
+                }
+                .uw-a11y-checkbox input[type="checkbox"] {
+                    margin-right: 8px;
+                    width: 16px;
+                    height: 16px;
+                }
+                .uw-a11y-issue.checked {
+                    opacity: 0.7;
+                    background: #d4edda !important;
+                    border-left-color: #28a745 !important;
+                }
+                .uw-a11y-issue.checked .uw-a11y-manual-check {
+                    background: #d4edda;
+                    border-color: #c3e6cb;
+                }
+                .uw-a11y-check-label {
+                    color: #155724;
+                    font-weight: 500;
+                }
                 .uw-a11y-spinner {
                     width: 40px;
                     height: 40px;
@@ -712,7 +751,9 @@
         },
         
         addIssue: function(type, title, description, element, recommendation, helpUrl, impact, tags, detailedInfo) {
+            const issueId = this.issues.length; // Use array index as unique ID
             this.issues.push({
+                id: issueId,
                 type: type,
                 title: title,
                 description: description,
@@ -734,6 +775,7 @@
             const counts = {
                 error: this.issues.filter(i => i.type === 'error').length,
                 warning: this.issues.filter(i => i.type === 'warning').length,
+                warningChecked: this.issues.filter(i => i.type === 'warning' && i.uniqueId && this.checkedItems.has(i.uniqueId)).length,
                 info: this.issues.filter(i => i.type === 'info').length
             };
             
@@ -745,10 +787,11 @@
                 ${scoreData ? this.renderScoreDial(scoreData) : ''}
                 <h3>axe-core Accessibility Analysis</h3>
                 <p><strong>Total Issues Found:</strong> ${this.issues.length}</p>
-                <div style="margin: 8px 0;">
-                    <span class="uw-a11y-count count-error">${counts.error}</span>Violations
-                    <span class="uw-a11y-count count-warning">${counts.warning}</span>Manual Review
-                </div>
+                                    <div style="margin: 8px 0;">
+                        <span class="uw-a11y-count count-error">${counts.error}</span>Violations
+                        <span class="uw-a11y-count count-warning">${counts.warning}</span>Manual Review
+                        ${counts.warningChecked > 0 ? `<span class="uw-a11y-count count-verified">${counts.warningChecked}</span>Verified` : ''}
+                    </div>
                 <p><small>Click on any issue to highlight the element on the page.</small></p>
                 ${this.axeResults ? `
                     <div class="axe-summary">
@@ -770,26 +813,44 @@
                     </div>
                 `;
             } else {
-                results.innerHTML = this.issues.map((issue, index) => `
-                    <div class="uw-a11y-issue ${issue.type}" onclick="window.uwAccessibilityChecker.highlightElement(${index})" style="cursor: ${issue.element ? 'pointer' : 'default'}">
-                        <h4>${issue.title}</h4>
-                        <p>${issue.description.split('\n')[0]}</p>
-                        <p><strong>How to fix:</strong> ${issue.recommendation}</p>
-                        ${issue.detailedInfo && issue.detailedInfo.length > 0 ? `
-                            <button class="uw-a11y-details-toggle" onclick="window.uwAccessibilityChecker.toggleDetails(${index}); event.stopPropagation();">
-                                Show technical details
-                            </button>
-                            <div class="uw-a11y-details" id="details-${index}">
-                                ${this.renderDetailedInfo(issue.detailedInfo)}
+                results.innerHTML = this.issues.map((issue, index) => {
+                    // Add checkbox for manual review items
+                    const checkboxHtml = issue.type === 'warning' && issue.uniqueId ? 
+                        `<div class="uw-a11y-manual-check">
+                            <label class="uw-a11y-checkbox">
+                                <input type="checkbox" 
+                                       id="check-${issue.uniqueId}" 
+                                       ${this.checkedItems.has(issue.uniqueId) ? 'checked' : ''}
+                                       onchange="window.uwAccessibilityChecker.toggleManualCheck('${issue.uniqueId}'); event.stopPropagation();">
+                                <span class="uw-a11y-checkmark"></span>
+                                <span class="uw-a11y-check-label">
+                                    ${this.checkedItems.has(issue.uniqueId) ? 'Manually verified ✓' : 'Mark as manually verified'}
+                                </span>
+                            </label>
+                        </div>` : '';
+
+                    return `
+                        <div class="uw-a11y-issue ${issue.type} ${issue.uniqueId && this.checkedItems.has(issue.uniqueId) ? 'checked' : ''}" onclick="window.uwAccessibilityChecker.highlightElement(${index})" style="cursor: ${issue.element ? 'pointer' : 'default'}">
+                            <h4>${issue.title}</h4>
+                            <p>${issue.description.split('\n')[0]}</p>
+                            <p><strong>How to fix:</strong> ${issue.recommendation}</p>
+                            ${checkboxHtml}
+                            ${issue.detailedInfo && issue.detailedInfo.length > 0 ? `
+                                <button class="uw-a11y-details-toggle" onclick="window.uwAccessibilityChecker.toggleDetails(${index}); event.stopPropagation();">
+                                    Show technical details
+                                </button>
+                                <div class="uw-a11y-details" id="details-${index}">
+                                    ${this.renderDetailedInfo(issue.detailedInfo)}
+                                </div>
+                            ` : ''}
+                            <div class="issue-meta">
+                                <strong>Impact:</strong> ${issue.impact || 'unknown'} | 
+                                <strong>Tags:</strong> ${issue.tags.join(', ')}
+                                ${issue.helpUrl ? `<br><a href="${issue.helpUrl}" target="_blank" class="learn-more">Learn more about this rule</a>` : ''}
                             </div>
-                        ` : ''}
-                        <div class="issue-meta">
-                            <strong>Impact:</strong> ${issue.impact || 'unknown'} | 
-                            <strong>Tags:</strong> ${issue.tags.join(', ')}
-                            ${issue.helpUrl ? `<br><a href="${issue.helpUrl}" target="_blank" class="learn-more">Learn more about this rule</a>` : ''}
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
         },
         
@@ -879,6 +940,88 @@
             } else {
                 detailsElement.classList.add('expanded');
                 button.textContent = 'Hide technical details';
+            }
+        },
+
+        // Toggle manual verification checkbox
+        toggleManualCheck: function(uniqueId) {
+            if (this.checkedItems.has(uniqueId)) {
+                this.checkedItems.delete(uniqueId);
+            } else {
+                this.checkedItems.add(uniqueId);
+            }
+            
+            // Update the label text
+            const checkbox = document.getElementById(`check-${uniqueId}`);
+            const label = checkbox.parentNode.querySelector('.uw-a11y-check-label');
+            const issueDiv = checkbox.closest('.uw-a11y-issue');
+            
+            if (this.checkedItems.has(uniqueId)) {
+                label.textContent = 'Manually verified ✓';
+                issueDiv.classList.add('checked');
+            } else {
+                label.textContent = 'Mark as manually verified';
+                issueDiv.classList.remove('checked');
+            }
+            
+            // Recalculate and update the score
+            this.updateScore();
+            
+            // Store in sessionStorage for persistence during the session
+            sessionStorage.setItem('uw-a11y-checked', JSON.stringify(Array.from(this.checkedItems)));
+        },
+
+        // Update the accessibility score display
+        updateScore: function() {
+            if (!this.axeResults) return;
+            
+            const newScore = this.calculateAccessibilityScore(this.axeResults);
+            this.axeResults.score = newScore;
+            
+            // Update the score display
+            const scoreNumber = document.querySelector('.uw-a11y-score-number');
+            const scoreCircle = document.querySelector('.uw-a11y-score-circle');
+            
+            if (scoreNumber && scoreCircle) {
+                scoreNumber.textContent = newScore.score;
+                
+                // Update color based on score
+                const score = newScore.score;
+                const color = score >= 90 ? '#28a745' : score >= 70 ? '#ffc107' : score >= 50 ? '#fd7e14' : '#dc3545';
+                const percentage = (score / 100) * 360;
+                scoreCircle.style.background = `conic-gradient(from 0deg, ${color} 0deg ${percentage}deg, #e9ecef ${percentage}deg 360deg)`;
+            }
+            
+            // Update the counts
+            const counts = {
+                error: this.issues.filter(i => i.type === 'error').length,
+                warning: this.issues.filter(i => i.type === 'warning').length,
+                warningChecked: this.issues.filter(i => i.type === 'warning' && i.uniqueId && this.checkedItems.has(i.uniqueId)).length
+            };
+            
+            // Update count display
+            const summaryDiv = document.getElementById('uw-a11y-summary');
+            if (summaryDiv) {
+                const countDisplay = summaryDiv.querySelector('div[style*="margin: 8px 0"]');
+                if (countDisplay) {
+                    countDisplay.innerHTML = `
+                        <span class="uw-a11y-count count-error">${counts.error}</span>Violations
+                        <span class="uw-a11y-count count-warning">${counts.warning}</span>Manual Review
+                        ${counts.warningChecked > 0 ? `<span class="uw-a11y-count count-verified">${counts.warningChecked}</span>Verified` : ''}
+                    `;
+                }
+            }
+        },
+
+        // Load checked items from sessionStorage
+        loadCheckedItems: function() {
+            try {
+                const stored = sessionStorage.getItem('uw-a11y-checked');
+                if (stored) {
+                    this.checkedItems = new Set(JSON.parse(stored));
+                }
+            } catch (e) {
+                console.warn('Could not load checked items from sessionStorage:', e);
             }
         },
         

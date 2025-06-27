@@ -50,19 +50,19 @@
 </head>
 <body>
     <div class="header">
-        <h1>UW Accessibility Checker Test Page</h1>
+        <h1>Pinpoint Accessibility Checker Test Page</h1>
         <p>This page contains intentional accessibility issues for testing</p>
     </div>
 
     <div class="container">
         <h2>Welcome to the Test Page</h2>
-        <p>This page contains several accessibility issues that the UW Accessibility Checker should detect.</p>
+        <p>This page contains several accessibility issues that the Pinpoint Accessibility Checker should detect.</p>
 
         <div class="test-section">
             <h3>Test the Bookmarklet</h3>
             <p>Copy and paste this bookmarklet code into your browser's address bar, or save it as a bookmark:</p>
             <div style="background: #f4f4f4; padding: 1rem; border-radius: 4px; font-family: monospace; word-break: break-all; font-size: 0.8rem;">
-                javascript:(function(){if(window.axe){axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa']},function(e,r){if(e)return alert('Error: '+e.message);var v=r.violations.length,i=r.incomplete.length,h='WCAG 2.1 AA Results:\nViolations: '+v+'\nManual review: '+i+'\n\nCheck browser console for details.';console.log('UW A11y Results:',r);alert(h);});}else{var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/axe-core@4.8.2/axe.min.js';s.onload=function(){axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa']},function(e,r){if(e)return alert('Error: '+e.message);var v=r.violations.length,i=r.incomplete.length,h='WCAG 2.1 AA Results:\nViolations: '+v+'\nManual review: '+i+'\n\nCheck browser console for details.';console.log('UW A11y Results:',r);alert(h);});};document.head.appendChild(s);}})();
+                javascript:(function(){if(window.axe){axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa']},function(e,r){if(e)return alert('Error: '+e.message);var v=r.violations.length,i=r.incomplete.length,h='WCAG 2.1 AA Results:\nViolations: '+v+'\nManual review: '+i+'\n\nCheck browser console for details.';console.log('Pinpoint A11y Results:',r);alert(h);});}else{var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/axe-core@4.8.2/axe.min.js';s.onload=function(){axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa']},function(e,r){if(e)return alert('Error: '+e.message);var v=r.violations.length,i=r.incomplete.length,h='WCAG 2.1 AA Results:\nViolations: '+v+'\nManual review: '+i+'\n\nCheck browser console for details.';console.log('Pinpoint A11y Results:',r);alert(h);});};document.head.appendChild(s);}})();
             </div>
         </div>
 

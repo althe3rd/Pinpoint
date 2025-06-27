@@ -1,16 +1,16 @@
-# Contributing to UW Accessibility Checker
+# Contributing to Pinpoint Accessibility Checker
 
-Thank you for your interest in contributing to the UW Accessibility Checker project! This tool helps University of Wisconsin faculty and staff ensure their digital content meets accessibility standards.
+Thank you for your interest in contributing to the Pinpoint Accessibility Checker project! This tool helps organizations ensure their digital content meets accessibility standards.
 
-## 🎯 Project Goals
+## Project Goals
 
 This project aims to:
-- Provide easy-to-use accessibility testing for UW faculty and staff
+- Provide easy-to-use accessibility testing for organizations and individuals
 - Deliver consistent results using industry-standard axe-core
-- Maintain professional UW branding and standards
+- Maintain professional branding and standards
 - Support local development and testing workflows
 
-## 🤝 How to Contribute
+## How to Contribute
 
 ### Reporting Issues
 
@@ -134,7 +134,7 @@ Help improve documentation by:
 - **Improving code comments**
 - **Creating usage examples**
 
-## 🧪 Testing
+## Testing
 
 ### Required Testing
 
@@ -155,14 +155,14 @@ The tool should:
 - Handle errors gracefully (network issues, CSP blocks, etc.)
 - Clean up properly when closed
 
-## 📋 Review Process
+## Review Process
 
 1. **Automated checks**: GitHub Actions will run basic validation
 2. **Manual review**: Maintainers will test functionality and code quality
 3. **Feedback**: You may receive requests for changes
 4. **Merge**: Approved changes will be merged and deployed
 
-## 🏫 University Guidelines
+## University Guidelines
 
 This project follows University of Wisconsin standards:
 
@@ -171,7 +171,7 @@ This project follows University of Wisconsin standards:
 - **Security**: No tracking, analytics, or data collection
 - **Privacy**: Tool runs entirely client-side
 
-## 📞 Questions?
+## Questions?
 
 If you have questions about contributing:
 
@@ -180,7 +180,7 @@ If you have questions about contributing:
 - **Create an issue** for new questions
 - **Contact project maintainers** through GitHub
 
-## 🙏 Recognition
+## Recognition
 
 Contributors will be recognized in:
 - GitHub Contributors list

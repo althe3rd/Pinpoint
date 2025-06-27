@@ -1,8 +1,8 @@
 # GitHub Pages Configuration
-title: UW Accessibility Checker
-description: A powerful accessibility testing bookmarklet powered by axe-core for University of Wisconsin faculty and staff
-author: University of Wisconsin System
-email: accessibility@wisconsin.edu
+title: Pinpoint Accessibility Checker
+description: A powerful accessibility testing bookmarklet powered by axe-core for digital accessibility testing
+author: Pinpoint Development Team
+email: support@pinpoint-a11y.dev
 
 # GitHub Pages specific settings
 github:
@@ -62,7 +62,7 @@ organization:
 
 # Tool information
 tool:
-  name: UW Accessibility Checker
+  name: Pinpoint Accessibility Checker
   version: "1.0"
   powered_by: axe-core
   standards:

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Testing - UW Accessibility Checker</title>
+    <title>Local Testing - Pinpoint Accessibility Checker</title>
     <style>
         body { 
             font-family: Arial, sans-serif; 
@@ -56,15 +56,15 @@
 </head>
 <body>
     <div class="container">
-        <h1>🧪 Local Testing - UW Accessibility Checker</h1>
+        <h1>Local Testing - Pinpoint Accessibility Checker</h1>
         
         <div class="alert">
             <strong>Local Testing Environment:</strong> This page includes axe-core directly, so the bookmarklet will work even without internet connectivity for the CDN.
         </div>
         
         <h2>Test the Bookmarklet Functions</h2>
-        <button class="test-btn" onclick="testAccessibilityChecker()">🎓 Test Full Accessibility Checker</button>
-        <button class="test-btn" onclick="testSimpleAxe()">⚡ Test Simple Axe Check</button>
+        <button class="test-btn" onclick="testAccessibilityChecker()">Test Full Pinpoint Checker</button>
+        <button class="test-btn" onclick="testSimpleAxe()">Test Simple Axe Check</button>
         
         <div id="results" style="margin-top: 1rem;"></div>
         
@@ -243,13 +243,13 @@
                     };
                     
                     let html = '<div style="background: white; border: 2px solid #c5050c; border-radius: 8px; padding: 1rem; margin: 1rem 0;">';
-                    html += '<h3 style="color: #c5050c; margin-bottom: 1rem;">🎓 Accessibility Test Results</h3>';
+                    html += '<h3 style="color: #c5050c; margin-bottom: 1rem;">Accessibility Test Results</h3>';
                     html += '<p><strong>Total Issues Found:</strong> ' + this.issues.length + '</p>';
                     html += '<p><span style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 12px; margin-right: 8px;">' + counts.error + '</span>Violations ';
                     html += '<span style="background: #ffc107; color: #212529; padding: 2px 8px; border-radius: 12px; margin-left: 8px;">' + counts.warning + '</span>Manual Review</p>';
                     
                     if (this.issues.length === 0) {
-                        html += '<p style="color: #28a745; font-weight: bold;">🎉 No accessibility violations detected!</p>';
+                        html += '<p style="color: #28a745; font-weight: bold;">No accessibility violations detected!</p>';
                     } else {
                         html += '<div style="margin-top: 1rem; max-height: 300px; overflow-y: auto;">';
                         this.issues.forEach(function(issue, index) {

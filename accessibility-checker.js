@@ -24,7 +24,7 @@
             panel.id = 'uw-a11y-panel';
             panel.innerHTML = `
                 <div id="uw-a11y-header">
-                    <h2>🎓 UW Accessibility Checker</h2>
+                    <h2>Pinpoint Accessibility Checker</h2>
                     <button id="uw-a11y-close">✕</button>
                 </div>
                 <div id="uw-a11y-content">
@@ -185,7 +185,7 @@
                 const content = panel.querySelector('#uw-a11y-content');
                 content.innerHTML = `
                     <div class="uw-a11y-issue error" style="margin: 1rem;">
-                        <h4>⚠️ Error Loading Accessibility Checker</h4>
+                        <h4>Error Loading Accessibility Checker</h4>
                         <p>${message}</p>
                         <p><strong>Suggestions:</strong></p>
                         <ul>
@@ -209,7 +209,7 @@
             
             panel.innerHTML = `
                 <div id="uw-a11y-header">
-                    <h2>🎓 UW Accessibility Checker</h2>
+                    <h2>Pinpoint Accessibility Checker</h2>
                     <button id="uw-a11y-close">✕</button>
                 </div>
                 <div id="uw-a11y-content">
@@ -420,7 +420,7 @@
             if (this.issues.length === 0) {
                 results.innerHTML = `
                     <div class="uw-a11y-issue info">
-                        <h4>🎉 Excellent Accessibility!</h4>
+                        <h4>Excellent Accessibility!</h4>
                         <p>No accessibility violations detected by axe-core. Your page meets WCAG 2.1 AA automated testing standards.</p>
                         <p><strong>Next Steps:</strong> Consider manual testing with screen readers and keyboard navigation for complete accessibility validation.</p>
                     </div>
@@ -434,7 +434,7 @@
                         <div class="issue-meta">
                             <strong>Impact:</strong> ${issue.impact || 'unknown'} | 
                             <strong>Tags:</strong> ${issue.tags.join(', ')}
-                            ${issue.helpUrl ? `<br><a href="${issue.helpUrl}" target="_blank" class="learn-more">Learn more about this rule ↗</a>` : ''}
+                            ${issue.helpUrl ? `<br><a href="${issue.helpUrl}" target="_blank" class="learn-more">Learn more about this rule</a>` : ''}
                         </div>
                     </div>
                 `).join('');

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page for UW Accessibility Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 2rem;
+            background: #f9f9f9;
+        }
+        .header {
+            background: #c5050c;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 2rem 0;
+            padding: 1rem;
+            border-left: 4px solid #c5050c;
+            background: #f8f9fa;
+        }
+        .low-contrast {
+            color: #ccc;
+            background: #ddd;
+            padding: 0.5rem;
+        }
+        button {
+            background: #c5050c;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>UW Accessibility Checker Test Page</h1>
+        <p>This page contains intentional accessibility issues for testing</p>
+    </div>
+
+    <div class="container">
+        <h2>Welcome to the Test Page</h2>
+        <p>This page contains several accessibility issues that the UW Accessibility Checker should detect.</p>
+
+        <div class="test-section">
+            <h3>Test the Bookmarklet</h3>
+            <p>Copy and paste this bookmarklet code into your browser's address bar, or save it as a bookmark:</p>
+            <div style="background: #f4f4f4; padding: 1rem; border-radius: 4px; font-family: monospace; word-break: break-all; font-size: 0.8rem;">
+                javascript:(function(){if(window.axe){axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa']},function(e,r){if(e)return alert('Error: '+e.message);var v=r.violations.length,i=r.incomplete.length,h='WCAG 2.1 AA Results:\nViolations: '+v+'\nManual review: '+i+'\n\nCheck browser console for details.';console.log('UW A11y Results:',r);alert(h);});}else{var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/axe-core@4.8.2/axe.min.js';s.onload=function(){axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa']},function(e,r){if(e)return alert('Error: '+e.message);var v=r.violations.length,i=r.incomplete.length,h='WCAG 2.1 AA Results:\nViolations: '+v+'\nManual review: '+i+'\n\nCheck browser console for details.';console.log('UW A11y Results:',r);alert(h);});};document.head.appendChild(s);}})();
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Accessibility Issues Present on This Page</h3>
+            <p>The bookmarklet should detect the following issues:</p>
+            <ul>
+                <li>Missing alt text on image</li>
+                <li>Low color contrast text</li>
+                <li>Form without labels</li>
+                <li>Empty link</li>
+            </ul>
+        </div>
+
+        <!-- Intentional accessibility issues for testing -->
+        
+        <!-- Missing alt text -->
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23c5050c'/%3E%3C/svg%3E" width="100" height="100">
+        
+        <!-- Low contrast text -->
+        <div class="low-contrast">
+            This text has low contrast and may be hard to read for users with visual impairments.
+        </div>
+        
+        <!-- Form without labels -->
+        <form>
+            <h3>Contact Form (Missing Labels)</h3>
+            <input type="text" placeholder="Your name">
+            <input type="email" placeholder="Your email">
+            <textarea placeholder="Your message"></textarea>
+            <button type="submit">Submit</button>
+        </form>
+        
+        <!-- Empty link -->
+        <a href="#"></a>
+        
+        <!-- Good examples -->
+        <div class="test-section">
+            <h3>Good Examples (Should Pass)</h3>
+            
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%2328a745'/%3E%3C/svg%3E" alt="Green square representing a passing accessibility test" width="100" height="100">
+            
+            <form>
+                <h4>Accessible Form</h4>
+                <label for="good-name">Name:</label>
+                <input type="text" id="good-name" name="name">
+                
+                <label for="good-email">Email:</label>
+                <input type="email" id="good-email" name="email">
+                
+                <label for="good-message">Message:</label>
+                <textarea id="good-message" name="message"></textarea>
+                
+                <button type="submit">Send Message</button>
+            </form>
+            
+            <a href="https://www.wisconsin.edu">University of Wisconsin System Website</a>
+        </div>
+
+        <div class="test-section">
+            <h3>Debugging Tips</h3>
+            <ul>
+                <li><strong>Open Developer Tools:</strong> Press F12 and check the Console tab for detailed results</li>
+                <li><strong>Check Network Tab:</strong> Make sure axe-core loads successfully from CDN</li>
+                <li><strong>Try a Simple Test:</strong> Type <code>console.log('test')</code> in the console to ensure JavaScript is working</li>
+                <li><strong>Internet Connection:</strong> The bookmarklet needs to download axe-core from CDN</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>Expected Results</h3>
+            <p>When you run the bookmarklet on this page, you should see:</p>
+            <ul>
+                <li>Multiple violations detected (4-6 issues)</li>
+                <li>Some items marked for manual review</li>
+                <li>Detailed results in the browser console</li>
+            </ul>
+            <p>If you see these results, the bookmarklet is working correctly!</p>
+        </div>
+    </div>
+
+    <script>
+        // Add some debugging info
+        console.log('Test page loaded. Ready for accessibility testing.');
+        console.log('To test the bookmarklet, copy the code above and paste it in the address bar or save it as a bookmark.');
+    </script>
+</body>
+</html> 

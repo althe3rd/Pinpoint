@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookmarklet Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 2rem; line-height: 1.6; }
+        .test-area { background: #f5f5f5; padding: 1rem; margin: 1rem 0; border-radius: 5px; }
+        .bookmarklet { 
+            display: inline-block; 
+            background: #007cba; 
+            color: white; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            margin: 5px;
+        }
+        .bookmarklet:hover { background: #005a87; }
+        .console-test { 
+            background: #2d2d2d; 
+            color: #f8f8f2; 
+            padding: 1rem; 
+            border-radius: 5px; 
+            font-family: monospace; 
+            margin: 1rem 0;
+        }
+        h1 { color: #c5050c; }
+        .alert { background: #fff3cd; border: 1px solid #ffeaa7; padding: 1rem; border-radius: 5px; margin: 1rem 0; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Bookmarklet Testing Page</h1>
+    
+    <div class="alert">
+        <strong>Note:</strong> This page has some accessibility issues intentionally for testing purposes.
+    </div>
+    
+    <h2>Method 1: Click to Test (Drag to Bookmarks Bar)</h2>
+    <p>Right-click and "Bookmark this link" or drag to your bookmarks bar:</p>
+    
+    <!-- Simple working version -->
+    <a href="javascript:(function(){if(window.axe){axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa']},function(e,r){if(e)return alert('Error: '+e.message);alert('Violations: '+r.violations.length+'\nNeeds review: '+r.incomplete.length);});}else{var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/axe-core@4.8.2/axe.min.js';s.onload=function(){axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa']},function(e,r){if(e)return alert('Error: '+e.message);alert('Violations: '+r.violations.length+'\nNeeds review: '+r.incomplete.length);});};s.onerror=function(){alert('Failed to load axe-core');};document.head.appendChild(s);}})();" class="bookmarklet">Simple A11y Test</a>
+    
+    <h2>Method 2: Developer Console Test</h2>
+    <p>Press F12, go to Console tab, and paste this code:</p>
+    <div class="console-test">
+(function(){
+  if(window.axe){
+    axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa']},function(e,r){
+      if(e) return alert('Error: '+e.message);
+      alert('Violations: '+r.violations.length+'\nNeeds review: '+r.incomplete.length);
+    });
+  } else {
+    var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/axe-core@4.8.2/axe.min.js';
+    s.onload=function(){
+      axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa']},function(e,r){
+        if(e) return alert('Error: '+e.message);
+        alert('Violations: '+r.violations.length+'\nNeeds review: '+r.incomplete.length);
+      });
+    };
+    s.onerror=function(){alert('Failed to load axe-core');};
+    document.head.appendChild(s);
+  }
+})()
+    </div>
+    
+    <h2>Test Content (with accessibility issues)</h2>
+    <div class="test-area">
+        <!-- Missing alt text -->
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='50'%3E%3Crect width='100' height='50' fill='%23ddd'/%3E%3Ctext x='50' y='25' text-anchor='middle' fill='%23999'%3ETest Image%3C/text%3E%3C/svg%3E">
+        
+        <!-- Missing form label -->
+        <form>
+            <input type="text" placeholder="Enter your name">
+            <button type="submit">Submit</button>
+        </form>
+        
+        <!-- Poor contrast text (light gray on white) -->
+        <p style="color: #ccc;">This text has poor contrast and should be flagged.</p>
+        
+        <!-- Missing heading hierarchy -->
+        <h5>This is an h5 without h2, h3, h4 first</h5>
+        
+        <!-- Link without descriptive text -->
+        <a href="#">Click here</a>
+    </div>
+    
+    <h2>Instructions</h2>
+    <ol>
+        <li><strong>Bookmark method:</strong> Right-click the blue "Simple A11y Test" link above and select "Bookmark this link" or drag it to your bookmarks bar</li>
+        <li><strong>Console method:</strong> Press F12, click Console tab, copy the code from the gray box, paste it, and press Enter</li>
+        <li><strong>Expected result:</strong> You should see an alert showing the number of violations and items needing review</li>
+    </ol>
+    
+    <div class="alert">
+        <strong>Expected Results:</strong> This page should show several violations including missing alt text, missing form labels, poor color contrast, and heading hierarchy issues.
+    </div>
+</body>
+</html>

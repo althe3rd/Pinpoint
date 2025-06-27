@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Testing - UW Accessibility Checker</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 2rem; 
+            line-height: 1.6; 
+            background: #f5f5f5;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 2rem; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 { color: #c5050c; margin-bottom: 1rem; }
+        .test-btn { 
+            background: #007cba; 
+            color: white; 
+            border: none;
+            padding: 12px 24px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 1.1rem;
+            margin: 0.5rem;
+        }
+        .test-btn:hover { background: #005a87; }
+        .alert { 
+            background: #fff3cd; 
+            border: 1px solid #ffeaa7; 
+            padding: 1rem; 
+            border-radius: 5px; 
+            margin: 1rem 0; 
+        }
+        .success { 
+            background: #d4edda; 
+            border-color: #c3e6cb; 
+            color: #155724; 
+        }
+        .test-content { 
+            background: #f8f9fa; 
+            padding: 1rem; 
+            border-radius: 5px; 
+            margin: 1rem 0; 
+        }
+    </style>
+    
+    <!-- Include axe-core directly for local testing -->
+    <script src="https://cdn.jsdelivr.net/npm/axe-core@4.8.2/axe.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Local Testing - UW Accessibility Checker</h1>
+        
+        <div class="alert">
+            <strong>Local Testing Environment:</strong> This page includes axe-core directly, so the bookmarklet will work even without internet connectivity for the CDN.
+        </div>
+        
+        <h2>Test the Bookmarklet Functions</h2>
+        <button class="test-btn" onclick="testAccessibilityChecker()">🎓 Test Full Accessibility Checker</button>
+        <button class="test-btn" onclick="testSimpleAxe()">⚡ Test Simple Axe Check</button>
+        
+        <div id="results" style="margin-top: 1rem;"></div>
+        
+        <h2>Test Content (with intentional accessibility issues)</h2>
+        <div class="test-content">
+            <!-- Missing alt text -->
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='50'%3E%3Crect width='100' height='50' fill='%23ddd'/%3E%3Ctext x='50' y='25' text-anchor='middle' fill='%23999'%3ETest Image%3C/text%3E%3C/svg%3E">
+            
+            <!-- Missing form label -->
+            <form style="margin: 1rem 0;">
+                <input type="text" placeholder="Enter your name" style="margin: 0.5rem;">
+                <button type="submit">Submit</button>
+            </form>
+            
+            <!-- Poor contrast text -->
+            <p style="color: #ccc;">This text has poor contrast and should be flagged.</p>
+            
+            <!-- Missing heading hierarchy -->
+            <h5>This is an h5 without h2, h3, h4 first</h5>
+            
+            <!-- Link without descriptive text -->
+            <a href="#">Click here</a>
+            
+            <!-- Empty button -->
+            <button style="margin: 1rem 0.5rem;"></button>
+        </div>
+        
+        <div class="alert success">
+            <strong>Expected Results:</strong> You should see several violations including missing alt text, missing form labels, poor color contrast, heading hierarchy issues, and non-descriptive link text.
+        </div>
+        
+        <h3>Instructions for Local Development</h3>
+        <ol>
+            <li><strong>Start a local server:</strong> Use one of these commands in your project directory:
+                <ul style="margin: 0.5rem 0; padding-left: 2rem;">
+                    <li><code>python -m http.server 8000</code></li>
+                    <li><code>npx http-server</code></li>
+                    <li><code>php -S localhost:8000</code></li>
+                </ul>
+            </li>
+            <li><strong>Access via localhost:</strong> Open <code>http://localhost:8000</code> instead of <code>file://</code></li>
+            <li><strong>Test the bookmarklet:</strong> It should work properly when served over HTTP</li>
+        </ol>
+    </div>
+    
+    <script>
+        // Test the full accessibility checker (same as your bookmarklet)
+        function testAccessibilityChecker() {
+            // Clear any existing checker
+            if (window.uwAccessibilityChecker) {
+                window.uwAccessibilityChecker.remove();
+            }
+            
+            // Initialize the full checker
+            window.uwAccessibilityChecker = {
+                issues: [],
+                axeLoaded: true, // axe is already loaded on this page
+                
+                init: function() {
+                    this.runAxeChecks();
+                },
+                
+                runAxeChecks: function() {
+                    if (!window.axe) {
+                        alert('axe-core is not loaded on this page');
+                        return;
+                    }
+                    
+                    const axeConfig = {
+                        rules: {},
+                        tags: ['wcag2a', 'wcag2aa', 'wcag21aa']
+                    };
+                    
+                    const self = this;
+                    window.axe.run(document, axeConfig, function(err, results) {
+                        if (err) {
+                            alert('Error running accessibility analysis: ' + err.message);
+                            return;
+                        }
+                        
+                        self.processAxeResults(results);
+                        self.displayResults();
+                    });
+                },
+                
+                processAxeResults: function(results) {
+                    this.issues = [];
+                    const self = this;
+                    
+                    results.violations.forEach(function(violation) {
+                        violation.nodes.forEach(function(node) {
+                            self.addIssue(
+                                'error',
+                                violation.description,
+                                self.buildDescription(violation, node),
+                                self.getElementFromNode(node),
+                                self.buildRecommendation(violation),
+                                violation.helpUrl,
+                                violation.impact || 'serious',
+                                violation.tags
+                            );
+                        });
+                    });
+                    
+                    results.incomplete.forEach(function(incomplete) {
+                        incomplete.nodes.forEach(function(node) {
+                            self.addIssue(
+                                'warning',
+                                incomplete.description,
+                                'Manual review needed: ' + self.buildDescription(incomplete, node),
+                                self.getElementFromNode(node),
+                                self.buildRecommendation(incomplete),
+                                incomplete.helpUrl,
+                                incomplete.impact || 'moderate',
+                                incomplete.tags
+                            );
+                        });
+                    });
+                    
+                    this.axeResults = {
+                        url: results.url,
+                        timestamp: results.timestamp,
+                        violations: results.violations.length,
+                        passes: results.passes.length,
+                        incomplete: results.incomplete.length,
+                        inapplicable: results.inapplicable.length
+                    };
+                },
+                
+                buildDescription: function(rule, node) {
+                    let description = rule.help || rule.description;
+                    if (node.failureSummary) {
+                        description += '\n\nDetails: ' + node.failureSummary;
+                    }
+                    if (node.html) {
+                        description += '\n\nElement: ' + node.html.substring(0, 100);
+                        if (node.html.length > 100) description += '...';
+                    }
+                    return description;
+                },
+                
+                buildRecommendation: function(rule) {
+                    return rule.help || 'Please refer to the help documentation for specific guidance on fixing this issue.';
+                },
+                
+                getElementFromNode: function(node) {
+                    if (node.target && node.target.length > 0) {
+                        try {
+                            return document.querySelector(node.target[0]);
+                        } catch (e) {
+                            return null;
+                        }
+                    }
+                    return null;
+                },
+                
+                addIssue: function(type, title, description, element, recommendation, helpUrl, impact, tags) {
+                    this.issues.push({
+                        type: type,
+                        title: title,
+                        description: description,
+                        element: element,
+                        recommendation: recommendation,
+                        helpUrl: helpUrl,
+                        impact: impact,
+                        tags: tags || []
+                    });
+                },
+                
+                displayResults: function() {
+                    const resultsDiv = document.getElementById('results');
+                    
+                    const counts = {
+                        error: this.issues.filter(i => i.type === 'error').length,
+                        warning: this.issues.filter(i => i.type === 'warning').length
+                    };
+                    
+                    let html = '<div style="background: white; border: 2px solid #c5050c; border-radius: 8px; padding: 1rem; margin: 1rem 0;">';
+                    html += '<h3 style="color: #c5050c; margin-bottom: 1rem;">🎓 Accessibility Test Results</h3>';
+                    html += '<p><strong>Total Issues Found:</strong> ' + this.issues.length + '</p>';
+                    html += '<p><span style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 12px; margin-right: 8px;">' + counts.error + '</span>Violations ';
+                    html += '<span style="background: #ffc107; color: #212529; padding: 2px 8px; border-radius: 12px; margin-left: 8px;">' + counts.warning + '</span>Manual Review</p>';
+                    
+                    if (this.issues.length === 0) {
+                        html += '<p style="color: #28a745; font-weight: bold;">🎉 No accessibility violations detected!</p>';
+                    } else {
+                        html += '<div style="margin-top: 1rem; max-height: 300px; overflow-y: auto;">';
+                        this.issues.forEach(function(issue, index) {
+                            const bgColor = issue.type === 'error' ? '#f8d7da' : '#fff3cd';
+                            const borderColor = issue.type === 'error' ? '#dc3545' : '#ffc107';
+                            
+                            html += '<div style="background: ' + bgColor + '; border-left: 4px solid ' + borderColor + '; padding: 0.5rem; margin: 0.5rem 0; border-radius: 0 4px 4px 0;">';
+                            html += '<strong>' + issue.title + '</strong><br>';
+                            html += '<small>' + issue.description.split('\n')[0] + '</small><br>';
+                            html += '<small><strong>Fix:</strong> ' + issue.recommendation + '</small>';
+                            if (issue.helpUrl) {
+                                html += '<br><small><a href="' + issue.helpUrl + '" target="_blank">Learn more ↗</a></small>';
+                            }
+                            html += '</div>';
+                        });
+                        html += '</div>';
+                    }
+                    
+                    html += '</div>';
+                    resultsDiv.innerHTML = html;
+                },
+                
+                remove: function() {
+                    // Clean up if needed
+                    delete window.uwAccessibilityChecker;
+                }
+            };
+            
+            // Start the test
+            window.uwAccessibilityChecker.init();
+        }
+        
+        // Simple axe test (like your working simple version)
+        function testSimpleAxe() {
+            if (!window.axe) {
+                alert('axe-core is not loaded on this page');
+                return;
+            }
+            
+            window.axe.run(document, {tags: ['wcag2a', 'wcag2aa', 'wcag21aa']}, function(err, results) {
+                if (err) {
+                    alert('Error: ' + err.message);
+                    return;
+                }
+                
+                const violations = results.violations.length;
+                const incomplete = results.incomplete.length;
+                const message = 'Violations: ' + violations + '\nNeeds review: ' + incomplete;
+                alert(message);
+            });
+        }
+    </script>
+</body>
+</html>

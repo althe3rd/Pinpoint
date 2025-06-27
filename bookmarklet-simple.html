@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UW Accessibility Checker Bookmarklet</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; margin: 0; }
+        .header { background: #c5050c; color: white; padding: 2rem 0; text-align: center; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .container { max-width: 800px; margin: 2rem auto; padding: 0 2rem; }
+        .card { background: white; border-radius: 8px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-left: 4px solid #c5050c; }
+        .card h2 { color: #c5050c; margin-bottom: 1rem; font-size: 1.5rem; }
+        .bookmarklet-container { background: #f8f9fa; border: 2px dashed #c5050c; border-radius: 8px; padding: 1.5rem; text-align: center; margin: 1rem 0; }
+        .bookmarklet { display: inline-block; background: #c5050c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 1.1rem; transition: all 0.3s ease; margin: 0.5rem; }
+        .bookmarklet:hover { background: #a00408; transform: translateY(-2px); }
+        .alert { background: #d1ecf1; border: 1px solid #bee5eb; border-radius: 6px; padding: 1rem; margin: 1rem 0; color: #0c5460; }
+        .alert.warning { background: #fff3cd; border-color: #ffeaa7; color: #856404; }
+        .footer { background: #333; color: white; text-align: center; padding: 2rem; margin-top: 3rem; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎓 UW Accessibility Checker</h1>
+        <p>Digital Accessibility Testing Tool for Faculty & Staff</p>
+    </div>
+    
+    <div class="container">
+        <div class="card">
+            <h2>📖 About This Tool</h2>
+            <p>The UW Accessibility Checker is a bookmarklet powered by <strong>axe-core</strong>, the industry-standard accessibility testing engine. This tool provides comprehensive WCAG 2.1 AA compliance testing for University of Wisconsin Faculty and Staff.</p>
+            
+            <div class="alert">
+                <strong>Powered by axe-core:</strong> Uses the same accessibility testing engine that powers popular tools throughout the industry, ensuring consistent and accurate results.
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>🚀 Installation Instructions</h2>
+            
+            <div class="alert warning">
+                <strong>Important:</strong> This bookmarklet loads external resources from CDN. If you're testing on a local server or behind a firewall, you may need to use a different approach.
+            </div>
+            
+            <div class="bookmarklet-container">
+                <h3>Method 1: Self-Contained Bookmarklet (Recommended)</h3>
+                <p>This version loads axe-core directly from CDN:</p>
+                <a href="javascript:(function(){'use strict';if(window.uwAccessibilityChecker){window.uwAccessibilityChecker.remove();return;}window.uwAccessibilityChecker={issues:[],axeLoaded:false,init:function(){this.showLoadingPanel();this.loadAxeCore();},showLoadingPanel:function(){var panel=document.createElement('div');panel.id='uw-a11y-panel';panel.innerHTML='<div id=\"uw-a11y-header\"><h2>🎓 UW Accessibility Checker</h2><button id=\"uw-a11y-close\">✕</button></div><div id=\"uw-a11y-content\"><div style=\"text-align: center; padding: 2rem;\"><div class=\"uw-a11y-spinner\"></div><p style=\"margin-top: 1rem;\">Loading axe-core accessibility engine...</p><p style=\"font-size: 0.9rem; color: #666;\">This may take a few seconds on first use.</p></div></div>';this.addStyles();document.body.appendChild(panel);var self=this;document.getElementById('uw-a11y-close').onclick=function(){self.remove();};},loadAxeCore:function(){if(window.axe){this.axeLoaded=true;this.runAxeChecks();return;}var script=document.createElement('script');var self=this;script.src='https://cdn.jsdelivr.net/npm/axe-core@4.8.2/axe.min.js';script.onload=function(){self.axeLoaded=true;self.runAxeChecks();};script.onerror=function(){self.showError('Failed to load axe-core. Please check your internet connection and try again.');};document.head.appendChild(script);},runAxeChecks:function(){if(!window.axe){this.showError('axe-core failed to load properly.');return;}var axeConfig={rules:{},tags:['wcag2a','wcag2aa','wcag21aa']};var self=this;window.axe.run(document,axeConfig,function(err,results){if(err){self.showError('Error running accessibility analysis: '+err.message);return;}self.processAxeResults(results);self.displayResults();});},processAxeResults:function(results){this.issues=[];var self=this;results.violations.forEach(function(violation){violation.nodes.forEach(function(node){self.addIssue('error',violation.description,self.buildDescription(violation,node),self.getElementFromNode(node),self.buildRecommendation(violation),violation.helpUrl,violation.impact||'serious',violation.tags);});});results.incomplete.forEach(function(incomplete){incomplete.nodes.forEach(function(node){self.addIssue('warning',incomplete.description,'Manual review needed: '+self.buildDescription(incomplete,node),self.getElementFromNode(node),self.buildRecommendation(incomplete),incomplete.helpUrl,incomplete.impact||'moderate',incomplete.tags);});});this.axeResults={url:results.url,timestamp:results.timestamp,toolOptions:results.toolOptions,violations:results.violations.length,passes:results.passes.length,incomplete:results.incomplete.length,inapplicable:results.inapplicable.length};},buildDescription:function(rule,node){var description=rule.help||rule.description;if(node.failureSummary){description+='\\n\\nDetails: '+node.failureSummary;}if(node.html){description+='\\n\\nElement: '+node.html.substring(0,100);if(node.html.length>100)description+='...';}return description;},buildRecommendation:function(rule){if(rule.help){return rule.help;}return 'Please refer to the help documentation for specific guidance on fixing this issue.';},getElementFromNode:function(node){if(node.target&&node.target.length>0){try{return document.querySelector(node.target[0]);}catch(e){return null;}}return null;},showError:function(message){var panel=document.getElementById('uw-a11y-panel');if(panel){var content=panel.querySelector('#uw-a11y-content');content.innerHTML='<div class=\"uw-a11y-issue error\" style=\"margin: 1rem;\"><h4>⚠️ Error Loading Accessibility Checker</h4><p>'+message+'</p><p><strong>Suggestions:</strong></p><ul><li>Check your internet connection</li><li>Try refreshing the page and running the bookmarklet again</li><li>Ensure your browser allows loading external scripts</li></ul></div>';}},createPanel:function(){var panel=document.getElementById('uw-a11y-panel');if(!panel){panel=document.createElement('div');panel.id='uw-a11y-panel';document.body.appendChild(panel);}panel.innerHTML='<div id=\"uw-a11y-header\"><h2>🎓 UW Accessibility Checker</h2><button id=\"uw-a11y-close\">✕</button></div><div id=\"uw-a11y-content\"><div id=\"uw-a11y-summary\"></div><div id=\"uw-a11y-results\"></div></div>';var self=this;document.getElementById('uw-a11y-close').onclick=function(){self.remove();};return panel;},addStyles:function(){if(document.getElementById('uw-a11y-styles'))return;var style=document.createElement('style');style.id='uw-a11y-styles';style.textContent='#uw-a11y-panel{position:fixed;top:20px;right:20px;width:450px;max-height:85vh;background:#ffffff;border:3px solid #c5050c;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.3);z-index:999999;font-family:Arial,sans-serif;font-size:14px;overflow:hidden;}#uw-a11y-header{background:#c5050c;color:white;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;}#uw-a11y-header h2{margin:0;font-size:16px;font-weight:bold;}#uw-a11y-close{background:none;border:none;color:white;font-size:18px;cursor:pointer;padding:0;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;}#uw-a11y-close:hover{background:rgba(255,255,255,0.2);}#uw-a11y-content{max-height:calc(85vh - 60px);overflow-y:auto;padding:16px;}#uw-a11y-summary{background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;padding:12px;margin-bottom:16px;}.uw-a11y-issue{margin-bottom:12px;padding:12px;border-left:4px solid #ffc107;background:#fff3cd;border-radius:0 4px 4px 0;cursor:pointer;}.uw-a11y-issue.error{border-left-color:#dc3545;background:#f8d7da;}.uw-a11y-issue.warning{border-left-color:#ffc107;background:#fff3cd;}.uw-a11y-issue.info{border-left-color:#17a2b8;background:#d1ecf1;}.uw-a11y-issue h4{margin:0 0 8px 0;font-size:14px;font-weight:bold;}.uw-a11y-issue p{margin:4px 0;line-height:1.4;}.uw-a11y-issue .issue-meta{font-size:12px;color:#666;margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.1);}.uw-a11y-issue .learn-more{color:#c5050c;text-decoration:none;font-size:12px;}.uw-a11y-issue .learn-more:hover{text-decoration:underline;}.uw-a11y-highlight{background:yellow !important;border:2px solid red !important;box-shadow:0 0 0 2px yellow !important;}.uw-a11y-count{font-weight:bold;padding:2px 8px;border-radius:12px;color:white;font-size:12px;margin-right:8px;}.count-error{background:#dc3545;}.count-warning{background:#ffc107;color:#212529;}.count-info{background:#17a2b8;}.uw-a11y-spinner{width:40px;height:40px;border:4px solid #f3f3f3;border-top:4px solid #c5050c;border-radius:50%;animation:uw-spin 1s linear infinite;margin:0 auto;}@keyframes uw-spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}.axe-summary{font-size:12px;color:#666;border-top:1px solid #dee2e6;padding-top:12px;margin-top:12px;}';document.head.appendChild(style);},addIssue:function(type,title,description,element,recommendation,helpUrl,impact,tags){this.issues.push({type:type,title:title,description:description,element:element,recommendation:recommendation,helpUrl:helpUrl,impact:impact,tags:tags||[]});},displayResults:function(){var panel=this.createPanel();var summary=document.getElementById('uw-a11y-summary');var results=document.getElementById('uw-a11y-results');var counts={error:this.issues.filter(function(i){return i.type==='error';}).length,warning:this.issues.filter(function(i){return i.type==='warning';}).length,info:this.issues.filter(function(i){return i.type==='info';}).length};summary.innerHTML='<h3>axe-core Accessibility Analysis</h3><p><strong>Total Issues Found:</strong> '+this.issues.length+'</p><div style=\"margin: 8px 0;\"><span class=\"uw-a11y-count count-error\">'+counts.error+'</span>Violations <span class=\"uw-a11y-count count-warning\">'+counts.warning+'</span>Manual Review</div><p><small>Click on any issue to highlight the element on the page.</small></p>'+(this.axeResults?'<div class=\"axe-summary\"><strong>Test Summary:</strong> '+this.axeResults.violations+' violations, '+this.axeResults.passes+' passes, '+this.axeResults.incomplete+' need review, '+this.axeResults.inapplicable+' not applicable<br><strong>Standard:</strong> WCAG 2.1 AA | <strong>Engine:</strong> axe-core</div>':'');if(this.issues.length===0){results.innerHTML='<div class=\"uw-a11y-issue info\"><h4>🎉 Excellent Accessibility!</h4><p>No accessibility violations detected by axe-core. Your page meets WCAG 2.1 AA automated testing standards.</p><p><strong>Next Steps:</strong> Consider manual testing with screen readers and keyboard navigation for complete accessibility validation.</p></div>';}else{var self=this;results.innerHTML=this.issues.map(function(issue,index){return '<div class=\"uw-a11y-issue '+issue.type+'\" onclick=\"window.uwAccessibilityChecker.highlightElement('+index+')\" style=\"cursor: '+(issue.element?'pointer':'default')+'\"><h4>'+issue.title+'</h4><p>'+issue.description.split('\\n')[0]+'</p><p><strong>How to fix:</strong> '+issue.recommendation+'</p><div class=\"issue-meta\"><strong>Impact:</strong> '+(issue.impact||'unknown')+' | <strong>Tags:</strong> '+issue.tags.join(', ')+(issue.helpUrl?'<br><a href=\"'+issue.helpUrl+'\" target=\"_blank\" class=\"learn-more\">Learn more about this rule ↗</a>':'')+'</div></div>';}).join('');}},highlightElement:function(issueIndex){document.querySelectorAll('.uw-a11y-highlight').forEach(function(el){el.classList.remove('uw-a11y-highlight');});var issue=this.issues[issueIndex];if(issue.element){issue.element.classList.add('uw-a11y-highlight');issue.element.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(function(){if(issue.element){issue.element.classList.remove('uw-a11y-highlight');}},3000);}},remove:function(){var panel=document.getElementById('uw-a11y-panel');if(panel)panel.remove();var styles=document.getElementById('uw-a11y-styles');if(styles)styles.remove();document.querySelectorAll('.uw-a11y-highlight').forEach(function(el){el.classList.remove('uw-a11y-highlight');});delete window.uwAccessibilityChecker;}};window.uwAccessibilityChecker.init();})();" class="bookmarklet">UW A11y Checker</a>
+                <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
+                    Click the button above to get the bookmarklet code, then save it as a bookmark
+                </p>
+                
+                <div style="margin: 1rem 0; padding: 1rem; background: #fff; border: 1px solid #ddd; border-radius: 4px;">
+                    <h4>Quick Setup Instructions:</h4>
+                    <ol style="text-align: left; margin-top: 0.5rem;">
+                        <li>Click the "Get UW A11y Checker" button above</li>
+                        <li>Copy the code from the alert dialog</li>
+                        <li>Create a new bookmark in your browser</li>
+                        <li>Paste the code as the URL</li>
+                        <li>Name it "UW A11y Checker"</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <ol>
+                <li>Show your bookmarks bar: <code>Ctrl+Shift+B</code> (Windows) or <code>Cmd+Shift+B</code> (Mac)</li>
+                <li>Drag the "UW A11y Checker" button above to your bookmarks bar</li>
+                <li>Visit any webpage and click the bookmark to test accessibility</li>
+            </ol>
+        </div>
+        
+        <div class="card">
+            <h2>🔧 Troubleshooting</h2>
+            <p>If you're getting errors, try these solutions:</p>
+            <ul>
+                <li><strong>Script loading error:</strong> Check your internet connection - the tool needs to download axe-core from CDN</li>
+                <li><strong>Nothing happening:</strong> Make sure JavaScript is enabled in your browser</li>
+                <li><strong>CSP violations:</strong> Some sites block external scripts - this is a security feature and expected</li>
+                <li><strong>Already running message:</strong> Refresh the page if you see this message</li>
+            </ul>
+            
+            <div class="alert warning">
+                <strong>Content Security Policy (CSP):</strong> Some websites block external scripts for security. If the bookmarklet doesn't work on a specific site, this is likely the cause.
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>🔍 Features</h2>
+            <ul>
+                <li><strong>axe-core Integration:</strong> Industry-standard accessibility testing</li>
+                <li><strong>WCAG 2.1 AA Compliance:</strong> Tests against current standards</li>
+                <li><strong>Violations:</strong> Issues that must be fixed</li>
+                <li><strong>Manual Review:</strong> Items requiring human judgment</li>
+                <li><strong>Impact Assessment:</strong> Severity levels for prioritization</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>📚 How to Use</h2>
+            <ol>
+                <li>Navigate to any webpage you want to test</li>
+                <li>Click the "UW A11y Checker" bookmark</li>
+                <li>Wait for axe-core to load and analyze the page (3-5 seconds)</li>
+                <li>Review violations (must fix) and manual review items</li>
+                <li>Follow axe-core recommendations to fix accessibility issues</li>
+            </ol>
+            
+            <div class="alert">
+                <strong>Results:</strong> Violations are definite failures that must be fixed. Manual review items require human judgment and testing.
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>🎯 Best Practices</h2>
+            <ul>
+                <li>Run this tool on all your web pages before publishing</li>
+                <li>Fix all identified violations</li>
+                <li>Address manual review items when applicable</li>
+                <li>Test keyboard navigation manually</li>
+                <li>Verify with screen readers when possible</li>
+            </ul>
+            
+            <h3>UW Resources:</h3>
+            <ul>
+                <li><a href="https://www.wisconsin.edu/accessibility/" target="_blank">UW System Accessibility Guidelines</a></li>
+                <li><a href="https://www.doit.wisc.edu/accessibility/" target="_blank">UW-Madison Accessibility Resources</a></li>
+                <li><a href="https://www.deque.com/axe/" target="_blank">About axe-core</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem;">University of Wisconsin System</div>
+        <p>Digital Accessibility Initiative</p>
+        <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">
+            Powered by axe-core accessibility testing engine
+        </p>
+    </div>
+</body>
+</html> 

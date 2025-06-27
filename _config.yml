@@ -1,0 +1,72 @@
+# GitHub Pages Configuration
+title: UW Accessibility Checker
+description: A powerful accessibility testing bookmarklet powered by axe-core for University of Wisconsin faculty and staff
+author: University of Wisconsin System
+email: accessibility@wisconsin.edu
+
+# GitHub Pages specific settings
+github:
+  is_project_page: true
+
+# Theme (optional - GitHub Pages will use default if not specified)
+# theme: jekyll-theme-minimal
+
+# Custom domain (uncomment and modify if you have a custom domain)
+# url: "https://your-domain.com"
+
+# Base URL for GitHub Pages (usually your repository name)
+baseurl: "/TestMark"
+
+# Exclude files from processing
+exclude:
+  - README.md
+  - .gitignore
+  - .git/
+  - .DS_Store
+
+# Include files that start with underscores
+include:
+  - _config.yml
+
+# Markdown processor
+markdown: kramdown
+
+# Syntax highlighting
+highlighter: rouge
+
+# Plugins (GitHub Pages supports these by default)
+plugins:
+  - jekyll-default-layout
+  - jekyll-optional-front-matter
+  - jekyll-readme-index
+  - jekyll-titles-from-headings
+
+# SEO and metadata
+lang: en-US
+timezone: America/Chicago
+
+# Navigation and structure
+navigation:
+  - title: Home
+    url: /
+  - title: Local Testing
+    url: /local-test.html
+  - title: Simple Version
+    url: /bookmarklet-simple.html
+
+# Social and institutional information
+organization:
+  name: University of Wisconsin System
+  url: https://www.wisconsin.edu/
+  accessibility_url: https://www.wisconsin.edu/accessibility/
+
+# Tool information
+tool:
+  name: UW Accessibility Checker
+  version: "1.0"
+  powered_by: axe-core
+  standards:
+    - WCAG 2.0 Level A
+    - WCAG 2.0 Level AA
+    - WCAG 2.1 Level AA
+    - Section 508

@@ -126,9 +126,20 @@
             });
             
                     // Process incomplete items (warnings) with unique IDs for tracking
+        console.log('DEBUG: Processing incomplete items from axe:', results.incomplete.length);
         results.incomplete.forEach((incomplete, incompleteIndex) => {
+            console.log(`DEBUG: Incomplete item ${incompleteIndex}:`, {
+                id: incomplete.id,
+                description: incomplete.description,
+                nodeCount: incomplete.nodes.length,
+                impact: incomplete.impact,
+                tags: incomplete.tags
+            });
+            
             incomplete.nodes.forEach((node, nodeIndex) => {
                 const uniqueId = `incomplete-${incompleteIndex}-${nodeIndex}`;
+                console.log(`DEBUG: Adding manual review issue ${uniqueId} for rule ${incomplete.id}`);
+                
                 this.addIssue(
                     'warning',
                     incomplete.description,
@@ -142,8 +153,11 @@
                 );
                 // Store the unique ID for this manual review item
                 this.issues[this.issues.length - 1].uniqueId = uniqueId;
+                console.log('DEBUG: Added issue, total count now:', this.issues.length);
             });
         });
+        
+        console.log('DEBUG: Final issue count after processing incomplete items:', this.issues.length);
             
             // Store the original results for score recalculation
             this.originalAxeResults = results;
@@ -883,12 +897,31 @@
             this.loadMinimizeState();
             
             // Count issues by type
+            console.log('DEBUG: Starting issue count analysis');
+            console.log('DEBUG: Total issues:', this.issues.length);
+            console.log('DEBUG: Original axe results:', this.axeResults);
+            
+            // Log all issues to see their structure
+            this.issues.forEach((issue, index) => {
+                console.log(`DEBUG: Issue ${index}:`, {
+                    type: issue.type,
+                    title: issue.title,
+                    impact: issue.impact,
+                    tags: issue.tags,
+                    uniqueId: issue.uniqueId,
+                    hasCheckbox: issue.type === 'warning' && issue.uniqueId
+                });
+            });
+            
             const counts = {
                 error: this.issues.filter(i => i.type === 'error').length,
                 warning: this.issues.filter(i => i.type === 'warning').length,
                 warningChecked: this.issues.filter(i => i.type === 'warning' && i.uniqueId && this.checkedItems.has(i.uniqueId)).length,
                 info: this.issues.filter(i => i.type === 'info').length
             };
+            
+            console.log('DEBUG: Calculated counts:', counts);
+            console.log('DEBUG: Expected manual review count from axe:', this.axeResults?.incomplete || 0);
             
             // Get accessibility score
             const scoreData = this.axeResults ? this.axeResults.score : null;

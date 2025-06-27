@@ -58,9 +58,28 @@ If you prefer to build manually:
 1. Modify `accessibility-checker.js`
 2. Run `npm run build`
 3. The build process will:
-   - Minify your code (typically 70-80% size reduction)
+   - Minify your code (typically 35-40% size reduction)
    - Update `accessibility-checker.min.js`
    - Update the embedded code in `index.html`
+
+### Automated Deployment
+
+The project includes a GitHub Actions workflow (`.github/workflows/build-and-deploy.yml`) that automatically:
+
+- **Runs on every push to main branch**
+- Installs dependencies and executes `npm run build`
+- Deploys the built files to GitHub Pages
+
+This ensures that:
+- The deployed site always has the latest minified bookmarklet
+- Manual build steps are never forgotten before deployment
+- The live site reflects the current source code
+
+**Benefits:**
+- ✅ No manual build steps required before deployment
+- ✅ Guaranteed fresh build on every deployment
+- ✅ Automatic GitHub Pages deployment
+- ✅ Clean workflow without additional commits
 
 ## File Structure
 

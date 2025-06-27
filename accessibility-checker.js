@@ -1106,7 +1106,7 @@
             // Update the counts
             const counts = {
                 error: this.issues.filter(i => i.type === 'error').length,
-                warning: this.issues.filter(i => i.type === 'warning').length,
+                warning: this.issues.filter(i => i.type === 'warning' && i.uniqueId).length, // Only count manual review items with uniqueId
                 warningChecked: this.issues.filter(i => i.type === 'warning' && i.uniqueId && this.checkedItems.has(i.uniqueId)).length
             };
             

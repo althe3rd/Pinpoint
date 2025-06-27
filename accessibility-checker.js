@@ -9,6 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
+            version: '1.3.0', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -16,6 +17,7 @@
         
         // Initialize the checker
         init: function() {
+            this.checkForUpdates();
             this.showLoadingPanel();
             this.loadAxeCore();
         },
@@ -947,7 +949,7 @@
                         <strong>Test Summary:</strong> ${this.axeResults.violations} violations, 
                         ${this.axeResults.passes} passes, ${this.axeResults.incomplete} need review, 
                         ${this.axeResults.inapplicable} not applicable<br>
-                        <strong>Standard:</strong> WCAG 2.1 AA | <strong>Engine:</strong> axe-core
+                        <strong>Standard:</strong> WCAG 2.1 AA | <strong>Engine:</strong> axe-core | <strong>Checker:</strong> v${this.version}
                     </div>
                 ` : ''}
             `;
@@ -1365,6 +1367,79 @@
             } catch (e) {
                 console.warn('Could not load minimize state from sessionStorage:', e);
             }
+        },
+
+        // Check for updates
+        checkForUpdates: function() {
+            // Only check once per session to avoid spam
+            if (sessionStorage.getItem('uw-a11y-update-checked')) {
+                return;
+            }
+            
+            sessionStorage.setItem('uw-a11y-update-checked', 'true');
+            
+            // Fetch latest version info from GitHub
+            fetch('https://api.github.com/repos/alnemec/TestMark/releases/latest')
+                .then(response => response.json())
+                .then(data => {
+                    const latestVersion = data.tag_name.replace('v', '');
+                    if (this.compareVersions(latestVersion, this.version) > 0) {
+                        this.showUpdateNotification(latestVersion, data.html_url);
+                    }
+                })
+                .catch(error => {
+                    // Silently fail - don't bother users with update check errors
+                    console.log('Update check failed:', error);
+                });
+        },
+
+        // Compare version strings (returns 1 if a > b, -1 if a < b, 0 if equal)
+        compareVersions: function(a, b) {
+            const partsA = a.split('.').map(Number);
+            const partsB = b.split('.').map(Number);
+            
+            for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+                const partA = partsA[i] || 0;
+                const partB = partsB[i] || 0;
+                
+                if (partA > partB) return 1;
+                if (partA < partB) return -1;
+            }
+            return 0;
+        },
+
+        // Show update notification
+        showUpdateNotification: function(newVersion, releaseUrl) {
+            const notification = document.createElement('div');
+            notification.id = 'uw-a11y-update-notification';
+            notification.innerHTML = `
+                <div style="background: #28a745; color: white; padding: 10px; border-radius: 4px; margin-bottom: 10px; font-size: 13px;">
+                    <strong>📢 Update Available!</strong><br>
+                    A new version (v${newVersion}) of the Pinpoint Accessibility Checker is available.<br>
+                    Current version: v${this.version}<br>
+                    <div style="margin-top: 8px;">
+                        <a href="${releaseUrl}" target="_blank" style="color: #ffffff; text-decoration: underline;">
+                            View release notes →
+                        </a>
+                        <span style="margin: 0 8px;">|</span>
+                        <a href="https://alnemec.github.io/TestMark/" target="_blank" style="color: #ffffff; text-decoration: underline;">
+                            Get latest bookmarklet →
+                        </a>
+                        <button onclick="this.parentElement.parentElement.style.display='none'" 
+                                style="float: right; background: none; border: 1px solid white; color: white; border-radius: 2px; padding: 2px 6px; cursor: pointer; font-size: 11px;">
+                            ✕
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Insert at the top of the summary section
+            setTimeout(() => {
+                const summary = document.getElementById('uw-a11y-summary');
+                if (summary) {
+                    summary.insertBefore(notification, summary.firstChild);
+                }
+            }, 500);
         },
 
 

@@ -112,12 +112,57 @@ The checker also automatically excludes its own UI elements from analysis:
 
 To modify which rules or elements are excluded, edit the `axeConfig` object in `accessibility-checker.js` and rebuild.
 
+## Version Management & Updates
+
+### Automatic Update Notifications
+The bookmarklet includes an automatic update notification system:
+- Checks for new releases on GitHub (once per browser session)
+- Shows a notification banner when updates are available
+- Provides direct links to release notes and the latest bookmarklet
+
+### Creating Releases
+When you're ready to release a new version:
+
+1. **Update version**: Increment the version number in `accessibility-checker.js`:
+   ```javascript
+   version: '1.4.0', // Update this
+   ```
+
+2. **Build and commit**: 
+   ```bash
+   npm run build
+   git add -A
+   git commit -m "Release v1.4.0"
+   ```
+
+3. **Create release tag**:
+   ```bash
+   git tag v1.4.0
+   git push origin v1.4.0
+   ```
+
+4. **Automatic release**: GitHub Actions will automatically create a release with the tag
+
+### Update Methods Available to Users
+
+1. **Automatic notification** (recommended): Users get notified in the checker UI
+2. **Manual check**: Users can visit the GitHub releases page
+3. **Bookmark replacement**: Users can re-drag the bookmarklet from the website
+4. **Force update**: Users can delete their bookmark and recreate it
+
+### Benefits of This System
+- ✅ Non-intrusive notifications (once per session)
+- ✅ Direct links to release notes and updates  
+- ✅ Version tracking in the UI
+- ✅ Automatic release creation via GitHub Actions
+
 ## Contributing
 
 1. Make changes to `accessibility-checker.js`
-2. Run `npm run build` to update generated files
-3. Test your changes
-4. Submit a pull request
+2. Update the version number if creating a release
+3. Run `npm run build` to update generated files
+4. Test your changes
+5. Submit a pull request
 
 ## License
 

@@ -1,0 +1,59 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build
+      run: npm run build
+      
+    - name: Extract version from tag
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.get_version.outputs.VERSION }}
+        release_name: Pinpoint Accessibility Checker ${{ steps.get_version.outputs.VERSION }}
+        body: |
+          ## Changes in ${{ steps.get_version.outputs.VERSION }}
+          
+          ### New Features
+          - [List new features here]
+          
+          ### Bug Fixes
+          - [List bug fixes here]
+          
+          ### Improvements
+          - [List improvements here]
+          
+          ## Installation
+          
+          Visit [Pinpoint Accessibility Checker](https://alnemec.github.io/TestMark/) to get the latest bookmarklet.
+          
+          ## What's Changed
+          
+          Full changelog: https://github.com/alnemec/TestMark/compare/v1.2.0...${{ steps.get_version.outputs.VERSION }}
+        draft: false
+        prerelease: false 

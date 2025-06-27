@@ -883,12 +883,31 @@
             this.loadMinimizeState();
             
             // Count issues by type
+            // Debug: Log all issues to understand the categorization
+            console.log('=== DEBUGGING ISSUE CATEGORIZATION ===');
+            console.log('Total issues:', this.issues.length);
+            console.log('Axe incomplete count:', this.axeResults?.incomplete || 0);
+            
+            this.issues.forEach((issue, index) => {
+                console.log(`Issue ${index}:`, {
+                    type: issue.type,
+                    hasUniqueId: !!issue.uniqueId,
+                    uniqueId: issue.uniqueId,
+                    title: issue.title?.substring(0, 50) + '...',
+                    impact: issue.impact
+                });
+            });
+            
             const counts = {
                 error: this.issues.filter(i => i.type === 'error').length,
                 warning: this.issues.filter(i => i.type === 'warning' && i.uniqueId).length, // Only count manual review items with uniqueId
                 warningChecked: this.issues.filter(i => i.type === 'warning' && i.uniqueId && this.checkedItems.has(i.uniqueId)).length,
                 info: this.issues.filter(i => i.type === 'info').length
             };
+            
+            console.log('Calculated counts:', counts);
+            console.log('Expected warning count (from axe):', this.axeResults?.incomplete || 0);
+            console.log('=== END DEBUG ===');
             
             // Get accessibility score
             const scoreData = this.axeResults ? this.axeResults.score : null;

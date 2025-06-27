@@ -107,7 +107,8 @@
                         this.buildRecommendation(violation),
                         violation.helpUrl,
                         violation.impact || 'serious',
-                        violation.tags
+                        violation.tags,
+                        this.buildDetailedInfo(violation, node)
                     );
                 });
             });
@@ -123,12 +124,13 @@
                         this.buildRecommendation(incomplete),
                         incomplete.helpUrl,
                         incomplete.impact || 'moderate',
-                        incomplete.tags
+                        incomplete.tags,
+                        this.buildDetailedInfo(incomplete, node)
                     );
                 });
             });
             
-            // Add summary information
+            // Add summary information and calculate score
             this.axeResults = {
                 url: results.url,
                 timestamp: results.timestamp,
@@ -136,7 +138,8 @@
                 violations: results.violations.length,
                 passes: results.passes.length,
                 incomplete: results.incomplete.length,
-                inapplicable: results.inapplicable.length
+                inapplicable: results.inapplicable.length,
+                score: this.calculateAccessibilityScore(results)
             };
         },
         
@@ -176,6 +179,251 @@
                 }
             }
             return null;
+        },
+        
+        // Build detailed technical information about the issue
+        buildDetailedInfo: function(rule, node) {
+            const details = [];
+            
+            // Add HTML source context with line number estimation
+            if (node.html) {
+                details.push({
+                    type: 'html',
+                    label: 'HTML Source',
+                    value: node.html
+                });
+                
+                // Try to estimate line number
+                const lineNumber = this.estimateLineNumber(node.html);
+                if (lineNumber > 0) {
+                    details.push({
+                        type: 'line',
+                        label: 'Approximate Line',
+                        value: lineNumber
+                    });
+                }
+            }
+            
+            // Add CSS selector
+            if (node.target && node.target[0]) {
+                details.push({
+                    type: 'selector',
+                    label: 'CSS Selector',
+                    value: node.target[0]
+                });
+            }
+            
+            // Add specific rule-based details
+            if (rule.id === 'color-contrast') {
+                const colorInfo = this.extractColorContrastInfo(node);
+                if (colorInfo) {
+                    details.push({
+                        type: 'colors',
+                        label: 'Color Information',
+                        value: colorInfo
+                    });
+                }
+            }
+            
+            if (rule.id.includes('landmark') || rule.id.includes('region')) {
+                details.push({
+                    type: 'landmarks',
+                    label: 'Landmark Context',
+                    value: this.analyzeLandmarkContext(node)
+                });
+            }
+            
+            if (rule.id.includes('heading')) {
+                details.push({
+                    type: 'headings',
+                    label: 'Heading Structure',
+                    value: this.analyzeHeadingStructure(node)
+                });
+            }
+            
+            // Add failure summary details
+            if (node.failureSummary) {
+                details.push({
+                    type: 'failure',
+                    label: 'Technical Details',
+                    value: node.failureSummary
+                });
+            }
+            
+            // Add any additional data from axe
+            if (node.any && node.any.length > 0) {
+                const anyDetails = node.any.map(item => item.message || item.id).filter(Boolean);
+                if (anyDetails.length > 0) {
+                    details.push({
+                        type: 'checks',
+                        label: 'Failed Checks',
+                        value: anyDetails.join(', ')
+                    });
+                }
+            }
+            
+            return details;
+        },
+        
+        // Estimate line number by counting newlines in document
+        estimateLineNumber: function(htmlSnippet) {
+            try {
+                const documentHTML = document.documentElement.outerHTML;
+                const index = documentHTML.indexOf(htmlSnippet.substring(0, 50));
+                if (index > -1) {
+                    const beforeSnippet = documentHTML.substring(0, index);
+                    return beforeSnippet.split('\n').length;
+                }
+            } catch (e) {
+                // Fallback: return 0 if estimation fails
+            }
+            return 0;
+        },
+        
+        // Extract color contrast information
+        extractColorContrastInfo: function(node) {
+            try {
+                const element = this.getElementFromNode(node);
+                if (!element) return null;
+                
+                const styles = window.getComputedStyle(element);
+                const fgColor = styles.color;
+                const bgColor = styles.backgroundColor;
+                
+                // Calculate contrast ratio if possible
+                const contrast = this.calculateContrastRatio(fgColor, bgColor);
+                
+                return {
+                    foreground: fgColor,
+                    background: bgColor,
+                    contrast: contrast ? contrast.toFixed(2) + ':1' : 'Unable to calculate',
+                    required: 'WCAG AA requires 4.5:1 for normal text, 3:1 for large text'
+                };
+            } catch (e) {
+                return null;
+            }
+        },
+        
+        // Simple contrast ratio calculation
+        calculateContrastRatio: function(fg, bg) {
+            try {
+                // This is a simplified version - in practice you'd want a more robust color parser
+                const fgLuminance = this.getLuminance(fg);
+                const bgLuminance = this.getLuminance(bg);
+                
+                if (fgLuminance === null || bgLuminance === null) return null;
+                
+                const lighter = Math.max(fgLuminance, bgLuminance);
+                const darker = Math.min(fgLuminance, bgLuminance);
+                
+                return (lighter + 0.05) / (darker + 0.05);
+            } catch (e) {
+                return null;
+            }
+        },
+        
+        // Get relative luminance (simplified)
+        getLuminance: function(color) {
+            // This is a very simplified version - would need more robust color parsing for production
+            try {
+                if (color.startsWith('rgb')) {
+                    const values = color.match(/\d+/g);
+                    if (values && values.length >= 3) {
+                        const r = parseInt(values[0]) / 255;
+                        const g = parseInt(values[1]) / 255;
+                        const b = parseInt(values[2]) / 255;
+                        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+                    }
+                }
+            } catch (e) {
+                // Return null if calculation fails
+            }
+            return null;
+        },
+        
+        // Analyze landmark context
+        analyzeLandmarkContext: function(node) {
+            try {
+                const element = this.getElementFromNode(node);
+                if (!element) return 'Element not found';
+                
+                const landmarks = document.querySelectorAll('main, nav, header, footer, aside, section[aria-label], section[aria-labelledby], [role="banner"], [role="navigation"], [role="main"], [role="contentinfo"], [role="complementary"]');
+                
+                return `Found ${landmarks.length} landmarks on page. Current element: ${element.tagName.toLowerCase()}${element.getAttribute('role') ? ' (role="' + element.getAttribute('role') + '")' : ''}`;
+            } catch (e) {
+                return 'Unable to analyze landmark context';
+            }
+        },
+        
+        // Analyze heading structure
+        analyzeHeadingStructure: function(node) {
+            try {
+                const element = this.getElementFromNode(node);
+                if (!element) return 'Element not found';
+                
+                const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+                const currentIndex = headings.indexOf(element);
+                const currentLevel = parseInt(element.tagName.charAt(1));
+                
+                let context = `Current: ${element.tagName} "${element.textContent.substring(0, 50)}"`;
+                
+                if (currentIndex > 0) {
+                    const prevHeading = headings[currentIndex - 1];
+                    const prevLevel = parseInt(prevHeading.tagName.charAt(1));
+                    context += `\nPrevious: ${prevHeading.tagName} (level ${prevLevel})`;
+                    
+                    if (currentLevel > prevLevel + 1) {
+                        context += `\nIssue: Skipped from H${prevLevel} to H${currentLevel}`;
+                    }
+                }
+                
+                return context;
+            } catch (e) {
+                return 'Unable to analyze heading structure';
+            }
+        },
+        
+        // Calculate accessibility score
+        calculateAccessibilityScore: function(results) {
+            // Weight different types of issues
+            const weights = {
+                critical: 10,
+                serious: 7,
+                moderate: 3,
+                minor: 1
+            };
+            
+            let totalDeductions = 0;
+            let totalPossible = results.passes.length + results.violations.length + results.incomplete.length;
+            
+            // Calculate deductions for violations
+            results.violations.forEach(violation => {
+                const weight = weights[violation.impact] || weights.moderate;
+                totalDeductions += violation.nodes.length * weight;
+            });
+            
+            // Calculate deductions for incomplete items (less severe)
+            results.incomplete.forEach(incomplete => {
+                const weight = (weights[incomplete.impact] || weights.moderate) * 0.5;
+                totalDeductions += incomplete.nodes.length * weight;
+            });
+            
+            // Calculate score (0-100)
+            if (totalPossible === 0) return 100; // No tests run
+            
+            const maxPossibleDeductions = totalPossible * weights.critical;
+            const score = Math.max(0, Math.round(100 - (totalDeductions / maxPossibleDeductions) * 100));
+            
+            return {
+                score: score,
+                deductions: totalDeductions,
+                maxPossible: maxPossibleDeductions,
+                details: {
+                    violations: results.violations.length,
+                    incomplete: results.incomplete.length,
+                    passes: results.passes.length
+                }
+            };
         },
         
         // Show error message
@@ -368,11 +616,95 @@
                     padding-top: 12px;
                     margin-top: 12px;
                 }
+                .uw-a11y-score-container {
+                    text-align: center;
+                    margin: 1rem 0;
+                    padding: 1rem;
+                    background: #f8f9fa;
+                    border-radius: 8px;
+                    border: 2px solid #e9ecef;
+                }
+                .uw-a11y-score-dial {
+                    position: relative;
+                    width: 120px;
+                    height: 120px;
+                    margin: 0 auto 1rem auto;
+                }
+                .uw-a11y-score-circle {
+                    width: 120px;
+                    height: 120px;
+                    border-radius: 50%;
+                    background: conic-gradient(from 0deg, #28a745 0deg 0deg, #e9ecef 0deg 360deg);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                }
+                .uw-a11y-score-inner {
+                    width: 90px;
+                    height: 90px;
+                    background: white;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-direction: column;
+                    font-weight: bold;
+                }
+                .uw-a11y-score-number {
+                    font-size: 24px;
+                    color: #333;
+                }
+                .uw-a11y-score-label {
+                    font-size: 10px;
+                    color: #666;
+                    text-transform: uppercase;
+                }
+                .uw-a11y-details {
+                    margin-top: 1rem;
+                    padding: 0.5rem;
+                    background: #f1f3f4;
+                    border-left: 3px solid #007cba;
+                    border-radius: 0 4px 4px 0;
+                    font-size: 12px;
+                    display: none;
+                }
+                .uw-a11y-details.expanded {
+                    display: block;
+                }
+                .uw-a11y-details-toggle {
+                    background: none;
+                    border: none;
+                    color: #007cba;
+                    cursor: pointer;
+                    font-size: 12px;
+                    text-decoration: underline;
+                    padding: 0;
+                    margin-top: 0.5rem;
+                }
+                .uw-a11y-details-item {
+                    margin: 0.5rem 0;
+                    padding: 0.5rem;
+                    background: white;
+                    border-radius: 3px;
+                }
+                .uw-a11y-details-label {
+                    font-weight: bold;
+                    color: #495057;
+                }
+                .uw-a11y-details-value {
+                    font-family: monospace;
+                    background: #f8f9fa;
+                    padding: 0.25rem;
+                    border-radius: 2px;
+                    margin-top: 0.25rem;
+                    word-break: break-all;
+                }
             `;
             document.head.appendChild(style);
         },
         
-        addIssue: function(type, title, description, element, recommendation, helpUrl, impact, tags) {
+        addIssue: function(type, title, description, element, recommendation, helpUrl, impact, tags, detailedInfo) {
             this.issues.push({
                 type: type,
                 title: title,
@@ -381,7 +713,8 @@
                 recommendation: recommendation,
                 helpUrl: helpUrl,
                 impact: impact,
-                tags: tags || []
+                tags: tags || [],
+                detailedInfo: detailedInfo || []
             });
         },
         
@@ -397,8 +730,12 @@
                 info: this.issues.filter(i => i.type === 'info').length
             };
             
-            // Display summary
+            // Get accessibility score
+            const scoreData = this.axeResults ? this.axeResults.score : null;
+            
+            // Display summary with score dial
             summary.innerHTML = `
+                ${scoreData ? this.renderScoreDial(scoreData) : ''}
                 <h3>axe-core Accessibility Analysis</h3>
                 <p><strong>Total Issues Found:</strong> ${this.issues.length}</p>
                 <div style="margin: 8px 0;">
@@ -431,6 +768,14 @@
                         <h4>${issue.title}</h4>
                         <p>${issue.description.split('\n')[0]}</p>
                         <p><strong>How to fix:</strong> ${issue.recommendation}</p>
+                        ${issue.detailedInfo && issue.detailedInfo.length > 0 ? `
+                            <button class="uw-a11y-details-toggle" onclick="window.uwAccessibilityChecker.toggleDetails(${index}); event.stopPropagation();">
+                                Show technical details
+                            </button>
+                            <div class="uw-a11y-details" id="details-${index}">
+                                ${this.renderDetailedInfo(issue.detailedInfo)}
+                            </div>
+                        ` : ''}
                         <div class="issue-meta">
                             <strong>Impact:</strong> ${issue.impact || 'unknown'} | 
                             <strong>Tags:</strong> ${issue.tags.join(', ')}
@@ -458,6 +803,75 @@
                         issue.element.classList.remove('uw-a11y-highlight');
                     }
                 }, 3000);
+            }
+        },
+        
+        // Render the accessibility score dial
+        renderScoreDial: function(scoreData) {
+            const score = scoreData.score;
+            const percentage = (score / 100) * 360; // Convert to degrees
+            const color = score >= 90 ? '#28a745' : score >= 70 ? '#ffc107' : score >= 50 ? '#fd7e14' : '#dc3545';
+            
+            return `
+                <div class="uw-a11y-score-container">
+                    <div class="uw-a11y-score-dial">
+                        <div class="uw-a11y-score-circle" style="background: conic-gradient(from 0deg, ${color} 0deg ${percentage}deg, #e9ecef ${percentage}deg 360deg);">
+                            <div class="uw-a11y-score-inner">
+                                <div class="uw-a11y-score-number">${score}</div>
+                                <div class="uw-a11y-score-label">Score</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-size: 14px;">
+                        <strong>Accessibility Score:</strong> ${score}/100<br>
+                        <span style="font-size: 12px; color: #666;">
+                            ${score >= 90 ? 'Excellent accessibility!' : 
+                              score >= 70 ? 'Good accessibility with room for improvement' : 
+                              score >= 50 ? 'Fair accessibility - several issues to address' : 
+                              'Poor accessibility - immediate attention needed'}
+                        </span>
+                    </div>
+                </div>
+            `;
+        },
+        
+        // Render detailed technical information
+        renderDetailedInfo: function(detailedInfo) {
+            return detailedInfo.map(detail => {
+                let value = detail.value;
+                
+                // Special formatting for different types
+                if (detail.type === 'colors' && typeof value === 'object') {
+                    value = `
+                        <div style="margin: 0.5rem 0;">
+                            <div><strong>Foreground:</strong> <span style="background: ${value.foreground}; color: white; padding: 2px 6px; border-radius: 2px;">${value.foreground}</span></div>
+                            <div><strong>Background:</strong> <span style="background: ${value.background}; border: 1px solid #ccc; padding: 2px 6px; border-radius: 2px;">${value.background}</span></div>
+                            <div><strong>Contrast Ratio:</strong> ${value.contrast}</div>
+                            <div><strong>Requirement:</strong> ${value.required}</div>
+                        </div>
+                    `;
+                }
+                
+                return `
+                    <div class="uw-a11y-details-item">
+                        <div class="uw-a11y-details-label">${detail.label}:</div>
+                        <div class="uw-a11y-details-value">${value}</div>
+                    </div>
+                `;
+            }).join('');
+        },
+        
+        // Toggle detailed information display
+        toggleDetails: function(issueIndex) {
+            const detailsElement = document.getElementById(`details-${issueIndex}`);
+            const button = detailsElement.previousElementSibling;
+            
+            if (detailsElement.classList.contains('expanded')) {
+                detailsElement.classList.remove('expanded');
+                button.textContent = 'Show technical details';
+            } else {
+                detailsElement.classList.add('expanded');
+                button.textContent = 'Hide technical details';
             }
         },
         

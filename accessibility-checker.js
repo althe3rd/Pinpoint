@@ -12,6 +12,7 @@
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
+            isMinimized: false, // Track minimized state
         
         // Initialize the checker
         init: function() {
@@ -143,6 +144,9 @@
                 this.issues[this.issues.length - 1].uniqueId = uniqueId;
             });
         });
+            
+            // Store the original results for score recalculation
+            this.originalAxeResults = results;
             
             // Add summary information and calculate score
             this.axeResults = {
@@ -397,7 +401,7 @@
             }
         },
         
-        // Calculate accessibility score
+        // Calculate accessibility score (considering manually verified items)
         calculateAccessibilityScore: function(results) {
             // Weight different types of issues
             const weights = {
@@ -410,20 +414,44 @@
             let totalDeductions = 0;
             let totalPossible = results.passes.length + results.violations.length + results.incomplete.length;
             
-            // Calculate deductions for violations
+            // Calculate deductions for violations (errors)
             results.violations.forEach(violation => {
                 const weight = weights[violation.impact] || weights.moderate;
                 totalDeductions += violation.nodes.length * weight;
             });
             
-            // Calculate deductions for incomplete items (less severe)
-            results.incomplete.forEach(incomplete => {
-                const weight = (weights[incomplete.impact] || weights.moderate) * 0.5;
-                totalDeductions += incomplete.nodes.length * weight;
+            // Calculate deductions for incomplete items, considering manually verified status
+            let incompleteDeductions = 0;
+            let totalManualReview = 0;
+            let verifiedCount = 0;
+            
+            results.incomplete.forEach((incomplete, incompleteIndex) => {
+                incomplete.nodes.forEach((node, nodeIndex) => {
+                    totalManualReview++;
+                    const uniqueId = `incomplete-${incompleteIndex}-${nodeIndex}`;
+                    
+                    // If item is manually verified, don't count it as a deduction
+                    if (this.checkedItems && this.checkedItems.has(uniqueId)) {
+                        verifiedCount++;
+                        // No deduction for verified items
+                    } else {
+                        // Half weight for unverified manual review items
+                        const weight = (weights[incomplete.impact] || weights.moderate) * 0.5;
+                        incompleteDeductions += weight;
+                    }
+                });
             });
             
+            totalDeductions += incompleteDeductions;
+            
             // Calculate score (0-100)
-            if (totalPossible === 0) return 100; // No tests run
+            if (totalPossible === 0) return {
+                score: 100,
+                deductions: 0,
+                maxPossible: 0,
+                verifiedCount: 0,
+                totalManualReview: 0
+            };
             
             const maxPossibleDeductions = totalPossible * weights.critical;
             const score = Math.max(0, Math.round(100 - (totalDeductions / maxPossibleDeductions) * 100));
@@ -432,6 +460,8 @@
                 score: score,
                 deductions: totalDeductions,
                 maxPossible: maxPossibleDeductions,
+                verifiedCount: verifiedCount,
+                totalManualReview: totalManualReview,
                 details: {
                     violations: results.violations.length,
                     incomplete: results.incomplete.length,
@@ -472,7 +502,10 @@
             panel.innerHTML = `
                 <div id="uw-a11y-header">
                     <h2>Pinpoint Accessibility Checker</h2>
-                    <button id="uw-a11y-close">✕</button>
+                    <div class="uw-a11y-header-buttons">
+                        <button id="uw-a11y-minimize" title="Minimize">−</button>
+                        <button id="uw-a11y-close" title="Close">✕</button>
+                    </div>
                 </div>
                 <div id="uw-a11y-content">
                     <div id="uw-a11y-summary"></div>
@@ -482,6 +515,7 @@
             
             // Add event listeners
             document.getElementById('uw-a11y-close').onclick = () => this.remove();
+            document.getElementById('uw-a11y-minimize').onclick = () => this.toggleMinimize();
             
             return panel;
         },
@@ -507,6 +541,63 @@
                     font-family: Arial, sans-serif;
                     font-size: 14px;
                     overflow: hidden;
+                    transition: all 0.3s ease;
+                }
+                
+                #uw-a11y-panel.minimized {
+                    bottom: 0px;
+                    top: auto;
+                    right: 20px;
+                    width: 400px;
+                    max-height: 180px;
+                    border-radius: 8px 8px 0 0;
+                }
+                
+                #uw-a11y-panel.minimized #uw-a11y-content {
+                    max-height: 120px;
+                    padding: 8px 16px;
+                    display: none;
+                }
+                
+                #uw-a11y-panel.minimized #uw-a11y-results {
+                    display: none;
+                }
+                
+                #uw-a11y-panel.minimized .uw-a11y-score-container {
+                    margin: 0.5rem 0;
+                    padding: 0.5rem;
+                }
+                
+                #uw-a11y-panel.minimized .uw-a11y-score-dial {
+                    width: 60px;
+                    height: 60px;
+                }
+                
+                #uw-a11y-panel.minimized .uw-a11y-score-circle {
+                    width: 60px;
+                    height: 60px;
+                }
+                
+                #uw-a11y-panel.minimized .uw-a11y-score-inner {
+                    width: 45px;
+                    height: 45px;
+                }
+                
+                #uw-a11y-panel.minimized .uw-a11y-score-number {
+                    font-size: 16px;
+                }
+                
+                #uw-a11y-panel.minimized .uw-a11y-score-label {
+                    font-size: 8px;
+                }
+                
+                #uw-a11y-panel.minimized h3 {
+                    font-size: 14px;
+                    margin-bottom: 0.5rem;
+                }
+                
+                #uw-a11y-panel.minimized #uw-a11y-minimize {
+                    transform: rotate(180deg);
                 }
                 #uw-a11y-header {
                     background: #c5050c;
@@ -515,13 +606,23 @@
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
+                                            cursor: default;
+                }
+                
+                #uw-a11y-header:active {
+                   
+                }
+                
+                .uw-a11y-header-buttons {
+                    display: flex;
+                    gap: 8px;
                 }
                 #uw-a11y-header h2 {
                     margin: 0;
                     font-size: 16px;
                     font-weight: bold;
                 }
-                #uw-a11y-close {
+                #uw-a11y-close, #uw-a11y-minimize {
                     background: none;
                     border: none;
                     color: white;
@@ -534,9 +635,16 @@
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                    transition: all 0.2s ease;
                 }
-                #uw-a11y-close:hover {
+                
+                #uw-a11y-close:hover, #uw-a11y-minimize:hover {
                     background: rgba(255,255,255,0.2);
+                }
+                
+                #uw-a11y-minimize {
+                    font-size: 20px;
+                    font-weight: bold;
                 }
                 #uw-a11y-content {
                     max-height: calc(85vh - 60px);
@@ -771,6 +879,9 @@
             const summary = document.getElementById('uw-a11y-summary');
             const results = document.getElementById('uw-a11y-results');
             
+            // Load minimize state after panel is created
+            this.loadMinimizeState();
+            
             // Count issues by type
             const counts = {
                 error: this.issues.filter(i => i.type === 'error').length,
@@ -891,12 +1002,12 @@
                         </div>
                     </div>
                     <div style="font-size: 14px;">
-                        <strong>Accessibility Score:</strong> ${score}/100<br>
                         <span style="font-size: 12px; color: #666;">
-                            ${score >= 90 ? 'Excellent accessibility!' : 
+                            ${score >= 98 ? 'Excellent' : 
+                              score >= 90 ? 'Very Good - just a few issues to address' : 
                               score >= 70 ? 'Good accessibility with room for improvement' : 
                               score >= 50 ? 'Fair accessibility - several issues to address' : 
-                              'Poor accessibility - immediate attention needed'}
+                              'Immediate attention needed'}
                         </span>
                     </div>
                 </div>
@@ -973,9 +1084,9 @@
 
         // Update the accessibility score display
         updateScore: function() {
-            if (!this.axeResults) return;
+            if (!this.originalAxeResults) return;
             
-            const newScore = this.calculateAccessibilityScore(this.axeResults);
+            const newScore = this.calculateAccessibilityScore(this.originalAxeResults);
             this.axeResults.score = newScore;
             
             // Update the score display
@@ -1024,6 +1135,46 @@
                 console.warn('Could not load checked items from sessionStorage:', e);
             }
         },
+
+        // Toggle minimize state
+        toggleMinimize: function() {
+            const panel = document.getElementById('uw-a11y-panel');
+            const minimizeBtn = document.getElementById('uw-a11y-minimize');
+            
+            if (!panel || !minimizeBtn) return;
+            
+            this.isMinimized = !this.isMinimized;
+            
+            if (this.isMinimized) {
+                panel.classList.add('minimized');
+                minimizeBtn.textContent = '+';
+                minimizeBtn.title = 'Restore';
+            } else {
+                panel.classList.remove('minimized');
+                minimizeBtn.textContent = '−';
+                minimizeBtn.title = 'Minimize';
+            }
+            
+            // Store minimize state in sessionStorage
+            sessionStorage.setItem('uw-a11y-minimized', this.isMinimized);
+        },
+
+        // Load minimize state from sessionStorage
+        loadMinimizeState: function() {
+            try {
+                const stored = sessionStorage.getItem('uw-a11y-minimized');
+                if (stored === 'true') {
+                    // Delay to ensure DOM is ready
+                    setTimeout(() => {
+                        this.toggleMinimize();
+                    }, 100);
+                }
+            } catch (e) {
+                console.warn('Could not load minimize state from sessionStorage:', e);
+            }
+        },
+
+
         
         remove: function() {
             const panel = document.getElementById('uw-a11y-panel');

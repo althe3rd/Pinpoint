@@ -111,17 +111,18 @@
             // Process violations (errors)
             results.violations.forEach(violation => {
                 violation.nodes.forEach(node => {
-                    this.addIssue(
-                        'error',
-                        violation.description,
-                        this.buildDescription(violation, node),
-                        this.getElementFromNode(node),
-                        this.buildRecommendation(violation),
-                        violation.helpUrl,
-                        violation.impact || 'serious',
-                        violation.tags,
-                        this.buildDetailedInfo(violation, node)
-                    );
+                                    this.addIssue(
+                    'error',
+                    violation.description,
+                    this.buildDescription(violation, node),
+                    this.getElementFromNode(node),
+                    this.buildRecommendation(violation),
+                    violation.helpUrl,
+                    violation.impact || 'serious',
+                    violation.tags,
+                    this.buildDetailedInfo(violation, node),
+                    violation.id
+                );
                 });
             });
             
@@ -138,7 +139,8 @@
                     incomplete.helpUrl,
                     incomplete.impact || 'moderate',
                     incomplete.tags,
-                    this.buildDetailedInfo(incomplete, node)
+                    this.buildDetailedInfo(incomplete, node),
+                    incomplete.id
                 );
                 // Store the unique ID for this manual review item
                 this.issues[this.issues.length - 1].uniqueId = uniqueId;
@@ -854,11 +856,46 @@
                     margin-top: 0.25rem;
                     word-break: break-all;
                 }
+                body #uw-a11y-panel .uw-a11y-instance-nav {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin: 8px 0;
+                    padding: 8px;
+                    background: #e9ecef;
+                    border-radius: 4px;
+                    font-size: 12px;
+                }
+                body #uw-a11y-panel .uw-a11y-instance-count {
+                    font-weight: bold;
+                    color: #495057;
+                }
+                body #uw-a11y-panel .uw-a11y-nav-buttons {
+                    display: flex;
+                    gap: 4px;
+                }
+                body #uw-a11y-panel .uw-a11y-nav-buttons button {
+                    background: #6c757d;
+                    color: white;
+                    border: none;
+                    padding: 4px 8px;
+                    border-radius: 3px;
+                    font-size: 11px;
+                    cursor: pointer;
+                    transition: background 0.2s;
+                }
+                body #uw-a11y-panel .uw-a11y-nav-buttons button:hover:not(:disabled) {
+                    background: #5a6268;
+                }
+                body #uw-a11y-panel .uw-a11y-nav-buttons button:disabled {
+                    background: #adb5bd;
+                    cursor: not-allowed;
+                }
             `;
             document.head.appendChild(style);
         },
         
-        addIssue: function(type, title, description, element, recommendation, helpUrl, impact, tags, detailedInfo) {
+        addIssue: function(type, title, description, element, recommendation, helpUrl, impact, tags, detailedInfo, ruleId) {
             const issueId = this.issues.length; // Use array index as unique ID
             this.issues.push({
                 id: issueId,
@@ -870,7 +907,8 @@
                 helpUrl: helpUrl,
                 impact: impact,
                 tags: tags || [],
-                detailedInfo: detailedInfo || []
+                detailedInfo: detailedInfo || [],
+                ruleId: ruleId || title.toLowerCase().replace(/[^a-z0-9]/g, '-')
             });
         },
         
@@ -883,31 +921,12 @@
             this.loadMinimizeState();
             
             // Count issues by type
-            // Debug: Log all issues to understand the categorization
-            console.log('=== DEBUGGING ISSUE CATEGORIZATION ===');
-            console.log('Total issues:', this.issues.length);
-            console.log('Axe incomplete count:', this.axeResults?.incomplete || 0);
-            
-            this.issues.forEach((issue, index) => {
-                console.log(`Issue ${index}:`, {
-                    type: issue.type,
-                    hasUniqueId: !!issue.uniqueId,
-                    uniqueId: issue.uniqueId,
-                    title: issue.title?.substring(0, 50) + '...',
-                    impact: issue.impact
-                });
-            });
-            
             const counts = {
                 error: this.issues.filter(i => i.type === 'error').length,
                 warning: this.issues.filter(i => i.type === 'warning' && i.uniqueId).length, // Only count manual review items with uniqueId
                 warningChecked: this.issues.filter(i => i.type === 'warning' && i.uniqueId && this.checkedItems.has(i.uniqueId)).length,
                 info: this.issues.filter(i => i.type === 'info').length
             };
-            
-            console.log('Calculated counts:', counts);
-            console.log('Expected warning count (from axe):', this.axeResults?.incomplete || 0);
-            console.log('=== END DEBUG ===');
             
             // Get accessibility score
             const scoreData = this.axeResults ? this.axeResults.score : null;
@@ -943,40 +962,65 @@
                     </div>
                 `;
             } else {
-                results.innerHTML = this.issues.map((issue, index) => {
-                    // Add checkbox for manual review items
-                    const checkboxHtml = issue.type === 'warning' && issue.uniqueId ? 
+                // Group issues by rule for better organization
+                const groupedIssues = this.groupIssuesByRule(this.issues);
+                
+                results.innerHTML = Object.keys(groupedIssues).map(ruleId => {
+                    const issueGroup = groupedIssues[ruleId];
+                    const firstIssue = issueGroup[0];
+                    const isManualReview = firstIssue.type === 'warning' && firstIssue.uniqueId;
+                    
+                    // Create navigation for multiple instances
+                    const instanceNavigation = issueGroup.length > 1 ? `
+                        <div class="uw-a11y-instance-nav">
+                            <span class="uw-a11y-instance-count">Instance <span id="current-${ruleId}">1</span> of ${issueGroup.length}</span>
+                            <div class="uw-a11y-nav-buttons">
+                                <button onclick="window.uwAccessibilityChecker.navigateInstance('${ruleId}', -1); event.stopPropagation();" 
+                                        id="prev-${ruleId}" disabled>‹ Prev</button>
+                                <button onclick="window.uwAccessibilityChecker.navigateInstance('${ruleId}', 1); event.stopPropagation();" 
+                                        id="next-${ruleId}">Next ›</button>
+                            </div>
+                        </div>
+                    ` : '';
+                    
+                    // Create checkbox for manual review items (affects all instances of this rule)
+                    const checkboxHtml = isManualReview ? 
                         `<div class="uw-a11y-manual-check">
                             <label class="uw-a11y-checkbox">
                                 <input type="checkbox" 
-                                       id="check-${issue.uniqueId}" 
-                                       ${this.checkedItems.has(issue.uniqueId) ? 'checked' : ''}
-                                       onchange="window.uwAccessibilityChecker.toggleManualCheck('${issue.uniqueId}'); event.stopPropagation();">
+                                       id="check-${ruleId}" 
+                                       ${this.isRuleVerified(ruleId) ? 'checked' : ''}
+                                       onchange="window.uwAccessibilityChecker.toggleRuleVerification('${ruleId}'); event.stopPropagation();">
                                 <span class="uw-a11y-checkmark"></span>
                                 <span class="uw-a11y-check-label">
-                                    ${this.checkedItems.has(issue.uniqueId) ? 'Manually verified ✓' : 'Mark as manually verified'}
+                                    ${this.isRuleVerified(ruleId) ? `All ${issueGroup.length} instances manually verified ✓` : `Mark all ${issueGroup.length} instances as verified`}
                                 </span>
                             </label>
                         </div>` : '';
 
                     return `
-                        <div class="uw-a11y-issue ${issue.type} ${issue.uniqueId && this.checkedItems.has(issue.uniqueId) ? 'checked' : ''}" onclick="window.uwAccessibilityChecker.highlightElement(${index})" style="cursor: ${issue.element ? 'pointer' : 'default'}">
-                            <h4>${issue.title}</h4>
-                            <p>${issue.description.split('\n')[0]}</p>
-                            <p><strong>How to fix:</strong> ${issue.recommendation}</p>
+                        <div class="uw-a11y-issue ${firstIssue.type} ${isManualReview && this.isRuleVerified(ruleId) ? 'checked' : ''}" 
+                             onclick="window.uwAccessibilityChecker.highlightCurrentInstance('${ruleId}')" 
+                             style="cursor: pointer" id="issue-${ruleId}">
+                            <h4>${firstIssue.title} ${issueGroup.length > 1 ? `(${issueGroup.length} instances)` : ''}</h4>
+                            <p id="description-${ruleId}">${firstIssue.description.split('\n')[0]}</p>
+                            <p><strong>How to fix:</strong> <span id="recommendation-${ruleId}">${firstIssue.recommendation}</span></p>
+                            ${instanceNavigation}
                             ${checkboxHtml}
-                            ${issue.detailedInfo && issue.detailedInfo.length > 0 ? `
-                                <button class="uw-a11y-details-toggle" onclick="window.uwAccessibilityChecker.toggleDetails(${index}); event.stopPropagation();">
+                            ${firstIssue.detailedInfo && firstIssue.detailedInfo.length > 0 ? `
+                                <button class="uw-a11y-details-toggle" onclick="window.uwAccessibilityChecker.toggleDetails('${ruleId}'); event.stopPropagation();">
                                     Show technical details
                                 </button>
-                                <div class="uw-a11y-details" id="details-${index}">
-                                    ${this.renderDetailedInfo(issue.detailedInfo)}
+                                <div class="uw-a11y-details" id="details-${ruleId}">
+                                    <div id="detailed-content-${ruleId}">
+                                        ${this.renderDetailedInfo(firstIssue.detailedInfo)}
+                                    </div>
                                 </div>
                             ` : ''}
                             <div class="issue-meta">
-                                <strong>Impact:</strong> ${issue.impact || 'unknown'} | 
-                                <strong>Tags:</strong> ${issue.tags.join(', ')}
-                                ${issue.helpUrl ? `<br><a href="${issue.helpUrl}" target="_blank" class="learn-more">Learn more about this rule</a>` : ''}
+                                <strong>Impact:</strong> ${firstIssue.impact || 'unknown'} | 
+                                <strong>Tags:</strong> ${firstIssue.tags.join(', ')}
+                                ${firstIssue.helpUrl ? `<br><a href="${firstIssue.helpUrl}" target="_blank" class="learn-more">Learn more about this rule</a>` : ''}
                             </div>
                         </div>
                     `;
@@ -984,25 +1028,7 @@
             }
         },
         
-        highlightElement: function(issueIndex) {
-            // Remove previous highlights
-            document.querySelectorAll('.uw-a11y-highlight').forEach(el => {
-                el.classList.remove('uw-a11y-highlight');
-            });
-            
-            const issue = this.issues[issueIndex];
-            if (issue.element) {
-                issue.element.classList.add('uw-a11y-highlight');
-                issue.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // Remove highlight after 3 seconds
-                setTimeout(() => {
-                    if (issue.element) {
-                        issue.element.classList.remove('uw-a11y-highlight');
-                    }
-                }, 3000);
-            }
-        },
+
         
         // Render the accessibility score dial
         renderScoreDial: function(scoreData) {
@@ -1059,9 +1085,157 @@
             }).join('');
         },
         
+        // Group issues by rule ID for better organization
+        groupIssuesByRule: function(issues) {
+            const grouped = {};
+            issues.forEach(issue => {
+                const ruleId = issue.ruleId || issue.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
+                if (!grouped[ruleId]) {
+                    grouped[ruleId] = [];
+                }
+                grouped[ruleId].push(issue);
+            });
+            return grouped;
+        },
+
+        // Initialize current instance tracking
+        currentInstances: {},
+
+        // Navigate between instances of the same rule
+        navigateInstance: function(ruleId, direction) {
+            if (!this.currentInstances[ruleId]) {
+                this.currentInstances[ruleId] = 0;
+            }
+            
+            const groupedIssues = this.groupIssuesByRule(this.issues);
+            const issueGroup = groupedIssues[ruleId];
+            
+            if (!issueGroup) return;
+            
+            const currentIndex = this.currentInstances[ruleId];
+            const newIndex = currentIndex + direction;
+            
+            if (newIndex >= 0 && newIndex < issueGroup.length) {
+                this.currentInstances[ruleId] = newIndex;
+                this.updateInstanceDisplay(ruleId, issueGroup);
+                this.highlightCurrentInstance(ruleId);
+            }
+        },
+
+        // Update the display for the current instance
+        updateInstanceDisplay: function(ruleId, issueGroup) {
+            const currentIndex = this.currentInstances[ruleId] || 0;
+            const currentIssue = issueGroup[currentIndex];
+            
+            // Update displayed content
+            const descElement = document.getElementById(`description-${ruleId}`);
+            const recElement = document.getElementById(`recommendation-${ruleId}`);
+            const currentSpan = document.getElementById(`current-${ruleId}`);
+            const detailedContent = document.getElementById(`detailed-content-${ruleId}`);
+            
+            if (descElement) descElement.textContent = currentIssue.description.split('\n')[0];
+            if (recElement) recElement.textContent = currentIssue.recommendation;
+            if (currentSpan) currentSpan.textContent = currentIndex + 1;
+            if (detailedContent && currentIssue.detailedInfo) {
+                detailedContent.innerHTML = this.renderDetailedInfo(currentIssue.detailedInfo);
+            }
+            
+            // Update navigation buttons
+            const prevBtn = document.getElementById(`prev-${ruleId}`);
+            const nextBtn = document.getElementById(`next-${ruleId}`);
+            
+            if (prevBtn) prevBtn.disabled = currentIndex === 0;
+            if (nextBtn) nextBtn.disabled = currentIndex === issueGroup.length - 1;
+        },
+
+        // Highlight the current instance of a rule
+        highlightCurrentInstance: function(ruleId) {
+            // Remove previous highlights
+            document.querySelectorAll('.uw-a11y-highlight').forEach(el => {
+                el.classList.remove('uw-a11y-highlight');
+            });
+            
+            const groupedIssues = this.groupIssuesByRule(this.issues);
+            const issueGroup = groupedIssues[ruleId];
+            
+            if (!issueGroup) return;
+            
+            const currentIndex = this.currentInstances[ruleId] || 0;
+            const currentIssue = issueGroup[currentIndex];
+            
+            if (currentIssue.element) {
+                currentIssue.element.classList.add('uw-a11y-highlight');
+                currentIssue.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Remove highlight after 3 seconds
+                setTimeout(() => {
+                    if (currentIssue.element) {
+                        currentIssue.element.classList.remove('uw-a11y-highlight');
+                    }
+                }, 3000);
+            }
+        },
+
+        // Check if all instances of a rule are verified
+        isRuleVerified: function(ruleId) {
+            const groupedIssues = this.groupIssuesByRule(this.issues);
+            const issueGroup = groupedIssues[ruleId];
+            
+            if (!issueGroup) return false;
+            
+            return issueGroup.every(issue => 
+                issue.uniqueId && this.checkedItems.has(issue.uniqueId)
+            );
+        },
+
+        // Toggle verification for all instances of a rule
+        toggleRuleVerification: function(ruleId) {
+            const groupedIssues = this.groupIssuesByRule(this.issues);
+            const issueGroup = groupedIssues[ruleId];
+            
+            if (!issueGroup) return;
+            
+            const isCurrentlyVerified = this.isRuleVerified(ruleId);
+            
+            issueGroup.forEach(issue => {
+                if (issue.uniqueId) {
+                    if (isCurrentlyVerified) {
+                        this.checkedItems.delete(issue.uniqueId);
+                    } else {
+                        this.checkedItems.add(issue.uniqueId);
+                    }
+                }
+            });
+            
+            // Update the UI
+            const checkbox = document.getElementById(`check-${ruleId}`);
+            const label = checkbox?.parentNode.querySelector('.uw-a11y-check-label');
+            const issueDiv = document.getElementById(`issue-${ruleId}`);
+            
+            const newVerificationState = this.isRuleVerified(ruleId);
+            
+            if (checkbox) checkbox.checked = newVerificationState;
+            if (label) {
+                label.textContent = newVerificationState 
+                    ? `All ${issueGroup.length} instances manually verified ✓` 
+                    : `Mark all ${issueGroup.length} instances as verified`;
+            }
+            if (issueDiv) {
+                if (newVerificationState) {
+                    issueDiv.classList.add('checked');
+                } else {
+                    issueDiv.classList.remove('checked');
+                }
+            }
+            
+            // Update score and save state
+            this.updateScore();
+            sessionStorage.setItem('uw-a11y-checked', JSON.stringify(Array.from(this.checkedItems)));
+        },
+
         // Toggle detailed information display
-        toggleDetails: function(issueIndex) {
-            const detailsElement = document.getElementById(`details-${issueIndex}`);
+        toggleDetails: function(ruleId) {
+            const detailsElement = document.getElementById(`details-${ruleId}`);
             const button = detailsElement.previousElementSibling;
             
             if (detailsElement.classList.contains('expanded')) {

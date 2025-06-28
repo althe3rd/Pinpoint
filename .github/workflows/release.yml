@@ -48,10 +48,10 @@ jobs:
           
           ## Installation
           
-          Visit [Pinpoint Accessibility Checker](https://alnemec.github.io/TestMark/) to get the latest bookmarklet.
+          Visit [Pinpoint Accessibility Checker](https://althe3rd.github.io/Pinpoint/) to get the latest bookmarklet.
           
           ## What's Changed
           
-          Full changelog: https://github.com/alnemec/TestMark/compare/v1.2.0...${{ steps.get_version.outputs.VERSION }}"
+          Full changelog: https://github.com/althe3rd/Pinpoint/compare/v1.2.0...${{ steps.get_version.outputs.VERSION }}"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

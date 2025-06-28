@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.3.1', // Current version
+            version: '1.3.0', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -1451,7 +1451,7 @@
             sessionStorage.setItem('uw-a11y-update-checked', 'true');
             
             // Fetch latest version info from GitHub
-            fetch('https://api.github.com/repos/alnemec/TestMark/releases/latest')
+            fetch('https://api.github.com/repos/althe3rd/Pinpoint/releases/latest')
                 .then(response => response.json())
                 .then(data => {
                     const latestVersion = data.tag_name.replace('v', '');
@@ -1494,7 +1494,7 @@
                             View release notes →
                         </a>
                         <span style="margin: 0 8px;">|</span>
-                        <a href="https://alnemec.github.io/TestMark/" target="_blank" style="color: #ffffff; text-decoration: underline;">
+                        <a href="https://althe3rd.github.io/Pinpoint/" target="_blank" style="color: #ffffff; text-decoration: underline;">
                             Get latest bookmarklet →
                         </a>
                         <button onclick="this.parentElement.parentElement.style.display='none'" 

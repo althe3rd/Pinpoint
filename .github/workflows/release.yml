@@ -8,6 +8,8 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
     steps:
     - name: Checkout code
@@ -30,14 +32,10 @@ jobs:
       run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
       
     - name: Create Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ steps.get_version.outputs.VERSION }}
-        release_name: Pinpoint Accessibility Checker ${{ steps.get_version.outputs.VERSION }}
-        body: |
-          ## Changes in ${{ steps.get_version.outputs.VERSION }}
+      run: |
+        gh release create ${{ steps.get_version.outputs.VERSION }} \
+          --title "Pinpoint Accessibility Checker ${{ steps.get_version.outputs.VERSION }}" \
+          --notes "## Changes in ${{ steps.get_version.outputs.VERSION }}
           
           ### New Features
           - [List new features here]
@@ -54,6 +52,6 @@ jobs:
           
           ## What's Changed
           
-          Full changelog: https://github.com/alnemec/TestMark/compare/v1.2.0...${{ steps.get_version.outputs.VERSION }}
-        draft: false
-        prerelease: false 
+          Full changelog: https://github.com/alnemec/TestMark/compare/v1.2.0...${{ steps.get_version.outputs.VERSION }}"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

@@ -778,6 +778,26 @@
                 body #uw-a11y-panel .uw-a11y-issue .learn-more:hover {
                     text-decoration: underline;
                 }
+
+                body #uw-a11y-panel .uw-a11y-issue .how-to-fix {
+                    margin-top: 8px;
+                    border-radius: 4px;
+                    background: #D0C5DE;
+                    padding: 8px;
+                    font-size: 12px;
+                    color: #212529;
+                    font-weight: 500;
+                    border-left: 4px solid #AD8DD9;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                body #uw-a11y-panel .uw-a11y-issue .how-to-fix-icon {
+                    width: 30px;
+                    height: 30px;
+                }
+
                 body .uw-a11y-highlight {
                     background: yellow !important;
                     border: 2px solid red !important;
@@ -1078,7 +1098,42 @@
                              style="cursor: pointer" id="issue-${ruleId}">
                             <h4>${firstIssue.title} ${issueGroup.length > 1 ? `(${issueGroup.length} instances)` : ''}</h4>
                             <p id="description-${ruleId}">${firstIssue.description.split('\n')[0]}</p>
-                            <p><strong>How to fix:</strong> <span id="recommendation-${ruleId}">${firstIssue.recommendation}</span></p>
+                            <div class="how-to-fix"><div class="how-to-fix-icon"><svg width="30" height="30" viewBox="0 0 147 147" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="99.2783" y="14.156" width="41.4421" height="48.3491" rx="13.0626" transform="rotate(42.7275 99.2783 14.156)" fill="url(#paint0_linear_702_2)"/>
+<foreignObject x="22.0078" y="19.1681" width="103.864" height="106.653"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(6.53px);clip-path:url(#bgblur_0_702_2_clip_path);height:100%;width:100%"></div></foreignObject><g data-figma-bg-blur-radius="13.0626">
+<mask id="path-2-inside-1_702_2" fill="white">
+<path d="M80.5323 34.4515C83.1206 31.6493 87.4909 31.4755 90.2931 34.0638L110.588 52.8099C113.39 55.3981 113.564 59.7684 110.976 62.5706L71.3927 105.424C69.6941 107.263 67.5277 108.606 65.1251 109.309L53.3361 112.758L35.0704 95.887L37.5743 83.8616C38.0848 81.4105 39.2515 79.1442 40.9503 77.305L80.5323 34.4515Z"/>
+</mask>
+<path d="M80.5323 34.4515C83.1206 31.6493 87.4909 31.4755 90.2931 34.0638L110.588 52.8099C113.39 55.3981 113.564 59.7684 110.976 62.5706L71.3927 105.424C69.6941 107.263 67.5277 108.606 65.1251 109.309L53.3361 112.758L35.0704 95.887L37.5743 83.8616C38.0848 81.4105 39.2515 79.1442 40.9503 77.305L80.5323 34.4515Z" fill="#BFB5FF" fill-opacity="0.6"/>
+<path d="M80.5323 34.4515L80.0829 34.0363L80.0829 34.0363L80.5323 34.4515ZM90.2931 34.0638L90.7083 33.6143L90.7083 33.6143L90.2931 34.0638ZM110.588 52.8099L110.173 53.2594L110.173 53.2594L110.588 52.8099ZM110.976 62.5706L111.425 62.9858L111.425 62.9858L110.976 62.5706ZM71.3927 105.424L71.8422 105.839L71.8422 105.839L71.3927 105.424ZM65.1251 109.309L65.2969 109.896L65.297 109.896L65.1251 109.309ZM53.3361 112.758L52.9209 113.208L53.1754 113.443L53.5079 113.345L53.3361 112.758ZM35.0704 95.887L34.4714 95.7623L34.4008 96.1014L34.6553 96.3365L35.0704 95.887ZM37.5743 83.8616L36.9753 83.7369L36.9753 83.7369L37.5743 83.8616ZM40.9503 77.305L41.3998 77.7202L41.3998 77.7202L40.9503 77.305ZM80.5323 34.4515L80.9818 34.8666C83.3409 32.3127 87.324 32.1543 89.8779 34.5133L90.2931 34.0638L90.7083 33.6143C87.6578 30.7967 82.9004 30.9859 80.0829 34.0363L80.5323 34.4515ZM90.2931 34.0638L89.8779 34.5133L110.173 53.2594L110.588 52.8099L111.003 52.3604L90.7083 33.6143L90.2931 34.0638ZM110.588 52.8099L110.173 53.2594C112.727 55.6184 112.885 59.6015 110.526 62.1554L110.976 62.5706L111.425 62.9858C114.243 59.9353 114.054 55.1779 111.003 52.3604L110.588 52.8099ZM110.976 62.5706L110.526 62.1554L70.9432 105.009L71.3927 105.424L71.8422 105.839L111.425 62.9858L110.976 62.5706ZM71.3927 105.424L70.9432 105.009C69.3198 106.766 67.2494 108.05 64.9533 108.722L65.1251 109.309L65.297 109.896C67.806 109.162 70.0683 107.76 71.8422 105.839L71.3927 105.424ZM65.1251 109.309L64.9533 108.722L53.1642 112.171L53.3361 112.758L53.5079 113.345L65.2969 109.896L65.1251 109.309ZM53.3361 112.758L53.7512 112.309L35.4856 95.4375L35.0704 95.887L34.6553 96.3365L52.9209 113.208L53.3361 112.758ZM35.0704 95.887L35.6695 96.0117L38.1734 83.9864L37.5743 83.8616L36.9753 83.7369L34.4714 95.7623L35.0704 95.887ZM37.5743 83.8616L38.1734 83.9864C38.6612 81.6438 39.7763 79.4779 41.3998 77.7202L40.9503 77.305L40.5008 76.8898C38.7268 78.8105 37.5083 81.1772 36.9753 83.7369L37.5743 83.8616ZM40.9503 77.305L41.3998 77.7202L80.9818 34.8666L80.5323 34.4515L80.0829 34.0363L40.5008 76.8898L40.9503 77.305Z" fill="url(#paint1_linear_702_2)" mask="url(#path-2-inside-1_702_2)"/>
+</g>
+<foreignObject x="56.2212" y="14.4392" width="74.3788" height="73.2169"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(13.06px);clip-path:url(#bgblur_1_702_2_clip_path);height:100%;width:100%"></div></foreignObject><rect data-figma-bg-blur-radius="26.1252" x="-0.345868" y="0.0137252" width="27.1385" height="6.4175" rx="3.20875" transform="matrix(-0.734589 -0.678512 -0.678513 0.734589 105.311 57.6527)" fill="url(#paint2_linear_702_2)" fill-opacity="0.9" stroke="url(#paint3_linear_702_2)" stroke-width="0.489516"/>
+<path d="M53.3362 112.758L35.0704 95.8869L31.3173 113.909C30.7858 116.461 33.1658 118.66 35.6681 117.928L53.3362 112.758Z" fill="url(#paint4_linear_702_2)"/>
+<defs>
+<clipPath id="bgblur_0_702_2_clip_path" transform="translate(-22.0078 -19.1681)"><path d="M80.5323 34.4515C83.1206 31.6493 87.4909 31.4755 90.2931 34.0638L110.588 52.8099C113.39 55.3981 113.564 59.7684 110.976 62.5706L71.3927 105.424C69.6941 107.263 67.5277 108.606 65.1251 109.309L53.3361 112.758L35.0704 95.887L37.5743 83.8616C38.0848 81.4105 39.2515 79.1442 40.9503 77.305L80.5323 34.4515Z"/>
+</clipPath><clipPath id="bgblur_1_702_2_clip_path" transform="translate(-56.2212 -14.4392)"><rect x="-0.345868" y="0.0137252" width="27.1385" height="6.4175" rx="3.20875" transform="matrix(-0.734589 -0.678512 -0.678513 0.734589 105.311 57.6527)"/>
+</clipPath><linearGradient id="paint0_linear_702_2" x1="111.233" y1="24.7324" x2="143.949" y2="34.3759" gradientUnits="userSpaceOnUse">
+<stop stop-color="#917FFB"/>
+<stop offset="1" stop-color="#3F2DAF"/>
+</linearGradient>
+<linearGradient id="paint1_linear_702_2" x1="27.7428" y1="33.6286" x2="83.9437" y2="109.387" gradientUnits="userSpaceOnUse">
+<stop stop-color="white"/>
+<stop offset="0.765625" stop-color="white" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="paint2_linear_702_2" x1="28.1556" y1="3.85131" x2="-11.7222" y2="2.83569" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FCFDFE"/>
+<stop offset="1" stop-color="#FCFDFE" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="paint3_linear_702_2" x1="27.3252" y1="4.75029" x2="13.814" y2="6.90701" gradientUnits="userSpaceOnUse">
+<stop stop-color="white"/>
+<stop offset="1" stop-color="white" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="paint4_linear_702_2" x1="37.7476" y1="103.56" x2="44.6712" y2="121.426" gradientUnits="userSpaceOnUse">
+<stop stop-color="#917FFB"/>
+<stop offset="1" stop-color="#3F2DAF"/>
+</linearGradient>
+</defs>
+</svg></div><div><strong>How to fix:</strong> <span id="recommendation-${ruleId}">${firstIssue.recommendation}</span></div></div>
                             ${instanceNavigation}
                             ${checkboxHtml}
                             ${firstIssue.detailedInfo && firstIssue.detailedInfo.length > 0 ? `

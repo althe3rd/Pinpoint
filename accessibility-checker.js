@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.3.0', // Current version
+            version: '1.3.1', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items

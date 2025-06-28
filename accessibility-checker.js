@@ -113,24 +113,34 @@
             // Process violations (errors)
             results.violations.forEach(violation => {
                 violation.nodes.forEach(node => {
-                                    this.addIssue(
-                    'error',
-                    violation.description,
-                    this.buildDescription(violation, node),
-                    this.getElementFromNode(node),
-                    this.buildRecommendation(violation),
-                    violation.helpUrl,
-                    violation.impact || 'serious',
-                    violation.tags,
-                    this.buildDetailedInfo(violation, node),
-                    violation.id
-                );
+                    // Skip if this node is part of our accessibility checker UI
+                    if (this.isOwnUIElement(node)) {
+                        return;
+                    }
+                    
+                    this.addIssue(
+                        'error',
+                        violation.description,
+                        this.buildDescription(violation, node),
+                        this.getElementFromNode(node),
+                        this.buildRecommendation(violation),
+                        violation.helpUrl,
+                        violation.impact || 'serious',
+                        violation.tags,
+                        this.buildDetailedInfo(violation, node),
+                        violation.id
+                    );
                 });
             });
             
                     // Process incomplete items (warnings) with unique IDs for tracking
         results.incomplete.forEach((incomplete, incompleteIndex) => {
             incomplete.nodes.forEach((node, nodeIndex) => {
+                // Skip if this node is part of our accessibility checker UI
+                if (this.isOwnUIElement(node)) {
+                    return;
+                }
+                
                 const uniqueId = `incomplete-${incompleteIndex}-${nodeIndex}`;
                 this.addIssue(
                     'warning',
@@ -152,17 +162,33 @@
             // Store the original results for score recalculation
             this.originalAxeResults = results;
             
-            // Add summary information and calculate score
+            // Create filtered results for accurate scoring (excluding our own UI elements)
+            const filteredResults = {
+                ...results,
+                violations: results.violations.map(violation => ({
+                    ...violation,
+                    nodes: violation.nodes.filter(node => !this.isOwnUIElement(node))
+                })).filter(violation => violation.nodes.length > 0),
+                incomplete: results.incomplete.map(incomplete => ({
+                    ...incomplete,
+                    nodes: incomplete.nodes.filter(node => !this.isOwnUIElement(node))
+                })).filter(incomplete => incomplete.nodes.length > 0)
+            };
+            
+            // Add summary information and calculate score using filtered results
             this.axeResults = {
                 url: results.url,
                 timestamp: results.timestamp,
                 toolOptions: results.toolOptions,
-                violations: results.violations.length,
-                passes: results.passes.length,
-                incomplete: results.incomplete.length,
-                inapplicable: results.inapplicable.length,
-                score: this.calculateAccessibilityScore(results)
+                violations: filteredResults.violations.length,
+                passes: results.passes.length, // Passes don't need filtering
+                incomplete: filteredResults.incomplete.length,
+                inapplicable: results.inapplicable.length, // Inapplicable don't need filtering
+                score: this.calculateAccessibilityScore(filteredResults)
             };
+            
+            // Store filtered results for score recalculation
+            this.filteredAxeResults = filteredResults;
         },
         
         // Build description from axe result
@@ -201,6 +227,52 @@
                 }
             }
             return null;
+        },
+
+        // Check if a node belongs to our accessibility checker UI
+        isOwnUIElement: function(node) {
+            // Check the CSS selector for our UI elements
+            if (node.target && node.target[0]) {
+                const selector = node.target[0];
+                
+                // Check if it's our main panel or any child element
+                if (selector.includes('#uw-a11y-panel') || 
+                    selector.includes('uw-a11y-')) {
+                    return true;
+                }
+            }
+            
+            // Check the HTML content for our UI elements
+            if (node.html) {
+                if (node.html.includes('uw-a11y-') || 
+                    node.html.includes('id="uw-a11y-')) {
+                    return true;
+                }
+            }
+            
+            // Check the actual DOM element if available
+            const element = this.getElementFromNode(node);
+            if (element) {
+                // Check if element is inside our panel
+                const panel = document.getElementById('uw-a11y-panel');
+                if (panel && (element === panel || panel.contains(element))) {
+                    return true;
+                }
+                
+                // Check if element has our CSS classes
+                if (element.className && typeof element.className === 'string') {
+                    if (element.className.includes('uw-a11y-')) {
+                        return true;
+                    }
+                }
+                
+                // Check if element has our ID pattern
+                if (element.id && element.id.includes('uw-a11y-')) {
+                    return true;
+                }
+            }
+            
+            return false;
         },
         
         // Build detailed technical information about the issue
@@ -1050,7 +1122,7 @@
                     </div>
                     <div style="font-size: 14px;">
                         <span style="font-size: 12px; color: #666;">
-                            ${score >= 98 ? 'Excellent' : 
+                            ${score >= 97 ? 'Excellent' : 
                               score >= 90 ? 'Very Good - just a few issues to address' : 
                               score >= 70 ? 'Good accessibility with room for improvement' : 
                               score >= 50 ? 'Fair accessibility - several issues to address' : 
@@ -1279,9 +1351,9 @@
 
         // Update the accessibility score display
         updateScore: function() {
-            if (!this.originalAxeResults) return;
+            if (!this.filteredAxeResults) return;
             
-            const newScore = this.calculateAccessibilityScore(this.originalAxeResults);
+            const newScore = this.calculateAccessibilityScore(this.filteredAxeResults);
             this.axeResults.score = newScore;
             
             // Update the score display

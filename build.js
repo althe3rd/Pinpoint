@@ -57,6 +57,10 @@ async function buildBookmarklet() {
         updateIndexHtml(minifiedCode);
         console.log('✅ Updated index.html');
         
+        // Update test-page.html
+        updateTestPage(minifiedCode);
+        console.log('✅ Updated test-page.html');
+        
         console.log('🎉 Build complete!');
         
     } catch (error) {
@@ -137,6 +141,53 @@ function updateIndexHtml(minifiedCode) {
         
         console.log(`🔍 Fallback replacement successful`);
         fs.writeFileSync(indexPath, indexContent, 'utf8');
+    }
+}
+
+function updateTestPage(minifiedCode) {
+    const testPagePath = 'test-page.html';
+    
+    // Check if test page exists
+    if (!fs.existsSync(testPagePath)) {
+        console.log('⚠️ test-page.html not found, skipping update');
+        return;
+    }
+    
+    let testPageContent = fs.readFileSync(testPagePath, 'utf8');
+    
+    // Clean and escape the minified code for safe embedding
+    const escapedCode = minifiedCode
+        .replace(/\r?\n/g, '')   // Remove all newlines FIRST
+        .replace(/\r/g, '')      // Remove carriage returns
+        .replace(/\s+/g, ' ')    // Replace multiple whitespace with single space
+        .trim()                  // Remove leading/trailing whitespace
+        .replace(/\\/g, '\\\\')  // Escape backslashes
+        .replace(/`/g, '\\`')    // Escape backticks
+        .replace(/\$/g, '\\$');  // Escape dollar signs (for template literals)
+    
+    // Find and replace the testBookmarkletCode variable
+    const testBookmarkletCodeRegex = /const testBookmarkletCode = `[^`]*(?:`[^`]*`[^`]*)*`;/;
+    const newTestBookmarkletCode = `const testBookmarkletCode = \`${escapedCode}\`;`;
+    
+    // Check if we can find the pattern
+    const match = testPageContent.match(testBookmarkletCodeRegex);
+    if (match) {
+        console.log(`🔍 Found existing testBookmarkletCode in test page`);
+        testPageContent = testPageContent.replace(testBookmarkletCodeRegex, newTestBookmarkletCode);
+        fs.writeFileSync(testPagePath, testPageContent, 'utf8');
+    } else {
+        // Fallback: try to find the placeholder
+        const placeholderPattern = 'PLACEHOLDER_FOR_BOOKMARKLET_CODE';
+        if (testPageContent.includes(placeholderPattern)) {
+            console.log('🔍 Found placeholder in test page, replacing...');
+            testPageContent = testPageContent.replace(
+                `const testBookmarkletCode = \`${placeholderPattern}\`;`,
+                newTestBookmarkletCode
+            );
+            fs.writeFileSync(testPagePath, testPageContent, 'utf8');
+        } else {
+            console.log('⚠️ Could not find testBookmarkletCode variable or placeholder in test-page.html');
+        }
     }
 }
 

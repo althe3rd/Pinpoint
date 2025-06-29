@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.3.2', // Current version
+            version: '1.3.4', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -81,9 +81,15 @@
                 rules: {
                     // Disable the region rule which often creates false positives
                     // for "Ensures all page content is contained by landmarks"
-                    'region': { enabled: false }
+                    'region': { enabled: false },
+                    // Enable rules that commonly generate incomplete results for manual review
+                    'color-contrast-enhanced': { enabled: true },
+                    'audio-caption': { enabled: true },
+                    'hidden-content': { enabled: true },
+                    'identical-links-same-purpose': { enabled: true },
+                    'meta-refresh': { enabled: true }
                 },
-                tags: ['wcag2a', 'wcag2aa', 'wcag21aa'],
+                tags: ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag21aaa'],
                 // Exclude the accessibility checker's own UI elements from analysis
                 exclude: [
                     '#uw-a11y-panel',     // Main panel container
@@ -123,7 +129,7 @@
                         violation.description,
                         this.buildDescription(violation, node),
                         this.getElementFromNode(node),
-                        this.buildRecommendation(violation),
+                        this.buildRecommendation(violation, node),
                         violation.helpUrl,
                         violation.impact || 'serious',
                         violation.tags,
@@ -134,7 +140,10 @@
             });
             
                     // Process incomplete items (warnings) with unique IDs for tracking
+        console.log('Axe incomplete results:', results.incomplete);
+        console.log('Number of incomplete rules:', results.incomplete.length);
         results.incomplete.forEach((incomplete, incompleteIndex) => {
+            console.log(`Incomplete rule ${incompleteIndex}: ${incomplete.id} with ${incomplete.nodes.length} nodes`);
             incomplete.nodes.forEach((node, nodeIndex) => {
                 // Skip if this node is part of our accessibility checker UI
                 if (this.isOwnUIElement(node)) {
@@ -147,7 +156,7 @@
                     incomplete.description,
                     'Manual review needed: ' + this.buildDescription(incomplete, node),
                     this.getElementFromNode(node),
-                    this.buildRecommendation(incomplete),
+                    this.buildRecommendation(incomplete, node),
                     incomplete.helpUrl,
                     incomplete.impact || 'moderate',
                     incomplete.tags,
@@ -208,11 +217,203 @@
         },
         
         // Build recommendation from axe result
-        buildRecommendation: function(rule) {
-            if (rule.help) {
-                return rule.help;
+        buildRecommendation: function(rule, node) {
+            const ruleId = rule.id;
+            const recommendations = this.getActionableRecommendations();
+            
+            let recommendationText = '';
+            
+            if (recommendations[ruleId]) {
+                // Get context-aware recommendation
+                const rec = recommendations[ruleId];
+                if (typeof rec === 'function') {
+                    recommendationText = rec(node, rule);
+                } else {
+                    recommendationText = rec;
+                }
+            } else {
+                // Fallback to rule help if no custom recommendation
+                recommendationText = rule.help || 'Please refer to the help documentation for specific guidance on fixing this issue.';
             }
-            return 'Please refer to the help documentation for specific guidance on fixing this issue.';
+            
+            // Format the recommendation with proper code escaping
+            return this.formatRecommendation(recommendationText);
+        },
+        
+        // Format recommendation text with proper code escaping
+        formatRecommendation: function(text) {
+            // Escape HTML entities first
+            const escapeHtml = (unsafe) => {
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            };
+            
+            // Find HTML code examples and wrap them in <code> tags
+            // This regex looks for patterns like <tag>, <tag attr="value">, etc.
+            const codePattern = /(<[^>]+>)/g;
+            
+            // Replace HTML code examples with properly formatted code tags
+            const formatted = text.replace(codePattern, (match) => {
+                return `<code>${escapeHtml(match)}</code>`;
+            });
+            
+            // Also handle attribute examples like 'aria-label="text"'
+            const attrPattern = /([\w-]+="[^"]*")/g;
+            const withAttrs = formatted.replace(attrPattern, (match) => {
+                // Only format if it's not already inside a code tag
+                if (!match.includes('&lt;') && !match.includes('&gt;')) {
+                    return `<code>${match}</code>`;
+                }
+                return match;
+            });
+            
+            // Handle CSS values and specific technical terms
+            const cssPattern = /(\d+:\d+|tabindex="\d+"|role="[^"]*"|#[a-zA-Z0-9-]+)/g;
+            const withCss = withAttrs.replace(cssPattern, (match) => {
+                // Only format if not already in code tags
+                if (!match.includes('&lt;') && !match.includes('&gt;')) {
+                    return `<code>${match}</code>`;
+                }
+                return match;
+            });
+            
+            return withCss;
+        },
+        
+        // Comprehensive mapping of actionable recommendations
+        getActionableRecommendations: function() {
+            return {
+                // Images and Media
+                'image-alt': (node, rule) => {
+                    const element = this.getElementFromNode(node);
+                    if (element && element.tagName === 'IMG') {
+                        if (element.src && element.src.includes('decorative') || element.getAttribute('role') === 'presentation') {
+                            return 'Add alt="" for decorative images, or add role="presentation" if the image is purely decorative.';
+                        }
+                        return 'Add descriptive alt text: <img src="..." alt="Brief description of what the image shows or its purpose">. Describe the content and function, not just "image of..."';
+                    }
+                    return 'Add appropriate alt text describing the image content and purpose.';
+                },
+                
+                'image-redundant-alt': 'Remove redundant words like "image of", "picture of", "graphic of" from alt text. Just describe what the image shows: alt="Red sports car" instead of alt="Image of a red sports car"',
+                
+                // Forms
+                'label': (node, rule) => {
+                    const element = this.getElementFromNode(node);
+                    if (element) {
+                        const id = element.id || 'unique-id';
+                        const type = element.type || 'text';
+                        return `Add a label: <label for="${id}">Field Name</label><input type="${type}" id="${id}"> OR use aria-label: <input type="${type}" aria-label="Field Name">`;
+                    }
+                    return 'Associate each form control with a descriptive label using <label> or aria-label.';
+                },
+                
+                'button-name': (node, rule) => {
+                    const element = this.getElementFromNode(node);
+                    if (element) {
+                        if (element.innerHTML.trim() === '') {
+                            return 'Add text content inside the button: <button>Submit Form</button> OR add aria-label: <button aria-label="Submit form">👍</button>';
+                        }
+                        return 'Ensure button has accessible text via text content, aria-label, or aria-labelledby.';
+                    }
+                    return 'Buttons need accessible names - add text content or aria-label.';
+                },
+                
+                'duplicate-id': 'Make each ID unique. Find duplicate IDs in your HTML and rename them. Each ID must be used only once per page.',
+                
+                // Color and Contrast
+                'color-contrast': (node, rule) => {
+                    const colorInfo = this.extractColorContrastInfo(node);
+                    if (colorInfo) {
+                        return `Current contrast is ${colorInfo.contrast}. WCAG AA requires 4.5:1 for normal text, 3:1 for large text (18pt+ or 14pt+ bold). Try: 1) Darker text color, 2) Lighter background, 3) Use online contrast checker tools.`;
+                    }
+                    return 'Improve text contrast ratio. Use darker text on light backgrounds or lighter text on dark backgrounds.';
+                },
+                
+                // Links
+                'link-name': 'Make link text descriptive. Instead of "click here" or "read more", use "Download annual report" or "Read more about accessibility testing". The link text should make sense out of context.',
+                
+                'link-in-text-block': 'Links in text need visual distinction beyond color alone. Add underlines, bold text, or other visual indicators that work for colorblind users.',
+                
+                // Headings
+                'heading-order': (node, rule) => {
+                    const element = this.getElementFromNode(node);
+                    if (element) {
+                        const level = parseInt(element.tagName.charAt(1));
+                        return `Fix heading sequence - don't skip levels. After H${level-2}, use H${level-1}, not H${level}. Structure should be H1→H2→H3, not H1→H3.`;
+                    }
+                    return 'Use headings in sequential order (H1, H2, H3...) without skipping levels. Think of headings as a document outline.';
+                },
+                
+                'empty-heading': 'Add meaningful text inside headings. Remove empty headings or add descriptive content: <h2>Our Services</h2>',
+                
+                // ARIA
+                'aria-allowed-attr': 'Remove unsupported ARIA attributes from this element type. Check the ARIA specification for which attributes are valid for each element.',
+                
+                'aria-required-attr': 'Add required ARIA attributes. For example, role="button" needs aria-label or text content. Check ARIA patterns for required attributes.',
+                
+                'aria-valid-attr-value': 'Fix ARIA attribute values. Use valid values like aria-expanded="true" or "false", not "yes" or other invalid values.',
+                
+                'button-name': 'Add accessible name to button using text content, aria-label, or aria-labelledby.',
+                
+                // Tables
+                'table-fake-caption': 'Use proper <caption> element instead of fake caption. Move the caption text inside: <table><caption>Sales Data 2024</caption><tr>...</table>',
+                
+                'td-headers-attr': 'Add headers attribute to complex table cells: <td headers="row1 col2">Data</td> where "row1 col2" are IDs of header cells.',
+                
+                'th-has-data-cells': 'Ensure table headers (th) actually relate to data cells. Remove empty or irrelevant header cells.',
+                
+                // Structure
+                'region': 'Add landmark regions using HTML5 elements: <main>, <nav>, <aside>, <header>, <footer>. OR use ARIA: <div role="main">, <div role="navigation">.',
+                
+                'page-has-heading-one': 'Add exactly one H1 heading per page. The H1 should describe the main content: <h1>Page Title</h1>',
+                
+                'landmark-one-main': 'Add one <main> element per page: <main><!-- main content here --></main> OR <div role="main">',
+                
+                // Lists
+                'list': 'Use proper list markup. Wrap list items in <ul> or <ol>: <ul><li>Item 1</li><li>Item 2</li></ul>',
+                
+                'definition-list': 'Use proper definition list structure: <dl><dt>Term</dt><dd>Definition</dd></dl>',
+                
+                // Focus and Keyboard
+                'focus-order-semantics': 'Use semantic HTML elements (button, a, input) instead of div/span with click handlers. This ensures proper keyboard focus order.',
+                
+                'tabindex': 'Remove positive tabindex values (tabindex="1", "2", etc). Use tabindex="0" to make elements focusable or tabindex="-1" to remove from tab order.',
+                
+                // Language
+                'html-has-lang': 'Add language attribute to html element: <html lang="en"> or <html lang="es"> for Spanish, etc.',
+                
+                'html-lang-valid': 'Use valid language code. Examples: "en" for English, "es" for Spanish, "fr" for French. Use format like "en-US" for regional variants.',
+                
+                // Audio/Video
+                'audio-caption': 'Add captions to audio content using <track> element with captions file, or provide transcript nearby.',
+                
+                'video-caption': 'Add captions: <video><track kind="captions" src="captions.vtt" srclang="en" label="English"></video>',
+                
+                // Meta
+                'meta-refresh': 'Remove auto-refresh meta tags. Use JavaScript with user control: <button onclick="refresh()">Refresh Page</button>',
+                
+                'meta-viewport': 'Add viewport meta tag: <meta name="viewport" content="width=device-width, initial-scale=1.0">',
+                
+                // Misc
+                'duplicate-id-active': 'Remove duplicate IDs from interactive elements. Each ID must be unique across the entire page.',
+                
+                'duplicate-id-aria': 'Fix duplicate IDs used in ARIA relationships (aria-labelledby, aria-describedby). Each referenced ID must be unique.',
+                
+                'frame-title': 'Add descriptive title to iframe: <iframe title="Customer feedback form" src="..."></iframe>',
+                
+                'object-alt': 'Add alternative text to object elements: <object data="chart.svg" type="image/svg+xml">Sales chart showing 20% increase</object>',
+                
+                'scope-attr-valid': 'Use valid scope attribute values on table headers: scope="col" for column headers, scope="row" for row headers.',
+                
+                'skip-link': 'Add skip navigation link at page start: <a href="#main" class="skip-link">Skip to main content</a>',
+                
+                'css-orientation-lock': 'Don\'t lock orientation in CSS. Remove or modify CSS that prevents rotation: transform: rotate() or orientation locks.'
+            };
         },
         
         // Get DOM element from axe node data
@@ -603,25 +804,28 @@
             const style = document.createElement('style');
             style.id = 'uw-a11y-styles';
             style.textContent = `
+                @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&family=Red+Hat+Text:ital,wght@0,300..900;1,300..900&display=swap');
+
                 body #uw-a11y-panel {
                     position: fixed;
                     top: 20px;
                     right: 20px;
                     width: 450px;
                     max-height: 85vh;
-                    background: #ffffff;
-                    border: 3px solid #c5050c;
-                    border-radius: 8px;
+                    background: rgba(255,255,255,0.65);
+                    border: 1px solid rgba(255,255,255,0.85);
+                    border-radius: 12px;
+                    backdrop-filter: blur(12px);
                     box-shadow: 0 8px 32px rgba(0,0,0,0.3);
                     z-index: 999999;
-                    font-family: Arial, sans-serif;
+                    font-family: "Red Hat Display", "Red Hat Text", Arial, sans-serif;
                     font-size: 14px;
                     overflow: hidden;
                     transition: all 0.3s ease;
                 }
                 
                 body #uw-a11y-panel.minimized {
-                    bottom: 0px;
+                    bottom: -1px;
                     top: auto;
                     right: 20px;
                     width: 400px;
@@ -676,8 +880,8 @@
                     transform: rotate(180deg);
                 }
                 body #uw-a11y-panel #uw-a11y-header {
-                    background: #c5050c;
-                    color: white;
+                    
+                    color: #000;
                     padding: 12px 16px;
                     display: flex;
                     justify-content: space-between;
@@ -701,7 +905,7 @@
                 body #uw-a11y-panel #uw-a11y-close, body #uw-a11y-panel #uw-a11y-minimize {
                     background: none;
                     border: none;
-                    color: white;
+                    color: black;
                     font-size: 18px;
                     cursor: pointer;
                     padding: 0;
@@ -730,9 +934,10 @@
                 body #uw-a11y-panel #uw-a11y-summary {
                     background: #f8f9fa;
                     border: 1px solid #dee2e6;
-                    border-radius: 4px;
-                    padding: 12px;
+                    border-radius: 10px;
+                    padding: 10px;
                     margin-bottom: 16px;
+                    
                 }
                 body #uw-a11y-panel .uw-a11y-issue {
                     margin-bottom: 12px;
@@ -782,20 +987,25 @@
                 body #uw-a11y-panel .uw-a11y-issue .how-to-fix {
                     margin-top: 8px;
                     border-radius: 4px;
-                    background: #D0C5DE;
+                    background: rgb(196, 218, 229);
                     padding: 8px;
                     font-size: 12px;
                     color: #212529;
                     font-weight: 500;
-                    border-left: 4px solid #AD8DD9;
+                    border-left: 4px solid rgb(63, 96, 166);
                     display: flex;
                     align-items: center;
                     gap: 8px;
                 }
 
                 body #uw-a11y-panel .uw-a11y-issue .how-to-fix-icon {
-                    width: 30px;
-                    height: 30px;
+                    align-self: flex-start;
+                    margin-top: 2px;
+                }
+
+                body #uw-a11y-panel .uw-a11y-issue .how-to-fix-icon svg {
+                    width: 12px;
+                    height: 12px;
                 }
 
                 body .uw-a11y-highlight {
@@ -932,12 +1142,26 @@
                     padding: 0;
                     margin-top: 0.5rem;
                 }
+
+                body #uw-a11y-panel .uw-a11y-details-toggle {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+
+                body #uw-a11y-panel .uw-a11y-details-toggle .technical-details-icon {
+                    width: 12px;
+                    height: 12px;
+                }
+
                 body #uw-a11y-panel .uw-a11y-details-item {
                     margin: 0.5rem 0;
                     padding: 0.5rem;
                     background: white;
                     border-radius: 3px;
                 }
+
                 body #uw-a11y-panel .uw-a11y-details-label {
                     font-weight: bold;
                     color: #495057;
@@ -954,10 +1178,13 @@
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    margin: 8px 0;
+                    margin-top: -12px;
+                    margin-left: -12px;
+                    margin-right: -12px;
                     padding: 8px;
-                    background: #e9ecef;
-                    border-radius: 4px;
+                    background: rgba(0,0,0,0.1);
+                    backdrop-filter: saturate(200%);
+                    border-top-right-radius: 4px;
                     font-size: 12px;
                 }
                 body #uw-a11y-panel .uw-a11y-instance-count {
@@ -969,7 +1196,8 @@
                     gap: 4px;
                 }
                 body #uw-a11y-panel .uw-a11y-nav-buttons button {
-                    background: #6c757d;
+                    background:rgba(0,0,0,0.4);
+                    backdrop-filter: saturate(200%);
                     color: white;
                     border: none;
                     padding: 4px 8px;
@@ -979,14 +1207,30 @@
                     transition: background 0.2s;
                 }
                 body #uw-a11y-panel .uw-a11y-nav-buttons button:hover:not(:disabled) {
-                    background: #5a6268;
+                    background:rgba(0,0,0,0.4);
                 }
-                body #uw-a11y-panel .uw-a11y-nav-buttons button:disabled {
-                    background: #adb5bd;
-                    cursor: not-allowed;
-                }
-            `;
-            document.head.appendChild(style);
+                        body #uw-a11y-panel .uw-a11y-nav-buttons button:disabled {
+            background:rgba(0,0,0,0.1);
+            cursor: not-allowed;
+        }
+        
+        body #uw-a11y-panel .how-to-fix code {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 3px;
+            padding: 2px 4px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            color: #e83e8c;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        body #uw-a11y-panel .how-to-fix code:not(:last-child) {
+            margin-right: 2px;
+        }
+        `;
+        document.head.appendChild(style);
         },
         
         addIssue: function(type, title, description, element, recommendation, helpUrl, impact, tags, detailedInfo, ruleId) {
@@ -1096,49 +1340,15 @@
                         <div class="uw-a11y-issue ${firstIssue.type} ${isManualReview && this.isRuleVerified(ruleId) ? 'checked' : ''}" 
                              onclick="window.uwAccessibilityChecker.highlightCurrentInstance('${ruleId}')" 
                              style="cursor: pointer" id="issue-${ruleId}">
+                             ${instanceNavigation}
                             <h4>${firstIssue.title} ${issueGroup.length > 1 ? `(${issueGroup.length} instances)` : ''}</h4>
-                            <p id="description-${ruleId}">${firstIssue.description.split('\n')[0]}</p>
-                            <div class="how-to-fix"><div class="how-to-fix-icon"><svg width="30" height="30" viewBox="0 0 147 147" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect x="99.2783" y="14.156" width="41.4421" height="48.3491" rx="13.0626" transform="rotate(42.7275 99.2783 14.156)" fill="url(#paint0_linear_702_2)"/>
-<foreignObject x="22.0078" y="19.1681" width="103.864" height="106.653"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(6.53px);clip-path:url(#bgblur_0_702_2_clip_path);height:100%;width:100%"></div></foreignObject><g data-figma-bg-blur-radius="13.0626">
-<mask id="path-2-inside-1_702_2" fill="white">
-<path d="M80.5323 34.4515C83.1206 31.6493 87.4909 31.4755 90.2931 34.0638L110.588 52.8099C113.39 55.3981 113.564 59.7684 110.976 62.5706L71.3927 105.424C69.6941 107.263 67.5277 108.606 65.1251 109.309L53.3361 112.758L35.0704 95.887L37.5743 83.8616C38.0848 81.4105 39.2515 79.1442 40.9503 77.305L80.5323 34.4515Z"/>
-</mask>
-<path d="M80.5323 34.4515C83.1206 31.6493 87.4909 31.4755 90.2931 34.0638L110.588 52.8099C113.39 55.3981 113.564 59.7684 110.976 62.5706L71.3927 105.424C69.6941 107.263 67.5277 108.606 65.1251 109.309L53.3361 112.758L35.0704 95.887L37.5743 83.8616C38.0848 81.4105 39.2515 79.1442 40.9503 77.305L80.5323 34.4515Z" fill="#BFB5FF" fill-opacity="0.6"/>
-<path d="M80.5323 34.4515L80.0829 34.0363L80.0829 34.0363L80.5323 34.4515ZM90.2931 34.0638L90.7083 33.6143L90.7083 33.6143L90.2931 34.0638ZM110.588 52.8099L110.173 53.2594L110.173 53.2594L110.588 52.8099ZM110.976 62.5706L111.425 62.9858L111.425 62.9858L110.976 62.5706ZM71.3927 105.424L71.8422 105.839L71.8422 105.839L71.3927 105.424ZM65.1251 109.309L65.2969 109.896L65.297 109.896L65.1251 109.309ZM53.3361 112.758L52.9209 113.208L53.1754 113.443L53.5079 113.345L53.3361 112.758ZM35.0704 95.887L34.4714 95.7623L34.4008 96.1014L34.6553 96.3365L35.0704 95.887ZM37.5743 83.8616L36.9753 83.7369L36.9753 83.7369L37.5743 83.8616ZM40.9503 77.305L41.3998 77.7202L41.3998 77.7202L40.9503 77.305ZM80.5323 34.4515L80.9818 34.8666C83.3409 32.3127 87.324 32.1543 89.8779 34.5133L90.2931 34.0638L90.7083 33.6143C87.6578 30.7967 82.9004 30.9859 80.0829 34.0363L80.5323 34.4515ZM90.2931 34.0638L89.8779 34.5133L110.173 53.2594L110.588 52.8099L111.003 52.3604L90.7083 33.6143L90.2931 34.0638ZM110.588 52.8099L110.173 53.2594C112.727 55.6184 112.885 59.6015 110.526 62.1554L110.976 62.5706L111.425 62.9858C114.243 59.9353 114.054 55.1779 111.003 52.3604L110.588 52.8099ZM110.976 62.5706L110.526 62.1554L70.9432 105.009L71.3927 105.424L71.8422 105.839L111.425 62.9858L110.976 62.5706ZM71.3927 105.424L70.9432 105.009C69.3198 106.766 67.2494 108.05 64.9533 108.722L65.1251 109.309L65.297 109.896C67.806 109.162 70.0683 107.76 71.8422 105.839L71.3927 105.424ZM65.1251 109.309L64.9533 108.722L53.1642 112.171L53.3361 112.758L53.5079 113.345L65.2969 109.896L65.1251 109.309ZM53.3361 112.758L53.7512 112.309L35.4856 95.4375L35.0704 95.887L34.6553 96.3365L52.9209 113.208L53.3361 112.758ZM35.0704 95.887L35.6695 96.0117L38.1734 83.9864L37.5743 83.8616L36.9753 83.7369L34.4714 95.7623L35.0704 95.887ZM37.5743 83.8616L38.1734 83.9864C38.6612 81.6438 39.7763 79.4779 41.3998 77.7202L40.9503 77.305L40.5008 76.8898C38.7268 78.8105 37.5083 81.1772 36.9753 83.7369L37.5743 83.8616ZM40.9503 77.305L41.3998 77.7202L80.9818 34.8666L80.5323 34.4515L80.0829 34.0363L40.5008 76.8898L40.9503 77.305Z" fill="url(#paint1_linear_702_2)" mask="url(#path-2-inside-1_702_2)"/>
-</g>
-<foreignObject x="56.2212" y="14.4392" width="74.3788" height="73.2169"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(13.06px);clip-path:url(#bgblur_1_702_2_clip_path);height:100%;width:100%"></div></foreignObject><rect data-figma-bg-blur-radius="26.1252" x="-0.345868" y="0.0137252" width="27.1385" height="6.4175" rx="3.20875" transform="matrix(-0.734589 -0.678512 -0.678513 0.734589 105.311 57.6527)" fill="url(#paint2_linear_702_2)" fill-opacity="0.9" stroke="url(#paint3_linear_702_2)" stroke-width="0.489516"/>
-<path d="M53.3362 112.758L35.0704 95.8869L31.3173 113.909C30.7858 116.461 33.1658 118.66 35.6681 117.928L53.3362 112.758Z" fill="url(#paint4_linear_702_2)"/>
-<defs>
-<clipPath id="bgblur_0_702_2_clip_path" transform="translate(-22.0078 -19.1681)"><path d="M80.5323 34.4515C83.1206 31.6493 87.4909 31.4755 90.2931 34.0638L110.588 52.8099C113.39 55.3981 113.564 59.7684 110.976 62.5706L71.3927 105.424C69.6941 107.263 67.5277 108.606 65.1251 109.309L53.3361 112.758L35.0704 95.887L37.5743 83.8616C38.0848 81.4105 39.2515 79.1442 40.9503 77.305L80.5323 34.4515Z"/>
-</clipPath><clipPath id="bgblur_1_702_2_clip_path" transform="translate(-56.2212 -14.4392)"><rect x="-0.345868" y="0.0137252" width="27.1385" height="6.4175" rx="3.20875" transform="matrix(-0.734589 -0.678512 -0.678513 0.734589 105.311 57.6527)"/>
-</clipPath><linearGradient id="paint0_linear_702_2" x1="111.233" y1="24.7324" x2="143.949" y2="34.3759" gradientUnits="userSpaceOnUse">
-<stop stop-color="#917FFB"/>
-<stop offset="1" stop-color="#3F2DAF"/>
-</linearGradient>
-<linearGradient id="paint1_linear_702_2" x1="27.7428" y1="33.6286" x2="83.9437" y2="109.387" gradientUnits="userSpaceOnUse">
-<stop stop-color="white"/>
-<stop offset="0.765625" stop-color="white" stop-opacity="0"/>
-</linearGradient>
-<linearGradient id="paint2_linear_702_2" x1="28.1556" y1="3.85131" x2="-11.7222" y2="2.83569" gradientUnits="userSpaceOnUse">
-<stop stop-color="#FCFDFE"/>
-<stop offset="1" stop-color="#FCFDFE" stop-opacity="0"/>
-</linearGradient>
-<linearGradient id="paint3_linear_702_2" x1="27.3252" y1="4.75029" x2="13.814" y2="6.90701" gradientUnits="userSpaceOnUse">
-<stop stop-color="white"/>
-<stop offset="1" stop-color="white" stop-opacity="0"/>
-</linearGradient>
-<linearGradient id="paint4_linear_702_2" x1="37.7476" y1="103.56" x2="44.6712" y2="121.426" gradientUnits="userSpaceOnUse">
-<stop stop-color="#917FFB"/>
-<stop offset="1" stop-color="#3F2DAF"/>
-</linearGradient>
-</defs>
-</svg></div><div><strong>How to fix:</strong> <span id="recommendation-${ruleId}">${firstIssue.recommendation}</span></div></div>
-                            ${instanceNavigation}
+                            <!--<p id="description-${ruleId}">${firstIssue.description.split('\n')[0]}</p>-->
+                            <div class="how-to-fix"><div class="how-to-fix-icon"><svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M331.8 224.1c28.29 0 54.88 10.99 74.86 30.97l19.59 19.59c40.01-17.74 71.25-53.3 81.62-96.65c5.725-23.92 5.34-47.08 .2148-68.4c-2.613-10.88-16.43-14.51-24.34-6.604l-68.9 68.9h-75.6V97.2l68.9-68.9c7.912-7.912 4.275-21.73-6.604-24.34c-21.32-5.125-44.48-5.51-68.4 .2148c-55.3 13.23-98.39 60.22-107.2 116.4C224.5 128.9 224.2 137 224.3 145l82.78 82.86C315.2 225.1 323.5 224.1 331.8 224.1zM384 278.6c-23.16-23.16-57.57-27.57-85.39-13.9L191.1 158L191.1 95.99l-127.1-95.99L0 63.1l96 127.1l62.04 .0077l106.7 106.6c-13.67 27.82-9.251 62.23 13.91 85.39l117 117.1c14.62 14.5 38.21 14.5 52.71-.0016l52.75-52.75c14.5-14.5 14.5-38.08-.0016-52.71L384 278.6zM227.9 307L168.7 247.9l-148.9 148.9c-26.37 26.37-26.37 69.08 0 95.45C32.96 505.4 50.21 512 67.5 512s34.54-6.592 47.72-19.78l119.1-119.1C225.5 352.3 222.6 329.4 227.9 307zM64 472c-13.25 0-24-10.75-24-24c0-13.26 10.75-24 24-24S88 434.7 88 448C88 461.3 77.25 472 64 472z"/></svg></div><div><strong>How to fix:</strong> <span id="recommendation-${ruleId}">${firstIssue.recommendation}</span></div></div>
+                            
                             ${checkboxHtml}
                             ${firstIssue.detailedInfo && firstIssue.detailedInfo.length > 0 ? `
                                 <button class="uw-a11y-details-toggle" onclick="window.uwAccessibilityChecker.toggleDetails('${ruleId}'); event.stopPropagation();">
-                                    Show technical details
+                                   <div class="technical-details-icon"><svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><title/><g><path d="M24.8452,25.3957a6.0129,6.0129,0,0,0-8.4487.7617L1.3974,44.1563a5.9844,5.9844,0,0,0,0,7.687L16.3965,69.8422a5.9983,5.9983,0,1,0,9.21-7.687L13.8068,48l11.8-14.1554A6,6,0,0,0,24.8452,25.3957Z"/><path d="M55.1714,12.1192A6.0558,6.0558,0,0,0,48.1172,16.83L36.1179,76.8262A5.9847,5.9847,0,0,0,40.8286,83.88a5.7059,5.7059,0,0,0,1.1835.1172A5.9949,5.9949,0,0,0,47.8828,79.17L59.8821,19.1735A5.9848,5.9848,0,0,0,55.1714,12.1192Z"/><path d="M94.6026,44.1563,79.6035,26.1574a5.9983,5.9983,0,1,0-9.21,7.687L82.1932,48l-11.8,14.1554a5.9983,5.9983,0,1,0,9.21,7.687L94.6026,51.8433A5.9844,5.9844,0,0,0,94.6026,44.1563Z"/></g></svg></div>Show technical details
                                 </button>
                                 <div class="uw-a11y-details" id="details-${ruleId}">
                                     <div id="detailed-content-${ruleId}">
@@ -1263,7 +1473,7 @@
             const detailedContent = document.getElementById(`detailed-content-${ruleId}`);
             
             if (descElement) descElement.textContent = currentIssue.description.split('\n')[0];
-            if (recElement) recElement.textContent = currentIssue.recommendation;
+            if (recElement) recElement.innerHTML = currentIssue.recommendation;
             if (currentSpan) currentSpan.textContent = currentIndex + 1;
             if (detailedContent && currentIssue.detailedInfo) {
                 detailedContent.innerHTML = this.renderDetailedInfo(currentIssue.detailedInfo);
@@ -1369,11 +1579,29 @@
             
             if (detailsElement.classList.contains('expanded')) {
                 detailsElement.classList.remove('expanded');
-                button.textContent = 'Show technical details';
+                // Update only the text portion, preserving the icon
+                this.updateButtonText(button, 'Show technical details');
             } else {
                 detailsElement.classList.add('expanded');
-                button.textContent = 'Hide technical details';
+                // Update only the text portion, preserving the icon
+                this.updateButtonText(button, 'Hide technical details');
             }
+        },
+        
+        // Helper function to update button text while preserving icon
+        updateButtonText: function(button, newText) {
+            // Find the text node in the button (it's the last child that's a text node)
+            const childNodes = button.childNodes;
+            for (let i = childNodes.length - 1; i >= 0; i--) {
+                const node = childNodes[i];
+                if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+                    node.textContent = newText;
+                    return;
+                }
+            }
+            
+            // If no text node found, append the text (fallback)
+            button.appendChild(document.createTextNode(newText));
         },
 
         // Toggle manual verification checkbox

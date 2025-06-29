@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.3.4', // Current version
+            version: '1.3.5', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -82,14 +82,10 @@
                     // Disable the region rule which often creates false positives
                     // for "Ensures all page content is contained by landmarks"
                     'region': { enabled: false },
-                    // Enable rules that commonly generate incomplete results for manual review
-                    'color-contrast-enhanced': { enabled: true },
-                    'audio-caption': { enabled: true },
-                    'hidden-content': { enabled: true },
-                    'identical-links-same-purpose': { enabled: true },
-                    'meta-refresh': { enabled: true }
+                    // Disable AAA-level color contrast rule (7:1 ratio) - we only want AA level (4.5:1)
+                    'color-contrast-enhanced': { enabled: false }
                 },
-                tags: ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag21aaa'],
+                tags: ['wcag2a', 'wcag2aa', 'wcag21aa'],
                 // Exclude the accessibility checker's own UI elements from analysis
                 exclude: [
                     '#uw-a11y-panel',     // Main panel container
@@ -987,12 +983,12 @@
                 body #uw-a11y-panel .uw-a11y-issue .how-to-fix {
                     margin-top: 8px;
                     border-radius: 4px;
-                    background: rgb(196, 218, 229);
+                    background: rgb(236, 236, 236);
                     padding: 8px;
                     font-size: 12px;
                     color: #212529;
                     font-weight: 500;
-                    border-left: 4px solid rgb(63, 96, 166);
+                    border-left: 4px solid rgb(51, 141, 214);
                     display: flex;
                     align-items: center;
                     gap: 8px;
@@ -1769,7 +1765,7 @@
             notification.id = 'uw-a11y-update-notification';
             notification.innerHTML = `
                 <div style="background: #28a745; color: white; padding: 10px; border-radius: 4px; margin-bottom: 10px; font-size: 13px;">
-                    <strong>📢 Update Available!</strong><br>
+                    <strong>Update Available!</strong><br>
                     A new version (v${newVersion}) of the Pinpoint Accessibility Checker is available.<br>
                     Current version: v${this.version}<br>
                     <div style="margin-top: 8px;">

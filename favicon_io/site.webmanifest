@@ -1,0 +1,21 @@
+{
+    "name": "Pinpoint Accessibility Checker",
+    "short_name": "Pinpoint",
+    "description": "WCAG 2.1 AA accessibility testing bookmarklet powered by axe-core",
+    "icons": [
+        {
+            "src": "/favicon_io/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/favicon_io/android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#c5050c",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "start_url": "/"
+} 

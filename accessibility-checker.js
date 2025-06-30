@@ -808,7 +808,7 @@
                     right: 20px;
                     width: 450px;
                     max-height: 85vh;
-                    background: rgba(255,255,255,0.65);
+                    background: rgba(255,255,255,0.8);
                     border: 1px solid rgba(255,255,255,0.85);
                     border-radius: 12px;
                     backdrop-filter: blur(12px);
@@ -818,6 +818,7 @@
                     font-size: 14px;
                     overflow: hidden;
                     transition: all 0.3s ease;
+                    
                 }
                 
                 body #uw-a11y-panel.minimized {
@@ -828,6 +829,8 @@
                     max-height: 180px;
                     border-radius: 8px 8px 0 0;
                 }
+
+                
                 
                 body #uw-a11y-panel.minimized #uw-a11y-content {
                     max-height: 120px;

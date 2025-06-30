@@ -1,4 +1,4 @@
-# TestMark - Pinpoint Accessibility Checker
+# Pinpoint Accessibility Checker
 
 A bookmarklet-based accessibility testing tool powered by axe-core that provides comprehensive WCAG 2.1 AA compliance testing.
 
@@ -269,12 +269,8 @@ If you're getting errors when clicking the bookmarklet:
 - [axe-core Documentation](https://www.deque.com/axe/)
 - [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
 
-## About
-
-Developed for the University of Wisconsin System to provide Faculty and Staff with professional-grade accessibility testing tools. This bookmarklet ensures consistency with industry-standard axe-based accessibility testing workflows while maintaining the professional appearance expected of university resources.
 
 ---
 
-**University of Wisconsin System**  
-Digital Accessibility Initiative  
+
 Powered by axe-core accessibility testing engine 

@@ -29,7 +29,48 @@
             panel.innerHTML = `
                 <div id="uw-a11y-header">
                     <div class="uw-a11y-title-container">
-                        <img src="images/radial.png" alt="Pinpoint logo" class="uw-a11y-logo">
+                        <svg viewBox="0 0 404 404" fill="none" xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo">
+                            <g filter="url(#filter0_d_1_19)">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M201 349C288.261 349 359 278.261 359 191C359 103.739 288.261 33 201 33C113.739 33 43 103.739 43 191C43 278.261 113.739 349 201 349ZM201 373C301.516 373 383 291.516 383 191C383 90.4842 301.516 9 201 9C100.484 9 19 90.4842 19 191C19 291.516 100.484 373 201 373Z" fill="url(#paint0_linear_1_19)"/>
+                            </g>
+                            <g filter="url(#filter1_d_1_19)">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M200.5 302C262.08 302 312 252.08 312 190.5C312 128.92 262.08 79 200.5 79C138.92 79 89 128.92 89 190.5C89 252.08 138.92 302 200.5 302ZM200.5 326C275.335 326 336 265.335 336 190.5C336 115.665 275.335 55 200.5 55C125.665 55 65 115.665 65 190.5C65 265.335 125.665 326 200.5 326Z" fill="url(#paint1_linear_1_19)"/>
+                            </g>
+                            <defs>
+                            <filter id="filter0_d_1_19" x="0.4" y="0.4" width="403.2" height="403.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                            <feOffset dx="1" dy="11"/>
+                            <feGaussianBlur stdDeviation="9.8"/>
+                            <feComposite in2="hardAlpha" operator="out"/>
+                            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
+                            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
+                            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
+                            </filter>
+                            <filter id="filter1_d_1_19" x="46.4" y="46.4" width="310.2" height="310.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                            <feOffset dx="1" dy="11"/>
+                            <feGaussianBlur stdDeviation="9.8"/>
+                            <feComposite in2="hardAlpha" operator="out"/>
+                            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
+                            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
+                            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
+                            </filter>
+                            <linearGradient id="paint0_linear_1_19" x1="78.7712" y1="51.9816" x2="324.572" y2="313.9" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#35CD9C"/>
+                            <stop offset="0.465" stop-color="#43FFFC"/>
+                            <stop offset="0.545" stop-color="#C2F6F9"/>
+                            <stop offset="1" stop-color="#33BFF1"/>
+                            </linearGradient>
+                            <linearGradient id="paint1_linear_1_19" x1="109.5" y1="87" x2="292.5" y2="282" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#35CD9C"/>
+                            <stop offset="0.465" stop-color="#43FFFC"/>
+                            <stop offset="0.545" stop-color="#C2F6F9"/>
+                            <stop offset="1" stop-color="#33BFF1"/>
+                            </linearGradient>
+                            </defs>
+                        </svg>
                         <h2>Pinpoint Accessibility Checker</h2>
                     </div>
                     <button id="uw-a11y-close">✕</button>
@@ -870,7 +911,48 @@
             panel.innerHTML = `
                 <div id="uw-a11y-header">
                     <div class="uw-a11y-title-container">
-                        <img src="images/radial.png" alt="Pinpoint logo" class="uw-a11y-logo">
+                        <svg viewBox="0 0 404 404" fill="none" xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo">
+                            <g filter="url(#filter0_d_1_19)">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M201 349C288.261 349 359 278.261 359 191C359 103.739 288.261 33 201 33C113.739 33 43 103.739 43 191C43 278.261 113.739 349 201 349ZM201 373C301.516 373 383 291.516 383 191C383 90.4842 301.516 9 201 9C100.484 9 19 90.4842 19 191C19 291.516 100.484 373 201 373Z" fill="url(#paint0_linear_1_19)"/>
+                            </g>
+                            <g filter="url(#filter1_d_1_19)">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M200.5 302C262.08 302 312 252.08 312 190.5C312 128.92 262.08 79 200.5 79C138.92 79 89 128.92 89 190.5C89 252.08 138.92 302 200.5 302ZM200.5 326C275.335 326 336 265.335 336 190.5C336 115.665 275.335 55 200.5 55C125.665 55 65 115.665 65 190.5C65 265.335 125.665 326 200.5 326Z" fill="url(#paint1_linear_1_19)"/>
+                            </g>
+                            <defs>
+                            <filter id="filter0_d_1_19" x="0.4" y="0.4" width="403.2" height="403.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                            <feOffset dx="1" dy="11"/>
+                            <feGaussianBlur stdDeviation="9.8"/>
+                            <feComposite in2="hardAlpha" operator="out"/>
+                            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
+                            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
+                            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
+                            </filter>
+                            <filter id="filter1_d_1_19" x="46.4" y="46.4" width="310.2" height="310.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                            <feOffset dx="1" dy="11"/>
+                            <feGaussianBlur stdDeviation="9.8"/>
+                            <feComposite in2="hardAlpha" operator="out"/>
+                            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
+                            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
+                            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
+                            </filter>
+                            <linearGradient id="paint0_linear_1_19" x1="78.7712" y1="51.9816" x2="324.572" y2="313.9" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#35CD9C"/>
+                            <stop offset="0.465" stop-color="#43FFFC"/>
+                            <stop offset="0.545" stop-color="#C2F6F9"/>
+                            <stop offset="1" stop-color="#33BFF1"/>
+                            </linearGradient>
+                            <linearGradient id="paint1_linear_1_19" x1="109.5" y1="87" x2="292.5" y2="282" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#35CD9C"/>
+                            <stop offset="0.465" stop-color="#43FFFC"/>
+                            <stop offset="0.545" stop-color="#C2F6F9"/>
+                            <stop offset="1" stop-color="#33BFF1"/>
+                            </linearGradient>
+                            </defs>
+                        </svg>
                         <h2>Pinpoint Accessibility Checker</h2>
                     </div>
                     <div class="uw-a11y-header-buttons">
@@ -1001,9 +1083,14 @@
                 }
                 
                 body #uw-a11y-panel .uw-a11y-logo {
-                    width: 20px;
-                    height: 20px;
+                    width: 24px;
+                    height: 24px;
                     flex-shrink: 0;
+                }
+                
+                body #uw-a11y-panel.minimized .uw-a11y-logo {
+                    width: 18px;
+                    height: 18px;
                 }
                 
                 body #uw-a11y-panel #uw-a11y-header h2 {

@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.3.5', // Current version
+            version: '1.3.6', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -28,7 +28,10 @@
             panel.id = 'uw-a11y-panel';
             panel.innerHTML = `
                 <div id="uw-a11y-header">
-                    <h2>Pinpoint Accessibility Checker</h2>
+                    <div class="uw-a11y-title-container">
+                        <img src="images/radial.png" alt="Pinpoint logo" class="uw-a11y-logo">
+                        <h2>Pinpoint Accessibility Checker</h2>
+                    </div>
                     <button id="uw-a11y-close">✕</button>
                 </div>
                 <div id="uw-a11y-content">
@@ -268,7 +271,8 @@
             });
             
             // Handle CSS values and specific technical terms
-            const cssPattern = /(\d+:\d+|tabindex="\d+"|role="[^"]*"|#[a-zA-Z0-9-]+)/g;
+            // Fixed to properly handle decimal contrast ratios like 1.77:1, 4.5:1, etc.
+            const cssPattern = /(\d+(?:\.\d+)?:\d+(?:\.\d+)?|tabindex="\d+"|role="[^"]*"|#[a-zA-Z0-9-]+)/g;
             const withCss = withAttrs.replace(cssPattern, (match) => {
                 // Only format if not already in code tags
                 if (!match.includes('&lt;') && !match.includes('&gt;')) {
@@ -578,8 +582,28 @@
                 if (!element) return null;
                 
                 const styles = window.getComputedStyle(element);
-                const fgColor = styles.color;
-                const bgColor = styles.backgroundColor;
+                let fgColor = styles.color;
+                let bgColor = styles.backgroundColor;
+                
+                // Handle transparent or rgba(0,0,0,0) backgrounds by finding the effective background
+                if (!bgColor || bgColor === 'transparent' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor.includes('rgba(0, 0, 0, 0)')) {
+                    // Walk up the DOM tree to find the first non-transparent background
+                    let parent = element.parentElement;
+                    while (parent && parent !== document.body) {
+                        const parentStyles = window.getComputedStyle(parent);
+                        const parentBg = parentStyles.backgroundColor;
+                        if (parentBg && parentBg !== 'transparent' && parentBg !== 'rgba(0, 0, 0, 0)' && !parentBg.includes('rgba(0, 0, 0, 0)')) {
+                            bgColor = parentBg;
+                            break;
+                        }
+                        parent = parent.parentElement;
+                    }
+                    
+                    // If still no background found, assume white (common default)
+                    if (!bgColor || bgColor === 'transparent' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor.includes('rgba(0, 0, 0, 0)')) {
+                        bgColor = '#ffffff';
+                    }
+                }
                 
                 // Calculate contrast ratio if possible
                 const contrast = this.calculateContrastRatio(fgColor, bgColor);
@@ -591,45 +615,116 @@
                     required: 'WCAG AA requires 4.5:1 for normal text, 3:1 for large text'
                 };
             } catch (e) {
+                console.warn('Error extracting color contrast info:', e);
                 return null;
             }
         },
         
-        // Simple contrast ratio calculation
+        // WCAG compliant contrast ratio calculation
         calculateContrastRatio: function(fg, bg) {
             try {
-                // This is a simplified version - in practice you'd want a more robust color parser
                 const fgLuminance = this.getLuminance(fg);
                 const bgLuminance = this.getLuminance(bg);
                 
-                if (fgLuminance === null || bgLuminance === null) return null;
+                // Return null if we can't calculate luminance for either color
+                if (fgLuminance === null || bgLuminance === null) {
+                    console.warn('Could not calculate luminance for colors:', fg, bg);
+                    return null;
+                }
                 
+                // WCAG contrast ratio formula: (L1 + 0.05) / (L2 + 0.05)
+                // where L1 is the lighter color and L2 is the darker color
                 const lighter = Math.max(fgLuminance, bgLuminance);
                 const darker = Math.min(fgLuminance, bgLuminance);
                 
-                return (lighter + 0.05) / (darker + 0.05);
+                const contrast = (lighter + 0.05) / (darker + 0.05);
+                
+                // Ensure we return a reasonable value
+                if (isNaN(contrast) || !isFinite(contrast)) {
+                    console.warn('Invalid contrast ratio calculated for colors:', fg, bg);
+                    return null;
+                }
+                
+                return contrast;
             } catch (e) {
+                console.warn('Error calculating contrast ratio:', e);
                 return null;
             }
         },
         
-        // Get relative luminance (simplified)
+        // Get relative luminance (WCAG compliant)
         getLuminance: function(color) {
-            // This is a very simplified version - would need more robust color parsing for production
             try {
-                if (color.startsWith('rgb')) {
+                let r, g, b;
+                
+                // Handle different color formats
+                if (color.startsWith('#')) {
+                    // Hex color
+                    const hex = color.slice(1);
+                    if (hex.length === 3) {
+                        // Short hex (#rgb)
+                        r = parseInt(hex[0] + hex[0], 16);
+                        g = parseInt(hex[1] + hex[1], 16);
+                        b = parseInt(hex[2] + hex[2], 16);
+                    } else if (hex.length === 6) {
+                        // Long hex (#rrggbb)
+                        r = parseInt(hex.slice(0, 2), 16);
+                        g = parseInt(hex.slice(2, 4), 16);
+                        b = parseInt(hex.slice(4, 6), 16);
+                    } else {
+                        return null;
+                    }
+                } else if (color.startsWith('rgb')) {
+                    // RGB/RGBA color
                     const values = color.match(/\d+/g);
                     if (values && values.length >= 3) {
-                        const r = parseInt(values[0]) / 255;
-                        const g = parseInt(values[1]) / 255;
-                        const b = parseInt(values[2]) / 255;
-                        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+                        r = parseInt(values[0]);
+                        g = parseInt(values[1]);
+                        b = parseInt(values[2]);
+                    } else {
+                        return null;
+                    }
+                } else {
+                    // Named colors - basic support for common ones
+                    const namedColors = {
+                        'white': [255, 255, 255],
+                        'black': [0, 0, 0],
+                        'red': [255, 0, 0],
+                        'green': [0, 128, 0],
+                        'blue': [0, 0, 255],
+                        'yellow': [255, 255, 0],
+                        'cyan': [0, 255, 255],
+                        'magenta': [255, 0, 255],
+                        'silver': [192, 192, 192],
+                        'gray': [128, 128, 128],
+                        'grey': [128, 128, 128]
+                    };
+                    
+                    const colorName = color.toLowerCase().trim();
+                    if (namedColors[colorName]) {
+                        [r, g, b] = namedColors[colorName];
+                    } else {
+                        return null;
                     }
                 }
+                
+                // Apply gamma correction (sRGB to linear RGB)
+                const gammaCorrect = (c) => {
+                    c = c / 255;
+                    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+                };
+                
+                const rLinear = gammaCorrect(r);
+                const gLinear = gammaCorrect(g);
+                const bLinear = gammaCorrect(b);
+                
+                // Calculate relative luminance using WCAG formula
+                return 0.2126 * rLinear + 0.7152 * gLinear + 0.0722 * bLinear;
+                
             } catch (e) {
-                // Return null if calculation fails
+                console.warn('Error calculating luminance for color:', color, e);
+                return null;
             }
-            return null;
         },
         
         // Analyze landmark context
@@ -774,7 +869,10 @@
             
             panel.innerHTML = `
                 <div id="uw-a11y-header">
-                    <h2>Pinpoint Accessibility Checker</h2>
+                    <div class="uw-a11y-title-container">
+                        <img src="images/radial.png" alt="Pinpoint logo" class="uw-a11y-logo">
+                        <h2>Pinpoint Accessibility Checker</h2>
+                    </div>
                     <div class="uw-a11y-header-buttons">
                         <button id="uw-a11y-minimize" title="Minimize">−</button>
                         <button id="uw-a11y-close" title="Close">✕</button>
@@ -896,6 +994,18 @@
                     display: flex;
                     gap: 8px;
                 }
+                body #uw-a11y-panel .uw-a11y-title-container {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+                
+                body #uw-a11y-panel .uw-a11y-logo {
+                    width: 20px;
+                    height: 20px;
+                    flex-shrink: 0;
+                }
+                
                 body #uw-a11y-panel #uw-a11y-header h2 {
                     margin: 0;
                     font-size: 16px;
@@ -939,24 +1049,27 @@
                     
                 }
                 body #uw-a11y-panel .uw-a11y-issue {
-                    margin-bottom: 12px;
+                    margin-bottom: 18px;
                     padding: 12px;
                     border-left: 4px solid #ffc107;
                     background: #fff3cd;
-                    border-radius: 0 4px 4px 0;
+                    border-radius: 8px;
                     cursor: pointer;
                 }
                 body #uw-a11y-panel .uw-a11y-issue.error {
                     border-left-color: #dc3545;
                     background: #f8d7da;
+                    box-shadow: 0 2px 10px 0 rgba(211, 23, 41, 0.22);
                 }
                 body #uw-a11y-panel .uw-a11y-issue.warning {
                     border-left-color: #ffc107;
                     background: #fff3cd;
+                    box-shadow: 0 2px 10px 0 rgba(211, 133, 23, 0.22);
                 }
                 body #uw-a11y-panel .uw-a11y-issue.info {
                     border-left-color: #17a2b8;
                     background: #d1ecf1;
+                    box-shadow: 0 2px 10px 0 rgba(23, 104, 211, 0.22);
                 }
                 body #uw-a11y-panel .uw-a11y-issue h4 {
                     margin: 0 0 8px 0;
@@ -973,10 +1086,13 @@
                     margin-top: 8px;
                     padding-top: 8px;
                     border-top: 1px solid rgba(0,0,0,0.1);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
                 }
                 body #uw-a11y-panel .uw-a11y-issue .learn-more {
                     color: #c5050c;
-                    text-decoration: none;
+                   
                     font-size: 12px;
                 }
                 body #uw-a11y-panel .uw-a11y-issue .learn-more:hover {
@@ -1132,13 +1248,16 @@
                     display: block;
                 }
                 body #uw-a11y-panel .uw-a11y-details-toggle {
-                    background: none;
-                    border: none;
-                    color: #007cba;
+                    display: block;
+                    background: rgba(0,0,0,0.12);
+                    border: 1px solid rgba(0,0,0,0.3);
+                    border-radius: 50rem;
+                    padding: 4px 8px;
+                    color:rgb(28, 28, 28);
                     cursor: pointer;
                     font-size: 12px;
-                    text-decoration: underline;
-                    padding: 0;
+                    text-decoration: none;
+                    backdrop-filter: saturate(250%);
                     margin-top: 0.5rem;
                 }
 
@@ -1180,6 +1299,7 @@
                     margin-top: -12px;
                     margin-left: -12px;
                     margin-right: -12px;
+                    margin-bottom: 10px;
                     padding: 8px;
                     background: rgba(0,0,0,0.1);
                     backdrop-filter: saturate(200%);
@@ -1342,7 +1462,7 @@
                              ${instanceNavigation}
                             <h4>${firstIssue.title} ${issueGroup.length > 1 ? `(${issueGroup.length} instances)` : ''}</h4>
                             <!--<p id="description-${ruleId}">${firstIssue.description.split('\n')[0]}</p>-->
-                            <div class="how-to-fix"><div class="how-to-fix-icon"><svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M331.8 224.1c28.29 0 54.88 10.99 74.86 30.97l19.59 19.59c40.01-17.74 71.25-53.3 81.62-96.65c5.725-23.92 5.34-47.08 .2148-68.4c-2.613-10.88-16.43-14.51-24.34-6.604l-68.9 68.9h-75.6V97.2l68.9-68.9c7.912-7.912 4.275-21.73-6.604-24.34c-21.32-5.125-44.48-5.51-68.4 .2148c-55.3 13.23-98.39 60.22-107.2 116.4C224.5 128.9 224.2 137 224.3 145l82.78 82.86C315.2 225.1 323.5 224.1 331.8 224.1zM384 278.6c-23.16-23.16-57.57-27.57-85.39-13.9L191.1 158L191.1 95.99l-127.1-95.99L0 63.1l96 127.1l62.04 .0077l106.7 106.6c-13.67 27.82-9.251 62.23 13.91 85.39l117 117.1c14.62 14.5 38.21 14.5 52.71-.0016l52.75-52.75c14.5-14.5 14.5-38.08-.0016-52.71L384 278.6zM227.9 307L168.7 247.9l-148.9 148.9c-26.37 26.37-26.37 69.08 0 95.45C32.96 505.4 50.21 512 67.5 512s34.54-6.592 47.72-19.78l119.1-119.1C225.5 352.3 222.6 329.4 227.9 307zM64 472c-13.25 0-24-10.75-24-24c0-13.26 10.75-24 24-24S88 434.7 88 448C88 461.3 77.25 472 64 472z"/></svg></div><div><strong>How to fix:</strong> <span id="recommendation-${ruleId}">${firstIssue.recommendation}</span></div></div>
+                            <div class="how-to-fix"><div class="how-to-fix-icon"><svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M331.8 224.1c28.29 0 54.88 10.99 74.86 30.97l19.59 19.59c40.01-17.74 71.25-53.3 81.62-96.65c5.725-23.92 5.34-47.08 .2148-68.4c-2.613-10.88-16.43-14.51-24.34-6.604l-68.9 68.9h-75.6V97.2l68.9-68.9c7.912-7.912 4.275-21.73-6.604-24.34c-21.32-5.125-44.48-5.51-68.4 .2148c-55.3 13.23-98.39 60.22-107.2 116.4C224.5 128.9 224.2 137 224.3 145l82.78 82.86C315.2 225.1 323.5 224.1 331.8 224.1zM384 278.6c-23.16-23.16-57.57-27.57-85.39-13.9L191.1 158L191.1 95.99l-127.1-95.99L0 63.1l96 127.1l62.04 .0077l106.7 106.6c-13.67 27.82-9.251 62.23 13.91 85.39l117 117.1c14.62 14.5 38.21 14.5 52.71-.0016l52.75-52.75c14.5-14.5 14.5-38.08-.0016-52.71L384 278.6zM227.9 307L168.7 247.9l-148.9 148.9c-26.37 26.37-26.37 69.08 0 95.45C32.96 505.4 50.21 512 67.5 512s34.54-6.592 47.72-19.78l119.1-119.1C225.5 352.3 222.6 329.4 227.9 307zM64 472c-13.25 0-24-10.75-24-24c0-13.26 10.75-24 24-24S88 434.7 88 448C88 461.3 77.25 472 64 472z"/></svg></div><div><strong>How to fix:</strong> <span id="recommendation-${ruleId}"></span></div></div>
                             
                             ${checkboxHtml}
                             ${firstIssue.detailedInfo && firstIssue.detailedInfo.length > 0 ? `
@@ -1356,13 +1476,25 @@
                                 </div>
                             ` : ''}
                             <div class="issue-meta">
-                                <strong>Impact:</strong> ${firstIssue.impact || 'unknown'} | 
-                                <strong>Tags:</strong> ${firstIssue.tags.join(', ')}
+                                <div><strong>Impact:</strong> ${firstIssue.impact || 'unknown'}
+                                
+                                </div>
+                                <!--<strong>Tags:</strong> ${firstIssue.tags.join(', ')}-->
                                 ${firstIssue.helpUrl ? `<br><a href="${firstIssue.helpUrl}" target="_blank" class="learn-more">Learn more about this rule</a>` : ''}
                             </div>
                         </div>
                     `;
                 }).join('');
+                
+                // Initialize recommendation content after HTML is created
+                Object.keys(groupedIssues).forEach(ruleId => {
+                    const issueGroup = groupedIssues[ruleId];
+                    const firstIssue = issueGroup[0];
+                    const recElement = document.getElementById(`recommendation-${ruleId}`);
+                    if (recElement) {
+                        recElement.innerHTML = firstIssue.recommendation;
+                    }
+                });
             }
         },
         

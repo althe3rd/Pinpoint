@@ -864,8 +864,11 @@
                     totalManualReview++;
                     const uniqueId = `incomplete-${incompleteIndex}-${nodeIndex}`;
                     
-                    // If item is manually verified, don't count it as a deduction
-                    if (this.checkedItems && this.checkedItems.has(uniqueId)) {
+                    // Check if this specific item is verified OR if the entire rule is verified
+                    const isRuleVerified = this.isRuleVerified(incomplete.id);
+                    const isIndividuallyVerified = this.checkedItems && this.checkedItems.has(uniqueId);
+                    
+                    if (isIndividuallyVerified || isRuleVerified) {
                         verifiedCount++;
                         // No deduction for verified items
                     } else {

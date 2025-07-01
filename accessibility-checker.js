@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.4.1', // Current version
+            version: '1.4.2', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -2059,22 +2059,28 @@
             const notification = document.createElement('div');
             notification.id = 'uw-a11y-update-notification';
             notification.innerHTML = `
-                <div style="background: #28a745; color: white; padding: 10px; border-radius: 4px; margin-bottom: 10px; font-size: 13px;">
-                    <strong>Update Available!</strong><br>
-                    A new version (v${newVersion}) of the Pinpoint Accessibility Checker is available.<br>
-                    Current version: v${this.version}<br>
-                    <div style="margin-top: 8px;">
-                        <a href="${releaseUrl}" target="_blank" style="color: #ffffff; text-decoration: underline;">
+                <div style="background: #56ab30; color: white; padding: 12px; border-radius: 4px; margin-bottom: 10px; font-size: 13px; position: relative;">
+                    <button onclick="this.parentElement.parentElement.style.display='none'" 
+                            style="position: absolute; top: 8px; right: 8px; background: none; border: none; color: white; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; opacity: 0.8; transition: opacity 0.2s;"
+                            onmouseover="this.style.opacity='1'; this.style.backgroundColor='rgba(255,255,255,0.2)'"
+                            onmouseout="this.style.opacity='0.8'; this.style.backgroundColor='transparent'">
+                        ✕
+                    </button>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink: 0;">
+                            <path d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="1" fill="currentColor"/>
+                        </svg>
+                        <h3 style="font-size: 14px; margin: 0; font-weight: 700;">Update Available</h3>
+                    </div>
+                    <div style="margin-bottom: 8px;">v${this.version} → v${newVersion}</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+                        <a href="${releaseUrl}" target="_blank" style="color: #ffffff; text-decoration: underline; font-size: 12px;">
                             View release notes →
                         </a>
-                        <span style="margin: 0 8px;">|</span>
-                        <a href="https://althe3rd.github.io/Pinpoint/" target="_blank" style="color: #ffffff; text-decoration: underline;">
+                        <a href="https://althe3rd.github.io/Pinpoint/" target="_blank" style="color: #ffffff; text-decoration: underline; font-size: 12px;">
                             Get latest bookmarklet →
                         </a>
-                        <button onclick="this.parentElement.parentElement.style.display='none'" 
-                                style="float: right; background: none; border: 1px solid white; color: white; border-radius: 2px; padding: 2px 6px; cursor: pointer; font-size: 11px;">
-                            ✕
-                        </button>
                     </div>
                 </div>
             `;
@@ -2105,6 +2111,11 @@
             });
             
             delete window.uwAccessibilityChecker;
+        },
+
+        // Debug method to trigger update notification
+        debugShowUpdateNotification: function() {
+            this.showUpdateNotification('1.5.0', 'https://github.com/althe3rd/Pinpoint/releases/tag/v1.5.0');
         }
     };
     

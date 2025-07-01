@@ -14,81 +14,106 @@
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
             isMinimized: false, // Track minimized state
+            shadowRoot: null, // Shadow DOM root
         
         // Initialize the checker
         init: function() {
+            this.setupShadowDOM();
             this.checkForUpdates();
             this.showLoadingPanel();
             this.loadAxeCore();
         },
         
+        // Setup Shadow DOM container
+        setupShadowDOM: function() {
+            // Create container element
+            const container = document.createElement('div');
+            container.id = 'uw-a11y-container';
+            document.body.appendChild(container);
+            
+            // Attach shadow root
+            this.shadowRoot = container.attachShadow({ mode: 'open' });
+            
+            // Add global styles for highlight class (applied to main document)
+            if (!document.getElementById('uw-a11y-global-styles')) {
+                const globalStyle = document.createElement('style');
+                globalStyle.id = 'uw-a11y-global-styles';
+                globalStyle.textContent = `
+                    .uw-a11y-highlight {
+                        background: yellow !important;
+                        border: 2px solid red !important;
+                        box-shadow: 0 0 0 2px yellow !important;
+                    }
+                `;
+                document.head.appendChild(globalStyle);
+            }
+        },
+        
         // Show loading panel while axe-core loads
         showLoadingPanel: function() {
-            const panel = document.createElement('div');
-            panel.id = 'uw-a11y-panel';
-            panel.innerHTML = `
-                <div id="uw-a11y-header">
-                    <div class="uw-a11y-title-container">
-                        <svg viewBox="0 0 404 404" fill="none" xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo">
-                            <g filter="url(#filter0_d_1_19)">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M201 349C288.261 349 359 278.261 359 191C359 103.739 288.261 33 201 33C113.739 33 43 103.739 43 191C43 278.261 113.739 349 201 349ZM201 373C301.516 373 383 291.516 383 191C383 90.4842 301.516 9 201 9C100.484 9 19 90.4842 19 191C19 291.516 100.484 373 201 373Z" fill="url(#paint0_linear_1_19)"/>
-                            </g>
-                            <g filter="url(#filter1_d_1_19)">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M200.5 302C262.08 302 312 252.08 312 190.5C312 128.92 262.08 79 200.5 79C138.92 79 89 128.92 89 190.5C89 252.08 138.92 302 200.5 302ZM200.5 326C275.335 326 336 265.335 336 190.5C336 115.665 275.335 55 200.5 55C125.665 55 65 115.665 65 190.5C65 265.335 125.665 326 200.5 326Z" fill="url(#paint1_linear_1_19)"/>
-                            </g>
-                            <defs>
-                            <filter id="filter0_d_1_19" x="0.4" y="0.4" width="403.2" height="403.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-                            <feOffset dx="1" dy="11"/>
-                            <feGaussianBlur stdDeviation="9.8"/>
-                            <feComposite in2="hardAlpha" operator="out"/>
-                            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
-                            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
-                            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
-                            </filter>
-                            <filter id="filter1_d_1_19" x="46.4" y="46.4" width="310.2" height="310.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-                            <feOffset dx="1" dy="11"/>
-                            <feGaussianBlur stdDeviation="9.8"/>
-                            <feComposite in2="hardAlpha" operator="out"/>
-                            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
-                            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
-                            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
-                            </filter>
-                            <linearGradient id="paint0_linear_1_19" x1="78.7712" y1="51.9816" x2="324.572" y2="313.9" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#35CD9C"/>
-                            <stop offset="0.465" stop-color="#43FFFC"/>
-                            <stop offset="0.545" stop-color="#C2F6F9"/>
-                            <stop offset="1" stop-color="#33BFF1"/>
-                            </linearGradient>
-                            <linearGradient id="paint1_linear_1_19" x1="109.5" y1="87" x2="292.5" y2="282" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#35CD9C"/>
-                            <stop offset="0.465" stop-color="#43FFFC"/>
-                            <stop offset="0.545" stop-color="#C2F6F9"/>
-                            <stop offset="1" stop-color="#33BFF1"/>
-                            </linearGradient>
-                            </defs>
-                        </svg>
-                        <h2>Pinpoint Accessibility Checker</h2>
+            this.shadowRoot.innerHTML = `
+                ${this.getStyles()}
+                <div id="uw-a11y-panel">
+                    <div id="uw-a11y-header">
+                        <div class="uw-a11y-title-container">
+                            <svg viewBox="0 0 404 404" fill="none" xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo">
+                                <g filter="url(#filter0_d_1_19)">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M201 349C288.261 349 359 278.261 359 191C359 103.739 288.261 33 201 33C113.739 33 43 103.739 43 191C43 278.261 113.739 349 201 349ZM201 373C301.516 373 383 291.516 383 191C383 90.4842 301.516 9 201 9C100.484 9 19 90.4842 19 191C19 291.516 100.484 373 201 373Z" fill="url(#paint0_linear_1_19)"/>
+                                </g>
+                                <g filter="url(#filter1_d_1_19)">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M200.5 302C262.08 302 312 252.08 312 190.5C312 128.92 262.08 79 200.5 79C138.92 79 89 128.92 89 190.5C89 252.08 138.92 302 200.5 302ZM200.5 326C275.335 326 336 265.335 336 190.5C336 115.665 275.335 55 200.5 55C125.665 55 65 115.665 65 190.5C65 265.335 125.665 326 200.5 326Z" fill="url(#paint1_linear_1_19)"/>
+                                </g>
+                                <defs>
+                                <filter id="filter0_d_1_19" x="0.4" y="0.4" width="403.2" height="403.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                                <feOffset dx="1" dy="11"/>
+                                <feGaussianBlur stdDeviation="9.8"/>
+                                <feComposite in2="hardAlpha" operator="out"/>
+                                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
+                                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
+                                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
+                                </filter>
+                                <filter id="filter1_d_1_19" x="46.4" y="46.4" width="310.2" height="310.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                                <feOffset dx="1" dy="11"/>
+                                <feGaussianBlur stdDeviation="9.8"/>
+                                <feComposite in2="hardAlpha" operator="out"/>
+                                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
+                                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
+                                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
+                                </filter>
+                                <linearGradient id="paint0_linear_1_19" x1="78.7712" y1="51.9816" x2="324.572" y2="313.9" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#35CD9C"/>
+                                <stop offset="0.465" stop-color="#43FFFC"/>
+                                <stop offset="0.545" stop-color="#C2F6F9"/>
+                                <stop offset="1" stop-color="#33BFF1"/>
+                                </linearGradient>
+                                <linearGradient id="paint1_linear_1_19" x1="109.5" y1="87" x2="292.5" y2="282" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#35CD9C"/>
+                                <stop offset="0.465" stop-color="#43FFFC"/>
+                                <stop offset="0.545" stop-color="#C2F6F9"/>
+                                <stop offset="1" stop-color="#33BFF1"/>
+                                </linearGradient>
+                                </defs>
+                            </svg>
+                            <h2>Pinpoint Accessibility Checker</h2>
+                        </div>
+                        <button id="uw-a11y-close">✕</button>
                     </div>
-                    <button id="uw-a11y-close">✕</button>
-                </div>
-                <div id="uw-a11y-content">
-                    <div style="text-align: center; padding: 2rem;">
-                        <div class="uw-a11y-spinner"></div>
-                        <p style="margin-top: 1rem;">Loading axe-core accessibility engine...</p>
-                        <p style="font-size: 0.9rem; color: #666;">This may take a few seconds on first use.</p>
+                    <div id="uw-a11y-content">
+                        <div style="text-align: center; padding: 2rem;">
+                            <div class="uw-a11y-spinner"></div>
+                            <p style="margin-top: 1rem;">Loading axe-core accessibility engine...</p>
+                            <p style="font-size: 0.9rem; color: #666;">This may take a few seconds on first use.</p>
+                        </div>
                     </div>
                 </div>
             `;
             
-            this.addStyles();
-            document.body.appendChild(panel);
-            
             // Add event listeners
-            document.getElementById('uw-a11y-close').onclick = () => this.remove();
+            this.shadowRoot.getElementById('uw-a11y-close').onclick = () => this.remove();
         },
         
         // Load axe-core dynamically
@@ -901,88 +926,84 @@
         
         // Create and show the results panel
         createPanel: function() {
-            let panel = document.getElementById('uw-a11y-panel');
-            if (!panel) {
-                panel = document.createElement('div');
-                panel.id = 'uw-a11y-panel';
-                document.body.appendChild(panel);
-            }
-            
-            panel.innerHTML = `
-                <div id="uw-a11y-header">
-                    <div class="uw-a11y-title-container">
-                        <svg viewBox="0 0 404 404" fill="none" xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo">
-                            <g filter="url(#filter0_d_1_19)">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M201 349C288.261 349 359 278.261 359 191C359 103.739 288.261 33 201 33C113.739 33 43 103.739 43 191C43 278.261 113.739 349 201 349ZM201 373C301.516 373 383 291.516 383 191C383 90.4842 301.516 9 201 9C100.484 9 19 90.4842 19 191C19 291.516 100.484 373 201 373Z" fill="url(#paint0_linear_1_19)"/>
-                            </g>
-                            <g filter="url(#filter1_d_1_19)">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M200.5 302C262.08 302 312 252.08 312 190.5C312 128.92 262.08 79 200.5 79C138.92 79 89 128.92 89 190.5C89 252.08 138.92 302 200.5 302ZM200.5 326C275.335 326 336 265.335 336 190.5C336 115.665 275.335 55 200.5 55C125.665 55 65 115.665 65 190.5C65 265.335 125.665 326 200.5 326Z" fill="url(#paint1_linear_1_19)"/>
-                            </g>
-                            <defs>
-                            <filter id="filter0_d_1_19" x="0.4" y="0.4" width="403.2" height="403.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-                            <feOffset dx="1" dy="11"/>
-                            <feGaussianBlur stdDeviation="9.8"/>
-                            <feComposite in2="hardAlpha" operator="out"/>
-                            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
-                            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
-                            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
-                            </filter>
-                            <filter id="filter1_d_1_19" x="46.4" y="46.4" width="310.2" height="310.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-                            <feOffset dx="1" dy="11"/>
-                            <feGaussianBlur stdDeviation="9.8"/>
-                            <feComposite in2="hardAlpha" operator="out"/>
-                            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
-                            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
-                            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
-                            </filter>
-                            <linearGradient id="paint0_linear_1_19" x1="78.7712" y1="51.9816" x2="324.572" y2="313.9" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#35CD9C"/>
-                            <stop offset="0.465" stop-color="#43FFFC"/>
-                            <stop offset="0.545" stop-color="#C2F6F9"/>
-                            <stop offset="1" stop-color="#33BFF1"/>
-                            </linearGradient>
-                            <linearGradient id="paint1_linear_1_19" x1="109.5" y1="87" x2="292.5" y2="282" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#35CD9C"/>
-                            <stop offset="0.465" stop-color="#43FFFC"/>
-                            <stop offset="0.545" stop-color="#C2F6F9"/>
-                            <stop offset="1" stop-color="#33BFF1"/>
-                            </linearGradient>
-                            </defs>
-                        </svg>
-                        <h2>Pinpoint Accessibility Checker</h2>
+            this.shadowRoot.innerHTML = `
+                ${this.getStyles()}
+                <div id="uw-a11y-panel">
+                    <div id="uw-a11y-header">
+                        <div class="uw-a11y-title-container">
+                            <svg viewBox="0 0 404 404" fill="none" xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo">
+                                <g filter="url(#filter0_d_1_19)">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M201 349C288.261 349 359 278.261 359 191C359 103.739 288.261 33 201 33C113.739 33 43 103.739 43 191C43 278.261 113.739 349 201 349ZM201 373C301.516 373 383 291.516 383 191C383 90.4842 301.516 9 201 9C100.484 9 19 90.4842 19 191C19 291.516 100.484 373 201 373Z" fill="url(#paint0_linear_1_19)"/>
+                                </g>
+                                <g filter="url(#filter1_d_1_19)">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M200.5 302C262.08 302 312 252.08 312 190.5C312 128.92 262.08 79 200.5 79C138.92 79 89 128.92 89 190.5C89 252.08 138.92 302 200.5 302ZM200.5 326C275.335 326 336 265.335 336 190.5C336 115.665 275.335 55 200.5 55C125.665 55 65 115.665 65 190.5C65 265.335 125.665 326 200.5 326Z" fill="url(#paint1_linear_1_19)"/>
+                                </g>
+                                <defs>
+                                <filter id="filter0_d_1_19" x="0.4" y="0.4" width="403.2" height="403.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                                <feOffset dx="1" dy="11"/>
+                                <feGaussianBlur stdDeviation="9.8"/>
+                                <feComposite in2="hardAlpha" operator="out"/>
+                                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
+                                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
+                                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
+                                </filter>
+                                <filter id="filter1_d_1_19" x="46.4" y="46.4" width="310.2" height="310.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                                <feOffset dx="1" dy="11"/>
+                                <feGaussianBlur stdDeviation="9.8"/>
+                                <feComposite in2="hardAlpha" operator="out"/>
+                                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
+                                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
+                                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
+                                </filter>
+                                <linearGradient id="paint0_linear_1_19" x1="78.7712" y1="51.9816" x2="324.572" y2="313.9" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#35CD9C"/>
+                                <stop offset="0.465" stop-color="#43FFFC"/>
+                                <stop offset="0.545" stop-color="#C2F6F9"/>
+                                <stop offset="1" stop-color="#33BFF1"/>
+                                </linearGradient>
+                                <linearGradient id="paint1_linear_1_19" x1="109.5" y1="87" x2="292.5" y2="282" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#35CD9C"/>
+                                <stop offset="0.465" stop-color="#43FFFC"/>
+                                <stop offset="0.545" stop-color="#C2F6F9"/>
+                                <stop offset="1" stop-color="#33BFF1"/>
+                                </linearGradient>
+                                </defs>
+                            </svg>
+                            <h2>Pinpoint Accessibility Checker</h2>
+                        </div>
+                        <div class="uw-a11y-header-buttons">
+                            <button id="uw-a11y-minimize" title="Minimize">−</button>
+                            <button id="uw-a11y-close" title="Close">✕</button>
+                        </div>
                     </div>
-                    <div class="uw-a11y-header-buttons">
-                        <button id="uw-a11y-minimize" title="Minimize">−</button>
-                        <button id="uw-a11y-close" title="Close">✕</button>
+                    <div id="uw-a11y-content">
+                        <div id="uw-a11y-summary"></div>
+                        <div id="uw-a11y-results"></div>
                     </div>
-                </div>
-                <div id="uw-a11y-content">
-                    <div id="uw-a11y-summary"></div>
-                    <div id="uw-a11y-results"></div>
                 </div>
             `;
             
             // Add event listeners
-            document.getElementById('uw-a11y-close').onclick = () => this.remove();
-            document.getElementById('uw-a11y-minimize').onclick = () => this.toggleMinimize();
+            this.shadowRoot.getElementById('uw-a11y-close').onclick = () => this.remove();
+            this.shadowRoot.getElementById('uw-a11y-minimize').onclick = () => this.toggleMinimize();
             
-            return panel;
+            return this.shadowRoot.getElementById('uw-a11y-panel');
         },
         
-        // Add CSS styles
-        addStyles: function() {
-            if (document.getElementById('uw-a11y-styles')) return;
-            
-            const style = document.createElement('style');
-            style.id = 'uw-a11y-styles';
-            style.textContent = `
+        // Get CSS styles as string for Shadow DOM
+        getStyles: function() {
+            return `<style>
+                :host {
+                    all: initial;
+                    font-family: "Red Hat Display", "Red Hat Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                }
                 
 
-                body #uw-a11y-panel {
+                #uw-a11y-panel {
                     position: fixed;
                     top: 20px;
                     right: 20px;
@@ -1001,7 +1022,7 @@
                     
                 }
                 
-                body #uw-a11y-panel.minimized {
+                #uw-a11y-panel.minimized {
                     bottom: -1px;
                     top: auto;
                     right: 20px;
@@ -1012,53 +1033,53 @@
 
                 
                 
-                body #uw-a11y-panel.minimized #uw-a11y-content {
+                #uw-a11y-panel.minimized #uw-a11y-content {
                     max-height: 120px;
                     padding: 8px 16px;
                     display: none;
                 }
                 
-                body #uw-a11y-panel.minimized #uw-a11y-results {
+                #uw-a11y-panel.minimized #uw-a11y-results {
                     display: none;
                 }
                 
-                body #uw-a11y-panel.minimized .uw-a11y-score-container {
+                #uw-a11y-panel.minimized .uw-a11y-score-container {
                     margin: 0.5rem 0;
                     padding: 0.5rem;
                 }
                 
-                body #uw-a11y-panel.minimized .uw-a11y-score-dial {
+                #uw-a11y-panel.minimized .uw-a11y-score-dial {
                     width: 60px;
                     height: 60px;
                 }
                 
-                body #uw-a11y-panel.minimized .uw-a11y-score-circle {
+                #uw-a11y-panel.minimized .uw-a11y-score-circle {
                     width: 60px;
                     height: 60px;
                 }
                 
-                body #uw-a11y-panel.minimized .uw-a11y-score-inner {
+                #uw-a11y-panel.minimized .uw-a11y-score-inner {
                     width: 45px;
                     height: 45px;
                 }
                 
-                body #uw-a11y-panel.minimized .uw-a11y-score-number {
+                #uw-a11y-panel.minimized .uw-a11y-score-number {
                     font-size: 16px;
                 }
                 
-                body #uw-a11y-panel.minimized .uw-a11y-score-label {
+                #uw-a11y-panel.minimized .uw-a11y-score-label {
                     font-size: 8px;
                 }
                 
-                body #uw-a11y-panel.minimized h3 {
+                #uw-a11y-panel.minimized h3 {
                     font-size: 14px;
                     margin-bottom: 0.5rem;
                 }
                 
-                body #uw-a11y-panel.minimized #uw-a11y-minimize {
+                #uw-a11y-panel.minimized #uw-a11y-minimize {
                     transform: rotate(180deg);
                 }
-                body #uw-a11y-panel #uw-a11y-header {
+                #uw-a11y-panel #uw-a11y-header {
                     
                     color: #000;
                     padding: 12px 16px;
@@ -1068,37 +1089,37 @@
                                             cursor: default;
                 }
                 
-                body #uw-a11y-panel #uw-a11y-header:active {
+                #uw-a11y-panel #uw-a11y-header:active {
                    
                 }
                 
-                body #uw-a11y-panel .uw-a11y-header-buttons {
+                #uw-a11y-panel .uw-a11y-header-buttons {
                     display: flex;
                     gap: 8px;
                 }
-                body #uw-a11y-panel .uw-a11y-title-container {
+                #uw-a11y-panel .uw-a11y-title-container {
                     display: flex;
                     align-items: center;
                     gap: 8px;
                 }
                 
-                body #uw-a11y-panel .uw-a11y-logo {
+                #uw-a11y-panel .uw-a11y-logo {
                     width: 24px;
                     height: 24px;
                     flex-shrink: 0;
                 }
                 
-                body #uw-a11y-panel.minimized .uw-a11y-logo {
+                #uw-a11y-panel.minimized .uw-a11y-logo {
                     width: 18px;
                     height: 18px;
                 }
                 
-                body #uw-a11y-panel #uw-a11y-header h2 {
+                #uw-a11y-panel #uw-a11y-header h2 {
                     margin: 0;
                     font-size: 16px;
                     font-weight: bold;
                 }
-                body #uw-a11y-panel #uw-a11y-close, body #uw-a11y-panel #uw-a11y-minimize {
+                #uw-a11y-panel #uw-a11y-close, #uw-a11y-panel #uw-a11y-minimize {
                     background: none;
                     border: none;
                     color: black;
@@ -1114,20 +1135,20 @@
                     transition: all 0.2s ease;
                 }
                 
-                body #uw-a11y-panel #uw-a11y-close:hover, body #uw-a11y-panel #uw-a11y-minimize:hover {
+                #uw-a11y-panel #uw-a11y-close:hover, #uw-a11y-panel #uw-a11y-minimize:hover {
                     background: rgba(255,255,255,0.2);
                 }
                 
-                body #uw-a11y-panel #uw-a11y-minimize {
+                #uw-a11y-panel #uw-a11y-minimize {
                     font-size: 20px;
                     font-weight: bold;
                 }
-                body #uw-a11y-panel #uw-a11y-content {
+                #uw-a11y-panel #uw-a11y-content {
                     max-height: calc(85vh - 60px);
                     overflow-y: auto;
                     padding: 16px;
                 }
-                body #uw-a11y-panel #uw-a11y-summary {
+                #uw-a11y-panel #uw-a11y-summary {
                     background: #f8f9fa;
                     border: 1px solid #dee2e6;
                     border-radius: 10px;
@@ -1135,7 +1156,7 @@
                     margin-bottom: 16px;
                     
                 }
-                body #uw-a11y-panel .uw-a11y-issue {
+                #uw-a11y-panel .uw-a11y-issue {
                     margin-bottom: 18px;
                     padding: 12px;
                     border-left: 4px solid #ffc107;
@@ -1143,31 +1164,61 @@
                     border-radius: 8px;
                     cursor: pointer;
                 }
-                body #uw-a11y-panel .uw-a11y-issue.error {
+                                #uw-a11y-panel .uw-a11y-issue.error {
                     border-left-color: #dc3545;
                     background: #f8d7da;
                     box-shadow: 0 2px 10px 0 rgba(211, 23, 41, 0.22);
                 }
-                body #uw-a11y-panel .uw-a11y-issue.warning {
+                #uw-a11y-panel .uw-a11y-issue.warning {
                     border-left-color: #ffc107;
                     background: #fff3cd;
                     box-shadow: 0 2px 10px 0 rgba(211, 133, 23, 0.22);
                 }
-                body #uw-a11y-panel .uw-a11y-issue.info {
+                #uw-a11y-panel .uw-a11y-issue.info {
                     border-left-color: #17a2b8;
                     background: #d1ecf1;
                     box-shadow: 0 2px 10px 0 rgba(23, 104, 211, 0.22);
                 }
-                body #uw-a11y-panel .uw-a11y-issue h4 {
+                #uw-a11y-panel .uw-a11y-issue h4 {
                     margin: 0 0 8px 0;
                     font-size: 14px;
                     font-weight: bold;
                 }
-                body #uw-a11y-panel .uw-a11y-issue p {
+                 
+                 #uw-a11y-panel .uw-a11y-issue-header {
+                     display: flex;
+                     align-items: center;
+                     gap: 8px;
+                 }
+                 
+                 #uw-a11y-panel .uw-a11y-issue-icon {
+                     width: 16px;
+                     height: 16px;
+                     flex-shrink: 0;
+                     align-self: flex-start;
+                     margin-top: 4px;
+                 }
+                 
+                 #uw-a11y-panel .uw-a11y-error-icon {
+                     color: #dc3545;
+                 }
+                 
+                 #uw-a11y-panel .uw-a11y-warning-icon {
+                     color: #856404;
+                 }
+                 
+                 #uw-a11y-panel .uw-a11y-issue.checked .uw-a11y-warning-icon {
+                     color: #155724;
+                 }
+                 
+                 #uw-a11y-panel .uw-a11y-issue-title {
+                     flex: 1;
+                 }
+                #uw-a11y-panel .uw-a11y-issue p {
                     margin: 4px 0;
                     line-height: 1.4;
                 }
-                body #uw-a11y-panel .uw-a11y-issue .issue-meta {
+                #uw-a11y-panel .uw-a11y-issue .issue-meta {
                     font-size: 12px;
                     color: #3c3c3c;
                     margin-top: 8px;
@@ -1177,16 +1228,16 @@
                     justify-content: space-between;
                     align-items: center;
                 }
-                body #uw-a11y-panel .uw-a11y-issue .learn-more {
+                #uw-a11y-panel .uw-a11y-issue .learn-more {
                     color: #c5050c;
                    
                     font-size: 12px;
                 }
-                body #uw-a11y-panel .uw-a11y-issue .learn-more:hover {
+                #uw-a11y-panel .uw-a11y-issue .learn-more:hover {
                     text-decoration: underline;
                 }
 
-                body #uw-a11y-panel .uw-a11y-issue .how-to-fix {
+                #uw-a11y-panel .uw-a11y-issue .how-to-fix {
                     margin-top: 8px;
                     border-radius: 4px;
                     background: rgb(241, 241, 241);
@@ -1200,26 +1251,23 @@
                     gap: 8px;
                 }
 
-                body #uw-a11y-panel .uw-a11y-issue .how-to-fix-icon {
+                #uw-a11y-panel .uw-a11y-issue .how-to-fix-icon {
                     align-self: flex-start;
                     margin-top: 2px;
                 }
 
-                body #uw-a11y-panel .uw-a11y-issue .how-to-fix-icon svg {
+                #uw-a11y-panel .uw-a11y-issue .how-to-fix-icon svg {
                     width: 12px;
                     height: 12px;
                 }
 
-                body #uw-a11y-panel .uw-a11y-issue .how-to-fix svg path {
+                #uw-a11y-panel .uw-a11y-issue .how-to-fix svg path {
                     fill: rgb(51, 141, 214);
         }
 
-                body .uw-a11y-highlight {
-                    background: yellow !important;
-                    border: 2px solid red !important;
-                    box-shadow: 0 0 0 2px yellow !important;
-                }
-                body #uw-a11y-panel .uw-a11y-count {
+                
+                /* Note: .uw-a11y-highlight is applied to the main document, not shadow DOM */
+                #uw-a11y-panel .uw-a11y-count {
                     font-weight: bold;
                     padding: 2px 8px;
                     border-radius: 12px;
@@ -1227,42 +1275,42 @@
                     font-size: 12px;
                     margin-right: 8px;
                 }
-                body #uw-a11y-panel .count-error { background: #dc3545; }
-                body #uw-a11y-panel .count-warning { background: #ffc107; color: #212529; }
-                body #uw-a11y-panel .count-info { background: #17a2b8; }
-                body #uw-a11y-panel .count-verified { background: #28a745; }
-                body #uw-a11y-panel .uw-a11y-manual-check {
+                #uw-a11y-panel .count-error { background: #dc3545; }
+                #uw-a11y-panel .count-warning { background: #ffc107; color: #212529; }
+                #uw-a11y-panel .count-info { background: #17a2b8; }
+                #uw-a11y-panel .count-verified { background: #28a745; }
+                #uw-a11y-panel .uw-a11y-manual-check {
                     margin: 8px 0;
                     padding: 8px;
                     background: #f8f9fa;
                     border-radius: 4px;
                     border: 1px solid #dee2e6;
                 }
-                body #uw-a11y-panel .uw-a11y-checkbox {
+                #uw-a11y-panel .uw-a11y-checkbox {
                     display: flex;
                     align-items: center;
                     cursor: pointer;
                     font-size: 13px;
                 }
-                body #uw-a11y-panel .uw-a11y-checkbox input[type="checkbox"] {
+                #uw-a11y-panel .uw-a11y-checkbox input[type="checkbox"] {
                     margin-right: 8px;
                     width: 16px;
                     height: 16px;
                 }
-                body #uw-a11y-panel .uw-a11y-issue.checked {
+                #uw-a11y-panel .uw-a11y-issue.checked {
                     opacity: 0.7;
                     background: #d4edda !important;
                     border-left-color: #28a745 !important;
                 }
-                body #uw-a11y-panel .uw-a11y-issue.checked .uw-a11y-manual-check {
+                #uw-a11y-panel .uw-a11y-issue.checked .uw-a11y-manual-check {
                     background: #d4edda;
                     border-color: #c3e6cb;
                 }
-                body #uw-a11y-panel .uw-a11y-check-label {
+                #uw-a11y-panel .uw-a11y-check-label {
                     color: #155724;
                     font-weight: 500;
                 }
-                body #uw-a11y-panel .uw-a11y-spinner {
+                #uw-a11y-panel .uw-a11y-spinner {
                     width: 40px;
                     height: 40px;
                     border: 4px solid #f3f3f3;
@@ -1275,14 +1323,14 @@
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
                 }
-                body #uw-a11y-panel .axe-summary {
+                #uw-a11y-panel .axe-summary {
                     font-size: 12px;
                     color: #666;
                     border-top: 1px solid #dee2e6;
                     padding-top: 12px;
                     margin-top: 12px;
                 }
-                body #uw-a11y-panel .uw-a11y-score-container {
+                #uw-a11y-panel .uw-a11y-score-container {
                     text-align: center;
                     margin: 1rem 0;
                     padding: 1rem;
@@ -1290,13 +1338,13 @@
                     border-radius: 8px;
                     border: 2px solid #e9ecef;
                 }
-                body #uw-a11y-panel .uw-a11y-score-dial {
+                #uw-a11y-panel .uw-a11y-score-dial {
                     position: relative;
                     width: 120px;
                     height: 120px;
                     margin: 0 auto 1rem auto;
                 }
-                body #uw-a11y-panel .uw-a11y-score-circle {
+                #uw-a11y-panel .uw-a11y-score-circle {
                     width: 120px;
                     height: 120px;
                     border-radius: 50%;
@@ -1306,7 +1354,7 @@
                     justify-content: center;
                     position: relative;
                 }
-                body #uw-a11y-panel .uw-a11y-score-inner {
+                #uw-a11y-panel .uw-a11y-score-inner {
                     width: 90px;
                     height: 90px;
                     background: white;
@@ -1317,16 +1365,16 @@
                     flex-direction: column;
                     font-weight: bold;
                 }
-                body #uw-a11y-panel .uw-a11y-score-number {
+                #uw-a11y-panel .uw-a11y-score-number {
                     font-size: 24px;
                     color: #333;
                 }
-                body #uw-a11y-panel .uw-a11y-score-label {
+                #uw-a11y-panel .uw-a11y-score-label {
                     font-size: 10px;
                     color: #666;
                     text-transform: uppercase;
                 }
-                body #uw-a11y-panel .uw-a11y-details {
+                #uw-a11y-panel .uw-a11y-details {
                     margin-top: 1rem;
                     padding: 0.5rem;
                     background: #f1f3f4;
@@ -1335,10 +1383,10 @@
                     font-size: 12px;
                     display: none;
                 }
-                body #uw-a11y-panel .uw-a11y-details.expanded {
+                #uw-a11y-panel .uw-a11y-details.expanded {
                     display: block;
                 }
-                body #uw-a11y-panel .uw-a11y-details-toggle {
+                #uw-a11y-panel .uw-a11y-details-toggle {
                     display: block;
                     background: rgba(0,0,0,0.12);
                     border: 1px solid rgba(0,0,0,0.3);
@@ -1352,30 +1400,30 @@
                     margin-top: 0.5rem;
                 }
 
-                body #uw-a11y-panel .uw-a11y-details-toggle {
+                #uw-a11y-panel .uw-a11y-details-toggle {
                     display: flex;
                     align-items: center;
                     gap: 8px;
                 }
 
 
-                body #uw-a11y-panel .uw-a11y-details-toggle .technical-details-icon {
+                #uw-a11y-panel .uw-a11y-details-toggle .technical-details-icon {
                     width: 12px;
                     height: 12px;
                 }
 
-                body #uw-a11y-panel .uw-a11y-details-item {
+                #uw-a11y-panel .uw-a11y-details-item {
                     margin: 0.5rem 0;
                     padding: 0.5rem;
                     background: white;
                     border-radius: 3px;
                 }
 
-                body #uw-a11y-panel .uw-a11y-details-label {
+                #uw-a11y-panel .uw-a11y-details-label {
                     font-weight: bold;
                     color: #495057;
                 }
-                body #uw-a11y-panel .uw-a11y-details-value {
+                #uw-a11y-panel .uw-a11y-details-value {
                     font-family: monospace;
                     background: #f8f9fa;
                     padding: 0.25rem;
@@ -1383,7 +1431,7 @@
                     margin-top: 0.25rem;
                     word-break: break-all;
                 }
-                body #uw-a11y-panel .uw-a11y-instance-nav {
+                #uw-a11y-panel .uw-a11y-instance-nav {
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
@@ -1397,15 +1445,15 @@
                     border-top-right-radius: 4px;
                     font-size: 12px;
                 }
-                body #uw-a11y-panel .uw-a11y-instance-count {
+                #uw-a11y-panel .uw-a11y-instance-count {
                     font-weight: bold;
                     color: #495057;
                 }
-                body #uw-a11y-panel .uw-a11y-nav-buttons {
+                #uw-a11y-panel .uw-a11y-nav-buttons {
                     display: flex;
                     gap: 4px;
                 }
-                body #uw-a11y-panel .uw-a11y-nav-buttons button {
+                #uw-a11y-panel .uw-a11y-nav-buttons button {
                     background:rgba(0,0,0,0.4);
                     backdrop-filter: saturate(200%);
                     color: white;
@@ -1416,15 +1464,15 @@
                     cursor: pointer;
                     transition: background 0.2s;
                 }
-                body #uw-a11y-panel .uw-a11y-nav-buttons button:hover:not(:disabled) {
+                #uw-a11y-panel .uw-a11y-nav-buttons button:hover:not(:disabled) {
                     background:rgba(0,0,0,0.4);
                 }
-                        body #uw-a11y-panel .uw-a11y-nav-buttons button:disabled {
+                        #uw-a11y-panel .uw-a11y-nav-buttons button:disabled {
             background:rgba(0,0,0,0.1);
             cursor: not-allowed;
         }
         
-        body #uw-a11y-panel .how-to-fix code {
+        #uw-a11y-panel .how-to-fix code {
             background: #f8f9fa;
             border: 1px solid #e9ecef;
             border-radius: 3px;
@@ -1436,11 +1484,10 @@
             white-space: nowrap;
         }
         
-        body #uw-a11y-panel .how-to-fix code:not(:last-child) {
+        #uw-a11y-panel .how-to-fix code:not(:last-child) {
             margin-right: 2px;
         }
-        `;
-        document.head.appendChild(style);
+        </style>`;
         },
         
         addIssue: function(type, title, description, element, recommendation, helpUrl, impact, tags, detailedInfo, ruleId) {
@@ -1462,8 +1509,8 @@
         
         displayResults: function() {
             const panel = this.createPanel();
-            const summary = document.getElementById('uw-a11y-summary');
-            const results = document.getElementById('uw-a11y-results');
+            const summary = this.shadowRoot.getElementById('uw-a11y-summary');
+            const results = this.shadowRoot.getElementById('uw-a11y-results');
             
             // Load minimize state after panel is created
             this.loadMinimizeState();
@@ -1546,12 +1593,25 @@
                             </label>
                         </div>` : '';
 
+                    const iconSvg = firstIssue.type === 'error' 
+                        ? `<svg class="uw-a11y-issue-icon uw-a11y-error-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                           </svg>`
+                        : `<svg class="uw-a11y-issue-icon uw-a11y-warning-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                           </svg>`;
+                    
                     return `
                         <div class="uw-a11y-issue ${firstIssue.type} ${isManualReview && this.isRuleVerified(ruleId) ? 'checked' : ''}" 
                              onclick="window.uwAccessibilityChecker.highlightCurrentInstance('${ruleId}')" 
                              style="cursor: pointer" id="issue-${ruleId}">
                              ${instanceNavigation}
-                            <h4>${firstIssue.title} ${issueGroup.length > 1 ? `(${issueGroup.length} instances)` : ''}</h4>
+                            <h4>
+                                <span class="uw-a11y-issue-header">
+                                    ${iconSvg}
+                                    <span class="uw-a11y-issue-title">${firstIssue.title} ${issueGroup.length > 1 ? `(${issueGroup.length} instances)` : ''}</span>
+                                </span>
+                            </h4>
                             <!--<p id="description-${ruleId}">${firstIssue.description.split('\n')[0]}</p>-->
                             <div class="how-to-fix"><div class="how-to-fix-icon"><svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M331.8 224.1c28.29 0 54.88 10.99 74.86 30.97l19.59 19.59c40.01-17.74 71.25-53.3 81.62-96.65c5.725-23.92 5.34-47.08 .2148-68.4c-2.613-10.88-16.43-14.51-24.34-6.604l-68.9 68.9h-75.6V97.2l68.9-68.9c7.912-7.912 4.275-21.73-6.604-24.34c-21.32-5.125-44.48-5.51-68.4 .2148c-55.3 13.23-98.39 60.22-107.2 116.4C224.5 128.9 224.2 137 224.3 145l82.78 82.86C315.2 225.1 323.5 224.1 331.8 224.1zM384 278.6c-23.16-23.16-57.57-27.57-85.39-13.9L191.1 158L191.1 95.99l-127.1-95.99L0 63.1l96 127.1l62.04 .0077l106.7 106.6c-13.67 27.82-9.251 62.23 13.91 85.39l117 117.1c14.62 14.5 38.21 14.5 52.71-.0016l52.75-52.75c14.5-14.5 14.5-38.08-.0016-52.71L384 278.6zM227.9 307L168.7 247.9l-148.9 148.9c-26.37 26.37-26.37 69.08 0 95.45C32.96 505.4 50.21 512 67.5 512s34.54-6.592 47.72-19.78l119.1-119.1C225.5 352.3 222.6 329.4 227.9 307zM64 472c-13.25 0-24-10.75-24-24c0-13.26 10.75-24 24-24S88 434.7 88 448C88 461.3 77.25 472 64 472z"/></svg></div><div><strong>How to fix:</strong> <span id="recommendation-${ruleId}"></span></div></div>
                             
@@ -1581,7 +1641,7 @@
                 Object.keys(groupedIssues).forEach(ruleId => {
                     const issueGroup = groupedIssues[ruleId];
                     const firstIssue = issueGroup[0];
-                    const recElement = document.getElementById(`recommendation-${ruleId}`);
+                    const recElement = this.shadowRoot.getElementById(`recommendation-${ruleId}`);
                     if (recElement) {
                         recElement.innerHTML = firstIssue.recommendation;
                     }
@@ -1689,10 +1749,10 @@
             const currentIssue = issueGroup[currentIndex];
             
             // Update displayed content
-            const descElement = document.getElementById(`description-${ruleId}`);
-            const recElement = document.getElementById(`recommendation-${ruleId}`);
-            const currentSpan = document.getElementById(`current-${ruleId}`);
-            const detailedContent = document.getElementById(`detailed-content-${ruleId}`);
+            const descElement = this.shadowRoot.getElementById(`description-${ruleId}`);
+            const recElement = this.shadowRoot.getElementById(`recommendation-${ruleId}`);
+            const currentSpan = this.shadowRoot.getElementById(`current-${ruleId}`);
+            const detailedContent = this.shadowRoot.getElementById(`detailed-content-${ruleId}`);
             
             if (descElement) descElement.textContent = currentIssue.description.split('\n')[0];
             if (recElement) recElement.innerHTML = currentIssue.recommendation;
@@ -1702,8 +1762,8 @@
             }
             
             // Update navigation buttons
-            const prevBtn = document.getElementById(`prev-${ruleId}`);
-            const nextBtn = document.getElementById(`next-${ruleId}`);
+            const prevBtn = this.shadowRoot.getElementById(`prev-${ruleId}`);
+            const nextBtn = this.shadowRoot.getElementById(`next-${ruleId}`);
             
             if (prevBtn) prevBtn.disabled = currentIndex === 0;
             if (nextBtn) nextBtn.disabled = currentIndex === issueGroup.length - 1;
@@ -1769,9 +1829,9 @@
             });
             
             // Update the UI
-            const checkbox = document.getElementById(`check-${ruleId}`);
+            const checkbox = this.shadowRoot.getElementById(`check-${ruleId}`);
             const label = checkbox?.parentNode.querySelector('.uw-a11y-check-label');
-            const issueDiv = document.getElementById(`issue-${ruleId}`);
+            const issueDiv = this.shadowRoot.getElementById(`issue-${ruleId}`);
             
             const newVerificationState = this.isRuleVerified(ruleId);
             
@@ -1796,7 +1856,7 @@
 
         // Toggle detailed information display
         toggleDetails: function(ruleId) {
-            const detailsElement = document.getElementById(`details-${ruleId}`);
+            const detailsElement = this.shadowRoot.getElementById(`details-${ruleId}`);
             const button = detailsElement.previousElementSibling;
             
             if (detailsElement.classList.contains('expanded')) {
@@ -1835,7 +1895,7 @@
             }
             
             // Update the label text
-            const checkbox = document.getElementById(`check-${uniqueId}`);
+            const checkbox = this.shadowRoot.getElementById(`check-${uniqueId}`);
             const label = checkbox.parentNode.querySelector('.uw-a11y-check-label');
             const issueDiv = checkbox.closest('.uw-a11y-issue');
             
@@ -1862,8 +1922,8 @@
             this.axeResults.score = newScore;
             
             // Update the score display
-            const scoreNumber = document.querySelector('.uw-a11y-score-number');
-            const scoreCircle = document.querySelector('.uw-a11y-score-circle');
+            const scoreNumber = this.shadowRoot.querySelector('.uw-a11y-score-number');
+            const scoreCircle = this.shadowRoot.querySelector('.uw-a11y-score-circle');
             
             if (scoreNumber && scoreCircle) {
                 scoreNumber.textContent = newScore.score;
@@ -1883,7 +1943,7 @@
             };
             
             // Update count display
-            const summaryDiv = document.getElementById('uw-a11y-summary');
+            const summaryDiv = this.shadowRoot.getElementById('uw-a11y-summary');
             if (summaryDiv) {
                 const countDisplay = summaryDiv.querySelector('div[style*="margin: 8px 0"]');
                 if (countDisplay) {
@@ -1910,8 +1970,8 @@
 
         // Toggle minimize state
         toggleMinimize: function() {
-            const panel = document.getElementById('uw-a11y-panel');
-            const minimizeBtn = document.getElementById('uw-a11y-minimize');
+            const panel = this.shadowRoot.getElementById('uw-a11y-panel');
+            const minimizeBtn = this.shadowRoot.getElementById('uw-a11y-minimize');
             
             if (!panel || !minimizeBtn) return;
             
@@ -2012,7 +2072,7 @@
             
             // Insert at the top of the summary section
             setTimeout(() => {
-                const summary = document.getElementById('uw-a11y-summary');
+                const summary = this.shadowRoot?.getElementById('uw-a11y-summary');
                 if (summary) {
                     summary.insertBefore(notification, summary.firstChild);
                 }
@@ -2022,13 +2082,15 @@
 
         
         remove: function() {
-            const panel = document.getElementById('uw-a11y-panel');
-            if (panel) panel.remove();
+            // Remove the shadow DOM container
+            const container = document.getElementById('uw-a11y-container');
+            if (container) container.remove();
             
-            const styles = document.getElementById('uw-a11y-styles');
-            if (styles) styles.remove();
+            // Remove global styles
+            const globalStyles = document.getElementById('uw-a11y-global-styles');
+            if (globalStyles) globalStyles.remove();
             
-            // Remove highlights
+            // Remove highlights from the main document
             document.querySelectorAll('.uw-a11y-highlight').forEach(el => {
                 el.classList.remove('uw-a11y-highlight');
             });

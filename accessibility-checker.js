@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.4.0', // Current version
+            version: '1.4.1', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -1164,7 +1164,7 @@
                     border-radius: 8px;
                     cursor: pointer;
                 }
-                                #uw-a11y-panel .uw-a11y-issue.error {
+               #uw-a11y-panel .uw-a11y-issue.error {
                     border-left-color: #dc3545;
                     background: #f8d7da;
                     box-shadow: 0 2px 10px 0 rgba(211, 23, 41, 0.22);
@@ -1196,15 +1196,16 @@
                      height: 16px;
                      flex-shrink: 0;
                      align-self: flex-start;
-                     margin-top: 4px;
                  }
                  
                  #uw-a11y-panel .uw-a11y-error-icon {
                      color: #dc3545;
+                     margin-top: 2px;
                  }
                  
                  #uw-a11y-panel .uw-a11y-warning-icon {
                      color: #856404;
+                     margin-top: 2px;
                  }
                  
                  #uw-a11y-panel .uw-a11y-issue.checked .uw-a11y-warning-icon {
@@ -1235,6 +1236,14 @@
                 }
                 #uw-a11y-panel .uw-a11y-issue .learn-more:hover {
                     text-decoration: underline;
+                }
+
+                #uw-a11y-panel .uw-a11y-issue.error .learn-more {
+                    color: #dc3545;
+                }
+
+                #uw-a11y-panel .uw-a11y-issue.warning .learn-more {
+                    color: #856404;
                 }
 
                 #uw-a11y-panel .uw-a11y-issue .how-to-fix {

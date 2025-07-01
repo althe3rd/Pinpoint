@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.4.2', // Current version
+            version: '1.4.3', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -2029,6 +2029,7 @@
                 .then(response => response.json())
                 .then(data => {
                     const latestVersion = data.tag_name.replace('v', '');
+                    console.log('Update check - Latest:', latestVersion, 'Current:', this.version, 'Comparison:', this.compareVersions(latestVersion, this.version));
                     if (this.compareVersions(latestVersion, this.version) > 0) {
                         this.showUpdateNotification(latestVersion, data.html_url);
                     }

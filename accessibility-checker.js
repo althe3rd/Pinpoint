@@ -887,6 +887,22 @@
                 totalManualReview: 0
             };
             
+            // If there are no deductions (all violations fixed and all manual items verified), give perfect score
+            if (totalDeductions === 0) {
+                return {
+                    score: 100,
+                    deductions: 0,
+                    maxPossible: totalPossible * weights.critical,
+                    verifiedCount: verifiedCount,
+                    totalManualReview: totalManualReview,
+                    details: {
+                        violations: results.violations.length,
+                        incomplete: results.incomplete.length,
+                        passes: results.passes.length
+                    }
+                };
+            }
+            
             const maxPossibleDeductions = totalPossible * weights.critical;
             const score = Math.max(0, Math.round(100 - (totalDeductions / maxPossibleDeductions) * 100));
             

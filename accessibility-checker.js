@@ -335,7 +335,7 @@
                         if (element.src && element.src.includes('decorative') || element.getAttribute('role') === 'presentation') {
                             return 'Add alt="" for decorative images, or add role="presentation" if the image is purely decorative.';
                         }
-                        return 'Add descriptive alt text: <img src="..." alt="Brief description of what the image shows or its purpose">. Describe the content and function, not just "image of..."';
+                        return 'Add descriptive alt text: <img src="..." alt="Brief description...">. Describe the content and function, not just "image of..."';
                     }
                     return 'Add appropriate alt text describing the image content and purpose.';
                 },
@@ -370,7 +370,7 @@
                 'color-contrast': (node, rule) => {
                     const colorInfo = this.extractColorContrastInfo(node);
                     if (colorInfo) {
-                        return `Current contrast is ${colorInfo.contrast}. WCAG AA requires 4.5:1 for normal text, 3:1 for large text (18pt+ or 14pt+ bold). Try: 1) Darker text color, 2) Lighter background, 3) Use online contrast checker tools.`;
+                        return `Current contrast is ${colorInfo.contrast} or may be difficult to determine due to the use of a gradient or image background. WCAG AA requires 4.5:1 for normal text, 3:1 for large text (18pt+ or 14pt+ bold).`;
                     }
                     return 'Improve text contrast ratio. Use darker text on light backgrounds or lighter text on dark backgrounds.';
                 },
@@ -980,7 +980,7 @@
             const style = document.createElement('style');
             style.id = 'uw-a11y-styles';
             style.textContent = `
-                @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&family=Red+Hat+Text:ital,wght@0,300..900;1,300..900&display=swap');
+                
 
                 body #uw-a11y-panel {
                     position: fixed;
@@ -994,7 +994,7 @@
                     backdrop-filter: blur(12px);
                     box-shadow: 0 8px 32px rgba(0,0,0,0.3);
                     z-index: 999999;
-                    font-family: "Red Hat Display", "Red Hat Text", Arial, sans-serif;
+                    font-family: "Red Hat Display", "Red Hat Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
                     font-size: 14px;
                     overflow: hidden;
                     transition: all 0.3s ease;
@@ -1169,7 +1169,7 @@
                 }
                 body #uw-a11y-panel .uw-a11y-issue .issue-meta {
                     font-size: 12px;
-                    color: #666;
+                    color: #3c3c3c;
                     margin-top: 8px;
                     padding-top: 8px;
                     border-top: 1px solid rgba(0,0,0,0.1);
@@ -1189,9 +1189,9 @@
                 body #uw-a11y-panel .uw-a11y-issue .how-to-fix {
                     margin-top: 8px;
                     border-radius: 4px;
-                    background: rgb(236, 236, 236);
+                    background: rgb(241, 241, 241);
                     padding: 8px;
-                    font-size: 12px;
+                    font-size: 13px;
                     color: #212529;
                     font-weight: 500;
                     border-left: 4px solid rgb(51, 141, 214);
@@ -1209,6 +1209,10 @@
                     width: 12px;
                     height: 12px;
                 }
+
+                body #uw-a11y-panel .uw-a11y-issue .how-to-fix svg path {
+                    fill: rgb(51, 141, 214);
+        }
 
                 body .uw-a11y-highlight {
                     background: yellow !important;

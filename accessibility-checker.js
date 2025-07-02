@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.4.3', // Current version
+            version: '1.4.4', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -189,18 +189,18 @@
                         return;
                     }
                     
-                    this.addIssue(
-                        'error',
-                        violation.description,
-                        this.buildDescription(violation, node),
-                        this.getElementFromNode(node),
-                        this.buildRecommendation(violation, node),
-                        violation.helpUrl,
-                        violation.impact || 'serious',
-                        violation.tags,
-                        this.buildDetailedInfo(violation, node),
-                        violation.id
-                    );
+                                    this.addIssue(
+                    'error',
+                    violation.description,
+                    this.buildDescription(violation, node),
+                    this.getElementFromNode(node),
+                    this.buildRecommendation(violation, node, 'error'),
+                    violation.helpUrl,
+                    violation.impact || 'serious',
+                    violation.tags,
+                    this.buildDetailedInfo(violation, node),
+                    violation.id
+                );
                 });
             });
             
@@ -221,7 +221,7 @@
                     incomplete.description,
                     'Manual review needed: ' + this.buildDescription(incomplete, node),
                     this.getElementFromNode(node),
-                    this.buildRecommendation(incomplete, node),
+                    this.buildRecommendation(incomplete, node, 'warning'),
                     incomplete.helpUrl,
                     incomplete.impact || 'moderate',
                     incomplete.tags,
@@ -282,23 +282,30 @@
         },
         
         // Build recommendation from axe result
-        buildRecommendation: function(rule, node) {
+        buildRecommendation: function(rule, node, issueType = 'error') {
             const ruleId = rule.id;
-            const recommendations = this.getActionableRecommendations();
-            
             let recommendationText = '';
             
-            if (recommendations[ruleId]) {
-                // Get context-aware recommendation
-                const rec = recommendations[ruleId];
-                if (typeof rec === 'function') {
-                    recommendationText = rec(node, rule);
+            if (issueType === 'warning') {
+                // Manual review items need verification guidance, not fixing instructions
+                const manualReviewRecommendations = this.getManualReviewRecommendations();
+                if (manualReviewRecommendations[ruleId]) {
+                    const rec = manualReviewRecommendations[ruleId];
+                    recommendationText = typeof rec === 'function' ? rec(node, rule) : rec;
                 } else {
-                    recommendationText = rec;
+                    // Use default manual review guidance
+                    const defaultRec = manualReviewRecommendations['default'];
+                    recommendationText = defaultRec(node, rule);
                 }
             } else {
-                // Fallback to rule help if no custom recommendation
-                recommendationText = rule.help || 'Please refer to the help documentation for specific guidance on fixing this issue.';
+                // Violations need fixing instructions
+                const recommendations = this.getActionableRecommendations();
+                if (recommendations[ruleId]) {
+                    const rec = recommendations[ruleId];
+                    recommendationText = typeof rec === 'function' ? rec(node, rule) : rec;
+                } else {
+                    recommendationText = rule.help || 'Please refer to the help documentation for specific guidance on fixing this issue.';
+                }
             }
             
             // Format the recommendation with proper code escaping
@@ -348,6 +355,67 @@
             });
             
             return withCss;
+        },
+        
+        // Manual review recommendations for verification guidance
+        getManualReviewRecommendations: function() {
+            return {
+                // Color contrast items that need manual verification
+                'color-contrast': (node, rule) => {
+                    return 'Manually verify the contrast meets WCAG standards. Use a contrast checker tool or browser extension to measure the exact ratio. For normal text, ensure at least 4.5:1 ratio; for large text (18pt+ or 14pt+ bold), ensure at least 3:1 ratio.';
+                },
+                
+                'color-contrast-enhanced': (node, rule) => {
+                    return 'Check if enhanced AAA contrast is needed for this content. Verify if 7:1 ratio for normal text or 4.5:1 for large text is required based on your accessibility requirements.';
+                },
+                
+                // Audio/Video content requiring manual review
+                'audio-caption': (node, rule) => {
+                    return 'Listen to the audio content and verify: 1) Does it contain speech or important audio information? 2) Are captions or transcripts provided if needed? 3) Are any captions accurate and properly synchronized?';
+                },
+                
+                'video-caption': (node, rule) => {
+                    return 'Watch the video content and verify: 1) Does it contain speech or important audio? 2) Are captions provided for all speech and sound effects? 3) Are captions accurate, synchronized, and properly formatted?';
+                },
+                
+                // Link purpose verification
+                'link-in-text-block': (node, rule) => {
+                    return 'Check if this link is distinguishable from surrounding text without relying on color alone. Verify there are visual indicators like underlines, different font weight, or other styling that works for colorblind users.';
+                },
+                
+                'identical-links-same-purpose': (node, rule) => {
+                    return 'Review these links with identical text and verify they serve the same purpose or lead to the same destination. If they serve different purposes, make the link text more descriptive to differentiate them.';
+                },
+                
+                // Hidden content verification  
+                'hidden-content': (node, rule) => {
+                    return 'Verify this hidden content is appropriately hidden and still accessible to screen readers when needed. Check that important information isn\'t hidden from all users unintentionally.';
+                },
+                
+                // ARIA usage that needs manual verification
+                'aria-hidden-focus': (node, rule) => {
+                    return 'Check if this focusable element with aria-hidden="true" is intentionally hidden from screen readers. Verify this doesn\'t hide important interactive content from assistive technologies.';
+                },
+                
+                // Complex widgets requiring manual testing
+                'nested-interactive': (node, rule) => {
+                    return 'Test this interactive element with keyboard navigation and screen readers. Verify all functionality is accessible and the focus order makes sense to users.';
+                },
+                
+                // Content structure requiring human judgment
+                'landmark-unique': (node, rule) => {
+                    return 'Review if multiple landmarks of the same type need distinguishing labels. Consider adding aria-label or aria-labelledby if users would benefit from clearer landmark identification.';
+                },
+                
+                'heading-structure': (node, rule) => {
+                    return 'Review the heading structure for logical flow. Verify headings accurately describe the content hierarchy and help users navigate and understand the page structure.';
+                },
+                
+                // Default for other manual review items
+                'default': (node, rule) => {
+                    return `Manually verify this element meets accessibility requirements. Review the content, test with assistive technologies if possible, and ensure it provides equivalent access for all users.`;
+                }
+            };
         },
         
         // Comprehensive mapping of actionable recommendations
@@ -1158,6 +1226,12 @@
                     background: rgba(255,255,255,0.2);
                 }
                 
+                #uw-a11y-panel #uw-a11y-close:focus, #uw-a11y-panel #uw-a11y-minimize:focus {
+                    outline: 2px solid #007cba;
+                    outline-offset: 2px;
+                    background: rgba(255,255,255,0.3);
+                }
+                
                 #uw-a11y-panel #uw-a11y-minimize {
                     font-size: 20px;
                     font-weight: bold;
@@ -1182,6 +1256,77 @@
                     background: #fff3cd;
                     border-radius: 8px;
                     cursor: pointer;
+                    transition: all 0.2s ease;
+                    position: relative;
+                    outline: none;
+                    
+                }
+                
+                /* Hover states for different issue types */
+                #uw-a11y-panel .uw-a11y-issue:hover {
+                    transform: translateY(-1px);
+                    border-color: rgba(0,0,0,0.15);
+                }
+                
+                #uw-a11y-panel .uw-a11y-issue.error:hover {
+                    background: #f5c2c7;
+                    box-shadow: 0 4px 20px 0 rgba(211, 23, 41, 0.35);
+                    border-color: rgba(220, 53, 69, 0.3);
+                }
+                
+                #uw-a11y-panel .uw-a11y-issue.warning:hover {
+                    background: #fff3a0;
+                    box-shadow: 0 4px 20px 0 rgba(211, 133, 23, 0.35);
+                    border-color: rgba(255, 193, 7, 0.4);
+                }
+                
+                #uw-a11y-panel .uw-a11y-issue.info:hover {
+                    background: #b8daff;
+                    box-shadow: 0 4px 20px 0 rgba(23, 104, 211, 0.35);
+                    border-color: rgba(23, 162, 184, 0.3);
+                }
+                
+                /* Focus states for keyboard accessibility */
+                #uw-a11y-panel .uw-a11y-issue:focus {
+                    outline: 3px solid #007cba;
+                    outline-offset: 2px;
+                    transform: translateY(-1px);
+                    z-index: 1;
+                }
+                
+                #uw-a11y-panel .uw-a11y-issue.error:focus {
+                    outline-color: #dc3545;
+                    background: #f5c2c7;
+                    box-shadow: 0 4px 20px 0 rgba(211, 23, 41, 0.35);
+                }
+                
+                #uw-a11y-panel .uw-a11y-issue.warning:focus {
+                    outline-color: #ffc107;
+                    background: #fff3a0;
+                    box-shadow: 0 4px 20px 0 rgba(211, 133, 23, 0.35);
+                }
+                
+                #uw-a11y-panel .uw-a11y-issue.info:focus {
+                    outline-color: #17a2b8;
+                    background: #b8daff;
+                    box-shadow: 0 4px 20px 0 rgba(23, 104, 211, 0.35);
+                }
+                
+                /* Active/pressed states */
+                #uw-a11y-panel .uw-a11y-issue:active {
+                    transform: translateY(0px);
+                    transition: transform 0.1s ease;
+                }
+                
+                /* Enhanced checked state hover */
+                #uw-a11y-panel .uw-a11y-issue.checked:hover {
+                    background: #c3e6cb !important;
+                    transform: translateY(-1px);
+                }
+                
+                #uw-a11y-panel .uw-a11y-issue.checked:focus {
+                    outline-color: #28a745;
+                    background: #c3e6cb !important;
                 }
                #uw-a11y-panel .uw-a11y-issue.error {
                     border-left-color: #dc3545;
@@ -1495,10 +1640,35 @@
                 #uw-a11y-panel .uw-a11y-nav-buttons button:hover:not(:disabled) {
                     background:rgba(0,0,0,0.4);
                 }
-                        #uw-a11y-panel .uw-a11y-nav-buttons button:disabled {
-            background:rgba(0,0,0,0.1);
-            cursor: not-allowed;
-        }
+                                        #uw-a11y-panel .uw-a11y-nav-buttons button:disabled {
+                    background:rgba(0,0,0,0.1);
+                    cursor: not-allowed;
+                }
+                
+                #uw-a11y-panel .uw-a11y-nav-buttons button:focus {
+                    outline: 2px solid #007cba;
+                    outline-offset: 1px;
+                }
+                
+                /* Details toggle button focus */
+                #uw-a11y-panel .uw-a11y-details-toggle:focus {
+                    outline: 2px solid #007cba;
+                    outline-offset: 2px;
+                    background: rgba(0,0,0,0.2);
+                }
+                
+                /* Checkbox focus states */
+                #uw-a11y-panel .uw-a11y-checkbox input[type="checkbox"]:focus {
+                    outline: 2px solid #007cba;
+                    outline-offset: 2px;
+                }
+                
+                /* Learn more link focus */
+                #uw-a11y-panel .uw-a11y-issue .learn-more:focus {
+                    outline: 2px solid #007cba;
+                    outline-offset: 2px;
+                    text-decoration: underline;
+                }
         
         #uw-a11y-panel .how-to-fix code {
             background: #f8f9fa;
@@ -1567,9 +1737,9 @@
                 <p><small>Click on any issue to highlight the element on the page.</small></p>
                 ${this.axeResults ? `
                     <div class="axe-summary">
-                        <strong>Test Summary:</strong> ${this.axeResults.violations} violations, 
+                        <!--<strong>Test Summary:</strong> ${this.axeResults.violations} violations, 
                         ${this.axeResults.passes} passes, ${this.axeResults.incomplete} need review, 
-                        ${this.axeResults.inapplicable} not applicable<br>
+                        ${this.axeResults.inapplicable} not applicable<br>-->
                         <strong>Standard:</strong> WCAG 2.1 AA | <strong>Engine:</strong> axe-core | <strong>Checker:</strong> v${this.version}
                     </div>
                 ` : ''}
@@ -1592,6 +1762,8 @@
                     const issueGroup = groupedIssues[ruleId];
                     const firstIssue = issueGroup[0];
                     const isManualReview = firstIssue.type === 'warning' && firstIssue.uniqueId;
+                    
+
                     
                     // Create navigation for multiple instances
                     const instanceNavigation = issueGroup.length > 1 ? `
@@ -1632,7 +1804,11 @@
                     return `
                         <div class="uw-a11y-issue ${firstIssue.type} ${isManualReview && this.isRuleVerified(ruleId) ? 'checked' : ''}" 
                              onclick="window.uwAccessibilityChecker.highlightCurrentInstance('${ruleId}')" 
-                             style="cursor: pointer" id="issue-${ruleId}">
+                             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.uwAccessibilityChecker.highlightCurrentInstance('${ruleId}');}"
+                             tabindex="0"
+                             role="button" 
+                             aria-label="Click to highlight ${firstIssue.title} on the page${issueGroup.length > 1 ? ` (${issueGroup.length} instances)` : ''}"
+                             id="issue-${ruleId}">
                              ${instanceNavigation}
                             <h4>
                                 <span class="uw-a11y-issue-header">
@@ -1738,11 +1914,15 @@
         groupIssuesByRule: function(issues) {
             const grouped = {};
             issues.forEach(issue => {
+                // Create a unique key that includes both rule ID and issue type
+                // This ensures errors and warnings are grouped separately
                 const ruleId = issue.ruleId || issue.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
-                if (!grouped[ruleId]) {
-                    grouped[ruleId] = [];
+                const groupKey = `${ruleId}-${issue.type}`;
+                
+                if (!grouped[groupKey]) {
+                    grouped[groupKey] = [];
                 }
-                grouped[ruleId].push(issue);
+                grouped[groupKey].push(issue);
             });
             return grouped;
         },

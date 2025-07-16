@@ -314,7 +314,7 @@
         
         // Format recommendation text with proper code escaping
         formatRecommendation: function(text) {
-            // Escape HTML entities first
+            // Escape HTML entities to prevent injection and structural issues
             const escapeHtml = (unsafe) => {
                 return unsafe
                     .replace(/&/g, "&amp;")
@@ -324,37 +324,9 @@
                     .replace(/'/g, "&#039;");
             };
             
-            // Find HTML code examples and wrap them in <code> tags
-            // This regex looks for patterns like <tag>, <tag attr="value">, etc.
-            const codePattern = /(<[^>]+>)/g;
-            
-            // Replace HTML code examples with properly formatted code tags
-            const formatted = text.replace(codePattern, (match) => {
-                return `<code>${escapeHtml(match)}</code>`;
-            });
-            
-            // Also handle attribute examples like 'aria-label="text"'
-            const attrPattern = /([\w-]+="[^"]*")/g;
-            const withAttrs = formatted.replace(attrPattern, (match) => {
-                // Only format if it's not already inside a code tag
-                if (!match.includes('&lt;') && !match.includes('&gt;')) {
-                    return `<code>${match}</code>`;
-                }
-                return match;
-            });
-            
-            // Handle CSS values and specific technical terms
-            // Fixed to properly handle decimal contrast ratios like 1.77:1, 4.5:1, etc.
-            const cssPattern = /(\d+(?:\.\d+)?:\d+(?:\.\d+)?|tabindex="\d+"|role="[^"]*"|#[a-zA-Z0-9-]+)/g;
-            const withCss = withAttrs.replace(cssPattern, (match) => {
-                // Only format if not already in code tags
-                if (!match.includes('&lt;') && !match.includes('&gt;')) {
-                    return `<code>${match}</code>`;
-                }
-                return match;
-            });
-            
-            return withCss;
+            // For now, just escape the text without complex regex processing
+            // This prevents HTML structure issues that were causing nesting problems
+            return escapeHtml(text);
         },
         
         // Escape HTML attributes (for use in HTML attributes like aria-label)
@@ -1812,10 +1784,12 @@
                 // Group issues by rule for better organization
                 const groupedIssues = this.groupIssuesByRule(this.issues);
                 
-                results.innerHTML = Object.keys(groupedIssues).map(ruleId => {
+                const generatedHtml = Object.keys(groupedIssues).map((ruleId, index) => {
                     const issueGroup = groupedIssues[ruleId];
                     const firstIssue = issueGroup[0];
                     const isManualReview = firstIssue.type === 'warning' && firstIssue.uniqueId;
+                    
+                    console.log(`DEBUG: Generating issue ${index + 1}: ${ruleId} - ${firstIssue.title}`);
                     
 
                     
@@ -1855,7 +1829,9 @@
                             <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                            </svg>`;
                     
-                    return `
+
+                    
+                    const htmlResult = `
                         <div class="uw-a11y-issue ${firstIssue.type} ${isManualReview && this.isRuleVerified(ruleId) ? 'checked' : ''}" 
                              onclick="window.uwAccessibilityChecker.highlightCurrentInstance('${this.escapeJavaScript(ruleId)}')" 
                              onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.uwAccessibilityChecker.highlightCurrentInstance('${this.escapeJavaScript(ruleId)}');}"
@@ -1876,7 +1852,7 @@
                             ${checkboxHtml}
                             ${firstIssue.detailedInfo && firstIssue.detailedInfo.length > 0 ? `
                                 <button class="uw-a11y-details-toggle" onclick="window.uwAccessibilityChecker.toggleDetails('${this.escapeJavaScript(ruleId)}'); event.stopPropagation();">
-                                   <div class="technical-details-icon"><svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><title/><g><path d="M24.8452,25.3957a6.0129,6.0129,0,0,0-8.4487.7617L1.3974,44.1563a5.9844,5.9844,0,0,0,0,7.687L16.3965,69.8422a5.9983,5.9983,0,1,0,9.21-7.687L13.8068,48l11.8-14.1554A6,6,0,0,0,24.8452,25.3957Z"/><path d="M55.1714,12.1192A6.0558,6.0558,0,0,0,48.1172,16.83L36.1179,76.8262A5.9847,5.9847,0,0,0,40.8286,83.88a5.7059,5.7059,0,0,0,1.1835.1172A5.9949,5.9949,0,0,0,47.8828,79.17L59.8821,19.1735A5.9848,5.9848,0,0,0,55.1714,12.1192Z"/><path d="M94.6026,44.1563,79.6035,26.1574a5.9983,5.9983,0,1,0-9.21,7.687L82.1932,48l-11.8,14.1554a5.9983,5.9983,0,1,0,9.21,7.687L94.6026,51.8433A5.9844,5.9844,0,0,0,94.6026,44.1563Z"/></g></svg></div>Show technical details
+                                   Show technical details
                                 </button>
                                 <div class="uw-a11y-details" id="details-${this.sanitizeHtmlId(ruleId)}">
                                     <div id="detailed-content-${this.sanitizeHtmlId(ruleId)}">
@@ -1892,7 +1868,18 @@
                             </div>
                         </div>
                     `;
+                    
+                    console.log(`DEBUG: Issue ${index + 1} HTML length:`, htmlResult.length);
+                    return htmlResult;
                 }).join('');
+                
+                // Debug: Log the generated HTML to see if there are structural issues
+                console.log('DEBUG: Generated HTML length:', generatedHtml.length);
+                console.log('DEBUG: Number of issues groups:', Object.keys(groupedIssues).length);
+                console.log('DEBUG: First 2000 chars of HTML:', generatedHtml.substring(0, 2000));
+                console.log('DEBUG: Last 1000 chars of HTML:', generatedHtml.substring(generatedHtml.length - 1000));
+                
+                results.innerHTML = generatedHtml;
                 
                 // Initialize recommendation content after HTML is created
                 Object.keys(groupedIssues).forEach(ruleId => {
@@ -1952,6 +1939,13 @@
                             <div><strong>Requirement:</strong> ${value.required}</div>
                         </div>
                     `;
+                } else if (typeof value === 'string') {
+                    // Only escape problematic characters that could break HTML structure
+                    // But preserve basic text formatting
+                    value = value
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/"/g, "&quot;");
                 }
                 
                 return `
@@ -1967,15 +1961,14 @@
         groupIssuesByRule: function(issues) {
             const grouped = {};
             issues.forEach(issue => {
-                // Create a unique key that includes both rule ID and issue type
-                // This ensures errors and warnings are grouped separately
-                const ruleId = issue.ruleId || issue.title.toLowerCase().replace(/[^a-z0-9]/g, '-');
-                const groupKey = `${ruleId}-${issue.type}`;
+                // Use the issue's existing ruleId directly to prevent conflicts
+                // Only fall back to title-based ID if ruleId is truly missing
+                const ruleId = issue.ruleId || `fallback-${issue.title.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${issue.id}`;
                 
-                if (!grouped[groupKey]) {
-                    grouped[groupKey] = [];
+                if (!grouped[ruleId]) {
+                    grouped[ruleId] = [];
                 }
-                grouped[groupKey].push(issue);
+                grouped[ruleId].push(issue);
             });
             return grouped;
         },

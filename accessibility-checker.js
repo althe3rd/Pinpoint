@@ -383,6 +383,34 @@
             return id.replace(/[^a-zA-Z0-9\-_:.]/g, '-');
         },
         
+        // Escape JavaScript strings (for use in onclick handlers)
+        escapeJavaScript: function(unsafe) {
+            if (!unsafe) return '';
+            return unsafe
+                .replace(/\\/g, "\\\\")
+                .replace(/'/g, "\\'")
+                .replace(/"/g, '\\"')
+                .replace(/\n/g, "\\n")
+                .replace(/\r/g, "\\r")
+                .replace(/\t/g, "\\t");
+        },
+        
+        // Validate and escape URLs
+        escapeUrl: function(url) {
+            if (!url) return '';
+            try {
+                // Basic URL validation
+                const urlObj = new URL(url);
+                // Only allow http and https protocols
+                if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
+                    return '';
+                }
+                return this.escapeHtmlAttribute(url);
+            } catch (e) {
+                return '';
+            }
+        },
+        
         // Manual review recommendations for verification guidance
         getManualReviewRecommendations: function() {
             return {
@@ -1794,12 +1822,12 @@
                     // Create navigation for multiple instances
                     const instanceNavigation = issueGroup.length > 1 ? `
                         <div class="uw-a11y-instance-nav">
-                            <span class="uw-a11y-instance-count">Instance <span id="current-${ruleId}">1</span> of ${issueGroup.length}</span>
+                            <span class="uw-a11y-instance-count">Instance <span id="current-${this.sanitizeHtmlId(ruleId)}">1</span> of ${issueGroup.length}</span>
                             <div class="uw-a11y-nav-buttons">
-                                <button onclick="window.uwAccessibilityChecker.navigateInstance('${ruleId}', -1); event.stopPropagation();" 
-                                        id="prev-${ruleId}" disabled>‹ Prev</button>
-                                <button onclick="window.uwAccessibilityChecker.navigateInstance('${ruleId}', 1); event.stopPropagation();" 
-                                        id="next-${ruleId}">Next ›</button>
+                                <button onclick="window.uwAccessibilityChecker.navigateInstance('${this.escapeJavaScript(ruleId)}', -1); event.stopPropagation();" 
+                                        id="prev-${this.sanitizeHtmlId(ruleId)}" disabled>‹ Prev</button>
+                                <button onclick="window.uwAccessibilityChecker.navigateInstance('${this.escapeJavaScript(ruleId)}', 1); event.stopPropagation();" 
+                                        id="next-${this.sanitizeHtmlId(ruleId)}">Next ›</button>
                             </div>
                         </div>
                     ` : '';
@@ -1809,9 +1837,9 @@
                         `<div class="uw-a11y-manual-check">
                             <label class="uw-a11y-checkbox">
                                 <input type="checkbox" 
-                                       id="check-${ruleId}" 
+                                       id="check-${this.sanitizeHtmlId(ruleId)}" 
                                        ${this.isRuleVerified(ruleId) ? 'checked' : ''}
-                                       onchange="window.uwAccessibilityChecker.toggleRuleVerification('${ruleId}'); event.stopPropagation();">
+                                       onchange="window.uwAccessibilityChecker.toggleRuleVerification('${this.escapeJavaScript(ruleId)}'); event.stopPropagation();">
                                 <span class="uw-a11y-checkmark"></span>
                                 <span class="uw-a11y-check-label">
                                     ${this.isRuleVerified(ruleId) ? `All ${issueGroup.length} instances manually verified ✓` : `Mark all ${issueGroup.length} instances as verified`}
@@ -1829,12 +1857,12 @@
                     
                     return `
                         <div class="uw-a11y-issue ${firstIssue.type} ${isManualReview && this.isRuleVerified(ruleId) ? 'checked' : ''}" 
-                             onclick="window.uwAccessibilityChecker.highlightCurrentInstance('${ruleId}')" 
-                             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.uwAccessibilityChecker.highlightCurrentInstance('${ruleId}');}"
+                             onclick="window.uwAccessibilityChecker.highlightCurrentInstance('${this.escapeJavaScript(ruleId)}')" 
+                             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.uwAccessibilityChecker.highlightCurrentInstance('${this.escapeJavaScript(ruleId)}');}"
                              tabindex="0"
                              role="button" 
                              aria-label="Click to highlight ${this.escapeHtmlAttribute(firstIssue.title)} on the page${issueGroup.length > 1 ? ` (${issueGroup.length} instances)` : ''}"
-                             id="issue-${ruleId}">
+                             id="issue-${this.sanitizeHtmlId(ruleId)}">
                              ${instanceNavigation}
                             <h4>
                                 <span class="uw-a11y-issue-header">
@@ -1842,16 +1870,16 @@
                                     <span class="uw-a11y-issue-title">${this.escapeHtmlContent(firstIssue.title)} ${issueGroup.length > 1 ? `(${issueGroup.length} instances)` : ''}</span>
                                 </span>
                             </h4>
-                            <!--<p id="description-${ruleId}">${firstIssue.description.split('\n')[0]}</p>-->
-                            <div class="how-to-fix"><div class="how-to-fix-icon"><svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M331.8 224.1c28.29 0 54.88 10.99 74.86 30.97l19.59 19.59c40.01-17.74 71.25-53.3 81.62-96.65c5.725-23.92 5.34-47.08 .2148-68.4c-2.613-10.88-16.43-14.51-24.34-6.604l-68.9 68.9h-75.6V97.2l68.9-68.9c7.912-7.912 4.275-21.73-6.604-24.34c-21.32-5.125-44.48-5.51-68.4 .2148c-55.3 13.23-98.39 60.22-107.2 116.4C224.5 128.9 224.2 137 224.3 145l82.78 82.86C315.2 225.1 323.5 224.1 331.8 224.1zM384 278.6c-23.16-23.16-57.57-27.57-85.39-13.9L191.1 158L191.1 95.99l-127.1-95.99L0 63.1l96 127.1l62.04 .0077l106.7 106.6c-13.67 27.82-9.251 62.23 13.91 85.39l117 117.1c14.62 14.5 38.21 14.5 52.71-.0016l52.75-52.75c14.5-14.5 14.5-38.08-.0016-52.71L384 278.6zM227.9 307L168.7 247.9l-148.9 148.9c-26.37 26.37-26.37 69.08 0 95.45C32.96 505.4 50.21 512 67.5 512s34.54-6.592 47.72-19.78l119.1-119.1C225.5 352.3 222.6 329.4 227.9 307zM64 472c-13.25 0-24-10.75-24-24c0-13.26 10.75-24 24-24S88 434.7 88 448C88 461.3 77.25 472 64 472z"/></svg></div><div><strong>How to fix:</strong> <span id="recommendation-${ruleId}"></span></div></div>
+                            <!--<p id="description-${this.sanitizeHtmlId(ruleId)}">${this.escapeHtmlContent(firstIssue.description.split('\n')[0])}</p>-->
+                            <div class="how-to-fix"><div class="how-to-fix-icon"><svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M331.8 224.1c28.29 0 54.88 10.99 74.86 30.97l19.59 19.59c40.01-17.74 71.25-53.3 81.62-96.65c5.725-23.92 5.34-47.08 .2148-68.4c-2.613-10.88-16.43-14.51-24.34-6.604l-68.9 68.9h-75.6V97.2l68.9-68.9c7.912-7.912 4.275-21.73-6.604-24.34c-21.32-5.125-44.48-5.51-68.4 .2148c-55.3 13.23-98.39 60.22-107.2 116.4C224.5 128.9 224.2 137 224.3 145l82.78 82.86C315.2 225.1 323.5 224.1 331.8 224.1zM384 278.6c-23.16-23.16-57.57-27.57-85.39-13.9L191.1 158L191.1 95.99l-127.1-95.99L0 63.1l96 127.1l62.04 .0077l106.7 106.6c-13.67 27.82-9.251 62.23 13.91 85.39l117 117.1c14.62 14.5 38.21 14.5 52.71-.0016l52.75-52.75c14.5-14.5 14.5-38.08-.0016-52.71L384 278.6zM227.9 307L168.7 247.9l-148.9 148.9c-26.37 26.37-26.37 69.08 0 95.45C32.96 505.4 50.21 512 67.5 512s34.54-6.592 47.72-19.78l119.1-119.1C225.5 352.3 222.6 329.4 227.9 307zM64 472c-13.25 0-24-10.75-24-24c0-13.26 10.75-24 24-24S88 434.7 88 448C88 461.3 77.25 472 64 472z"/></svg></div><div><strong>How to fix:</strong> <span id="recommendation-${this.sanitizeHtmlId(ruleId)}"></span></div></div>
                             
                             ${checkboxHtml}
                             ${firstIssue.detailedInfo && firstIssue.detailedInfo.length > 0 ? `
-                                <button class="uw-a11y-details-toggle" onclick="window.uwAccessibilityChecker.toggleDetails('${ruleId}'); event.stopPropagation();">
+                                <button class="uw-a11y-details-toggle" onclick="window.uwAccessibilityChecker.toggleDetails('${this.escapeJavaScript(ruleId)}'); event.stopPropagation();">
                                    <div class="technical-details-icon"><svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><title/><g><path d="M24.8452,25.3957a6.0129,6.0129,0,0,0-8.4487.7617L1.3974,44.1563a5.9844,5.9844,0,0,0,0,7.687L16.3965,69.8422a5.9983,5.9983,0,1,0,9.21-7.687L13.8068,48l11.8-14.1554A6,6,0,0,0,24.8452,25.3957Z"/><path d="M55.1714,12.1192A6.0558,6.0558,0,0,0,48.1172,16.83L36.1179,76.8262A5.9847,5.9847,0,0,0,40.8286,83.88a5.7059,5.7059,0,0,0,1.1835.1172A5.9949,5.9949,0,0,0,47.8828,79.17L59.8821,19.1735A5.9848,5.9848,0,0,0,55.1714,12.1192Z"/><path d="M94.6026,44.1563,79.6035,26.1574a5.9983,5.9983,0,1,0-9.21,7.687L82.1932,48l-11.8,14.1554a5.9983,5.9983,0,1,0,9.21,7.687L94.6026,51.8433A5.9844,5.9844,0,0,0,94.6026,44.1563Z"/></g></svg></div>Show technical details
                                 </button>
-                                <div class="uw-a11y-details" id="details-${ruleId}">
-                                    <div id="detailed-content-${ruleId}">
+                                <div class="uw-a11y-details" id="details-${this.sanitizeHtmlId(ruleId)}">
+                                    <div id="detailed-content-${this.sanitizeHtmlId(ruleId)}">
                                         ${this.renderDetailedInfo(firstIssue.detailedInfo)}
                                     </div>
                                 </div>
@@ -1861,7 +1889,7 @@
                                 
                                 </div>
                                 <!--<strong>Tags:</strong> ${firstIssue.tags.join(', ')}-->
-                                ${firstIssue.helpUrl ? `<br><a href="${firstIssue.helpUrl}" target="_blank" class="learn-more">Learn more about this rule</a>` : ''}
+                                ${firstIssue.helpUrl ? `<br><a href="${this.escapeUrl(firstIssue.helpUrl)}" target="_blank" class="learn-more">Learn more about this rule</a>` : ''}
                             </div>
                         </div>
                     `;
@@ -1981,12 +2009,13 @@
         updateInstanceDisplay: function(ruleId, issueGroup) {
             const currentIndex = this.currentInstances[ruleId] || 0;
             const currentIssue = issueGroup[currentIndex];
+            const sanitizedRuleId = this.sanitizeHtmlId(ruleId);
             
             // Update displayed content
-            const descElement = this.shadowRoot.getElementById(`description-${ruleId}`);
-            const recElement = this.shadowRoot.getElementById(`recommendation-${ruleId}`);
-            const currentSpan = this.shadowRoot.getElementById(`current-${ruleId}`);
-            const detailedContent = this.shadowRoot.getElementById(`detailed-content-${ruleId}`);
+            const descElement = this.shadowRoot.getElementById(`description-${sanitizedRuleId}`);
+            const recElement = this.shadowRoot.getElementById(`recommendation-${sanitizedRuleId}`);
+            const currentSpan = this.shadowRoot.getElementById(`current-${sanitizedRuleId}`);
+            const detailedContent = this.shadowRoot.getElementById(`detailed-content-${sanitizedRuleId}`);
             
             if (descElement) descElement.textContent = currentIssue.description.split('\n')[0];
             if (recElement) recElement.innerHTML = currentIssue.recommendation;
@@ -1996,8 +2025,8 @@
             }
             
             // Update navigation buttons
-            const prevBtn = this.shadowRoot.getElementById(`prev-${ruleId}`);
-            const nextBtn = this.shadowRoot.getElementById(`next-${ruleId}`);
+            const prevBtn = this.shadowRoot.getElementById(`prev-${sanitizedRuleId}`);
+            const nextBtn = this.shadowRoot.getElementById(`next-${sanitizedRuleId}`);
             
             if (prevBtn) prevBtn.disabled = currentIndex === 0;
             if (nextBtn) nextBtn.disabled = currentIndex === issueGroup.length - 1;
@@ -2063,9 +2092,10 @@
             });
             
             // Update the UI
-            const checkbox = this.shadowRoot.getElementById(`check-${ruleId}`);
+            const sanitizedRuleId = this.sanitizeHtmlId(ruleId);
+            const checkbox = this.shadowRoot.getElementById(`check-${sanitizedRuleId}`);
             const label = checkbox?.parentNode.querySelector('.uw-a11y-check-label');
-            const issueDiv = this.shadowRoot.getElementById(`issue-${ruleId}`);
+            const issueDiv = this.shadowRoot.getElementById(`issue-${sanitizedRuleId}`);
             
             const newVerificationState = this.isRuleVerified(ruleId);
             
@@ -2090,7 +2120,8 @@
 
         // Toggle detailed information display
         toggleDetails: function(ruleId) {
-            const detailsElement = this.shadowRoot.getElementById(`details-${ruleId}`);
+            const sanitizedRuleId = this.sanitizeHtmlId(ruleId);
+            const detailsElement = this.shadowRoot.getElementById(`details-${sanitizedRuleId}`);
             const button = detailsElement.previousElementSibling;
             
             if (detailsElement.classList.contains('expanded')) {

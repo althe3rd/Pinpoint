@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.4.6˙', // Current version
+            version: '1.4.7', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -1886,10 +1886,9 @@
                             ` : ''}
                             <div class="issue-meta">
                                 <div><strong>Impact:</strong> ${this.escapeHtmlContent(firstIssue.impact || 'unknown')}
-                                
+                                ${firstIssue.helpUrl ? `<br><a href="${this.escapeUrl(firstIssue.helpUrl)}" target="_blank" class="learn-more">Learn more about this rule</a>` : ''}
                                 </div>
                                 <!--<strong>Tags:</strong> ${firstIssue.tags.join(', ')}-->
-                                ${firstIssue.helpUrl ? `<br><a href="${this.escapeUrl(firstIssue.helpUrl)}" target="_blank" class="learn-more">Learn more about this rule</a>` : ''}
                             </div>
                         </div>
                     `;

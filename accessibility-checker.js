@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.4.4', // Current version
+            version: '1.4.5˙', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -355,6 +355,32 @@
             });
             
             return withCss;
+        },
+        
+        // Escape HTML attributes (for use in HTML attributes like aria-label)
+        escapeHtmlAttribute: function(unsafe) {
+            if (!unsafe) return '';
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+        },
+        
+        // Escape HTML content (for text content in HTML elements)
+        escapeHtmlContent: function(unsafe) {
+            if (!unsafe) return '';
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+        },
+        
+        // Sanitize HTML ID values
+        sanitizeHtmlId: function(id) {
+            if (!id) return '';
+            return id.replace(/[^a-zA-Z0-9\-_:.]/g, '-');
         },
         
         // Manual review recommendations for verification guidance
@@ -1275,7 +1301,7 @@
                 }
                 
                 #uw-a11y-panel .uw-a11y-issue.warning:hover {
-                    background: #fff3a0;
+                    background: #F6EBC7;
                     box-shadow: 0 4px 20px 0 rgba(211, 133, 23, 0.35);
                     border-color: rgba(255, 193, 7, 0.4);
                 }
@@ -1302,7 +1328,7 @@
                 
                 #uw-a11y-panel .uw-a11y-issue.warning:focus {
                     outline-color: #ffc107;
-                    background: #fff3a0;
+                    background: #F6EBC7;
                     box-shadow: 0 4px 20px 0 rgba(211, 133, 23, 0.35);
                 }
                 
@@ -1807,13 +1833,13 @@
                              onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.uwAccessibilityChecker.highlightCurrentInstance('${ruleId}');}"
                              tabindex="0"
                              role="button" 
-                             aria-label="Click to highlight ${firstIssue.title} on the page${issueGroup.length > 1 ? ` (${issueGroup.length} instances)` : ''}"
+                             aria-label="Click to highlight ${this.escapeHtmlAttribute(firstIssue.title)} on the page${issueGroup.length > 1 ? ` (${issueGroup.length} instances)` : ''}"
                              id="issue-${ruleId}">
                              ${instanceNavigation}
                             <h4>
                                 <span class="uw-a11y-issue-header">
                                     ${iconSvg}
-                                    <span class="uw-a11y-issue-title">${firstIssue.title} ${issueGroup.length > 1 ? `(${issueGroup.length} instances)` : ''}</span>
+                                    <span class="uw-a11y-issue-title">${this.escapeHtmlContent(firstIssue.title)} ${issueGroup.length > 1 ? `(${issueGroup.length} instances)` : ''}</span>
                                 </span>
                             </h4>
                             <!--<p id="description-${ruleId}">${firstIssue.description.split('\n')[0]}</p>-->
@@ -1831,7 +1857,7 @@
                                 </div>
                             ` : ''}
                             <div class="issue-meta">
-                                <div><strong>Impact:</strong> ${firstIssue.impact || 'unknown'}
+                                <div><strong>Impact:</strong> ${this.escapeHtmlContent(firstIssue.impact || 'unknown')}
                                 
                                 </div>
                                 <!--<strong>Tags:</strong> ${firstIssue.tags.join(', ')}-->

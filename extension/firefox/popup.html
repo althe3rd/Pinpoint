@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinpoint Accessibility Checker</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="popup-container">
+        <div class="header">
+            <img src="icons/icon-32.png" alt="Pinpoint logo" class="logo">
+            <div class="title">
+                <h1>Pinpoint</h1>
+                <p>Accessibility Checker</p>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="action-section">
+                <button id="runCheck" class="primary-button">
+                    <span class="button-icon">🔍</span>
+                    Run Accessibility Check
+                </button>
+                <p class="description">
+                    Analyze this page for WCAG 2.1 AA compliance using axe-core
+                </p>
+            </div>
+            
+            <div class="info-section">
+                <div class="feature">
+                    <span class="feature-icon">⚡</span>
+                    <span>Instant WCAG analysis</span>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">🎯</span>
+                    <span>Actionable recommendations</span>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">📊</span>
+                    <span>Accessibility score (0-100)</span>
+                </div>
+            </div>
+            
+            <div class="shortcut-info">
+                <small>
+                    <strong>Keyboard shortcut:</strong> <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd>
+                    <span class="mac-shortcut">(<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd> on Mac)</span>
+                </small>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="status" id="status"></div>
+            <div class="links">
+                <a href="https://althe3rd.github.io/Pinpoint/" target="_blank" class="link">Learn More</a>
+                <span class="separator">|</span>
+                <a href="https://github.com/althe3rd/Pinpoint" target="_blank" class="link">GitHub</a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>

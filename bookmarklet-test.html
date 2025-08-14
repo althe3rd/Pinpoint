@@ -49,14 +49,14 @@
     <p>Right-click and "Bookmark this link" or drag to your bookmarks bar:</p>
     
     <!-- Simple working version -->
-    <a href="javascript:(function(){if(window.axe){axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa']},function(e,r){if(e)return alert('Error: '+e.message);alert('Violations: '+r.violations.length+'\nNeeds review: '+r.incomplete.length);});}else{var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/axe-core@4.8.2/axe.min.js';s.onload=function(){axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa']},function(e,r){if(e)return alert('Error: '+e.message);alert('Violations: '+r.violations.length+'\nNeeds review: '+r.incomplete.length);});};s.onerror=function(){alert('Failed to load axe-core');};document.head.appendChild(s);}})();" class="bookmarklet">Simple A11y Test</a>
+    <a href="javascript:(function(){if(window.axe){axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa'],exclude:['#wpadminbar']},function(e,r){if(e)return alert('Error: '+e.message);alert('Violations: '+r.violations.length+'\nNeeds review: '+r.incomplete.length);});}else{var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/axe-core@4.8.2/axe.min.js';s.onload=function(){axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa'],exclude:['#wpadminbar']},function(e,r){if(e)return alert('Error: '+e.message);alert('Violations: '+r.violations.length+'\nNeeds review: '+r.incomplete.length);});};s.onerror=function(){alert('Failed to load axe-core');};document.head.appendChild(s);}})();" class="bookmarklet">Simple A11y Test</a>
     
     <h2>Method 2: Developer Console Test</h2>
     <p>Press F12, go to Console tab, and paste this code:</p>
     <div class="console-test">
 (function(){
   if(window.axe){
-    axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa']},function(e,r){
+    axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa'],exclude:['#wpadminbar']},function(e,r){
       if(e) return alert('Error: '+e.message);
       alert('Violations: '+r.violations.length+'\nNeeds review: '+r.incomplete.length);
     });
@@ -64,7 +64,7 @@
     var s=document.createElement('script');
     s.src='https://cdn.jsdelivr.net/npm/axe-core@4.8.2/axe.min.js';
     s.onload=function(){
-      axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa']},function(e,r){
+      axe.run(document,{tags:['wcag2a','wcag2aa','wcag21aa'],exclude:['#wpadminbar']},function(e,r){
         if(e) return alert('Error: '+e.message);
         alert('Violations: '+r.violations.length+'\nNeeds review: '+r.incomplete.length);
       });

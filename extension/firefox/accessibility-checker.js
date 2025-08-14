@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.4.7', // Current version
+            version: '1.4.8', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -162,6 +162,7 @@
                     '.uw-a11y-highlight',    // Highlighted elements (temporary styling)
                     '[id^="uw-a11y-"]',      // Any element with ID starting with uw-a11y-
                     '[class*="uw-a11y-"]',   // Any element with class containing uw-a11y-
+                    '#wpadminbar',           // WordPress admin bar (frontend toolbar)
                     '#uw-a11y-global-styles' // Global styles element
                 ]
             };

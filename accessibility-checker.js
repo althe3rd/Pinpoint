@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.4.8', // Current version
+            version: '1.4.9', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -98,7 +98,7 @@
                                 </linearGradient>
                                 </defs>
                             </svg>
-                            <h2>Pinpoint Accessibility Checker</h2>
+                            <h2 id="uw-a11y-title">Pinpoint Accessibility Checker</h2>
                         </div>
                         <button id="uw-a11y-close">✕</button>
                     </div>
@@ -1061,7 +1061,12 @@
         createPanel: function() {
             this.shadowRoot.innerHTML = `
                 ${this.getStyles()}
-                <div id="uw-a11y-panel">
+                <div id="uw-a11y-panel" tabindex="-1" role="dialog" aria-labelledby="uw-a11y-title">
+                    <div class="accentcolors">
+                        <div class="color1"></div>
+                        <div class="color2"></div>
+                        <div class="color3"></div>
+                    </div>
                     <div id="uw-a11y-header">
                         <div class="uw-a11y-title-container">
                             <svg viewBox="0 0 404 404" fill="none" xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo">
@@ -1106,7 +1111,7 @@
                                 </linearGradient>
                                 </defs>
                             </svg>
-                            <h2>Pinpoint Accessibility Checker</h2>
+                            <h2 id="uw-a11y-title">Pinpoint Accessibility Checker</h2>
                         </div>
                         <div class="uw-a11y-header-buttons">
                             <button id="uw-a11y-minimize" title="Minimize">−</button>
@@ -1115,6 +1120,10 @@
                     </div>
                     <div id="uw-a11y-content">
                         <div id="uw-a11y-summary"></div>
+                        <p class="if-issues">
+                            <div class="mouse-icon"></div>
+                            <small>Click on any issue to highlight the element on the page.</small>
+                        </p>
                         <div id="uw-a11y-results"></div>
                     </div>
                 </div>
@@ -1135,6 +1144,28 @@
                     font-family: "Red Hat Display", "Red Hat Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
                 }
                 
+                /* ===== Scrollbar CSS ===== */
+                /* Firefox */
+                * {
+                    scrollbar-width: auto;
+                    scrollbar-color:rgb(132, 132, 132) rgba(255,255,255,0.0) ;
+                }
+
+                /* Chrome, Edge, and Safari */
+                *::-webkit-scrollbar {
+                    width: 8px;
+                   
+                }
+
+                *::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+
+                *::-webkit-scrollbar-thumb {
+                    background-color:rgb(188, 188, 188);
+                    border-radius: 10px;
+                   
+                }
 
                 #uw-a11y-panel {
                     position: fixed;
@@ -1152,8 +1183,96 @@
                     font-size: 14px;
                     overflow: hidden;
                     transition: all 0.3s ease;
-                    
+                    outline: none;
                 }
+                
+                #uw-a11y-panel:focus {
+                    outline: 3px solid #007cba;
+                    outline-offset: 2px;
+                }
+                
+                /* Screen reader only text */
+                .sr-only {
+                    position: absolute;
+                    width: 1px;
+                    height: 1px;
+                    padding: 0;
+                    margin: -1px;
+                    overflow: hidden;
+                    clip: rect(0, 0, 0, 0);
+                    white-space: nowrap;
+                    border: 0;
+                }
+                
+                /* Animated click icon */
+                .uw-a11y-click-icon {
+                    display: inline-block;
+                    margin-right: 8px;
+                    color: #007cba;
+                    animation: uw-pulse 2s ease-in-out infinite;
+                    vertical-align: middle;
+                }
+                
+                @keyframes uw-pulse {
+                    0% {
+                        transform: scale(1);
+                        opacity: 1;
+                    }
+                    50% {
+                        transform: scale(1.1);
+                        opacity: 0.8;
+                    }
+                    100% {
+                        transform: scale(1);
+                        opacity: 1;
+                    }
+                }
+
+                #uw-a11y-panel .accentcolors {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: -1;
+                }
+
+                #uw-a11y-panel .accentcolors .color1 {
+                    content: "";
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 30%;
+                    height: 60px;
+                    filter: blur(60px);
+                    background: rgba(121, 20, 222, 0.6);
+                    z-index: -1;
+                }
+
+                #uw-a11y-panel .accentcolors .color2 {
+                    content: "";
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    width: 30%;
+                    height: 50px;
+                    filter: blur(60px);
+                    background: rgba(52, 126, 223, 0.6);
+                    z-index: -1;
+                }
+
+                #uw-a11y-panel .accentcolors .color3 {
+                    content: "";
+                    position: absolute;
+                    top: 0;
+                    left: 30%;
+                    width: 40%;
+                    height: 20px;
+                    filter: blur(60px);
+                    background: rgba(23, 72, 248, 0.6);
+                    z-index: -1;
+                }
+
                 
                 #uw-a11y-panel.minimized {
                     bottom: -1px;
@@ -1162,6 +1281,10 @@
                     width: 400px;
                     max-height: 180px;
                     border-radius: 8px 8px 0 0;
+                }
+
+                .violationtype {
+                    margin-bottom: 0.5rem;
                 }
 
                 
@@ -1289,7 +1412,8 @@
                 }
                 #uw-a11y-panel #uw-a11y-summary {
                     background: #f8f9fa;
-                    border: 1px solid #dee2e6;
+                    /*border: 1px solid #dee2e6;*/
+                    box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.12);
                     border-radius: 10px;
                     padding: 10px;
                     margin-bottom: 16px;
@@ -1330,6 +1454,7 @@
                     background: #b8daff;
                     box-shadow: 0 4px 20px 0 rgba(23, 104, 211, 0.35);
                     border-color: rgba(23, 162, 184, 0.3);
+                    cursor: default;
                 }
                 
                 /* Focus states for keyboard accessibility */
@@ -1759,6 +1884,75 @@
             });
         },
         
+        // Announce results to screen readers via ARIA live region
+        announceResults: function(scoreData, counts) {
+            const announcements = this.shadowRoot.getElementById('uw-a11y-announcements');
+            if (!announcements) return;
+            
+            let message = '';
+            
+            if (scoreData) {
+                const score = scoreData.score;
+                const ratingText = score >= 97 ? 'Excellent' : 
+                                  score >= 90 ? 'Very Good' : 
+                                  score >= 70 ? 'Good' : 
+                                  score >= 50 ? 'Fair' : 
+                                  'Needs immediate attention';
+                
+                message += `Accessibility test complete. Score: ${score} out of 100, rated as ${ratingText}. `;
+            }
+            
+            const totalIssues = counts.error + counts.warning;
+            if (totalIssues === 0) {
+                message += 'No accessibility violations found. Excellent work!';
+            } else {
+                message += `Found ${totalIssues} total issues: `;
+                if (counts.error > 0) {
+                    message += `${counts.error} violation${counts.error === 1 ? '' : 's'} requiring immediate attention`;
+                }
+                if (counts.warning > 0) {
+                    if (counts.error > 0) message += ' and ';
+                    message += `${counts.warning} item${counts.warning === 1 ? '' : 's'} requiring manual review`;
+                }
+                if (counts.warningChecked > 0) {
+                    message += `. ${counts.warningChecked} item${counts.warningChecked === 1 ? '' : 's'} already verified`;
+                }
+                message += '. Navigate through the list below to review each issue.';
+            }
+            
+            // Use setTimeout to ensure the live region is ready
+            setTimeout(() => {
+                announcements.textContent = message;
+            }, 500);
+        },
+        
+        // Set focus to the accessibility checker panel for keyboard navigation
+        setFocusToPanel: function() {
+            // Use a small delay to ensure DOM is fully rendered
+            setTimeout(() => {
+                const panel = this.shadowRoot.getElementById('uw-a11y-panel');
+                if (panel) {
+                    panel.focus();
+                    // Scroll into view if needed
+                    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }, 100);
+        },
+        
+        // Update visibility of elements with if-issues class
+        updateIfIssuesVisibility: function() {
+            const hasIssues = this.issues.length > 0;
+            const ifIssuesElements = this.shadowRoot.querySelectorAll('.if-issues');
+            
+            ifIssuesElements.forEach(element => {
+                if (hasIssues) {
+                    element.style.display = '';
+                } else {
+                    element.style.display = 'none';
+                }
+            });
+        },
+        
         displayResults: function() {
             const panel = this.createPanel();
             const summary = this.shadowRoot.getElementById('uw-a11y-summary');
@@ -1775,27 +1969,47 @@
                 info: this.issues.filter(i => i.type === 'info').length
             };
             
+            // Update visibility of elements with if-issues class
+            this.updateIfIssuesVisibility();
+            
 
             
             // Get accessibility score
             const scoreData = this.axeResults ? this.axeResults.score : null;
             
-            // Display summary with score dial
+            // Display summary with score dial and accessibility announcements
             summary.innerHTML = `
+                <!-- ARIA live region for screen reader announcements -->
+                <div id="uw-a11y-announcements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+                
                 ${scoreData ? this.renderScoreDial(scoreData) : ''}
-                <h3>axe-core v${this.getAxeVersion()} Accessibility Analysis</h3>
-                <p><strong>Total Issues Found:</strong> ${this.issues.length}</p>
-                                    <div style="margin: 8px 0;">
-                        <span class="uw-a11y-count count-error">${counts.error}</span>Violations
-                        <span class="uw-a11y-count count-warning">${counts.warning}</span>Manual Review
-                        ${counts.warningChecked > 0 ? `<span class="uw-a11y-count count-verified">${counts.warningChecked}</span>Verified` : ''}
+                
+                <!-- Accessible summary section -->
+                <div role="region" aria-labelledby="uw-a11y-summary-heading">
+                    <h3 id="uw-a11y-summary-heading" class="sr-only">Accessibility Test Results Summary</h3>
+                    
+                    <p><strong>Total Issues Found:</strong> ${this.issues.length}</p>
+                    
+                    <div style="margin: 8px 0;" role="list" aria-label="Issue breakdown by type">
+                        <div role="listitem" class="violationtype">
+                            <span class="uw-a11y-count count-error" aria-label="${counts.error} violations requiring immediate attention">${counts.error}</span>Violations
+                            <span class="sr-only"> - These are accessibility failures that must be fixed</span>
+                        </div>
+                        <div role="listitem" class="violationtype">
+                            <span class="uw-a11y-count count-warning" aria-label="${counts.warning} manual review items">${counts.warning}</span>Manual Review
+                            <span class="sr-only"> - These items need human verification</span>
+                        </div>
+                        ${counts.warningChecked > 0 ? `
+                            <div role="listitem" class="violationtype">
+                                <span class="uw-a11y-count count-verified" aria-label="${counts.warningChecked} verified items">${counts.warningChecked}</span>Verified
+                                <span class="sr-only"> - These manual review items have been checked and confirmed</span>
+                            </div>
+                        ` : ''}
                     </div>
-                <p><small>Click on any issue to highlight the element on the page.</small></p>
+                </div>
+                
                 ${this.axeResults ? `
                     <div class="axe-summary">
-                        <!--<strong>Test Summary:</strong> ${this.axeResults.violations} violations, 
-                        ${this.axeResults.passes} passes, ${this.axeResults.incomplete} need review, 
-                        ${this.axeResults.inapplicable} not applicable<br>-->
                         <strong>Standard:</strong> WCAG 2.1 AA | <strong>Engine:</strong> axe-core v${this.getAxeVersion()} | <strong>Checker:</strong> v${this.version}
                     </div>
                 ` : ''}
@@ -1919,33 +2133,70 @@
                     }
                 });
             }
+            
+            // Announce results to screen readers
+            this.announceResults(scoreData, counts);
+            
+            // Set focus to the panel for keyboard accessibility
+            this.setFocusToPanel();
         },
         
 
         
         // Render the accessibility score dial
+        // Helper function to create gradient with multiple stops
+        createScoreGradient: function(score, percentage) {
+            let gradientStops;
+            
+            if (score >= 90) {
+                // Dark green to light green for excellent scores
+                gradientStops = `#1e7e34 0deg, #28a745 ${percentage * 0.3}deg, #34ce57 ${percentage * 0.6}deg, #40d969 ${percentage}deg`;
+            } else if (score >= 70) {
+                // Dark yellow/amber to light yellow
+                gradientStops = `#e6a800 0deg, #ffc107 ${percentage * 0.3}deg, #ffce3a ${percentage * 0.6}deg, #ffd96a ${percentage}deg`;
+            } else if (score >= 50) {
+                // Dark orange to light orange
+                gradientStops = `#dc6002 0deg, #fd7e14 ${percentage * 0.3}deg, #ff8c42 ${percentage * 0.6}deg, #ff9a56 ${percentage}deg`;
+            } else {
+                // Dark red to light red
+                gradientStops = `#a71e2a 0deg, #dc3545 ${percentage * 0.3}deg, #e55666 ${percentage * 0.6}deg, #ee6674 ${percentage}deg`;
+            }
+            
+            return `conic-gradient(from 0deg, ${gradientStops}, #e9ecef ${percentage}deg 360deg)`;
+        },
+
         renderScoreDial: function(scoreData) {
             const score = scoreData.score;
             const percentage = (score / 100) * 360; // Convert to degrees
-            const color = score >= 90 ? '#28a745' : score >= 70 ? '#ffc107' : score >= 50 ? '#fd7e14' : '#dc3545';
+            const gradient = this.createScoreGradient(score, percentage);
+            
+            // Generate accessibility rating text
+            const ratingText = score >= 97 ? 'Excellent' : 
+                              score >= 90 ? 'Very Good - just a few issues to address' : 
+                              score >= 70 ? 'Good accessibility with room for improvement' : 
+                              score >= 50 ? 'Fair accessibility - several issues to address' : 
+                              'Immediate attention needed';
             
             return `
-                <div class="uw-a11y-score-container">
-                    <div class="uw-a11y-score-dial">
-                        <div class="uw-a11y-score-circle" style="background: conic-gradient(from 0deg, ${color} 0deg ${percentage}deg, #e9ecef ${percentage}deg 360deg);">
+                <div class="uw-a11y-score-container" role="region" aria-labelledby="uw-a11y-score-heading">
+                    <h3 id="uw-a11y-score-heading" class="sr-only">Accessibility Score</h3>
+                    
+                    <!-- Screen reader accessible score announcement -->
+                    <div class="sr-only">
+                        Accessibility score: ${score} out of 100. Rating: ${ratingText}
+                    </div>
+                    
+                    <div class="uw-a11y-score-dial" role="img" aria-label="Accessibility score ${score} out of 100, rated as ${ratingText}">
+                        <div class="uw-a11y-score-circle" style="background: ${gradient};">
                             <div class="uw-a11y-score-inner">
-                                <div class="uw-a11y-score-number">${score}</div>
-                                <div class="uw-a11y-score-label">Score</div>
+                                <div class="uw-a11y-score-number" aria-hidden="true">${score}</div>
+                                <div class="uw-a11y-score-label" aria-hidden="true">Score</div>
                             </div>
                         </div>
                     </div>
                     <div style="font-size: 14px;">
-                        <span style="font-size: 12px; color: #666;">
-                            ${score >= 97 ? 'Excellent' : 
-                              score >= 90 ? 'Very Good - just a few issues to address' : 
-                              score >= 70 ? 'Good accessibility with room for improvement' : 
-                              score >= 50 ? 'Fair accessibility - several issues to address' : 
-                              'Immediate attention needed'}
+                        <span style="font-size: 12px; color: #666;" aria-hidden="true">
+                            ${ratingText}
                         </span>
                     </div>
                 </div>
@@ -2216,11 +2467,11 @@
             if (scoreNumber && scoreCircle) {
                 scoreNumber.textContent = newScore.score;
                 
-                // Update color based on score
+                // Update gradient based on score
                 const score = newScore.score;
-                const color = score >= 90 ? '#28a745' : score >= 70 ? '#ffc107' : score >= 50 ? '#fd7e14' : '#dc3545';
                 const percentage = (score / 100) * 360;
-                scoreCircle.style.background = `conic-gradient(from 0deg, ${color} 0deg ${percentage}deg, #e9ecef ${percentage}deg 360deg)`;
+                const gradient = this.createScoreGradient(score, percentage);
+                scoreCircle.style.background = gradient;
             }
             
             // Update the counts
@@ -2241,6 +2492,16 @@
                         ${counts.warningChecked > 0 ? `<span class="uw-a11y-count count-verified">${counts.warningChecked}</span>Verified` : ''}
                     `;
                 }
+            }
+            
+            // Update visibility of if-issues elements
+            this.updateIfIssuesVisibility();
+            
+            // Announce score update to screen readers
+            const announcements = this.shadowRoot.getElementById('uw-a11y-announcements');
+            if (announcements && counts.warningChecked > 0) {
+                const message = `Score updated to ${newScore.score}. ${counts.warningChecked} item${counts.warningChecked === 1 ? '' : 's'} verified.`;
+                announcements.textContent = message;
             }
         },
 
@@ -2273,6 +2534,8 @@
                 panel.classList.remove('minimized');
                 minimizeBtn.textContent = '−';
                 minimizeBtn.title = 'Minimize';
+                // Set focus when restoring for keyboard users
+                this.setFocusToPanel();
             }
             
             // Store minimize state in sessionStorage

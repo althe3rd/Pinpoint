@@ -1783,7 +1783,6 @@
             // Display summary with score dial
             summary.innerHTML = `
                 ${scoreData ? this.renderScoreDial(scoreData) : ''}
-                <h3>axe-core v${this.getAxeVersion()} Accessibility Analysis</h3>
                 <p><strong>Total Issues Found:</strong> ${this.issues.length}</p>
                                     <div style="margin: 8px 0;">
                         <span class="uw-a11y-count count-error">${counts.error}</span>Violations

@@ -62,6 +62,25 @@ function validateExtensionFiles(extensionDir) {
     return true;
 }
 
+function syncAccessibilityCheckerSource() {
+    try {
+        const sourcePath = path.resolve('accessibility-checker.js');
+        const chromeTarget = path.resolve('extension/chrome/accessibility-checker.js');
+        const firefoxTarget = path.resolve('extension/firefox/accessibility-checker.js');
+
+        if (!fs.existsSync(sourcePath)) {
+            throw new Error('Source file accessibility-checker.js not found at project root');
+        }
+
+        fs.copyFileSync(sourcePath, chromeTarget);
+        fs.copyFileSync(sourcePath, firefoxTarget);
+        log('🔁 Synchronized accessibility-checker.js to extension/chrome/ and extension/firefox/', 'blue');
+    } catch (error) {
+        log(`❌ Error syncing accessibility-checker.js to extensions: ${error.message}`, 'red');
+        throw error;
+    }
+}
+
 function updateManifestVersion(manifestPath) {
     try {
         const manifestContent = fs.readFileSync(manifestPath, 'utf8');
@@ -181,6 +200,9 @@ function main() {
         // Ensure build directory exists
         ensureDirectoryExists(BUILD_DIR);
         
+        // Always sync the shared checker source into both extensions before packaging
+        syncAccessibilityCheckerSource();
+
         // Validate extension directories
         const chromeDir = 'extension/chrome';
         const firefoxDir = 'extension/firefox';

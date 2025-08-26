@@ -1,11 +1,13 @@
 {
   "manifest_version": 3,
   "name": "Pinpoint Accessibility Checker",
-  "version": "1.4.7",
+  "version": "1.4.8",
   "description": "Comprehensive WCAG 2.1 AA accessibility testing powered by axe-core. Get detailed reports with actionable recommendations.",
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+    "commands",
+    "contextMenus"
   ],
   "content_scripts": [
     {
@@ -53,5 +55,14 @@
   },
   "host_permissions": [
     "<all_urls>"
-  ]
+  ],
+  "commands": {
+    "run-accessibility-check": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+A",
+        "mac": "Command+Shift+A"
+      },
+      "description": "Run accessibility check on current page"
+    }
+  }
 }

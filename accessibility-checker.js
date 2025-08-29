@@ -1393,6 +1393,17 @@
         createPanel: function() {
             this.shadowRoot.innerHTML = `
                 ${this.getStyles()}
+                <div id="uw-a11y-wrapper">
+                <div id="uw-a11y-nav">
+                    <nav>
+                        <ul>
+                            <li><a href="#uw-a11y-panel">Results</a></li>
+                            <li><a href="#uw-a11y-settings">About</a></li>
+                            <li><a href="#uw-a11y-settings">Settings</a></li>
+                            <li><a href="#uw-a11y-settings">Help</a></li>
+                        </ul>
+                    </nav>
+                </div>
                 <div id="uw-a11y-panel" tabindex="-1" role="dialog" aria-labelledby="uw-a11y-title">
                     <div class="accentcolors">
                         <div class="color1"></div>
@@ -1459,6 +1470,7 @@
                         <div id="uw-a11y-results"></div>
                     </div>
                 </div>
+            </div>
             `;
             
             // Add event listeners
@@ -1499,13 +1511,60 @@
                    
                 }
 
-                #uw-a11y-panel {
+                #uw-a11y-wrapper {
+                    display: grid;
+                    grid-template-columns: 50px 1fr;
                     position: fixed;
                     top: 20px;
                     right: 20px;
                     width: 450px;
-                    max-height: 85vh;
-                    background: rgba(255,255,255,0.8);
+                    
+                    z-index: 999999;
+                    gap: .8rem;
+                    background: rgba(0,0,0,0.8);
+                    backdrop-filter: blur(20px);
+                    padding: 4px;
+                    border-radius: 16px;
+                }
+
+                #uw-a11y-nav {
+                    justify-content: center;
+                    color: #fff;
+
+                }
+
+                #uw-a11y-nav ul {
+                    list-style: none;
+                    padding: 0;
+                    margin: 0;
+                    display: flex;
+                    gap: 1rem;
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                #uw-a11y-nav ul li {
+                    position: relative;
+                }
+
+                #uw-a11y-nav ul li a {
+                    display: block;
+                    color: #fff;
+                    text-decoration: none;
+                    padding: 0.5rem 1rem;
+                    border-radius: 8px;
+                    transition: background 0.3s ease;
+                    font-size: 0.8rem;
+                    text-align: center
+                }
+
+                #uw-a11y-nav ul li a:hover {
+                    background: rgba(255, 255, 255, 0.1);
+                }
+
+                #uw-a11y-panel {
+                    
+                    background: rgba(239, 239, 239, 0.9);
                     border: 1px solid rgba(255,255,255,0.85);
                     border-radius: 12px;
                     backdrop-filter: blur(12px);

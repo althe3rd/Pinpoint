@@ -15,6 +15,8 @@
             checkedItems: new Set(), // Track manually verified items
             isMinimized: false, // Track minimized state
             shadowRoot: null, // Shadow DOM root
+            // Visibility filters for list rendering
+            filters: { errors: true, warnings: true, info: true },
         
         // Initialize the checker
         init: function() {
@@ -175,7 +177,337 @@
                 }
                 
                 this.processAxeResults(results);
+                // Run additional best-practices checks that axe doesn't cover
+                try {
+                    this.runBestPracticeChecks();
+                } catch (e) {
+                    // Don't let best-practice scan break the main flow
+                    console.warn('Best-practices scan failed:', e);
+                }
                 this.displayResults();
+            });
+        },
+
+        // Additional best-practices checks beyond axe rules
+        runBestPracticeChecks: function() {
+            // Helper: compute an approximate accessible name for links/buttons
+            const getAccessibleName = (el) => {
+                if (!el) return '';
+                // aria-label has highest precedence
+                const ariaLabel = el.getAttribute && el.getAttribute('aria-label');
+                if (ariaLabel && ariaLabel.trim()) return ariaLabel.trim();
+
+                // aria-labelledby
+                const labelledby = el.getAttribute && el.getAttribute('aria-labelledby');
+                if (labelledby) {
+                    const ids = labelledby.split(/\s+/);
+                    const text = ids.map(id => {
+                        const ref = document.getElementById(id);
+                        return ref ? (ref.innerText || ref.textContent || '').trim() : '';
+                    }).join(' ').trim();
+                    if (text) return text;
+                }
+
+                // img alt inside link
+                const img = el.querySelector && el.querySelector('img[alt]');
+                if (img && img.getAttribute('alt') && img.getAttribute('alt').trim()) {
+                    return img.getAttribute('alt').trim();
+                }
+
+                // input value for input buttons/submit
+                if (el.tagName === 'INPUT') {
+                    const type = (el.getAttribute('type') || '').toLowerCase();
+                    const val = el.getAttribute('value');
+                    if (val && val.trim() && ['button','submit','reset'].includes(type)) {
+                        return val.trim();
+                    }
+                }
+
+                // Fallback: text content
+                const text = (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim();
+                return text;
+            };
+
+            // Helper: basic visibility filter to reduce noise
+            const isVisible = (el) => {
+                try {
+                    if (!el || !(el instanceof Element)) return false;
+                    if (el.hidden) return false;
+                    const style = window.getComputedStyle(el);
+                    if (!style || style.display === 'none' || style.visibility === 'hidden' || parseFloat(style.opacity) === 0) return false;
+                    // Exclude our own UI container
+                    if (el.closest && el.closest('#uw-a11y-container')) return false;
+                    return true;
+                } catch (_) {
+                    return true;
+                }
+            };
+
+            // 1) Non-descriptive link text
+            const genericPhrases = [
+                'click here', 'here', 'learn more', 'read more', 'more', 'details',
+                'this', 'this link', 'continue', 'link', 'info'
+            ];
+            const anchors = Array.from(document.querySelectorAll('a[href]'));
+            anchors.forEach(a => {
+                if (!isVisible(a)) return;
+                const name = getAccessibleName(a).toLowerCase();
+                if (!name) return;
+                const isGeneric = genericPhrases.includes(name);
+                if (isGeneric) {
+                    this.addIssue(
+                        'info',
+                        'Best Practice: Use contextual link text',
+                        `The link text "${name}" is not descriptive out of context.`,
+                        a,
+                        'Use meaningful, specific link text that communicates the destination or action. For example, instead of <code>click here</code>, use <code>Download annual report (PDF)</code> or <code>Read more about financial aid</code>. You can also add context with <code>aria-label</code> when needed.',
+                        'https://www.w3.org/WAI/GL/UNDERSTANDING-WCAG20/navigation-mechanisms-meaningful-sequence.html',
+                        'minor',
+                        ['best-practice', 'links'],
+                        [
+                            { label: 'Detected Text', value: name },
+                            { label: 'Href', value: a.getAttribute('href') || '' }
+                        ],
+                        'bp-contextual-link-text'
+                    );
+                }
+            });
+
+            // 2) Multiple generic link texts that go to different destinations
+            const mapByText = new Map();
+            anchors.forEach(a => {
+                if (!isVisible(a)) return;
+                const name = getAccessibleName(a).toLowerCase();
+                if (!genericPhrases.includes(name)) return; // only for generic texts
+                const href = (a.getAttribute('href') || '').trim();
+                if (!mapByText.has(name)) mapByText.set(name, new Set());
+                mapByText.get(name).add(href);
+            });
+            mapByText.forEach((hrefs, text) => {
+                if (hrefs.size > 1) {
+                    // Flag once, reference examples
+                    const examples = anchors.filter(a => genericPhrases.includes(getAccessibleName(a).toLowerCase()))
+                        .slice(0, 3)
+                        .map(a => ({ text: getAccessibleName(a), href: a.getAttribute('href') || '' }));
+                    this.addIssue(
+                        'info',
+                        'Best Practice: Avoid repeated generic links',
+                        `Found multiple "${text}" links pointing to different destinations.`,
+                        null,
+                        'Provide unique, contextual link text for each destination. For example, replace repeated <code>Read more</code> with <code>Read more about scholarships</code>, <code>Read more about housing</code>, etc.',
+                        'https://www.w3.org/WAI/tutorials/page-structure/links/',
+                        'minor',
+                        ['best-practice', 'links'],
+                        [
+                            { label: 'Link Text', value: text },
+                            { label: 'Unique Destinations', value: Array.from(hrefs).join(', ') },
+                            { label: 'Examples (first 3)', value: examples.map(e => `${e.text} → ${e.href}`).join(' | ') }
+                        ],
+                        'bp-duplicate-generic-links'
+                    );
+                }
+            });
+
+            // 3) New tab/window behavior not communicated and missing rel security
+            anchors.forEach(a => {
+                if (!isVisible(a)) return;
+                const target = a.getAttribute('target');
+                if (target && target.toLowerCase() === '_blank') {
+                    const name = getAccessibleName(a);
+                    const nameLc = name.toLowerCase();
+                    const mentionsNewTab = nameLc.includes('opens in new tab') || nameLc.includes('opens in a new tab') || nameLc.includes('(new tab)');
+                    const rel = (a.getAttribute('rel') || '').toLowerCase();
+                    const hasNoopener = rel.includes('noopener');
+                    const hasNoreferrer = rel.includes('noreferrer');
+
+                    if (!mentionsNewTab || !hasNoopener || !hasNoreferrer) {
+                        const recommendations = [];
+                        if (!mentionsNewTab) recommendations.push('Inform users the link opens in a new tab/window (e.g., include visually hidden text like <code><span class="sr-only">(opens in new tab)</span></code> or add to <code>aria-label</code>).');
+                        if (!hasNoopener || !hasNoreferrer) recommendations.push('Add <code>rel="noopener noreferrer"</code> for security and privacy.');
+                        this.addIssue(
+                            'info',
+                            'Best Practice: Communicate new-tab behavior',
+                            'Link opens in a new tab/window but may not communicate this behavior or include recommended rel attributes.',
+                            a,
+                            recommendations.join(' '),
+                            'https://www.w3.org/TR/WCAG20-TECHS/G201.html',
+                            'minor',
+                            ['best-practice', 'links'],
+                            [
+                                { label: 'Text', value: name },
+                                { label: 'Href', value: a.getAttribute('href') || '' },
+                                { label: 'Has rel', value: rel || '(none)' }
+                            ],
+                            'bp-new-tab-communication'
+                        );
+                    }
+                }
+            });
+
+            // 4) Inputs using placeholder as the primary label (lack persistent label)
+            const formControls = Array.from(document.querySelectorAll('input, textarea, select'))
+                .filter(el => {
+                    const type = (el.getAttribute('type') || '').toLowerCase();
+                    if (type === 'hidden') return false;
+                    return true;
+                });
+            const hasAssociatedLabel = (el) => {
+                if (!el || !(el instanceof Element)) return false;
+                if (el.closest('label')) return true;
+                const id = el.getAttribute('id');
+                if (id && document.querySelector(`label[for="${CSS.escape(id)}"]`)) return true;
+                if (el.hasAttribute('aria-label') && el.getAttribute('aria-label').trim()) return true;
+                if (el.hasAttribute('aria-labelledby')) {
+                    const ids = el.getAttribute('aria-labelledby').split(/\s+/);
+                    const named = ids.map(i => document.getElementById(i)).filter(Boolean)
+                        .map(n => (n.innerText || n.textContent || '').trim()).join(' ').trim();
+                    if (named) return true;
+                }
+                return false;
+            };
+            formControls.forEach(el => {
+                if (!isVisible(el)) return;
+                const hasPlaceholder = el.hasAttribute('placeholder') && el.getAttribute('placeholder').trim();
+                if (hasPlaceholder && !hasAssociatedLabel(el)) {
+                    this.addIssue(
+                        'info',
+                        'Best Practice: Don\'t rely on placeholder as label',
+                        'This form control appears to rely on placeholder text instead of a persistent label.',
+                        el,
+                        'Provide a visible, persistent <code><label></code> or an accessible name via <code>aria-label</code>/<code>aria-labelledby</code>. Placeholders should be hints, not primary labels, because they disappear on input and can reduce readability.',
+                        'https://www.w3.org/WAI/tutorials/forms/labels/',
+                        'minor',
+                        ['best-practice', 'forms'],
+                        [
+                            { label: 'Control', value: el.tagName.toLowerCase() + (el.getAttribute('type') ? ` [type=${el.getAttribute('type')}]` : '') },
+                            { label: 'Placeholder', value: el.getAttribute('placeholder') || '' }
+                        ],
+                        'bp-placeholder-only-label'
+                    );
+                }
+            });
+
+            // 5) Generic/unclear button text
+            const buttonSelectors = 'button, input[type="button"], input[type="submit"], input[type="reset"], a[role="button"]';
+            const buttons = Array.from(document.querySelectorAll(buttonSelectors));
+            const genericButtonPhrases = [
+                'submit','go','more','learn more','read more','click here','ok','yes','no','continue','next','previous','prev','send'
+            ];
+            buttons.forEach(btn => {
+                if (!isVisible(btn)) return;
+                const name = getAccessibleName(btn).trim();
+                if (!name) return;
+                if (genericButtonPhrases.includes(name.toLowerCase())) {
+                    this.addIssue(
+                        'info',
+                        'Best Practice: Make button text specific',
+                        `The button label "${name}" is generic and may be unclear.`,
+                        btn,
+                        'Use specific labels that describe the action, e.g., <code>Submit application</code>, <code>Search site</code>, or <code>Download report</code>.',
+                        'https://www.w3.org/WAI/tutorials/forms/labels/#hints-and-instructions',
+                        'minor',
+                        ['best-practice', 'buttons'],
+                        [ { label: 'Detected Text', value: name } ],
+                        'bp-generic-button-text'
+                    );
+                }
+            });
+
+            // 6) Autoplaying media recommendations
+            const autoplayMedia = Array.from(document.querySelectorAll('video[autoplay], audio[autoplay]'));
+            autoplayMedia.forEach(m => {
+                if (!isVisible(m)) return;
+                const hasControls = m.hasAttribute('controls');
+                const isMuted = m.hasAttribute('muted');
+                const label = m.tagName.toLowerCase();
+                const recs = [];
+                if (!hasControls) recs.push('Add <code>controls</code> so users can pause/stop.');
+                if (!isMuted && m.tagName === 'VIDEO') recs.push('Avoid autoplay with sound; consider starting paused or muted.');
+                recs.push('Respect user preference with <code>@media (prefers-reduced-motion: reduce)</code> and avoid distracting motion.');
+                this.addIssue(
+                    'info',
+                    'Best Practice: Avoid autoplay without clear controls',
+                    `${label} element autoplays. Autoplay can be disorienting and should generally be avoided.`,
+                    m,
+                    recs.join(' '),
+                    'https://www.w3.org/WAI/WCAG21/Techniques/general/G19',
+                    'minor',
+                    ['best-practice', 'media'],
+                    [ { label: 'Element', value: `<${label}>` }, { label: 'Controls', value: hasControls ? 'present' : 'missing' } ],
+                    'bp-media-autoplay'
+                );
+            });
+
+            // 7) Infinite or marquee-style animations
+            // Simple tag checks first
+            const marqueeLike = Array.from(document.querySelectorAll('marquee, blink'));
+            marqueeLike.forEach(el => {
+                if (!isVisible(el)) return;
+                this.addIssue(
+                    'info',
+                    'Best Practice: Avoid marquee/blink effects',
+                    'Elements using marquee/blink effects can be distracting and hard to read.',
+                    el,
+                    'Replace with non-moving alternatives or provide user controls and respect <code>prefers-reduced-motion</code>.',
+                    'https://www.w3.org/WAI/WCAG21/Understanding/pause-stop-hide.html',
+                    'minor',
+                    ['best-practice', 'motion'],
+                    [],
+                    'bp-marquee-blink'
+                );
+            });
+            // Computed-style animation scan (limited for performance)
+            try {
+                const allEls = Array.from(document.querySelectorAll('*'));
+                if (allEls.length <= 2500) {
+                    allEls.forEach(el => {
+                        if (!isVisible(el)) return;
+                        const cs = getComputedStyle(el);
+                        if (!cs) return;
+                        const durations = (cs.animationDuration || '').split(',').map(s => (s || '').trim());
+                        const iters = (cs.animationIterationCount || '').split(',').map(s => (s || '').trim());
+                        const running = (cs.animationPlayState || '').split(',').some(s => s.trim() === 'running');
+                        const hasDuration = durations.some(d => d && d !== '0s' && d !== '0ms');
+                        const infinite = iters.some(n => n === 'infinite');
+                        if (running && hasDuration && infinite) {
+                            this.addIssue(
+                                'info',
+                                'Best Practice: Provide motion alternatives',
+                                'Detected an element with continuous animation.',
+                                el,
+                                'Offer a way to pause/stop animation and respect <code>prefers-reduced-motion</code> to reduce or remove motion for users who prefer it.',
+                                'https://www.w3.org/WAI/WCAG21/Understanding/animation-from-interactions.html',
+                                'minor',
+                                ['best-practice', 'motion'],
+                                [],
+                                'bp-infinite-animation'
+                            );
+                        }
+                    });
+                }
+            } catch (_) { /* ignore animation scan errors */ }
+
+            // 8) File-type link labeling (PDF, docs, etc.)
+            const fileExts = ['.pdf','.doc','.docx','.ppt','.pptx','.xls','.xlsx','.zip'];
+            anchors.forEach(a => {
+                if (!isVisible(a)) return;
+                const href = (a.getAttribute('href') || '').toLowerCase();
+                const name = getAccessibleName(a).toLowerCase();
+                const matched = fileExts.find(ext => href.endsWith(ext));
+                if (matched && name && !name.includes(matched.replace('.', ''))) {
+                    this.addIssue(
+                        'info',
+                        'Best Practice: Indicate file type in link',
+                        `This link points to a ${matched.toUpperCase()} file, but the link text may not indicate the file type.`,
+                        a,
+                        'Include the file type (and optionally size) in the link text, e.g., <code>Annual Report (PDF)</code>.',
+                        'https://www.w3.org/WAI/tips/writing/#inform-users-about-what-to-expect',
+                        'minor',
+                        ['best-practice', 'links'],
+                        [ { label: 'Href', value: href } ],
+                        'bp-filetype-link-label'
+                    );
+                }
             });
         },
         
@@ -1122,7 +1454,7 @@
                         <div id="uw-a11y-summary"></div>
                         <p class="if-issues">
                             <div class="mouse-icon"></div>
-                            <small>Click on any issue to highlight the element on the page.</small>
+                            <small>Select any item below to highlight the element on the page.</small>
                         </p>
                         <div id="uw-a11y-results"></div>
                     </div>
@@ -1285,6 +1617,9 @@
 
                 .violationtype {
                     margin-bottom: 0.5rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
                 }
 
                 
@@ -1623,6 +1958,32 @@
                 #uw-a11y-panel .count-warning { background: #ffc107; color: #212529; }
                 #uw-a11y-panel .count-info { background: #17a2b8; }
                 #uw-a11y-panel .count-verified { background: #28a745; }
+                #uw-a11y-panel .filter-toggle .icon-eye-off { display: none; }
+                #uw-a11y-panel .filter-toggle[aria-pressed="false"] .icon-eye { display: none; }
+                #uw-a11y-panel .filter-toggle[aria-pressed="false"] .icon-eye-off { display: inline; }
+                #uw-a11y-panel .filter-toggle {
+                    background: none;
+                    border: 1px solid rgba(0,0,0,0.15);
+                    border-radius: 6px;
+                    padding: 2px 6px;
+                    cursor: pointer;
+                    color: #333;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    font-size: 12px;
+                }
+                #uw-a11y-panel .filter-toggle:hover {
+                    background: rgba(0,0,0,0.05);
+                }
+                #uw-a11y-panel .filter-toggle:focus {
+                    outline: 2px solid #007cba;
+                    outline-offset: 2px;
+                }
+                #uw-a11y-panel .filter-toggle[aria-pressed="false"] {
+                    opacity: 0.45;
+                }
+                #uw-a11y-panel .filter-icon { width: 16px; height: 16px; }
                 #uw-a11y-panel .uw-a11y-manual-check {
                     margin: 8px 0;
                     padding: 8px;
@@ -1866,6 +2227,119 @@
             }
             return 'unknown';
         },
+
+        // Load and save filter preferences
+        loadFilters: function() {
+            try {
+                const stored = sessionStorage.getItem('uw-a11y-filters');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    this.filters = { errors: true, warnings: true, info: true, ...parsed };
+                }
+            } catch (e) { /* ignore */ }
+        },
+        saveFilters: function() {
+            try {
+                sessionStorage.setItem('uw-a11y-filters', JSON.stringify(this.filters));
+            } catch (e) { /* ignore */ }
+        },
+        toggleFilter: function(kind) {
+            if (!['errors','warnings','info'].includes(kind)) return;
+            this.filters[kind] = !this.filters[kind];
+            this.saveFilters();
+            this.updateFilterUI();
+            this.refreshIssueList();
+        },
+        updateFilterUI: function() {
+            const setState = (id, pressed) => {
+                const btn = this.shadowRoot.getElementById(id);
+                if (btn) btn.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+                const row = btn?.closest('.violationtype');
+                if (row) row.style.opacity = pressed ? '1' : '0.6';
+            };
+            setState('toggle-errors', this.filters.errors);
+            setState('toggle-warnings', this.filters.warnings);
+            setState('toggle-info', this.filters.info);
+        },
+        getIssuesForFilters: function() {
+            return this.issues.filter(i =>
+                (i.type === 'error' && this.filters.errors) ||
+                (i.type === 'warning' && this.filters.warnings) ||
+                (i.type === 'info' && this.filters.info)
+            );
+        },
+        refreshIssueList: function() {
+            const results = this.shadowRoot.getElementById('uw-a11y-results');
+            if (!results) return;
+            const issuesToShow = this.getIssuesForFilters();
+            if (issuesToShow.length === 0) {
+                results.innerHTML = `
+                    <div class="uw-a11y-issue info">
+                        <h4>No issues to display</h4>
+                        <p>Adjust the filters above to show hidden groups.</p>
+                    </div>
+                `;
+                return;
+            }
+            const groupedIssues = this.groupIssuesByRule(issuesToShow);
+            const generatedHtml = Object.keys(groupedIssues).map((ruleId, index) => {
+                const issueGroup = groupedIssues[ruleId];
+                const firstIssue = issueGroup[0];
+                const isManualReview = firstIssue.type === 'warning' && firstIssue.uniqueId;
+                const instanceNavigation = issueGroup.length > 1 ? `
+                        <div class=\"uw-a11y-instance-nav\">
+                            <span class=\"uw-a11y-instance-count\">Instance <span id=\"current-${this.sanitizeHtmlId(ruleId)}\">1</span> of ${issueGroup.length}</span>
+                            <div class=\"uw-a11y-nav-buttons\">
+                                <button onclick=\"window.uwAccessibilityChecker.navigateInstance('${this.escapeJavaScript(ruleId)}', -1); event.stopPropagation();\" 
+                                        id=\"prev-${this.sanitizeHtmlId(ruleId)}\" disabled>‹ Prev</button>
+                                <button onclick=\"window.uwAccessibilityChecker.navigateInstance('${this.escapeJavaScript(ruleId)}', 1); event.stopPropagation();\" 
+                                        id=\"next-${this.sanitizeHtmlId(ruleId)}\">Next ›</button>
+                            </div>
+                        </div>
+                    ` : '';
+                const iconSvg = firstIssue.type === 'error' 
+                    ? `<svg class="uw-a11y-issue-icon uw-a11y-error-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+                    : `<svg class="uw-a11y-issue-icon uw-a11y-warning-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+                return `
+                    <div class=\"uw-a11y-issue ${firstIssue.type} ${isManualReview && this.isRuleVerified(ruleId) ? 'checked' : ''}\" 
+                         onclick=\"window.uwAccessibilityChecker.highlightCurrentInstance('${this.escapeJavaScript(ruleId)}')\" 
+                         onkeydown=\"if(event.key==='Enter'||event.key===' '){event.preventDefault();window.uwAccessibilityChecker.highlightCurrentInstance('${this.escapeJavaScript(ruleId)}');}\"
+                         tabindex=\"0\"
+                         role=\"button\" 
+                         aria-label=\"Click to highlight ${this.escapeHtmlAttribute(firstIssue.title)} on the page${issueGroup.length > 1 ? ` (${issueGroup.length} instances)` : ''}\"
+                         id=\"issue-${this.sanitizeHtmlId(ruleId)}\">
+                         ${instanceNavigation}
+                        <h4>
+                            <span class=\"uw-a11y-issue-header\">${iconSvg}<span class=\"uw-a11y-issue-title\">${this.escapeHtmlContent(firstIssue.title)} ${issueGroup.length > 1 ? `(${issueGroup.length} instances)` : ''}</span></span>
+                        </h4>
+                        <div class=\"how-to-fix\"><div class=\"how-to-fix-icon\"><svg viewBox=\"0 0 512 512\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M331.8 224.1c28.29 0 54.88 10.99 74.86 30.97l19.59 19.59c40.01-17.74 71.25-53.3 81.62-96.65c5.725-23.92 5.34-47.08 .2148-68.4c-2.613-10.88-16.43-14.51-24.34-6.604l-68.9 68.9h-75.6V97.2l68.9-68.9c7.912-7.912 4.275-21.73-6.604-24.34c-21.32-5.125-44.48-5.51-68.4 .2148c-55.3 13.23-98.39 60.22-107.2 116.4C224.5 128.9 224.2 137 224.3 145l82.78 82.86C315.2 225.1 323.5 224.1 331.8 224.1zM384 278.6c-23.16-23.16-57.57-27.57-85.39-13.9L191.1 158L191.1 95.99l-127.1-95.99L0 63.1l96 127.1l62.04 .0077l106.7 106.6c-13.67 27.82-9.251 62.23 13.91 85.39l117 117.1c14.62 14.5 38.21 14.5 52.71-.0016l52.75-52.75c14.5-14.5 14.5-38.08-.0016-52.71L384 278.6zM227.9 307L168.7 247.9l-148.9 148.9c-26.37 26.37-26.37 69.08 0 95.45C32.96 505.4 50.21 512 67.5 512s34.54-6.592 47.72-19.78l119.1-119.1C225.5 352.3 222.6 329.4 227.9 307zM64 472c-13.25 0-24-10.75-24-24c0-13.26 10.75-24 24-24S88 434.7 88 448C88 461.3 77.25 472 64 472z\"/></svg></div><div><strong>How to fix:</strong> <span id=\"recommendation-${this.sanitizeHtmlId(ruleId)}\"></span></div></div>
+                        ${isManualReview ? `
+                        <div class=\"uw-a11y-manual-check\"> 
+                          <label class=\"uw-a11y-checkbox\"> 
+                            <input type=\"checkbox\" id=\"check-${this.sanitizeHtmlId(ruleId)}\" ${this.isRuleVerified(ruleId) ? 'checked' : ''} 
+                                   onchange=\"window.uwAccessibilityChecker.toggleRuleVerification('${this.escapeJavaScript(ruleId)}'); event.stopPropagation();\"> 
+                            <span class=\"uw-a11y-checkmark\"></span>
+                            <span class=\"uw-a11y-check-label\">${this.isRuleVerified(ruleId) ? `All ${issueGroup.length} instances manually verified ✓` : `Mark all ${issueGroup.length} instances as verified`}</span>
+                          </label>
+                        </div>` : ''}
+                        ${firstIssue.detailedInfo && firstIssue.detailedInfo.length > 0 ? `
+                            <button class=\"uw-a11y-details-toggle\" onclick=\"window.uwAccessibilityChecker.toggleDetails('${this.escapeJavaScript(ruleId)}'); event.stopPropagation();\">Show technical details</button>
+                            <div class=\"uw-a11y-details\" id=\"details-${this.sanitizeHtmlId(ruleId)}\"><div id=\"detailed-content-${this.sanitizeHtmlId(ruleId)}\">${this.renderDetailedInfo(firstIssue.detailedInfo)}</div></div>
+                        ` : ''}
+                        <div class=\"issue-meta\"><div><strong>Impact:</strong> ${this.escapeHtmlContent(firstIssue.impact || 'unknown')}
+                        ${firstIssue.helpUrl ? `<br><a href=\"${this.escapeUrl(firstIssue.helpUrl)}\" target=\"_blank\" class=\"learn-more\">Learn more about this rule</a>` : ''}
+                        </div></div>
+                    </div>`;
+            }).join('');
+            results.innerHTML = generatedHtml;
+            // initialize rec content
+            Object.keys(groupedIssues).forEach(ruleId => {
+                const issueGroup = groupedIssues[ruleId];
+                const firstIssue = issueGroup[0];
+                const recElement = this.shadowRoot.getElementById(`recommendation-${ruleId}`);
+                if (recElement) recElement.innerHTML = firstIssue.recommendation;
+            });
+        },
         
         addIssue: function(type, title, description, element, recommendation, helpUrl, impact, tags, detailedInfo, ruleId) {
             const issueId = this.issues.length; // Use array index as unique ID
@@ -1977,6 +2451,9 @@
             // Get accessibility score
             const scoreData = this.axeResults ? this.axeResults.score : null;
             
+            // Load and apply saved filter preferences
+            this.loadFilters();
+
             // Display summary with score dial and accessibility announcements
             summary.innerHTML = `
                 <!-- ARIA live region for screen reader announcements -->
@@ -1992,17 +2469,41 @@
                     
                     <div style="margin: 8px 0;" role="list" aria-label="Issue breakdown by type">
                         <div role="listitem" class="violationtype">
-                            <span class="uw-a11y-count count-error" aria-label="${counts.error} violations requiring immediate attention">${counts.error}</span>Violations
-                            <span class="sr-only"> - These are accessibility failures that must be fixed</span>
+                            <div>
+                                <span id="count-error" class="uw-a11y-count count-error" aria-label="${counts.error} violations requiring immediate attention">${counts.error}</span>Violations
+                                <span class="sr-only"> - These are accessibility failures that must be fixed</span>
+                            </div>
+                            <button id="toggle-errors" class="filter-toggle" aria-pressed="true" aria-label="Toggle showing violations" onclick="window.uwAccessibilityChecker.toggleFilter('errors')">
+                                <svg class="filter-icon icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                                <svg class="filter-icon icon-eye-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88" stroke="currentColor" stroke-width="2"/></svg>
+                            </button>
                         </div>
                         <div role="listitem" class="violationtype">
-                            <span class="uw-a11y-count count-warning" aria-label="${counts.warning} manual review items">${counts.warning}</span>Manual Review
-                            <span class="sr-only"> - These items need human verification</span>
+                            <div>
+                                <span id="count-warning" class="uw-a11y-count count-warning" aria-label="${counts.warning} manual review items">${counts.warning}</span>Manual Review
+                                <span class="sr-only"> - These items need human verification</span>
+                            </div>
+                            <button id="toggle-warnings" class="filter-toggle" aria-pressed="true" aria-label="Toggle showing manual review" onclick="window.uwAccessibilityChecker.toggleFilter('warnings')">
+                                <svg class="filter-icon icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                                <svg class="filter-icon icon-eye-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88" stroke="currentColor" stroke-width="2"/></svg>
+                            </button>
+                        </div>
+                        <div role="listitem" class="violationtype">
+                            <div>
+                                <span id="count-info" class="uw-a11y-count count-info" aria-label="${counts.info} best-practice suggestions">${counts.info}</span>Best Practices
+                                <span class="sr-only"> - Suggestions to improve usability and clarity</span>
+                            </div>
+                            <button id="toggle-info" class="filter-toggle" aria-pressed="true" aria-label="Toggle showing best practices" onclick="window.uwAccessibilityChecker.toggleFilter('info')">
+                                <svg class="filter-icon icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                                <svg class="filter-icon icon-eye-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88" stroke="currentColor" stroke-width="2"/></svg>
+                            </button>
                         </div>
                         ${counts.warningChecked > 0 ? `
                             <div role="listitem" class="violationtype">
-                                <span class="uw-a11y-count count-verified" aria-label="${counts.warningChecked} verified items">${counts.warningChecked}</span>Verified
-                                <span class="sr-only"> - These manual review items have been checked and confirmed</span>
+                                <div>
+                                    <span id="count-verified" class="uw-a11y-count count-verified" aria-label="${counts.warningChecked} verified items">${counts.warningChecked}</span>Verified
+                                    <span class="sr-only"> - These manual review items have been checked and confirmed</span>
+                                </div>
                             </div>
                         ` : ''}
                     </div>
@@ -2014,7 +2515,9 @@
                     </div>
                 ` : ''}
             `;
-            
+            // Initialize filter toggle UI state
+            this.updateFilterUI();
+
             // Display issues
             if (this.issues.length === 0) {
                 results.innerHTML = `
@@ -2025,113 +2528,8 @@
                     </div>
                 `;
             } else {
-                // Group issues by rule for better organization
-                const groupedIssues = this.groupIssuesByRule(this.issues);
-                
-                const generatedHtml = Object.keys(groupedIssues).map((ruleId, index) => {
-                    const issueGroup = groupedIssues[ruleId];
-                    const firstIssue = issueGroup[0];
-                    const isManualReview = firstIssue.type === 'warning' && firstIssue.uniqueId;
-                    
-
-                    
-
-                    
-
-                    
-                    // Create navigation for multiple instances
-                    const instanceNavigation = issueGroup.length > 1 ? `
-                        <div class="uw-a11y-instance-nav">
-                            <span class="uw-a11y-instance-count">Instance <span id="current-${this.sanitizeHtmlId(ruleId)}">1</span> of ${issueGroup.length}</span>
-                            <div class="uw-a11y-nav-buttons">
-                                <button onclick="window.uwAccessibilityChecker.navigateInstance('${this.escapeJavaScript(ruleId)}', -1); event.stopPropagation();" 
-                                        id="prev-${this.sanitizeHtmlId(ruleId)}" disabled>‹ Prev</button>
-                                <button onclick="window.uwAccessibilityChecker.navigateInstance('${this.escapeJavaScript(ruleId)}', 1); event.stopPropagation();" 
-                                        id="next-${this.sanitizeHtmlId(ruleId)}">Next ›</button>
-                            </div>
-                        </div>
-                    ` : '';
-                    
-                    // Create checkbox for manual review items (affects all instances of this rule)
-                    const checkboxHtml = isManualReview ? 
-                        `<div class="uw-a11y-manual-check">
-                            <label class="uw-a11y-checkbox">
-                                <input type="checkbox" 
-                                       id="check-${this.sanitizeHtmlId(ruleId)}" 
-                                       ${this.isRuleVerified(ruleId) ? 'checked' : ''}
-                                       onchange="window.uwAccessibilityChecker.toggleRuleVerification('${this.escapeJavaScript(ruleId)}'); event.stopPropagation();">
-                                <span class="uw-a11y-checkmark"></span>
-                                <span class="uw-a11y-check-label">
-                                    ${this.isRuleVerified(ruleId) ? `All ${issueGroup.length} instances manually verified ✓` : `Mark all ${issueGroup.length} instances as verified`}
-                                </span>
-                            </label>
-                        </div>` : '';
-
-                    const iconSvg = firstIssue.type === 'error' 
-                        ? `<svg class="uw-a11y-issue-icon uw-a11y-error-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                           </svg>`
-                        : `<svg class="uw-a11y-issue-icon uw-a11y-warning-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                           </svg>`;
-                    
-
-                    
-                    const htmlResult = `
-                        <div class="uw-a11y-issue ${firstIssue.type} ${isManualReview && this.isRuleVerified(ruleId) ? 'checked' : ''}" 
-                             onclick="window.uwAccessibilityChecker.highlightCurrentInstance('${this.escapeJavaScript(ruleId)}')" 
-                             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.uwAccessibilityChecker.highlightCurrentInstance('${this.escapeJavaScript(ruleId)}');}"
-                             tabindex="0"
-                             role="button" 
-                             aria-label="Click to highlight ${this.escapeHtmlAttribute(firstIssue.title)} on the page${issueGroup.length > 1 ? ` (${issueGroup.length} instances)` : ''}"
-                             id="issue-${this.sanitizeHtmlId(ruleId)}">
-                             ${instanceNavigation}
-                            <h4>
-                                <span class="uw-a11y-issue-header">
-                                    ${iconSvg}
-                                    <span class="uw-a11y-issue-title">${this.escapeHtmlContent(firstIssue.title)} ${issueGroup.length > 1 ? `(${issueGroup.length} instances)` : ''}</span>
-                                </span>
-                            </h4>
-                            <!--<p id="description-${this.sanitizeHtmlId(ruleId)}">${this.escapeHtmlContent(firstIssue.description.split('\n')[0])}</p>-->
-                            <div class="how-to-fix"><div class="how-to-fix-icon"><svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M331.8 224.1c28.29 0 54.88 10.99 74.86 30.97l19.59 19.59c40.01-17.74 71.25-53.3 81.62-96.65c5.725-23.92 5.34-47.08 .2148-68.4c-2.613-10.88-16.43-14.51-24.34-6.604l-68.9 68.9h-75.6V97.2l68.9-68.9c7.912-7.912 4.275-21.73-6.604-24.34c-21.32-5.125-44.48-5.51-68.4 .2148c-55.3 13.23-98.39 60.22-107.2 116.4C224.5 128.9 224.2 137 224.3 145l82.78 82.86C315.2 225.1 323.5 224.1 331.8 224.1zM384 278.6c-23.16-23.16-57.57-27.57-85.39-13.9L191.1 158L191.1 95.99l-127.1-95.99L0 63.1l96 127.1l62.04 .0077l106.7 106.6c-13.67 27.82-9.251 62.23 13.91 85.39l117 117.1c14.62 14.5 38.21 14.5 52.71-.0016l52.75-52.75c14.5-14.5 14.5-38.08-.0016-52.71L384 278.6zM227.9 307L168.7 247.9l-148.9 148.9c-26.37 26.37-26.37 69.08 0 95.45C32.96 505.4 50.21 512 67.5 512s34.54-6.592 47.72-19.78l119.1-119.1C225.5 352.3 222.6 329.4 227.9 307zM64 472c-13.25 0-24-10.75-24-24c0-13.26 10.75-24 24-24S88 434.7 88 448C88 461.3 77.25 472 64 472z"/></svg></div><div><strong>How to fix:</strong> <span id="recommendation-${this.sanitizeHtmlId(ruleId)}"></span></div></div>
-                            
-                            ${checkboxHtml}
-                            ${firstIssue.detailedInfo && firstIssue.detailedInfo.length > 0 ? `
-                                <button class="uw-a11y-details-toggle" onclick="window.uwAccessibilityChecker.toggleDetails('${this.escapeJavaScript(ruleId)}'); event.stopPropagation();">
-                                   Show technical details
-                                </button>
-                                <div class="uw-a11y-details" id="details-${this.sanitizeHtmlId(ruleId)}">
-                                    <div id="detailed-content-${this.sanitizeHtmlId(ruleId)}">
-                                        ${this.renderDetailedInfo(firstIssue.detailedInfo)}
-                                    </div>
-                                </div>
-                            ` : ''}
-                            <div class="issue-meta">
-                                <div><strong>Impact:</strong> ${this.escapeHtmlContent(firstIssue.impact || 'unknown')}
-                                ${firstIssue.helpUrl ? `<br><a href="${this.escapeUrl(firstIssue.helpUrl)}" target="_blank" class="learn-more">Learn more about this rule</a>` : ''}
-                                </div>
-                                <!--<strong>Tags:</strong> ${firstIssue.tags.join(', ')}-->
-                            </div>
-                        </div>
-                    `;
-                    
-
-                    return htmlResult;
-                }).join('');
-                
-
-                
-                results.innerHTML = generatedHtml;
-                
-                // Initialize recommendation content after HTML is created
-                Object.keys(groupedIssues).forEach(ruleId => {
-                    const issueGroup = groupedIssues[ruleId];
-                    const firstIssue = issueGroup[0];
-                    const recElement = this.shadowRoot.getElementById(`recommendation-${ruleId}`);
-                    if (recElement) {
-                        recElement.innerHTML = firstIssue.recommendation;
-                    }
-                });
+                // Render issue list using current filters
+                this.refreshIssueList();
             }
             
             // Announce results to screen readers
@@ -2477,22 +2875,20 @@
             // Update the counts
             const counts = {
                 error: this.issues.filter(i => i.type === 'error').length,
-                warning: this.issues.filter(i => i.type === 'warning' && i.uniqueId).length, // Only count manual review items with uniqueId
-                warningChecked: this.issues.filter(i => i.type === 'warning' && i.uniqueId && this.checkedItems.has(i.uniqueId)).length
+                warning: this.issues.filter(i => i.type === 'warning' && i.uniqueId).length, // Only count manual review with uniqueId
+                warningChecked: this.issues.filter(i => i.type === 'warning' && i.uniqueId && this.checkedItems.has(i.uniqueId)).length,
+                info: this.issues.filter(i => i.type === 'info').length
             };
             
-            // Update count display
-            const summaryDiv = this.shadowRoot.getElementById('uw-a11y-summary');
-            if (summaryDiv) {
-                const countDisplay = summaryDiv.querySelector('div[style*="margin: 8px 0"]');
-                if (countDisplay) {
-                    countDisplay.innerHTML = `
-                        <span class="uw-a11y-count count-error">${counts.error}</span>Violations
-                        <span class="uw-a11y-count count-warning">${counts.warning}</span>Manual Review
-                        ${counts.warningChecked > 0 ? `<span class="uw-a11y-count count-verified">${counts.warningChecked}</span>Verified` : ''}
-                    `;
-                }
-            }
+            // Update count display numbers without removing toggles
+            const setText = (id, value) => {
+                const el = this.shadowRoot.getElementById(id);
+                if (el) el.textContent = value;
+            };
+            setText('count-error', counts.error);
+            setText('count-warning', counts.warning);
+            setText('count-info', counts.info);
+            setText('count-verified', counts.warningChecked);
             
             // Update visibility of if-issues elements
             this.updateIfIssuesVisibility();

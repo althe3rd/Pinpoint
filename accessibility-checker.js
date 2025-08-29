@@ -1621,6 +1621,52 @@
                     align-items: center;
                     justify-content: space-between;
                 }
+                #uw-a11y-panel .info-with-tooltip {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    position: relative;
+                }
+                #uw-a11y-panel .info-btn {
+                    background: white;
+                    border: 1px solid rgba(0,0,0,0.2);
+                    color: #333;
+                    width: 18px;
+                    height: 18px;
+                    border-radius: 50%;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 12px;
+                    line-height: 1;
+                    cursor: pointer;
+                    padding: 0;
+                }
+                #uw-a11y-panel .info-btn:focus {
+                    outline: 2px solid #007cba;
+                    outline-offset: 2px;
+                }
+                #uw-a11y-panel .tooltip {
+                    position: absolute;
+                    left: 0;
+                    top: 140%;
+                    background: #212529;
+                    color: #fff;
+                    padding: 6px 8px;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    max-width: 260px;
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+                    opacity: 0;
+                    visibility: hidden;
+                    transition: opacity 0.15s ease;
+                    z-index: 10;
+                }
+                #uw-a11y-panel .info-btn:hover + .tooltip,
+                #uw-a11y-panel .info-btn:focus + .tooltip {
+                    opacity: 1;
+                    visibility: visible;
+                }
 
                 
                 
@@ -2469,9 +2515,10 @@
                     
                     <div style="margin: 8px 0;" role="list" aria-label="Issue breakdown by type">
                         <div role="listitem" class="violationtype">
-                            <div>
+                            <div class="info-with-tooltip">
                                 <span id="count-error" class="uw-a11y-count count-error" aria-label="${counts.error} violations requiring immediate attention">${counts.error}</span>Violations
-                                <span class="sr-only"> - These are accessibility failures that must be fixed</span>
+                                <button class="info-btn" aria-label="What does Violations mean?" aria-describedby="tip-violations">i</button>
+                                <span id="tip-violations" class="tooltip" role="tooltip">These are accessibility failures that must be fixed.</span>
                             </div>
                             <button id="toggle-errors" class="filter-toggle" aria-pressed="true" aria-label="Toggle showing violations" onclick="window.uwAccessibilityChecker.toggleFilter('errors')">
                                 <svg class="filter-icon icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
@@ -2479,9 +2526,10 @@
                             </button>
                         </div>
                         <div role="listitem" class="violationtype">
-                            <div>
+                            <div class="info-with-tooltip">
                                 <span id="count-warning" class="uw-a11y-count count-warning" aria-label="${counts.warning} manual review items">${counts.warning}</span>Manual Review
-                                <span class="sr-only"> - These items need human verification</span>
+                                <button class="info-btn" aria-label="What does Manual Review mean?" aria-describedby="tip-manual">i</button>
+                                <span id="tip-manual" class="tooltip" role="tooltip">These items need human verification.</span>
                             </div>
                             <button id="toggle-warnings" class="filter-toggle" aria-pressed="true" aria-label="Toggle showing manual review" onclick="window.uwAccessibilityChecker.toggleFilter('warnings')">
                                 <svg class="filter-icon icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
@@ -2489,9 +2537,10 @@
                             </button>
                         </div>
                         <div role="listitem" class="violationtype">
-                            <div>
+                            <div class="info-with-tooltip">
                                 <span id="count-info" class="uw-a11y-count count-info" aria-label="${counts.info} best-practice suggestions">${counts.info}</span>Best Practices
-                                <span class="sr-only"> - Suggestions to improve usability and clarity</span>
+                                <button class="info-btn" aria-label="What does Best Practices mean?" aria-describedby="tip-best">i</button>
+                                <span id="tip-best" class="tooltip" role="tooltip">Suggestions to improve usability and clarity.</span>
                             </div>
                             <button id="toggle-info" class="filter-toggle" aria-pressed="true" aria-label="Toggle showing best practices" onclick="window.uwAccessibilityChecker.toggleFilter('info')">
                                 <svg class="filter-icon icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>

@@ -1617,6 +1617,8 @@
 
                 #uw-a11y-nav ul li {
                     position: relative;
+                    /* Prevent FOUC: start hidden; GSAP/CSS will reveal */
+                    opacity: 0;
                 }
 
                 #uw-a11y-nav ul li a {

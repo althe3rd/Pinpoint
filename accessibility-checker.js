@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.4.9', // Current version
+            version: '1.5.0', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -1497,7 +1497,8 @@
                                 <h3>About Pinpoint</h3>
                                 <p>Version: <strong>${this.version}</strong> · Engine: axe-core v${this.getAxeVersion ? (this.getAxeVersion() || 'unknown') : 'unknown'}</p>
                                 <p>Pinpoint Accessibility Checker helps quickly find accessibility issues and best-practice improvements, pairing automated results with guidance.</p>
-                                <p><a href="https://github.com/althe3rd/Pinpoint" target="_blank" rel="noopener noreferrer">Project on GitHub</a></p>
+                                <p><a href="https://github.com/althe3rd/Pinpoint" target="_blank" rel="noopener noreferrer">Project on GitHub</a> | <a href="https://github.com/althe3rd/Pinpoint/issues" target="_blank" rel="noopener noreferrer">Report an Issue</a> | <a href="https://github.com/althe3rd/Pinpoint/releases" target="_blank" rel="noopener noreferrer">Changelog</a></p>
+                                
                             </div>
                         </div>
 

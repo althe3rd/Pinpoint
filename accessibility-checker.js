@@ -15,6 +15,7 @@
             checkedItems: new Set(), // Track manually verified items
             isMinimized: false, // Track minimized state
             shadowRoot: null, // Shadow DOM root
+            scoreAnimationPlayed: false, // Run score animation only once
             // Visibility filters for list rendering
             filters: { errors: true, warnings: true, info: true },
         
@@ -1399,33 +1400,25 @@
                         <ul>
                             <li>
                                 <a id="uw-a11y-nav-results" href="#uw-a11y-view-results" title="Results">
-                                    <svg class="uw-a11y-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path fill="currentColor" d="M3 13h6v8H3v-8zm12-10h6v18h-6V3zM9 3h6v12H9V3z"/>
-                                    </svg>
+                                    <svg class="feather feather-pie-chart" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
                                     <span class="uw-a11y-nav-label">Results</span>
                                 </a>
                             </li>
                             <li>
                                 <a id="uw-a11y-nav-settings" href="#uw-a11y-view-settings" title="Settings">
-                                    <svg class="uw-a11y-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path fill="currentColor" d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.007 7.007 0 0 0-1.63-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.58.23-1.13.54-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.67 8.84a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.13.22.39.3.6.22l2.39-.96c.5.4 1.05.72 1.63.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.58-.22 1.13-.54 1.63-.94l2.39.96c.22.08.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58zM12 15.5a3.5 3.5 0 1 1 0-7a3.5 3.5 0 0 1 0 7z"/>
-                                    </svg>
+                                    <svg class="feather feather-toggle-left" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><rect height="14" rx="7" ry="7" width="22" x="1" y="5"/><circle cx="8" cy="12" r="3"/></svg>
                                     <span class="uw-a11y-nav-label">Settings</span>
                                 </a>
                             </li>
                             <li>
                                 <a id="uw-a11y-nav-help" href="#uw-a11y-view-help" title="Help">
-                                    <svg class="uw-a11y-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path fill="currentColor" d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20zm0 17a1.25 1.25 0 1 1 0-2.5A1.25 1.25 0 0 1 12 19zm1.2-5.6v.6h-2v-1c0-1.1.9-2 2-2a1.5 1.5 0 1 0-1.5-1.5H9.7a3.3 3.3 0 1 1 6.6 0c0 1.54-1.16 2.81-2.5 2.9z"/>
-                                    </svg>
+                                    <svg class="feather feather-alert-triangle" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
                                     <span class="uw-a11y-nav-label">Help</span>
                                 </a>
                             </li>
                             <li>
                                 <a id="uw-a11y-nav-about" href="#uw-a11y-view-about" title="About">
-                                    <svg class="uw-a11y-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path fill="currentColor" d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20zm0 7a1.25 1.25 0 1 1 0-2.5A1.25 1.25 0 0 1 12 9zm1.5 7h-3v-1h1v-4h-1v-1h2v5h1v1z"/>
-                                    </svg>
+                                    <svg class="feather feather-info" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>
                                     <span class="uw-a11y-nav-label">About</span>
                                 </a>
                             </li>
@@ -1638,6 +1631,15 @@
 
                 #uw-a11y-nav ul li a.active {
                     background: rgba(255,255,255,0.18);
+                }
+
+                #uw-a11y-nav ul li a svg {
+                    width: 20px;
+                    height: 20px;
+                    margin: 0 auto;
+                    margin-bottom: 4px;
+                    display: block;
+                
                 }
 
                 .uw-a11y-nav-icon {
@@ -2134,12 +2136,12 @@
                      gap: 8px;
                  }
                  
-                 #uw-a11y-panel .uw-a11y-issue-icon {
-                     width: 16px;
-                     height: 16px;
-                     flex-shrink: 0;
-                     align-self: flex-start;
-                 }
+                #uw-a11y-panel .uw-a11y-issue-icon {
+                    width: 18px;
+                    height: 18px;
+                    flex-shrink: 0;
+                    align-self: flex-start;
+                }
                  
                  #uw-a11y-panel .uw-a11y-error-icon {
                      color: #dc3545;
@@ -2151,13 +2153,28 @@
                      margin-top: 2px;
                  }
                  
-                 #uw-a11y-panel .uw-a11y-issue.checked .uw-a11y-warning-icon {
+                 #uw-a11y-panel .uw-a11y-issue.checked .uw-a11y-issue-icon.type-warning {
                      color: #155724;
                  }
                  
                  #uw-a11y-panel .uw-a11y-issue-title {
                      flex: 1;
                  }
+
+                /* Unified icon styles for summary + issue items */
+                #uw-a11y-panel .issue-type-icon svg {
+                    width: 18px;
+                    height: 18px;
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+                #uw-a11y-panel .issue-type-icon { display: inline-flex; align-items: center; margin: 0 4px 0 6px; }
+                #uw-a11y-panel .issue-type-icon.type-error svg,
+                #uw-a11y-panel .uw-a11y-issue-icon.type-error { color: #dc3545; }
+                #uw-a11y-panel .issue-type-icon.type-warning svg,
+                #uw-a11y-panel .uw-a11y-issue-icon.type-warning { color: #e0a800; }
+                #uw-a11y-panel .issue-type-icon.type-info svg,
+                #uw-a11y-panel .uw-a11y-issue-icon.type-info { color: #17a2b8; }
                 #uw-a11y-panel .uw-a11y-issue p {
                     margin: 4px 0;
                     line-height: 1.4;
@@ -2868,6 +2885,10 @@
                 this.isAnimating = true;
                 this.animateViewTransition(currentView, view).then(() => {
                     this.isAnimating = false;
+                    if (view === 'results') {
+                        // Run score animation after the results view is visible
+                        this.startResultsScoreAnimation();
+                    }
                 });
             } else {
                 // Instant transition for reduced motion or no GSAP
@@ -2892,6 +2913,10 @@
                         content.style.height = finalHeight + 'px';
                         content.style.overflowY = finalHeight >= maxAllowedHeight ? 'auto' : 'hidden';
                     }
+                }
+
+                if (view === 'results') {
+                    this.startResultsScoreAnimation();
                 }
             }
         },
@@ -3134,6 +3159,8 @@
                 this.saveSettings(toSave);
                 msg.textContent = 'Saved. Re‑scanning…';
                 msg.className = 'uw-a11y-msg ok';
+                // Ensure the score dial re-animates after a settings-driven re-scan
+                this.scoreAnimationPlayed = false;
                 // Re-run analysis with new settings
                 this.runAxeChecks();
                 this.showView('results');
@@ -3197,7 +3224,7 @@
                 const btn = this.shadowRoot.getElementById(id);
                 if (btn) btn.setAttribute('aria-pressed', pressed ? 'true' : 'false');
                 const row = btn?.closest('.violationtype');
-                if (row) row.style.opacity = pressed ? '1' : '0.6';
+                if (row) row.style.color = pressed ? '#000' : '#ccc';
             };
             setState('toggle-errors', this.filters.errors);
             setState('toggle-warnings', this.filters.warnings);
@@ -3239,9 +3266,7 @@
                             </div>
                         </div>
                     ` : '';
-                const iconSvg = firstIssue.type === 'error' 
-                    ? `<svg class="uw-a11y-issue-icon uw-a11y-error-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
-                    : `<svg class="uw-a11y-issue-icon uw-a11y-warning-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+                const iconSvg = this.getIssueTypeIcon(firstIssue.type, 'issue');
                 return `
                     <div class=\"uw-a11y-issue ${firstIssue.type} ${isManualReview && this.isRuleVerified(ruleId) ? 'checked' : ''}\" 
                          onclick=\"window.uwAccessibilityChecker.highlightCurrentInstance('${this.escapeJavaScript(ruleId)}')\" 
@@ -3412,7 +3437,7 @@
                     <div style="margin: 8px 0;" role="list" aria-label="Issue breakdown by type">
                         <div role="listitem" class="violationtype">
                             <div class="info-with-tooltip">
-                                <span id="count-error" class="uw-a11y-count count-error" aria-label="${counts.error} violations requiring immediate attention">${counts.error}</span>Violations
+                                <span id="count-error" class="uw-a11y-count count-error" aria-label="${counts.error} violations requiring immediate attention">${counts.error}</span> <span class="issue-type-icon type-error">${this.getIssueTypeIcon('error','summary')}</span>Violations
                                 <button class="info-btn" aria-label="What does Violations mean?" aria-describedby="tip-violations">i</button>
                                 <span id="tip-violations" class="tooltip" role="tooltip">These are accessibility failures that must be fixed.</span>
                             </div>
@@ -3423,7 +3448,7 @@
                         </div>
                         <div role="listitem" class="violationtype">
                             <div class="info-with-tooltip">
-                                <span id="count-warning" class="uw-a11y-count count-warning" aria-label="${counts.warning} manual review items">${counts.warning}</span>Manual Review
+                                <span id="count-warning" class="uw-a11y-count count-warning" aria-label="${counts.warning} manual review items">${counts.warning}</span> <span class="issue-type-icon type-warning">${this.getIssueTypeIcon('warning','summary')}</span>Manual Review
                                 <button class="info-btn" aria-label="What does Manual Review mean?" aria-describedby="tip-manual">i</button>
                                 <span id="tip-manual" class="tooltip" role="tooltip">These items need human verification.</span>
                             </div>
@@ -3434,7 +3459,7 @@
                         </div>
                         <div role="listitem" class="violationtype">
                             <div class="info-with-tooltip">
-                                <span id="count-info" class="uw-a11y-count count-info" aria-label="${counts.info} best-practice suggestions">${counts.info}</span>Best Practices
+                                <span id="count-info" class="uw-a11y-count count-info" aria-label="${counts.info} best-practice suggestions">${counts.info}</span> <span class="issue-type-icon type-info">${this.getIssueTypeIcon('info','summary')}</span>Best Practices
                                 <button class="info-btn" aria-label="What does Best Practices mean?" aria-describedby="tip-best">i</button>
                                 <span id="tip-best" class="tooltip" role="tooltip">Suggestions to improve usability and clarity.</span>
                             </div>
@@ -3456,10 +3481,12 @@
                 
                 ${this.axeResults ? `
                     <div class="axe-summary">
-                        <strong>Standard:</strong> ${this.getWcagLabel()} | <strong>Engine:</strong> axe-core v${this.getAxeVersion()} | <strong>Checker:</strong> v${this.version}
+                        <strong>Standard:</strong> ${this.getWcagLabel()}
                     </div>
                 ` : ''}
             `;
+            // Animate the score dial and number on initial render
+            this.startResultsScoreAnimation();
             // Initialize filter toggle UI state
             this.updateFilterUI();
 
@@ -3508,6 +3535,23 @@
             return `conic-gradient(from 0deg, ${gradientStops}, #e9ecef ${percentage}deg 360deg)`;
         },
 
+        // Return a consistent SVG icon for a given issue type
+        // variant: 'issue' | 'summary' (controls class names)
+        getIssueTypeIcon: function(type, variant) {
+            const cls = variant === 'issue' ? 'uw-a11y-issue-icon' : '';
+            const base = (extra) => extra ? `${cls} ${extra}` : cls;
+            if (type === 'error') {
+                // Alert triangle
+                return `<svg class="${base('type-error')}" viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 9v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+            }
+            if (type === 'warning') {
+                // Magnifying glass (manual review)
+                return `<svg class="${base('type-warning')}" viewBox="0 0 512 512" width="18" height="18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="currentColor" d="M456.69,421.39,362.6,327.3a173.81,173.81,0,0,0,34.84-104.58C397.44,126.38,319.06,48,222.72,48S48,126.38,48,222.72s78.38,174.72,174.72,174.72A173.81,173.81,0,0,0,327.3,362.6l94.09,94.09a25,25,0,0,0,35.3-35.3ZM97.92,222.72a124.8,124.8,0,1,1,124.8,124.8A124.95,124.95,0,0,1,97.92,222.72Z"/></svg>`;
+            }
+            // Info / Best Practices — check circle
+            return `<svg class="${base('type-info')}" viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 4L12 14.01 9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        },
+
         renderScoreDial: function(scoreData) {
             const score = scoreData.score;
             const percentage = (score / 100) * 360; // Convert to degrees
@@ -3516,8 +3560,8 @@
             // Generate accessibility rating text
             const ratingText = score >= 97 ? 'Excellent' : 
                               score >= 90 ? 'Very Good - just a few issues to address' : 
-                              score >= 70 ? 'Good accessibility with room for improvement' : 
-                              score >= 50 ? 'Fair accessibility - several issues to address' : 
+                              score >= 70 ? 'Fair accessibility with room for improvement' : 
+                              score >= 50 ? 'Several issues to address' : 
                               'Immediate attention needed';
             
             return `
@@ -3530,9 +3574,9 @@
                     </div>
                     
                     <div class="uw-a11y-score-dial" role="img" aria-label="Accessibility score ${score} out of 100, rated as ${ratingText}">
-                        <div class="uw-a11y-score-circle" style="background: ${gradient};">
+                        <div class="uw-a11y-score-circle" style="background: ${this.createScoreGradient(0, 0)};">
                             <div class="uw-a11y-score-inner">
-                                <div class="uw-a11y-score-number" aria-hidden="true">${score}</div>
+                                <div class="uw-a11y-score-number" aria-hidden="true">0</div>
                                 <div class="uw-a11y-score-label" aria-hidden="true">Score</div>
                             </div>
                         </div>
@@ -3544,6 +3588,79 @@
                     </div>
                 </div>
             `;
+        },
+
+        // Animate the results score dial fill and count-up
+        startResultsScoreAnimation: function() {
+            try {
+                // Guard: only animate once per session
+                if (this.scoreAnimationPlayed) return;
+                if (this.prefersReducedMotion()) { this.scoreAnimationPlayed = true; return; } // Respect user preference
+                const scoreObj = this.axeResults && this.axeResults.score ? this.axeResults.score : null;
+                if (!scoreObj) return;
+                const finalScore = Math.max(0, Math.min(100, parseInt(scoreObj.score, 10) || 0));
+                const scoreDial = this.shadowRoot.querySelector('.uw-a11y-score-dial');
+                const scoreCircle = this.shadowRoot.querySelector('.uw-a11y-score-circle');
+                const scoreNumber = this.shadowRoot.querySelector('.uw-a11y-score-number');
+                if (!scoreCircle || !scoreNumber || !scoreDial) return;
+                // Mark as played now to avoid double-starts if called rapidly
+                this.scoreAnimationPlayed = true;
+
+                // Reset start state
+                scoreNumber.textContent = '0';
+                scoreCircle.style.background = this.createScoreGradient(0, 0);
+
+                // Kill prior animation if any
+                if (this._scoreTween && window.gsap) {
+                    this._scoreTween.kill();
+                    this._scoreTween = null;
+                }
+
+                const updateAria = (val) => {
+                    const current = Math.round(val);
+                    const ratingText = current >= 97 ? 'Excellent' :
+                        current >= 90 ? 'Very Good - just a few issues to address' :
+                        current >= 70 ? 'Good accessibility with room for improvement' :
+                        current >= 50 ? 'Fair accessibility - several issues to address' :
+                        'Immediate attention needed';
+                    scoreDial.setAttribute('aria-label', `Accessibility score ${current} out of 100, rated as ${ratingText}`);
+                };
+
+                const endDeg = (finalScore / 100) * 360;
+                if (window.gsap) {
+                    const state = { n: 0, deg: 0 };
+                    this._scoreTween = window.gsap.to(state, {
+                        n: finalScore,
+                        deg: endDeg,
+                        duration: 1.2,
+                        ease: 'power2.out',
+                        onUpdate: () => {
+                            const currentScore = Math.round(state.n);
+                            scoreNumber.textContent = String(currentScore);
+                            // Use currentScore for color banding and state.deg for fill
+                            scoreCircle.style.background = this.createScoreGradient(currentScore, state.deg);
+                            updateAria(state.n);
+                        }
+                    });
+                } else {
+                    // Simple JS fallback
+                    const start = performance.now();
+                    const dur = 1200;
+                    const step = (t) => {
+                        const p = Math.min(1, (t - start) / dur);
+                        const val = Math.round(finalScore * p);
+                        const deg = endDeg * p;
+                        scoreNumber.textContent = String(val);
+                        scoreCircle.style.background = this.createScoreGradient(val, deg);
+                        updateAria(val);
+                        if (p < 1) requestAnimationFrame(step);
+                    };
+                    requestAnimationFrame(step);
+                }
+            } catch (e) {
+                // Non-fatal; animation is cosmetic
+                console.warn('Score animation failed:', e);
+            }
         },
         
         // Render detailed technical information

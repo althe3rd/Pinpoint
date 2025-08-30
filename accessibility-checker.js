@@ -1965,7 +1965,9 @@
                     transform: scale(0.9) translateY(20px);
                 }
 
-                #uw-a11y-nav ul li {
+                /* Important: Only apply the initial offset when using the CSS fallback.
+                   GSAP handles transforms when available, so the base <li> should not be offset. */
+                #uw-a11y-nav ul li.uw-a11y-css-animate {
                     opacity: 0;
                     transform: translateX(-30px) scale(0.9);
                 }

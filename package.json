@@ -11,8 +11,8 @@
     "serve": "python3 -m http.server 8000 || python -m http.server 8000"
   },
   "devDependencies": {
-    "terser": "^5.24.0",
-    "chokidar": "^3.5.3"
+    "chokidar": "^3.5.3",
+    "terser": "^5.24.0"
   },
   "keywords": [
     "accessibility",
@@ -25,5 +25,8 @@
     "axe-core"
   ],
   "author": "",
-  "license": "MIT"
-} 
+  "license": "MIT",
+  "dependencies": {
+    "gsap": "^3.13.0"
+  }
+}

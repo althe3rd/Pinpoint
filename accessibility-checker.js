@@ -147,39 +147,37 @@
                 return;
             }
             
-            // Configure axe for WCAG 2.1 AA
+            // Configure axe with selected WCAG spec/level (defaults to 2.1 AA)
+            const { wcagSpec, wcagLevel } = this.getSelectedWcag();
+            const tags = this.buildWcagTags(wcagSpec, wcagLevel);
+            const isAAA = (wcagLevel || '').toUpperCase() === 'AAA';
             const axeConfig = {
                 rules: {
                     // Disable the region rule which often creates false positives
                     // for "Ensures all page content is contained by landmarks"
                     'region': { enabled: false },
-                    // Disable AAA-level color contrast rule (7:1 ratio) - we only want AA level (4.5:1)
-                    'color-contrast-enhanced': { enabled: false }
+                    // Disable AAA color contrast unless user asks for AAA
+                    'color-contrast-enhanced': { enabled: isAAA }
                 },
-                tags: ['wcag2a', 'wcag2aa', 'wcag21aa'],
-                // Exclude the accessibility checker's own UI elements from analysis
-                exclude: [
-                    '#uw-a11y-container',    // Shadow DOM container
-                    '#uw-a11y-panel',        // Main panel container (inside shadow DOM)
-                    '.uw-a11y-highlight',    // Highlighted elements (temporary styling)
-                    '[id^="uw-a11y-"]',      // Any element with ID starting with uw-a11y-
-                    '[class*="uw-a11y-"]',   // Any element with class containing uw-a11y-
-                    '#wpadminbar',           // WordPress admin bar (frontend toolbar)
-                    '#uw-a11y-global-styles' // Global styles element
-                ]
+                runOnly: { type: 'tag', values: tags }
             };
             
-            // Run axe-core analysis (excluding our own UI elements)
-            window.axe.run(document, axeConfig, (err, results) => {
+            // Build context with excludes
+            const context = { exclude: this.getEffectiveExcludeSelectors() };
+
+            // Run axe-core analysis with context (excluding configured selectors)
+            window.axe.run(context, axeConfig, (err, results) => {
                 if (err) {
                     this.showError('Error running accessibility analysis: ' + err.message);
                     return;
                 }
                 
                 this.processAxeResults(results);
-                // Run additional best-practices checks that axe doesn't cover
+                // Run additional best-practices checks if enabled
                 try {
-                    this.runBestPracticeChecks();
+                    if (this.isBestPracticesEnabled()) {
+                        this.runBestPracticeChecks();
+                    }
                 } catch (e) {
                     // Don't let best-practice scan break the main flow
                     console.warn('Best-practices scan failed:', e);
@@ -237,6 +235,8 @@
                     if (!style || style.display === 'none' || style.visibility === 'hidden' || parseFloat(style.opacity) === 0) return false;
                     // Exclude our own UI container
                     if (el.closest && el.closest('#uw-a11y-container')) return false;
+                    // Respect user/essential excludes for best-practice checks too
+                    if (this.shouldExcludeElement && this.shouldExcludeElement(el)) return false;
                     return true;
                 } catch (_) {
                     return true;
@@ -1397,10 +1397,38 @@
                 <div id="uw-a11y-nav">
                     <nav>
                         <ul>
-                            <li><a href="#uw-a11y-panel">Results</a></li>
-                            <li><a href="#uw-a11y-settings">About</a></li>
-                            <li><a href="#uw-a11y-settings">Settings</a></li>
-                            <li><a href="#uw-a11y-settings">Help</a></li>
+                            <li>
+                                <a id="uw-a11y-nav-results" href="#uw-a11y-view-results" title="Results">
+                                    <svg class="uw-a11y-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path fill="currentColor" d="M3 13h6v8H3v-8zm12-10h6v18h-6V3zM9 3h6v12H9V3z"/>
+                                    </svg>
+                                    <span class="uw-a11y-nav-label">Results</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="uw-a11y-nav-settings" href="#uw-a11y-view-settings" title="Settings">
+                                    <svg class="uw-a11y-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path fill="currentColor" d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.007 7.007 0 0 0-1.63-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.58.23-1.13.54-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.67 8.84a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.13.22.39.3.6.22l2.39-.96c.5.4 1.05.72 1.63.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.58-.22 1.13-.54 1.63-.94l2.39.96c.22.08.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58zM12 15.5a3.5 3.5 0 1 1 0-7a3.5 3.5 0 0 1 0 7z"/>
+                                    </svg>
+                                    <span class="uw-a11y-nav-label">Settings</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="uw-a11y-nav-help" href="#uw-a11y-view-help" title="Help">
+                                    <svg class="uw-a11y-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path fill="currentColor" d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20zm0 17a1.25 1.25 0 1 1 0-2.5A1.25 1.25 0 0 1 12 19zm1.2-5.6v.6h-2v-1c0-1.1.9-2 2-2a1.5 1.5 0 1 0-1.5-1.5H9.7a3.3 3.3 0 1 1 6.6 0c0 1.54-1.16 2.81-2.5 2.9z"/>
+                                    </svg>
+                                    <span class="uw-a11y-nav-label">Help</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="uw-a11y-nav-about" href="#uw-a11y-view-about" title="About">
+                                    <svg class="uw-a11y-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path fill="currentColor" d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20zm0 7a1.25 1.25 0 1 1 0-2.5A1.25 1.25 0 0 1 12 9zm1.5 7h-3v-1h1v-4h-1v-1h2v5h1v1z"/>
+                                    </svg>
+                                    <span class="uw-a11y-nav-label">About</span>
+                                </a>
+                            </li>
                         </ul>
                     </nav>
                 </div>
@@ -1462,12 +1490,42 @@
                         </div>
                     </div>
                     <div id="uw-a11y-content">
-                        <div id="uw-a11y-summary"></div>
-                        <p class="if-issues">
-                            <div class="mouse-icon"></div>
-                            <small>Select any item below to highlight the element on the page.</small>
-                        </p>
-                        <div id="uw-a11y-results"></div>
+                        <div id="uw-a11y-view-results" class="uw-a11y-view">
+                            <div id="uw-a11y-summary"></div>
+                            <p class="if-issues">
+                                <div class="mouse-icon"></div>
+                                <small>Select any item below to highlight the element on the page.</small>
+                            </p>
+                            <div id="uw-a11y-results"></div>
+                        </div>
+
+                        <div id="uw-a11y-view-about" class="uw-a11y-view" hidden>
+                            <div class="uw-a11y-about">
+                                <h3>About Pinpoint</h3>
+                                <p>Version: <strong>${this.version}</strong> · Engine: axe-core v${this.getAxeVersion ? (this.getAxeVersion() || 'unknown') : 'unknown'}</p>
+                                <p>Pinpoint Accessibility Checker helps quickly find accessibility issues and best-practice improvements, pairing automated results with guidance.</p>
+                                <p><a href="https://github.com/althe3rd/Pinpoint" target="_blank" rel="noopener noreferrer">Project on GitHub</a></p>
+                            </div>
+                        </div>
+
+                        <div id="uw-a11y-view-settings" class="uw-a11y-view" hidden>
+                            <div class="uw-a11y-settings">
+                                <h3>Settings</h3>
+                                <p>Lightweight options will appear here. For now, results filters and checked items persist for this session.</p>
+                            </div>
+                        </div>
+
+                        <div id="uw-a11y-view-help" class="uw-a11y-view" hidden>
+                            <div class="uw-a11y-help">
+                                <h3>Help</h3>
+                                <ul>
+                                    <li>Click a result to highlight it on the page.</li>
+                                    <li>Use the eye icons to filter categories.</li>
+                                    <li>Open “Learn more” links for WCAG details.</li>
+                                </ul>
+                                <p>Need more? Visit the <a href="https://github.com/althe3rd/Pinpoint#readme" target="_blank" rel="noopener noreferrer">documentation</a>.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1476,7 +1534,20 @@
             // Add event listeners
             this.shadowRoot.getElementById('uw-a11y-close').onclick = () => this.remove();
             this.shadowRoot.getElementById('uw-a11y-minimize').onclick = () => this.toggleMinimize();
+            this.initNavigation();
+            this.renderSettings();
             
+            // Load GSAP and animate panel
+            this.loadGSAP().then(() => {
+                this.setupInitialHeight();
+                this.animatePanel();
+                // Small delay to ensure panel animation starts before nav animation
+                setTimeout(() => {
+                    this.animateNavigation();
+                }, 100);
+                this.setupResizeHandler();
+            });
+
             return this.shadowRoot.getElementById('uw-a11y-panel');
         },
         
@@ -1513,18 +1584,19 @@
 
                 #uw-a11y-wrapper {
                     display: grid;
-                    grid-template-columns: 50px 1fr;
+                    grid-template-columns: 60px 1fr;
                     position: fixed;
                     top: 20px;
                     right: 20px;
                     width: 450px;
                     
                     z-index: 999999;
-                    gap: .8rem;
-                    background: rgba(0,0,0,0.8);
+                    gap: .4rem;
+                    background: rgba(0,0,0,0.7);
                     backdrop-filter: blur(20px);
                     padding: 4px;
                     border-radius: 16px;
+                    transition: height 0.4s;
                 }
 
                 #uw-a11y-nav {
@@ -1551,16 +1623,50 @@
                     display: block;
                     color: #fff;
                     text-decoration: none;
-                    padding: 0.5rem 1rem;
-                    border-radius: 8px;
+                    padding: 0.5rem .5rem;
+                    border-radius: 12px;
                     transition: background 0.3s ease;
-                    font-size: 0.8rem;
+                    font-size: 0.7rem;
                     text-align: center
                 }
 
                 #uw-a11y-nav ul li a:hover {
                     background: rgba(255, 255, 255, 0.1);
                 }
+
+                #uw-a11y-nav ul li a.active {
+                    background: rgba(255,255,255,0.18);
+                }
+
+                .uw-a11y-nav-icon {
+                    width: 22px;
+                    height: 22px;
+                    display: block;
+                    margin: 0 auto 4px auto;
+                }
+
+                .uw-a11y-nav-label {
+                    display: block;
+                    line-height: 1.1;
+                }
+
+                /* View switching */
+                .uw-a11y-view[hidden] { display: none; }
+
+                /* Settings styles */
+                .uw-a11y-settings { margin-bottom: 3rem; }
+                .uw-a11y-settings h3 { margin: 0 0 .5rem 0; }
+                .uw-a11y-form-row { margin: .75rem 0; }
+                .uw-a11y-input { width: 80%; padding: 8px 14px; border-radius: 6px; border: 1px solid #cbd3da; font-size: 14px; border-radius: 50rem; }
+                .uw-a11y-helptext { font-size: 12px; color: #555; margin-top: 4px; }
+                .uw-a11y-actions { display: flex; gap: .5rem; margin-top: .75rem; }
+                .uw-a11y-btn { appearance: none; border: 1px solid #b6bcc2; background: #fff; color: #111; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+                .uw-a11y-btn.primary { background: #0d6efd; border-color: #0d6efd; color: #fff; }
+                .uw-a11y-btn:disabled { opacity: .6; cursor: not-allowed; }
+                .uw-a11y-reset-icon { width: 16px; height: 16px; vertical-align: text-bottom; margin-right: 6px; }
+                .uw-a11y-msg { font-size: 12px; margin-top: 6px; }
+                .uw-a11y-msg.ok { color: #155724; }
+                .uw-a11y-msg.err { color: #721c24; }
 
                 #uw-a11y-panel {
                     
@@ -1849,6 +1955,64 @@
                     max-height: calc(85vh - 60px);
                     overflow-y: auto;
                     padding: 16px;
+                    transition: height 0.4s ease-in-out;
+                    box-sizing: border-box;
+                }
+
+                /* Initial animation states to prevent flash - fast transitions for GSAP override */
+                #uw-a11y-wrapper {
+                    opacity: 0;
+                    transform: scale(0.9) translateY(20px);
+                }
+
+                #uw-a11y-nav ul li {
+                    opacity: 0;
+                    transform: translateX(-30px) scale(0.9);
+                }
+
+                /* CSS-only animations (fallback when GSAP not available) */
+                #uw-a11y-wrapper.uw-a11y-css-animate {
+                    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+                }
+
+                #uw-a11y-nav ul li.uw-a11y-css-animate {
+                    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+                }
+
+                /* Stagger delays for CSS-only animations */
+                #uw-a11y-nav ul li.uw-a11y-css-animate:nth-child(1) { transition-delay: 0.3s; }
+                #uw-a11y-nav ul li.uw-a11y-css-animate:nth-child(2) { transition-delay: 0.4s; }
+                #uw-a11y-nav ul li.uw-a11y-css-animate:nth-child(3) { transition-delay: 0.5s; }
+                #uw-a11y-nav ul li.uw-a11y-css-animate:nth-child(4) { transition-delay: 0.6s; }
+
+                /* Show elements when animations are ready */
+                #uw-a11y-wrapper.uw-a11y-animate-in {
+                    opacity: 1;
+                    transform: scale(1) translateY(0);
+                }
+
+                #uw-a11y-nav ul li.uw-a11y-animate-in {
+                    opacity: 1;
+                    transform: translateX(0) scale(1);
+                }
+
+                /* Respect reduced motion preference */
+                @media (prefers-reduced-motion: reduce) {
+                    #uw-a11y-panel #uw-a11y-content {
+                        transition: none;
+                    }
+                    
+                    #uw-a11y-nav ul li a {
+                        transition: none;
+                    }
+
+                    /* Immediately show elements when reduced motion is preferred */
+                    #uw-a11y-wrapper,
+                    #uw-a11y-nav ul li {
+                        opacity: 1 !important;
+                        transform: none !important;
+                        transition: none !important;
+                    }
                 }
                 #uw-a11y-panel #uw-a11y-summary {
                     background: #f8f9fa;
@@ -2324,6 +2488,675 @@
         }
         </style>`;
         },
+
+        // Check if user prefers reduced motion
+        prefersReducedMotion: function() {
+            return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        },
+
+        // Load GSAP and initialize animations
+        loadGSAP: function() {
+            return new Promise((resolve, reject) => {
+                // Check if user prefers reduced motion
+                if (this.prefersReducedMotion()) {
+                    console.log('🎯 Reduced motion preferred - animations disabled');
+                    resolve(null);
+                    return;
+                }
+                
+                // Check if GSAP is already loaded
+                if (window.gsap) {
+                    resolve(window.gsap);
+                    return;
+                }
+                
+                // Load GSAP from CDN
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js';
+                script.onload = () => {
+                    console.log('✨ GSAP loaded successfully');
+                    resolve(window.gsap);
+                };
+                script.onerror = () => {
+                    console.warn('❌ Failed to load GSAP, animations will be disabled');
+                    resolve(null);
+                };
+                document.head.appendChild(script);
+            });
+        },
+
+        // Setup initial height for smooth transitions
+        setupInitialHeight: function() {
+            const content = this.shadowRoot.getElementById('uw-a11y-content');
+            if (!content) return;
+            
+            // Set initial height based on the first view (results)
+            const initialHeight = this.measureViewHeight('results');
+            const maxAllowedHeight = this.getMaxContentHeight();
+            
+            if (initialHeight) {
+                content.style.height = initialHeight + 'px';
+                content.style.maxHeight = maxAllowedHeight + 'px'; // Maintain max-height constraint
+                content.style.overflowY = initialHeight >= maxAllowedHeight ? 'auto' : 'hidden';
+            }
+        },
+
+        // Setup window resize handler to recalculate max heights
+        setupResizeHandler: function() {
+            if (this.resizeHandler) {
+                window.removeEventListener('resize', this.resizeHandler);
+            }
+            
+            this.resizeHandler = () => {
+                const content = this.shadowRoot.getElementById('uw-a11y-content');
+                if (!content) return;
+                
+                const maxAllowedHeight = this.getMaxContentHeight();
+                const currentView = this.currentView || 'results';
+                const idealHeight = this.measureViewHeight(currentView);
+                const newHeight = Math.min(idealHeight, maxAllowedHeight);
+                
+                // Update max-height and current height if needed
+                content.style.maxHeight = maxAllowedHeight + 'px';
+                if (window.gsap && !this.prefersReducedMotion()) {
+                    window.gsap.to(content, {
+                        height: newHeight,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                } else {
+                    content.style.height = newHeight + 'px';
+                }
+                
+                content.style.overflowY = newHeight >= maxAllowedHeight ? 'auto' : 'hidden';
+            };
+            
+            window.addEventListener('resize', this.resizeHandler);
+        },
+
+        // Animate the entire panel entrance
+        animatePanel: function() {
+            const wrapper = this.shadowRoot.getElementById('uw-a11y-wrapper');
+            if (!wrapper) return;
+            
+            if (window.gsap && !this.prefersReducedMotion()) {
+                // Use GSAP for enhanced animations - no delay needed
+                window.gsap.to(wrapper, {
+                    scale: 1,
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.5,
+                    ease: "power3.out"
+                });
+            } else {
+                // Use CSS animations as fallback or for reduced motion
+                wrapper.classList.add('uw-a11y-css-animate');
+                // Small delay to ensure DOM is ready
+                setTimeout(() => {
+                    wrapper.classList.add('uw-a11y-animate-in');
+                }, 50);
+            }
+        },
+
+        // Animate navigation items with stagger effect
+        animateNavigation: function() {
+            const navItems = this.shadowRoot.querySelectorAll('#uw-a11y-nav ul li');
+            console.log('🎯 animateNavigation called, found', navItems.length, 'nav items');
+            
+            if (navItems.length === 0) {
+                console.warn('❌ No navigation items found for animation');
+                return;
+            }
+            
+            if (window.gsap && !this.prefersReducedMotion()) {
+                console.log('✨ Starting GSAP navigation animation');
+                
+                // Clear CSS transforms and let GSAP take full control
+                navItems.forEach((item, index) => {
+                    item.style.transform = '';
+                    item.style.opacity = '';
+                    console.log(`🔧 Cleared styles for nav item ${index + 1}`);
+                });
+                
+                // Use GSAP for enhanced animations - set initial state and animate
+                const tl = window.gsap.fromTo(navItems, 
+                    {
+                        x: -30, 
+                        opacity: 0,
+                        scale: 0.9
+                    },
+                    {
+                        x: 0,
+                        opacity: 1,
+                        scale: 1,
+                        duration: 0.6,
+                        stagger: 0.1,
+                        ease: "back.out(1.7)",
+                        delay: 0.3,
+                        onStart: () => console.log('🚀 GSAP nav animation started'),
+                        onComplete: () => console.log('✅ GSAP nav animation completed')
+                    }
+                );
+                
+                console.log('📝 GSAP timeline created:', tl);
+                
+                // Add subtle hover animations with conflict prevention
+                navItems.forEach(item => {
+                    const link = item.querySelector('a');
+                    if (!link) return;
+                    
+                    link.addEventListener('mouseenter', () => {
+                        // Don't animate during view transitions or if reduced motion is preferred
+                        if (this.isAnimating || this.prefersReducedMotion()) return;
+                        
+                        window.gsap.to(item, {
+                            scale: 1.05,
+                            duration: 0.3,
+                            ease: "power2.out",
+                            overwrite: "auto"
+                        });
+                    });
+                    
+                    link.addEventListener('mouseleave', () => {
+                        // Don't animate if reduced motion is preferred
+                        if (this.prefersReducedMotion()) return;
+                        
+                        window.gsap.to(item, {
+                            scale: 1,
+                            duration: 0.3,
+                            ease: "power2.out",
+                            overwrite: "auto"
+                        });
+                    });
+                });
+            } else {
+                // Use CSS animations as fallback or for reduced motion
+                navItems.forEach(item => {
+                    item.classList.add('uw-a11y-css-animate');
+                });
+                
+                // Small delay to ensure DOM is ready, then trigger staggered animation
+                setTimeout(() => {
+                    navItems.forEach((item, index) => {
+                        setTimeout(() => {
+                            item.classList.add('uw-a11y-animate-in');
+                        }, index * 100); // 100ms stagger
+                    });
+                }, 100);
+            }
+        },
+
+        // Calculate the maximum allowed content height
+        getMaxContentHeight: function() {
+            // Calculate 85vh minus the header height (approximately 60px)
+            const maxHeight = Math.floor(window.innerHeight * 0.85) - 60;
+            return Math.max(200, maxHeight); // Minimum height of 200px
+        },
+
+        // Measure the height of a specific view section with max-height constraint
+        measureViewHeight: function(viewName) {
+            const viewEl = this.shadowRoot.getElementById(`uw-a11y-view-${viewName}`);
+            if (!viewEl) return null;
+            
+            // Temporarily show the element to measure its height
+            const wasHidden = viewEl.hasAttribute('hidden');
+            const originalStyles = {
+                position: viewEl.style.position,
+                visibility: viewEl.style.visibility,
+                height: viewEl.style.height
+            };
+            
+            // Make it measurable but invisible
+            viewEl.removeAttribute('hidden');
+            viewEl.style.position = 'absolute';
+            viewEl.style.visibility = 'hidden';
+            viewEl.style.height = 'auto';
+            
+            // Measure the natural height
+            const naturalHeight = viewEl.scrollHeight;
+            const maxAllowedHeight = this.getMaxContentHeight();
+            
+            // Use the smaller of natural height or max allowed height
+            const targetHeight = Math.min(naturalHeight, maxAllowedHeight);
+            
+            // Restore original state
+            if (wasHidden) viewEl.setAttribute('hidden', '');
+            viewEl.style.position = originalStyles.position;
+            viewEl.style.visibility = originalStyles.visibility;
+            viewEl.style.height = originalStyles.height;
+            
+            return targetHeight;
+        },
+
+        // Animate the panel height transition
+        animatePanelHeight: function(targetHeight) {
+            if (!window.gsap) return Promise.resolve();
+            
+            const content = this.shadowRoot.getElementById('uw-a11y-content');
+            if (!content) return Promise.resolve();
+            
+            // Kill any existing height animations
+            window.gsap.killTweensOf(content);
+            
+            return new Promise((resolve) => {
+                window.gsap.to(content, {
+                    height: targetHeight,
+                    duration: 0.4,
+                    ease: "power2.inOut",
+                    onComplete: resolve
+                });
+            });
+        },
+
+        // Animate navigation view transitions with height changes
+        animateViewTransition: function(currentView, newView) {
+            if (!window.gsap) return Promise.resolve();
+            
+            const currentEl = this.shadowRoot.getElementById(`uw-a11y-view-${currentView}`);
+            const newEl = this.shadowRoot.getElementById(`uw-a11y-view-${newView}`);
+            const content = this.shadowRoot.getElementById('uw-a11y-content');
+            
+            return new Promise((resolve) => {
+                // Kill any existing animations on these elements
+                if (currentEl) window.gsap.killTweensOf(currentEl);
+                if (newEl) window.gsap.killTweensOf(newEl);
+                if (content) window.gsap.killTweensOf(content);
+                
+                if (!currentEl || !newEl || currentView === newView) {
+                    resolve();
+                    return;
+                }
+                
+                // Measure the target height for the new view
+                const targetHeight = this.measureViewHeight(newView);
+                if (!targetHeight) {
+                    resolve();
+                    return;
+                }
+                
+                // Animate current view out and start height transition
+                window.gsap.to(currentEl, {
+                    opacity: 0,
+                    y: -10,
+                    duration: 0.2,
+                    ease: "power2.in",
+                    onComplete: () => {
+                        // Switch visibility
+                        currentEl.setAttribute('hidden', '');
+                        newEl.removeAttribute('hidden');
+                        
+                        // Ensure we don't exceed max height and manage overflow
+                        const maxAllowedHeight = this.getMaxContentHeight();
+                        const finalHeight = Math.min(targetHeight, maxAllowedHeight);
+                        
+                        // Update overflow based on whether content will be scrollable
+                        content.style.overflowY = finalHeight >= maxAllowedHeight ? 'auto' : 'hidden';
+                        
+                        // Animate height change and new view in simultaneously
+                        const heightTween = window.gsap.to(content, {
+                            height: finalHeight,
+                            duration: 0.4,
+                            ease: "power2.inOut"
+                        });
+                        
+                        // Animate new view in
+                        window.gsap.fromTo(newEl, 
+                            { opacity: 0, y: 10 },
+                            { 
+                                opacity: 1, 
+                                y: 0,
+                                duration: 0.3,
+                                ease: "power2.out",
+                                delay: 0.1,
+                                onComplete: resolve
+                            }
+                        );
+                    }
+                });
+            });
+        },
+
+        // Initialize left-hand navigation
+        initNavigation: function() {
+            // Initialize current view tracker
+            this.currentView = null;
+            this.isAnimating = false;
+            
+            const map = [
+                { id: 'uw-a11y-nav-results', view: 'results' },
+                { id: 'uw-a11y-nav-settings', view: 'settings' },
+                { id: 'uw-a11y-nav-help', view: 'help' },
+                { id: 'uw-a11y-nav-about', view: 'about' }
+            ];
+            map.forEach(({ id, view }) => {
+                const link = this.shadowRoot.getElementById(id);
+                if (link) {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        // Prevent rapid clicking during animations
+                        if (this.isAnimating) return;
+                        this.showView(view);
+                    });
+                }
+            });
+            // Default to results
+            this.showView('results');
+        },
+
+        // Show a specific view and update nav state
+        showView: function(view) {
+            const views = ['results', 'settings', 'help', 'about'];
+            const currentView = this.currentView;
+            
+            // Don't do anything if we're already on this view or currently animating
+            if (currentView === view || this.isAnimating) return;
+            
+            // Update current view tracker
+            this.currentView = view;
+            
+            // Update nav links active state first (without animation conflicts)
+            this.updateNavActiveState(view);
+            
+            // Check if animations should be used
+            const shouldAnimate = window.gsap && currentView && currentView !== view && !this.prefersReducedMotion();
+            
+            if (shouldAnimate) {
+                this.isAnimating = true;
+                this.animateViewTransition(currentView, view).then(() => {
+                    this.isAnimating = false;
+                });
+            } else {
+                // Instant transition for reduced motion or no GSAP
+                views.forEach(v => {
+                    const el = this.shadowRoot.getElementById(`uw-a11y-view-${v}`);
+                    if (!el) return;
+                    if (v === view) {
+                        el.removeAttribute('hidden');
+                    } else {
+                        el.setAttribute('hidden', '');
+                    }
+                });
+                
+                // Instantly adjust height if needed
+                if (currentView && currentView !== view) {
+                    const content = this.shadowRoot.getElementById('uw-a11y-content');
+                    if (content) {
+                        const targetHeight = this.measureViewHeight(view);
+                        const maxAllowedHeight = this.getMaxContentHeight();
+                        const finalHeight = Math.min(targetHeight, maxAllowedHeight);
+                        
+                        content.style.height = finalHeight + 'px';
+                        content.style.overflowY = finalHeight >= maxAllowedHeight ? 'auto' : 'hidden';
+                    }
+                }
+            }
+        },
+
+        // Update navigation active state without animation conflicts
+        updateNavActiveState: function(activeView) {
+            const views = ['results', 'settings', 'help', 'about'];
+            
+            views.forEach(v => {
+                const link = this.shadowRoot.getElementById(`uw-a11y-nav-${v}`);
+                if (!link) return;
+                
+                // Kill any existing GSAP animations on this link
+                if (window.gsap) {
+                    window.gsap.killTweensOf(link);
+                }
+                
+                if (v === activeView) {
+                    link.classList.add('active');
+                    link.setAttribute('aria-current', 'page');
+                } else {
+                    link.classList.remove('active');
+                    link.removeAttribute('aria-current');
+                    // Reset any inline styles that GSAP might have added
+                    if (window.gsap) {
+                        window.gsap.set(link, { backgroundColor: '' });
+                    }
+                }
+            });
+        },
+
+        // SETTINGS: defaults and persistence
+        // Always-excluded internal selectors (not user-configurable)
+        getEssentialExcludeSelectors: function() {
+            return [
+                '#uw-a11y-container',
+                '#uw-a11y-panel',
+                '.uw-a11y-highlight',
+                '[id^="uw-a11y-"]',
+                '[class*="uw-a11y-"]',
+                '#uw-a11y-global-styles'
+            ];
+        },
+        // Default user-adjustable excludes (shown in Settings)
+        getDefaultExcludeSelectors: function() {
+            return [
+                '#wpadminbar'
+            ];
+        },
+
+        getSettingsKey: function() { return 'uw-a11y-settings'; },
+
+        loadSettings: function() {
+            try {
+                const json = localStorage.getItem(this.getSettingsKey());
+                if (!json) return {};
+                const parsed = JSON.parse(json);
+                return parsed && typeof parsed === 'object' ? parsed : {};
+            } catch (_) { return {}; }
+        },
+
+        saveSettings: function(settings) {
+            try {
+                localStorage.setItem(this.getSettingsKey(), JSON.stringify(settings || {}));
+            } catch (_) { /* ignore quota errors */ }
+        },
+
+        // Whether best-practice suggestions are enabled (default: true)
+        isBestPracticesEnabled: function() {
+            const s = this.loadSettings();
+            return s.enableBestPractices !== false; // default true unless explicitly false
+        },
+
+        // Combine user excludes with enforced internal ones
+        getEffectiveExcludeSelectors: function() {
+            const essentials = this.getEssentialExcludeSelectors();
+            const defaults = this.getDefaultExcludeSelectors();
+            const s = this.loadSettings();
+            const user = Array.isArray(s.excludeSelectors) ? s.excludeSelectors : (typeof s.excludeSelectors === 'string' ? s.excludeSelectors.split(',') : []);
+            const clean = (user || [])
+                .map(v => (v || '').toString().trim())
+                .filter(Boolean);
+            // Merge in order: essentials (always), defaults, then user additions
+            return [...new Set([ ...essentials, ...defaults, ...clean ])];
+        },
+
+        // Check if an element should be excluded by settings
+        shouldExcludeElement: function(el) {
+            try {
+                const selectors = this.getEffectiveExcludeSelectors();
+                for (const sel of selectors) {
+                    if (!sel) continue;
+                    try {
+                        if (el.matches(sel)) return true;
+                        if (el.closest && el.closest(sel)) return true;
+                    } catch (_) { /* invalid selector safety */ }
+                }
+            } catch (_) { /* ignore */ }
+            return false;
+        },
+
+        // WCAG selection helpers
+        getDefaultWcag: function() { return { wcagSpec: '2.1', wcagLevel: 'AA' }; },
+        getSelectedWcag: function() {
+            const s = this.loadSettings();
+            const d = this.getDefaultWcag();
+            return { wcagSpec: s.wcagSpec || d.wcagSpec, wcagLevel: s.wcagLevel || d.wcagLevel };
+        },
+        buildWcagTags: function(spec, level) {
+            const lvl = (level || 'AA').toUpperCase();
+            const levelKey = lvl.toLowerCase(); // 'a' | 'aa' | 'aaa'
+            const specs = ['2.0','2.1','2.2'];
+            const chosenIdx = Math.max(0, specs.indexOf(spec || '2.1'));
+            const tags = [];
+            for (let i = 0; i <= chosenIdx; i++) {
+                const s = specs[i].replace('.', ''); // '20','21','22'
+                const prefix = i === 0 ? 'wcag2' : `wcag${s}`;
+                tags.push(`${prefix}${levelKey}`);
+            }
+            // Also include lower levels implicitly when AA/AAA chosen
+            if (lvl === 'AA' || lvl === 'AAA') {
+                for (let i = 0; i <= chosenIdx; i++) {
+                    const s = specs[i].replace('.', '');
+                    const prefix = i === 0 ? 'wcag2' : `wcag${s}`;
+                    if (!tags.includes(`${prefix}a`)) tags.push(`${prefix}a`);
+                }
+            }
+            if (lvl === 'AAA') {
+                for (let i = 0; i <= chosenIdx; i++) {
+                    const s = specs[i].replace('.', '');
+                    const prefix = i === 0 ? 'wcag2' : `wcag${s}`;
+                    if (!tags.includes(`${prefix}aa`)) tags.push(`${prefix}aa`);
+                }
+            }
+            return tags;
+        },
+
+        getWcagLabel: function() {
+            const { wcagSpec, wcagLevel } = this.getSelectedWcag();
+            return `WCAG ${wcagSpec} ${String(wcagLevel || '').toUpperCase()}`;
+        },
+
+        resetSettingsToDefaults: function() {
+            const defaults = { 
+                excludeSelectors: this.getDefaultExcludeSelectors(),
+                enableBestPractices: true,
+                ...this.getDefaultWcag()
+            };
+            this.saveSettings(defaults);
+            return defaults;
+        },
+
+        // Render the Settings view (called after panel creation)
+        renderSettings: function() {
+            const wrap = this.shadowRoot.getElementById('uw-a11y-view-settings');
+            if (!wrap) return;
+
+            const settings = this.loadSettings();
+            // Show only user-adjustable selectors in the input (strip essentials)
+            const renderList = Array.isArray(settings.excludeSelectors) ? settings.excludeSelectors : this.getDefaultExcludeSelectors();
+            const current = this.filterOutEssential(renderList).join(', ');
+            const bp = settings.enableBestPractices !== false; // default true
+            const wcag = { ...(this.getDefaultWcag()), wcagSpec: settings.wcagSpec || '2.1', wcagLevel: (settings.wcagLevel || 'AA').toUpperCase() };
+
+            wrap.innerHTML = `
+                <div class="uw-a11y-settings" role="region" aria-labelledby="uw-a11y-settings-heading">
+                    <h3 id="uw-a11y-settings-heading">Settings</h3>
+                    <div class="uw-a11y-form-row">
+                        <label for="uw-a11y-exclude-input"><strong>Exclude Selectors</strong></label>
+                        <input id="uw-a11y-exclude-input" class="uw-a11y-input" type="text" value="${this.escapeHtmlAttr(current)}" aria-describedby="uw-a11y-exclude-help">
+                        <div id="uw-a11y-exclude-help" class="uw-a11y-helptext">Comma‑separated CSS selectors skipped during scanning. Essential internal UI is always excluded.</div>
+                        <div id="uw-a11y-settings-msg" class="uw-a11y-msg" aria-live="polite"></div>
+                    </div>
+                    <div class="uw-a11y-form-row">
+                        <label for="uw-a11y-wcag-spec"><strong>WCAG Specification</strong></label>
+                        <select id="uw-a11y-wcag-spec" class="uw-a11y-input">
+                            <option value="2.0" ${wcag.wcagSpec==='2.0'?'selected':''}>WCAG 2.0</option>
+                            <option value="2.1" ${wcag.wcagSpec==='2.1'?'selected':''}>WCAG 2.1</option>
+                            <option value="2.2" ${wcag.wcagSpec==='2.2'?'selected':''}>WCAG 2.2</option>
+                        </select>
+                        <div class="uw-a11y-helptext">Choose which WCAG version to target. Default is 2.1.</div>
+                    </div>
+                    <div class="uw-a11y-form-row">
+                        <label for="uw-a11y-wcag-level"><strong>WCAG Level</strong></label>
+                        <select id="uw-a11y-wcag-level" class="uw-a11y-input">
+                            <option value="A" ${wcag.wcagLevel==='A'?'selected':''}>Level A</option>
+                            <option value="AA" ${wcag.wcagLevel==='AA'?'selected':''}>Level AA</option>
+                            <option value="AAA" ${wcag.wcagLevel==='AAA'?'selected':''}>Level AAA</option>
+                        </select>
+                        <div class="uw-a11y-helptext">Default is AA. Selecting AAA enables extra rules like enhanced color contrast.</div>
+                    </div>
+                    <div class="uw-a11y-form-row">
+                        <label>
+                            <input id="uw-a11y-bp-input" type="checkbox" ${bp ? 'checked' : ''}>
+                            <span>Include best‑practice suggestions</span>
+                        </label>
+                        <div class="uw-a11y-helptext">Additional tips beyond WCAG failures, like link text clarity or new‑tab labeling.</div>
+                        <div class="uw-a11y-actions">
+                            <button id="uw-a11y-save-settings" class="uw-a11y-btn primary">Save and Re‑scan</button>
+                            <button id="uw-a11y-reset-settings" class="uw-a11y-btn" title="Reset to defaults">
+                                <svg class="uw-a11y-reset-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 5V1L7 6l5 5V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const input = this.shadowRoot.getElementById('uw-a11y-exclude-input');
+            const msg = this.shadowRoot.getElementById('uw-a11y-settings-msg');
+            const saveBtn = this.shadowRoot.getElementById('uw-a11y-save-settings');
+            const resetBtn = this.shadowRoot.getElementById('uw-a11y-reset-settings');
+            const bpInput = this.shadowRoot.getElementById('uw-a11y-bp-input');
+            const wcagSpecSel = this.shadowRoot.getElementById('uw-a11y-wcag-spec');
+            const wcagLevelSel = this.shadowRoot.getElementById('uw-a11y-wcag-level');
+
+            const parseSelectors = (val) => val.split(',').map(s => s.trim()).filter(Boolean);
+            const validateSelectors = (arr) => {
+                for (const sel of arr) {
+                    try { document.querySelectorAll(sel); } catch (e) { return sel; }
+                }
+                return null;
+            };
+
+            saveBtn.addEventListener('click', () => {
+                const arr = parseSelectors(input.value || '');
+                const bad = validateSelectors(arr);
+                if (bad) {
+                    msg.textContent = `Invalid selector: ${bad}`;
+                    msg.className = 'uw-a11y-msg err';
+                    return;
+                }
+                const toSave = { 
+                    // Persist only non-essential selectors
+                    excludeSelectors: this.filterOutEssential(arr),
+                    enableBestPractices: !!(bpInput && bpInput.checked),
+                    wcagSpec: wcagSpecSel ? wcagSpecSel.value : '2.1',
+                    wcagLevel: wcagLevelSel ? wcagLevelSel.value : 'AA'
+                };
+                this.saveSettings(toSave);
+                msg.textContent = 'Saved. Re‑scanning…';
+                msg.className = 'uw-a11y-msg ok';
+                // Re-run analysis with new settings
+                this.runAxeChecks();
+                this.showView('results');
+            });
+
+            resetBtn.addEventListener('click', () => {
+                const defaults = this.resetSettingsToDefaults();
+                input.value = this.filterOutEssential(defaults.excludeSelectors).join(', ');
+                if (bpInput) bpInput.checked = !!defaults.enableBestPractices;
+                if (wcagSpecSel) wcagSpecSel.value = defaults.wcagSpec;
+                if (wcagLevelSel) wcagLevelSel.value = defaults.wcagLevel;
+                msg.textContent = 'Settings reset to defaults.';
+                msg.className = 'uw-a11y-msg ok';
+            });
+
+        },
+
+        // Remove essential/selectors from a provided list
+        filterOutEssential: function(list) {
+            const essentials = new Set(this.getEssentialExcludeSelectors());
+            return (list || []).filter(sel => !essentials.has(sel));
+        },
+
+        // Escape for attribute values
+        escapeHtmlAttr: function(str) {
+            return (str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        },
         
         // Get axe-core version dynamically
         getAxeVersion: function() {
@@ -2333,10 +3166,10 @@
             return 'unknown';
         },
 
-        // Load and save filter preferences
+        // Load and save filter preferences (persisted in localStorage)
         loadFilters: function() {
             try {
-                const stored = sessionStorage.getItem('uw-a11y-filters');
+                const stored = localStorage.getItem('uw-a11y-filters');
                 if (stored) {
                     const parsed = JSON.parse(stored);
                     this.filters = { errors: true, warnings: true, info: true, ...parsed };
@@ -2345,7 +3178,7 @@
         },
         saveFilters: function() {
             try {
-                sessionStorage.setItem('uw-a11y-filters', JSON.stringify(this.filters));
+                localStorage.setItem('uw-a11y-filters', JSON.stringify(this.filters));
             } catch (e) { /* ignore */ }
         },
         toggleFilter: function(kind) {
@@ -2619,7 +3452,7 @@
                 
                 ${this.axeResults ? `
                     <div class="axe-summary">
-                        <strong>Standard:</strong> WCAG 2.1 AA | <strong>Engine:</strong> axe-core v${this.getAxeVersion()} | <strong>Checker:</strong> v${this.version}
+                        <strong>Standard:</strong> ${this.getWcagLabel()} | <strong>Engine:</strong> axe-core v${this.getAxeVersion()} | <strong>Checker:</strong> v${this.version}
                     </div>
                 ` : ''}
             `;
@@ -2631,7 +3464,7 @@
                 results.innerHTML = `
                     <div class="uw-a11y-issue info">
                         <h4>Excellent Accessibility!</h4>
-                        <p>No accessibility violations detected by axe-core. Your page meets WCAG 2.1 AA automated testing standards.</p>
+                        <p>No accessibility violations detected by axe-core. Your page meets ${this.getWcagLabel()} automated testing standards.</p>
                         <p><strong>Next Steps:</strong> Consider manual testing with screen readers and keyboard navigation for complete accessibility validation.</p>
                     </div>
                 `;
@@ -3143,6 +3976,12 @@
 
         
         remove: function() {
+            // Clean up resize handler
+            if (this.resizeHandler) {
+                window.removeEventListener('resize', this.resizeHandler);
+                this.resizeHandler = null;
+            }
+            
             // Remove the shadow DOM container
             const container = document.getElementById('uw-a11y-container');
             if (container) container.remove();

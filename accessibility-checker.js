@@ -1528,7 +1528,11 @@
             
             // Add event listeners
             this.shadowRoot.getElementById('uw-a11y-close').onclick = () => this.remove();
-            this.shadowRoot.getElementById('uw-a11y-minimize').onclick = () => this.toggleMinimize();
+            // Hide deprecated minimize control; panel is now draggable
+            const minBtn = this.shadowRoot.getElementById('uw-a11y-minimize');
+            if (minBtn) minBtn.style.display = 'none';
+            // Enable drag on header
+            this.initDrag();
             this.initNavigation();
             this.renderSettings();
             
@@ -1888,18 +1892,16 @@
                     transform: rotate(180deg);
                 }
                 #uw-a11y-panel #uw-a11y-header {
-                    
                     color: #000;
                     padding: 12px 16px;
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                                            cursor: default;
+                    cursor: grab; /* drag handle */
+                    user-select: none;
                 }
                 
-                #uw-a11y-panel #uw-a11y-header:active {
-                   
-                }
+                #uw-a11y-panel #uw-a11y-header:active { cursor: grabbing; }
                 
                 #uw-a11y-panel .uw-a11y-header-buttons {
                     display: flex;
@@ -1953,10 +1955,7 @@
                     background: rgba(255,255,255,0.3);
                 }
                 
-                #uw-a11y-panel #uw-a11y-minimize {
-                    font-size: 20px;
-                    font-weight: bold;
-                }
+                #uw-a11y-panel #uw-a11y-minimize { display: none; }
                 #uw-a11y-panel #uw-a11y-content {
                     max-height: calc(85vh - 60px);
                     overflow-y: auto;
@@ -2597,6 +2596,80 @@
             };
             
             window.addEventListener('resize', this.resizeHandler);
+        },
+
+        // Make the panel draggable by its header
+        initDrag: function() {
+            const wrapper = this.shadowRoot.getElementById('uw-a11y-wrapper');
+            const header = this.shadowRoot.getElementById('uw-a11y-header');
+            if (!wrapper || !header) return;
+
+            let startX = 0, startY = 0, startLeft = 0, startTop = 0;
+            const onPointerDown = (e) => {
+                // Only left-click/primary pointer drags
+                if (e.button !== undefined && e.button !== 0) return;
+                // Do not start a drag when clicking header controls (close, etc.)
+                if (e.target && e.target.closest && e.target.closest('.uw-a11y-header-buttons')) {
+                    return; // allow normal button clicks
+                }
+                e.preventDefault();
+                try { header.setPointerCapture(e.pointerId); } catch (_) {}
+
+                const rect = wrapper.getBoundingClientRect();
+                // Switch to left/top positioning for free dragging
+                wrapper.style.right = 'auto';
+                wrapper.style.left = rect.left + 'px';
+                wrapper.style.top = rect.top + 'px';
+
+                startX = e.clientX; startY = e.clientY;
+                startLeft = rect.left; startTop = rect.top;
+
+                const onPointerMove = (ev) => {
+                    const dx = ev.clientX - startX;
+                    const dy = ev.clientY - startY;
+                    let newLeft = startLeft + dx;
+                    let newTop = startTop + dy;
+                    // Constrain within viewport
+                    const maxLeft = Math.max(0, window.innerWidth - wrapper.offsetWidth);
+                    const maxTop = Math.max(0, window.innerHeight - 40); // keep header reachable
+                    newLeft = Math.min(Math.max(0, newLeft), maxLeft);
+                    newTop = Math.min(Math.max(0, newTop), maxTop);
+                    wrapper.style.left = newLeft + 'px';
+                    wrapper.style.top = newTop + 'px';
+                };
+
+                const onPointerUp = () => {
+                    document.removeEventListener('pointermove', onPointerMove);
+                    document.removeEventListener('pointerup', onPointerUp);
+                    try { header.releasePointerCapture(e.pointerId); } catch (_) {}
+                    // Persist position
+                    try {
+                        const pos = { left: parseInt(wrapper.style.left || '0', 10) || 0, top: parseInt(wrapper.style.top || '0', 10) || 0 };
+                        sessionStorage.setItem('uw-a11y-pos', JSON.stringify(pos));
+                    } catch (_) {}
+                };
+
+                document.addEventListener('pointermove', onPointerMove);
+                document.addEventListener('pointerup', onPointerUp);
+            };
+
+            header.addEventListener('pointerdown', onPointerDown);
+        },
+
+        // Apply previously saved position to the wrapper, if present
+        applySavedPosition: function() {
+            try {
+                const raw = sessionStorage.getItem('uw-a11y-pos');
+                if (!raw) return;
+                const pos = JSON.parse(raw);
+                const wrapper = this.shadowRoot.getElementById('uw-a11y-wrapper');
+                if (!wrapper || typeof pos !== 'object') return;
+                if (typeof pos.left === 'number' && typeof pos.top === 'number') {
+                    wrapper.style.right = 'auto';
+                    wrapper.style.left = `${pos.left}px`;
+                    wrapper.style.top = `${pos.top}px`;
+                }
+            } catch (_) { /* ignore */ }
         },
 
         // Animate the entire panel entrance
@@ -3405,8 +3478,8 @@
             const summary = this.shadowRoot.getElementById('uw-a11y-summary');
             const results = this.shadowRoot.getElementById('uw-a11y-results');
             
-            // Load minimize state after panel is created
-            this.loadMinimizeState();
+            // Apply saved position for draggable panel (replaces minimize feature)
+            this.applySavedPosition();
             
             // Count issues by type
             const counts = {

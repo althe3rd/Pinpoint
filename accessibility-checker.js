@@ -15,6 +15,7 @@
             checkedItems: new Set(), // Track manually verified items
             isMinimized: false, // Track minimized state
             shadowRoot: null, // Shadow DOM root
+            heightPadding: 35, // Extra pixels added to content height to avoid tiny scrollbars
             scoreAnimationPlayed: false, // Run score animation only once
             // Visibility filters for list rendering
             filters: { errors: true, warnings: true, info: true },
@@ -2559,7 +2560,8 @@
             if (initialHeight) {
                 content.style.height = initialHeight + 'px';
                 content.style.maxHeight = maxAllowedHeight + 'px'; // Maintain max-height constraint
-                content.style.overflowY = initialHeight >= maxAllowedHeight ? 'auto' : 'hidden';
+                // Keep vertical scrolling available; rely on CSS to show only when needed
+                content.style.overflowY = 'auto';
             }
         },
 
@@ -2590,7 +2592,8 @@
                     content.style.height = newHeight + 'px';
                 }
                 
-                content.style.overflowY = newHeight >= maxAllowedHeight ? 'auto' : 'hidden';
+                // Always allow vertical scroll so long lists remain accessible
+                content.style.overflowY = 'auto';
             };
             
             window.addEventListener('resize', this.resizeHandler);
@@ -2738,8 +2741,10 @@
             const naturalHeight = viewEl.scrollHeight;
             const maxAllowedHeight = this.getMaxContentHeight();
             
-            // Use the smaller of natural height or max allowed height
-            const targetHeight = Math.min(naturalHeight, maxAllowedHeight);
+            // Add a small padding so short rounding differences don't cause tiny scrollbars
+            const padded = naturalHeight + (this.heightPadding || 0);
+            // Use the smaller of padded height or max allowed height
+            const targetHeight = Math.min(padded, maxAllowedHeight);
             
             // Restore original state
             if (wasHidden) viewEl.setAttribute('hidden', '');
@@ -2811,8 +2816,8 @@
                         const maxAllowedHeight = this.getMaxContentHeight();
                         const finalHeight = Math.min(targetHeight, maxAllowedHeight);
                         
-                        // Update overflow based on whether content will be scrollable
-                        content.style.overflowY = finalHeight >= maxAllowedHeight ? 'auto' : 'hidden';
+                        // Keep vertical scrolling enabled; browser will show scrollbar only if needed
+                        content.style.overflowY = 'auto';
                         
                         // Animate height change and new view in simultaneously
                         const heightTween = window.gsap.to(content, {
@@ -2912,7 +2917,7 @@
                         const finalHeight = Math.min(targetHeight, maxAllowedHeight);
                         
                         content.style.height = finalHeight + 'px';
-                        content.style.overflowY = finalHeight >= maxAllowedHeight ? 'auto' : 'hidden';
+                        content.style.overflowY = 'auto';
                     }
                 }
 

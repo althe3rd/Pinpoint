@@ -1302,29 +1302,22 @@
                 totalDeductions += violation.nodes.length * weight;
             });
             
-            // Calculate deductions for incomplete items, considering manually verified status
+            // Calculate deductions for incomplete items (manual review) using the
+            // rendered issues list so unique IDs stay stable with verification.
             let incompleteDeductions = 0;
-            let totalManualReview = 0;
             let verifiedCount = 0;
-            
-            results.incomplete.forEach((incomplete, incompleteIndex) => {
-                incomplete.nodes.forEach((node, nodeIndex) => {
-                    totalManualReview++;
-                    const uniqueId = `incomplete-${incompleteIndex}-${nodeIndex}`;
-                    
-                    // Check if this specific item is verified OR if the entire rule is verified
-                    const isRuleVerified = this.isRuleVerified(incomplete.id);
-                    const isIndividuallyVerified = this.checkedItems && this.checkedItems.has(uniqueId);
-                    
-                    if (isIndividuallyVerified || isRuleVerified) {
-                        verifiedCount++;
-                        // No deduction for verified items
-                    } else {
-                        // Half weight for unverified manual review items
-                        const weight = (weights[incomplete.impact] || weights.moderate) * 0.5;
-                        incompleteDeductions += weight;
-                    }
-                });
+            // Only count manual-review type warnings that have a trackable uniqueId
+            const manualIssues = (this.issues || []).filter(i => i.type === 'warning' && i.uniqueId);
+            const totalManualReview = manualIssues.length;
+            manualIssues.forEach(issue => {
+                const ruleVerified = this.isRuleVerified(issue.ruleId);
+                const individuallyVerified = this.checkedItems && this.checkedItems.has(issue.uniqueId);
+                if (individuallyVerified || ruleVerified) {
+                    verifiedCount++;
+                } else {
+                    const weight = (weights[issue.impact] || weights.moderate) * 0.5;
+                    incompleteDeductions += weight;
+                }
             });
             
             totalDeductions += incompleteDeductions;

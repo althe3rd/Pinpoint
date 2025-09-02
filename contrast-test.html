@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Contrast Testing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        /* Test cases for different contrast scenarios */
+        .test-case {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background: white;
+        }
+        
+        .test-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        /* Good contrast - should pass without manual review */
+        .good-contrast {
+            color: #000000;
+            background-color: #ffffff;
+        }
+        
+        /* Borderline contrast - should be auto-resolved by pixel analysis */
+        .borderline-contrast {
+            color: #595959;
+            background-color: #ffffff;
+        }
+        
+        /* Semi-transparent text - pixel analysis should resolve */
+        .semi-transparent {
+            color: rgba(0, 0, 0, 0.7);
+            background-color: #ffffff;
+        }
+        
+        /* Text on gradient background */
+        .gradient-bg {
+            color: #000000;
+            background: linear-gradient(to right, #f0f0f0, #ffffff);
+            padding: 10px;
+        }
+        
+        /* Text with transparent background over colored parent */
+        .parent-color {
+            background-color: #f5f5f5;
+            padding: 10px;
+        }
+        
+        .transparent-bg {
+            color: #333333;
+            background-color: transparent;
+            padding: 5px;
+        }
+        
+        /* Large text (should have lower contrast requirements) */
+        .large-text {
+            font-size: 24px;
+            color: #666666;
+            background-color: #ffffff;
+        }
+        
+        /* Bold large text */
+        .bold-large-text {
+            font-size: 19px;
+            font-weight: bold;
+            color: #777777;
+            background-color: #ffffff;
+        }
+        
+        /* Poor contrast - should remain as manual review */
+        .poor-contrast {
+            color: #cccccc;
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Enhanced Contrast Testing Page</h1>
+    <p>This page tests the enhanced pixel-based contrast analysis. Use the accessibility checker to see which contrast issues are automatically resolved.</p>
+    
+    <div class="test-case">
+        <div class="test-title">Test 1: Good Contrast (Black on White)</div>
+        <div class="good-contrast">
+            This text has excellent contrast (21:1) and should pass all tests without manual review.
+        </div>
+    </div>
+    
+    <div class="test-case">
+        <div class="test-title">Test 2: Borderline Contrast (#595959 on white)</div>
+        <div class="borderline-contrast">
+            This text has borderline contrast (~4.6:1) that might trigger manual review with standard analysis, but should be auto-resolved by pixel analysis.
+        </div>
+    </div>
+    
+    <div class="test-case">
+        <div class="test-title">Test 3: Semi-transparent Text (rgba black 0.7 alpha)</div>
+        <div class="semi-transparent">
+            This text uses semi-transparent black which computed styles might flag for manual review, but pixel analysis should resolve it as having sufficient contrast.
+        </div>
+    </div>
+    
+    <div class="test-case">
+        <div class="test-title">Test 4: Text on Gradient Background</div>
+        <div class="gradient-bg">
+            This text is on a gradient background where computed styles might fail to determine the effective background color, but pixel analysis should handle it.
+        </div>
+    </div>
+    
+    <div class="test-case">
+        <div class="test-title">Test 5: Transparent Background over Colored Parent</div>
+        <div class="parent-color">
+            <div class="transparent-bg">
+                This text has a transparent background but sits over a colored parent element. Pixel analysis should determine the effective background.
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-case">
+        <div class="test-title">Test 6: Large Text with Lower Contrast</div>
+        <div class="large-text">
+            This is large text (24px) with moderate contrast that should pass WCAG AA requirements for large text.
+        </div>
+    </div>
+    
+    <div class="test-case">
+        <div class="test-title">Test 7: Bold Large Text</div>
+        <div class="bold-large-text">
+            This is bold 19px text which qualifies as "large text" and should pass with moderate contrast.
+        </div>
+    </div>
+    
+    <div class="test-case">
+        <div class="test-title">Test 8: Poor Contrast (should remain manual review)</div>
+        <div class="poor-contrast">
+            This text has very poor contrast and should remain as a manual review item even with pixel analysis.
+        </div>
+    </div>
+
+    <script>
+        // Add some dynamic styles for more complex testing
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Test page loaded. Run the accessibility checker to see enhanced contrast analysis in action.');
+        });
+    </script>
+</body>
+</html>

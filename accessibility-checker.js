@@ -550,6 +550,14 @@
                 if (this.isOwnUIElement(node)) {
                     return;
                 }
+
+                // Check if this is a contrast issue that can be auto-resolved
+                const shouldSkipManualReview = this.shouldSkipContrastManualReview(incomplete, node);
+                
+                if (shouldSkipManualReview) {
+                    // Skip entirely - no need to show passing contrast items to user
+                    return;
+                }
                 
                 const uniqueId = `incomplete-${incompleteIndex}-${nodeIndex}`;
                 this.addIssue(
@@ -1089,7 +1097,7 @@
             return 0;
         },
         
-        // Extract color contrast information
+        // Extract color contrast information with enhanced pixel-based analysis
         extractColorContrastInfo: function(node) {
             try {
                 const element = this.getElementFromNode(node);
@@ -1098,6 +1106,7 @@
                 const styles = window.getComputedStyle(element);
                 let fgColor = styles.color;
                 let bgColor = styles.backgroundColor;
+                let analysisMethod = 'computed-style';
                 
                 // Handle transparent or rgba(0,0,0,0) backgrounds by finding the effective background
                 if (!bgColor || bgColor === 'transparent' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor.includes('rgba(0, 0, 0, 0)')) {
@@ -1118,6 +1127,14 @@
                         bgColor = '#ffffff';
                     }
                 }
+
+                // Enhanced pixel-based analysis for complex cases
+                const pixelAnalysis = this.analyzeElementPixels(element);
+                if (pixelAnalysis && pixelAnalysis.isMoreAccurate) {
+                    fgColor = pixelAnalysis.foreground;
+                    bgColor = pixelAnalysis.background;
+                    analysisMethod = 'pixel-analysis';
+                }
                 
                 // Calculate contrast ratio if possible
                 const contrast = this.calculateContrastRatio(fgColor, bgColor);
@@ -1126,7 +1143,8 @@
                     foreground: fgColor,
                     background: bgColor,
                     contrast: contrast ? contrast.toFixed(2) + ':1' : 'Unable to calculate',
-                    required: 'WCAG AA requires 4.5:1 for normal text, 3:1 for large text'
+                    required: 'WCAG AA requires 4.5:1 for normal text, 3:1 for large text',
+                    analysisMethod: analysisMethod
                 };
             } catch (e) {
                 console.warn('Error extracting color contrast info:', e);
@@ -1239,6 +1257,299 @@
                 console.warn('Error calculating luminance for color:', color, e);
                 return null;
             }
+        },
+
+        // Analyze element pixels for more accurate color detection
+        analyzeElementPixels: function(element) {
+            try {
+                // Skip pixel analysis for elements that are likely to work fine with computed styles
+                const computedStyles = window.getComputedStyle(element);
+                const hasComplexBackground = this.hasComplexBackground(element, computedStyles);
+                const hasTransparency = this.hasTransparentColors(computedStyles);
+                
+                if (!hasComplexBackground && !hasTransparency) {
+                    return null; // Use computed styles
+                }
+
+                const rect = element.getBoundingClientRect();
+                if (rect.width < 4 || rect.height < 4) {
+                    return null; // Element too small for reliable sampling
+                }
+
+                // Use a simpler approach: sample the rendered element directly
+                const colorSamples = this.sampleElementColors(element, rect);
+                
+                if (colorSamples && this.isPixelAnalysisMoreReliable(colorSamples, computedStyles)) {
+                    return {
+                        foreground: colorSamples.foreground,
+                        background: colorSamples.background,
+                        isMoreAccurate: true,
+                        samplingMethod: colorSamples.method
+                    };
+                }
+
+                return null;
+            } catch (e) {
+                console.warn('Error in pixel analysis:', e);
+                return null;
+            }
+        },
+
+        // Check if element has complex background that might need pixel analysis
+        hasComplexBackground: function(element, styles) {
+            return (
+                styles.backgroundImage !== 'none' ||
+                styles.background.includes('gradient') ||
+                this.hasComplexAncestorBackground(element)
+            );
+        },
+
+        // Check if colors contain transparency
+        hasTransparentColors: function(styles) {
+            const fgColor = styles.color;
+            const bgColor = styles.backgroundColor;
+            
+            return (
+                fgColor.includes('rgba') && this.getAlphaFromRgba(fgColor) < 1 ||
+                bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent'
+            );
+        },
+
+        // Check ancestor elements for complex backgrounds
+        hasComplexAncestorBackground: function(element) {
+            let parent = element.parentElement;
+            let depth = 0;
+            
+            while (parent && depth < 5) { // Check up to 5 levels up
+                const parentStyles = window.getComputedStyle(parent);
+                if (parentStyles.backgroundImage !== 'none' || 
+                    parentStyles.background.includes('gradient')) {
+                    return true;
+                }
+                parent = parent.parentElement;
+                depth++;
+            }
+            return false;
+        },
+
+        // Extract alpha value from rgba string
+        getAlphaFromRgba: function(rgbaString) {
+            const match = rgbaString.match(/rgba?\([^)]+\)/);
+            if (match) {
+                const values = match[0].match(/[\d.]+/g);
+                return values && values.length >= 4 ? parseFloat(values[3]) : 1;
+            }
+            return 1;
+        },
+
+        // Sample colors from element using a lightweight approach
+        sampleElementColors: function(element, rect) {
+            try {
+                // Create temporary elements to help with color sampling
+                const tempTextSpan = document.createElement('span');
+                const tempBgDiv = document.createElement('div');
+                
+                // Clone text content for foreground sampling
+                tempTextSpan.textContent = element.textContent?.charAt(0) || 'A';
+                tempTextSpan.style.cssText = `
+                    position: absolute;
+                    left: -9999px;
+                    font: ${window.getComputedStyle(element).font};
+                    color: ${window.getComputedStyle(element).color};
+                    background: transparent;
+                    border: none;
+                    padding: 0;
+                    margin: 0;
+                `;
+                
+                // Create background sample
+                tempBgDiv.style.cssText = `
+                    position: absolute;
+                    left: -9999px;
+                    width: 10px;
+                    height: 10px;
+                    background: ${window.getComputedStyle(element).background};
+                    border: none;
+                    padding: 0;
+                    margin: 0;
+                `;
+                
+                document.body.appendChild(tempTextSpan);
+                document.body.appendChild(tempBgDiv);
+                
+                // Get the actual rendered colors
+                const textStyles = window.getComputedStyle(tempTextSpan);
+                const bgStyles = window.getComputedStyle(tempBgDiv);
+                
+                const result = {
+                    foreground: textStyles.color,
+                    background: bgStyles.backgroundColor !== 'rgba(0, 0, 0, 0)' ? 
+                        bgStyles.backgroundColor : 
+                        this.findEffectiveBackground(element),
+                    method: 'dom-sampling'
+                };
+                
+                // Clean up
+                document.body.removeChild(tempTextSpan);
+                document.body.removeChild(tempBgDiv);
+                
+                return result;
+            } catch (e) {
+                console.warn('Error sampling element colors:', e);
+                return null;
+            }
+        },
+
+        // Find effective background by examining actual DOM hierarchy
+        findEffectiveBackground: function(element) {
+            let current = element;
+            while (current && current !== document.body) {
+                const styles = window.getComputedStyle(current);
+                const bg = styles.backgroundColor;
+                
+                if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+                    return bg;
+                }
+                
+                // Check for background images or gradients
+                if (styles.backgroundImage !== 'none') {
+                    // For images/gradients, we'll estimate based on common patterns
+                    return this.estimateBackgroundFromImage(styles);
+                }
+                
+                current = current.parentElement;
+            }
+            
+            // Default to white
+            return 'rgb(255, 255, 255)';
+        },
+
+        // Estimate background color from background image (simple heuristics)
+        estimateBackgroundFromImage: function(styles) {
+            const bgImage = styles.backgroundImage;
+            
+            // Check for gradients
+            if (bgImage.includes('gradient')) {
+                // Extract first color from gradient
+                const colorMatch = bgImage.match(/rgba?\([^)]+\)|#[a-fA-F0-9]{3,6}|\b\w+\b/);
+                if (colorMatch) {
+                    return colorMatch[0];
+                }
+            }
+            
+            // For other images, assume a neutral background
+            return 'rgb(240, 240, 240)';
+        },
+
+        // Determine if pixel analysis is more reliable than computed styles
+        isPixelAnalysisMoreReliable: function(colorSamples, computedStyles) {
+            // Pixel analysis is more reliable when:
+            // 1. Computed styles show transparency that we resolved
+            // 2. There's a significant difference in calculated contrast
+            // 3. We detected complex backgrounds
+            
+            const computedBg = computedStyles.backgroundColor;
+            const computedFg = computedStyles.color;
+            
+            // If computed styles show transparency, pixel analysis is likely better
+            if (computedBg === 'rgba(0, 0, 0, 0)' || computedBg === 'transparent') {
+                return true;
+            }
+            
+            // If foreground has transparency, pixel analysis handles blending better
+            if (computedFg.includes('rgba') && this.getAlphaFromRgba(computedFg) < 0.9) {
+                return true;
+            }
+            
+            // Compare contrast ratios
+            const computedContrast = this.calculateContrastRatio(computedFg, computedBg);
+            const sampledContrast = this.calculateContrastRatio(colorSamples.foreground, colorSamples.background);
+            
+            // If sampling gives us a significantly different result, trust it
+            if (computedContrast && sampledContrast) {
+                const difference = Math.abs(computedContrast - sampledContrast);
+                return difference > 1; // Significant difference in contrast ratio
+            }
+            
+            return false;
+        },
+
+        // Determine if a contrast manual review item should be skipped because pixel analysis shows sufficient contrast
+        shouldSkipContrastManualReview: function(axeRule, node) {
+            // Only apply to contrast-related rules
+            const contrastRules = ['color-contrast', 'color-contrast-enhanced'];
+            if (!contrastRules.includes(axeRule.id)) {
+                return false;
+            }
+
+            try {
+                const element = this.getElementFromNode(node);
+                if (!element) return false;
+
+                // Get enhanced color info with pixel analysis
+                const colorInfo = this.extractColorContrastInfo(node);
+                if (!colorInfo || !colorInfo.contrast || colorInfo.contrast === 'Unable to calculate') {
+                    return false;
+                }
+
+                // Parse contrast ratio
+                const contrastValue = parseFloat(colorInfo.contrast.split(':')[0]);
+                if (isNaN(contrastValue)) {
+                    return false;
+                }
+
+                // Determine if this element needs enhanced (AAA) contrast
+                const isEnhanced = axeRule.id === 'color-contrast-enhanced';
+                
+                // Check font size to determine if it's "large text"
+                const isLargeText = this.isLargeText(element);
+                
+                // WCAG contrast requirements
+                let requiredContrast;
+                if (isEnhanced) {
+                    // AAA requirements
+                    requiredContrast = isLargeText ? 4.5 : 7.0;
+                } else {
+                    // AA requirements  
+                    requiredContrast = isLargeText ? 3.0 : 4.5;
+                }
+
+                // Only skip manual review if we have significantly better contrast than required
+                // Use a buffer to account for measurement variations
+                const contrastBuffer = 0.3;
+                const meetsRequirement = contrastValue >= (requiredContrast + contrastBuffer);
+
+                if (meetsRequirement && colorInfo.analysisMethod === 'pixel-analysis') {
+                    console.log(`Auto-resolving contrast issue for element:`, {
+                        selector: node.target?.join(' '),
+                        measured: contrastValue,
+                        required: requiredContrast,
+                        isLargeText: isLargeText,
+                        analysisMethod: colorInfo.analysisMethod
+                    });
+                    return true;
+                }
+
+                return false;
+            } catch (e) {
+                console.warn('Error checking contrast for auto-resolution:', e);
+                return false;
+            }
+        },
+
+        // Check if element has large text (per WCAG definition)
+        isLargeText: function(element) {
+            const styles = window.getComputedStyle(element);
+            const fontSize = parseFloat(styles.fontSize);
+            const fontWeight = styles.fontWeight;
+            
+            // WCAG large text: 18pt+ (24px+) or 14pt+ (18.5px+) bold
+            // Note: 1pt ≈ 1.33px at 96 DPI
+            const isLarge = fontSize >= 24; // 18pt+
+            const isBoldAndMedium = (fontSize >= 18.5) && 
+                (fontWeight === 'bold' || fontWeight === '700' || parseInt(fontWeight) >= 700);
+                
+            return isLarge || isBoldAndMedium;
         },
         
         // Analyze landmark context

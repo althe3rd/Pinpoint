@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.5.1', // Current version
+            version: '1.5.2', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -60,51 +60,10 @@
                 <div id="uw-a11y-panel">
                     <div id="uw-a11y-header">
                         <div class="uw-a11y-title-container">
-                            <svg viewBox="0 0 404 404" fill="none" xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo">
-                                <g filter="url(#filter0_d_1_19)">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M201 349C288.261 349 359 278.261 359 191C359 103.739 288.261 33 201 33C113.739 33 43 103.739 43 191C43 278.261 113.739 349 201 349ZM201 373C301.516 373 383 291.516 383 191C383 90.4842 301.516 9 201 9C100.484 9 19 90.4842 19 191C19 291.516 100.484 373 201 373Z" fill="url(#paint0_linear_1_19)"/>
-                                </g>
-                                <g filter="url(#filter1_d_1_19)">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M200.5 302C262.08 302 312 252.08 312 190.5C312 128.92 262.08 79 200.5 79C138.92 79 89 128.92 89 190.5C89 252.08 138.92 302 200.5 302ZM200.5 326C275.335 326 336 265.335 336 190.5C336 115.665 275.335 55 200.5 55C125.665 55 65 115.665 65 190.5C65 265.335 125.665 326 200.5 326Z" fill="url(#paint1_linear_1_19)"/>
-                                </g>
-                                <defs>
-                                <filter id="filter0_d_1_19" x="0.4" y="0.4" width="403.2" height="403.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-                                <feOffset dx="1" dy="11"/>
-                                <feGaussianBlur stdDeviation="9.8"/>
-                                <feComposite in2="hardAlpha" operator="out"/>
-                                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
-                                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
-                                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
-                                </filter>
-                                <filter id="filter1_d_1_19" x="46.4" y="46.4" width="310.2" height="310.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-                                <feOffset dx="1" dy="11"/>
-                                <feGaussianBlur stdDeviation="9.8"/>
-                                <feComposite in2="hardAlpha" operator="out"/>
-                                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
-                                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
-                                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
-                                </filter>
-                                <linearGradient id="paint0_linear_1_19" x1="78.7712" y1="51.9816" x2="324.572" y2="313.9" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#35CD9C"/>
-                                <stop offset="0.465" stop-color="#43FFFC"/>
-                                <stop offset="0.545" stop-color="#C2F6F9"/>
-                                <stop offset="1" stop-color="#33BFF1"/>
-                                </linearGradient>
-                                <linearGradient id="paint1_linear_1_19" x1="109.5" y1="87" x2="292.5" y2="282" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#35CD9C"/>
-                                <stop offset="0.465" stop-color="#43FFFC"/>
-                                <stop offset="0.545" stop-color="#C2F6F9"/>
-                                <stop offset="1" stop-color="#33BFF1"/>
-                                </linearGradient>
-                                </defs>
-                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo" viewBox="0 0 404 404" fill="none"><g filter="url(#a)"><path fill="url(#b)" fill-rule="evenodd" d="M201 349c87.261 0 158-70.739 158-158S288.261 33 201 33 43 103.739 43 191s70.739 158 158 158Zm0 24c100.516 0 182-81.484 182-182S301.516 9 201 9 19 90.484 19 191s81.484 182 182 182Z" clip-rule="evenodd"/></g><g filter="url(#c)"><path fill="url(#d)" fill-rule="evenodd" d="M200.5 302c61.58 0 111.5-49.92 111.5-111.5S262.08 79 200.5 79 89 128.92 89 190.5 138.92 302 200.5 302Zm0 24c74.835 0 135.5-60.665 135.5-135.5C336 115.665 275.335 55 200.5 55 125.665 55 65 115.665 65 190.5 65 265.335 125.665 326 200.5 326Z" clip-rule="evenodd"/></g><defs><linearGradient id="b" x1="78.771" x2="324.572" y1="51.982" y2="313.9" gradientUnits="userSpaceOnUse"><stop stop-color="#7435CD"/><stop offset="1" stop-color="#33BFF1"/></linearGradient><linearGradient id="d" x1="109.5" x2="292.5" y1="87" y2="282" gradientUnits="userSpaceOnUse"><stop stop-color="#9A35CD"/><stop offset="1" stop-color="#33D1F1"/></linearGradient><filter id="a" width="403.2" height="403.2" x=".4" y=".4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.401609 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter><filter id="c" width="310.2" height="310.2" x="46.4" y="46.4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.670614 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter></defs></svg>
                             <h2 id="uw-a11y-title">Pinpoint Accessibility Checker</h2>
                         </div>
-                        <button id="uw-a11y-close">✕</button>
+                        <button id="uw-a11y-close">✕</button> 
                     </div>
                     <div id="uw-a11y-content">
                         <div style="text-align: center; padding: 2rem;">
@@ -1342,8 +1301,205 @@
             return 1;
         },
 
-        // Sample colors from element using a lightweight approach
+        // Sample colors from element using appropriate method based on complexity
         sampleElementColors: function(element, rect) {
+            try {
+                // Check if element has background image - use canvas sampling
+                const styles = window.getComputedStyle(element);
+                const hasBackgroundImage = this.hasBackgroundImage(element);
+                
+                if (hasBackgroundImage) {
+                    return this.canvasBasedColorSampling(element, rect);
+                }
+                
+                // For non-image backgrounds, use lightweight DOM sampling
+                return this.domBasedColorSampling(element);
+            } catch (e) {
+                console.warn('Error sampling element colors:', e);
+                return null;
+            }
+        },
+
+        // Check if element or ancestors have background images
+        hasBackgroundImage: function(element) {
+            let current = element;
+            let depth = 0;
+            
+            while (current && depth < 3) { // Check element and 2 levels up
+                const styles = window.getComputedStyle(current);
+                const bgImage = styles.backgroundImage;
+                
+                if (bgImage && bgImage !== 'none' && !bgImage.includes('gradient')) {
+                    return true;
+                }
+                
+                current = current.parentElement;
+                depth++;
+            }
+            return false;
+        },
+
+        // Canvas-based color sampling for complex backgrounds like images
+        canvasBasedColorSampling: function(element, rect) {
+            try {
+                // Create canvas for rendering
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Set reasonable canvas size (limit for performance)
+                const maxDimension = 100;
+                const scale = Math.min(maxDimension / rect.width, maxDimension / rect.height, 1);
+                canvas.width = Math.max(Math.ceil(rect.width * scale), 20);
+                canvas.height = Math.max(Math.ceil(rect.height * scale), 20);
+                
+                // Try to render element area using html2canvas-like approach
+                const elementColors = this.renderElementToCanvas(ctx, element, rect, scale);
+                
+                if (elementColors) {
+                    return {
+                        foreground: elementColors.foreground,
+                        background: elementColors.background,
+                        method: 'canvas-pixel-sampling'
+                    };
+                }
+                
+                // Fallback to DOM sampling if canvas fails
+                return this.domBasedColorSampling(element);
+                
+            } catch (e) {
+                console.warn('Canvas sampling failed, falling back to DOM sampling:', e);
+                return this.domBasedColorSampling(element);
+            }
+        },
+
+        // Render element to canvas and sample colors
+        renderElementToCanvas: function(ctx, element, rect, scale) {
+            try {
+                const canvas = ctx.canvas;
+                
+                // Fill with background
+                this.renderBackground(ctx, element, canvas.width, canvas.height);
+                
+                // Sample background pixels (before text)
+                const bgSamples = this.sampleCanvasPixels(ctx, canvas.width, canvas.height, 'background');
+                
+                // Render text content
+                this.renderTextContent(ctx, element, scale);
+                
+                // Sample foreground pixels (text areas)
+                const fgSamples = this.sampleCanvasPixels(ctx, canvas.width, canvas.height, 'foreground');
+                
+                if (bgSamples && fgSamples) {
+                    return {
+                        background: bgSamples,
+                        foreground: fgSamples
+                    };
+                }
+                
+                return null;
+            } catch (e) {
+                console.warn('Error rendering element to canvas:', e);
+                return null;
+            }
+        },
+
+        // Render background (including images) to canvas
+        renderBackground: function(ctx, element, width, height) {
+            const styles = window.getComputedStyle(element);
+            
+            // Fill with background color first
+            if (styles.backgroundColor !== 'transparent' && styles.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+                ctx.fillStyle = styles.backgroundColor;
+                ctx.fillRect(0, 0, width, height);
+            }
+            
+            // Handle background images
+            const bgImage = styles.backgroundImage;
+            if (bgImage && bgImage !== 'none' && !bgImage.includes('gradient')) {
+                // Extract image URL
+                const urlMatch = bgImage.match(/url\(["']?([^"')]+)["']?\)/);
+                if (urlMatch) {
+                    const imageUrl = urlMatch[1];
+                    // For now, estimate background color from image (simplified approach)
+                    // In a full implementation, we'd load and draw the actual image
+                    ctx.fillStyle = this.estimateImageAverageColor(imageUrl);
+                    ctx.fillRect(0, 0, width, height);
+                }
+            }
+        },
+
+        // Render text content to canvas
+        renderTextContent: function(ctx, element, scale) {
+            const styles = window.getComputedStyle(element);
+            const text = element.textContent?.trim();
+            
+            if (text) {
+                ctx.fillStyle = styles.color;
+                ctx.font = `${parseInt(styles.fontSize) * scale}px ${styles.fontFamily}`;
+                ctx.textBaseline = 'top';
+                
+                // Simple text rendering
+                const maxWidth = ctx.canvas.width - 4;
+                ctx.fillText(text.substring(0, 20), 2, 2, maxWidth);
+            }
+        },
+
+        // Sample pixels from canvas
+        sampleCanvasPixels: function(ctx, width, height, type) {
+            try {
+                const imageData = ctx.getImageData(0, 0, width, height);
+                const data = imageData.data;
+                
+                const samples = [];
+                const sampleCount = Math.min(20, width * height / 4); // Sample up to 20 pixels
+                
+                for (let i = 0; i < sampleCount; i++) {
+                    // Sample from different areas
+                    const x = Math.floor((i % 5) * width / 5) + Math.floor(width / 10);
+                    const y = Math.floor(Math.floor(i / 5) * height / 4) + Math.floor(height / 8);
+                    const index = (y * width + x) * 4;
+                    
+                    if (index < data.length - 3) {
+                        samples.push({
+                            r: data[index],
+                            g: data[index + 1], 
+                            b: data[index + 2],
+                            a: data[index + 3] / 255
+                        });
+                    }
+                }
+                
+                if (samples.length === 0) return null;
+                
+                // Return average color
+                const avg = this.averageColor(samples);
+                return `rgba(${avg.r}, ${avg.g}, ${avg.b}, ${avg.a})`;
+                
+            } catch (e) {
+                console.warn('Error sampling canvas pixels:', e);
+                return null;
+            }
+        },
+
+        // Estimate average color from image URL (simplified)
+        estimateImageAverageColor: function(imageUrl) {
+            // Simple heuristic based on common image types and naming
+            const url = imageUrl.toLowerCase();
+            
+            if (url.includes('dark') || url.includes('black')) {
+                return 'rgb(40, 40, 40)';
+            } else if (url.includes('light') || url.includes('white')) {
+                return 'rgb(240, 240, 240)';
+            } else if (url.includes('hero') || url.includes('banner')) {
+                return 'rgb(100, 100, 120)'; // Assume darker hero images
+            }
+            
+            // Default to neutral gray
+            return 'rgb(128, 128, 128)';
+        },
+
+        // DOM-based color sampling for simple backgrounds
+        domBasedColorSampling: function(element) {
             try {
                 // Create temporary elements to help with color sampling
                 const tempTextSpan = document.createElement('span');
@@ -1395,7 +1551,7 @@
                 
                 return result;
             } catch (e) {
-                console.warn('Error sampling element colors:', e);
+                console.warn('Error in DOM sampling:', e);
                 return null;
             }
         },
@@ -1738,48 +1894,7 @@
                     </div>
                     <div id="uw-a11y-header">
                         <div class="uw-a11y-title-container">
-                            <svg viewBox="0 0 404 404" fill="none" xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo">
-                                <g filter="url(#filter0_d_1_19)">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M201 349C288.261 349 359 278.261 359 191C359 103.739 288.261 33 201 33C113.739 33 43 103.739 43 191C43 278.261 113.739 349 201 349ZM201 373C301.516 373 383 291.516 383 191C383 90.4842 301.516 9 201 9C100.484 9 19 90.4842 19 191C19 291.516 100.484 373 201 373Z" fill="url(#paint0_linear_1_19)"/>
-                                </g>
-                                <g filter="url(#filter1_d_1_19)">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M200.5 302C262.08 302 312 252.08 312 190.5C312 128.92 262.08 79 200.5 79C138.92 79 89 128.92 89 190.5C89 252.08 138.92 302 200.5 302ZM200.5 326C275.335 326 336 265.335 336 190.5C336 115.665 275.335 55 200.5 55C125.665 55 65 115.665 65 190.5C65 265.335 125.665 326 200.5 326Z" fill="url(#paint1_linear_1_19)"/>
-                                </g>
-                                <defs>
-                                <filter id="filter0_d_1_19" x="0.4" y="0.4" width="403.2" height="403.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-                                <feOffset dx="1" dy="11"/>
-                                <feGaussianBlur stdDeviation="9.8"/>
-                                <feComposite in2="hardAlpha" operator="out"/>
-                                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
-                                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
-                                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
-                                </filter>
-                                <filter id="filter1_d_1_19" x="46.4" y="46.4" width="310.2" height="310.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-                                <feOffset dx="1" dy="11"/>
-                                <feGaussianBlur stdDeviation="9.8"/>
-                                <feComposite in2="hardAlpha" operator="out"/>
-                                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
-                                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
-                                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
-                                </filter>
-                                <linearGradient id="paint0_linear_1_19" x1="78.7712" y1="51.9816" x2="324.572" y2="313.9" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#35CD9C"/>
-                                <stop offset="0.465" stop-color="#43FFFC"/>
-                                <stop offset="0.545" stop-color="#C2F6F9"/>
-                                <stop offset="1" stop-color="#33BFF1"/>
-                                </linearGradient>
-                                <linearGradient id="paint1_linear_1_19" x1="109.5" y1="87" x2="292.5" y2="282" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#35CD9C"/>
-                                <stop offset="0.465" stop-color="#43FFFC"/>
-                                <stop offset="0.545" stop-color="#C2F6F9"/>
-                                <stop offset="1" stop-color="#33BFF1"/>
-                                </linearGradient>
-                                </defs>
-                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo" viewBox="0 0 404 404" fill="none"><g filter="url(#a)"><path fill="url(#b)" fill-rule="evenodd" d="M201 349c87.261 0 158-70.739 158-158S288.261 33 201 33 43 103.739 43 191s70.739 158 158 158Zm0 24c100.516 0 182-81.484 182-182S301.516 9 201 9 19 90.484 19 191s81.484 182 182 182Z" clip-rule="evenodd"/></g><g filter="url(#c)"><path fill="url(#d)" fill-rule="evenodd" d="M200.5 302c61.58 0 111.5-49.92 111.5-111.5S262.08 79 200.5 79 89 128.92 89 190.5 138.92 302 200.5 302Zm0 24c74.835 0 135.5-60.665 135.5-135.5C336 115.665 275.335 55 200.5 55 125.665 55 65 115.665 65 190.5 65 265.335 125.665 326 200.5 326Z" clip-rule="evenodd"/></g><defs><linearGradient id="b" x1="78.771" x2="324.572" y1="51.982" y2="313.9" gradientUnits="userSpaceOnUse"><stop stop-color="#7435CD"/><stop offset="1" stop-color="#33BFF1"/></linearGradient><linearGradient id="d" x1="109.5" x2="292.5" y1="87" y2="282" gradientUnits="userSpaceOnUse"><stop stop-color="#9A35CD"/><stop offset="1" stop-color="#33D1F1"/></linearGradient><filter id="a" width="403.2" height="403.2" x=".4" y=".4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.401609 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter><filter id="c" width="310.2" height="310.2" x="46.4" y="46.4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.670614 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter></defs></svg>
                             <h2 id="uw-a11y-title">Pinpoint Accessibility Checker</h2>
                         </div>
                         <div class="uw-a11y-header-buttons">

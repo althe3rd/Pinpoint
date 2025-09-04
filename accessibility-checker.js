@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.5.2', // Current version
+            version: '1.5.3', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -48,6 +48,20 @@
                         border: 2px solid red !important;
                         box-shadow: 0 0 0 2px yellow !important;
                     }
+                    /* Temporarily reveal hidden ancestors during highlight */
+                    [data-uw-a11y-reveal] {
+                        display: block !important;
+                        visibility: visible !important;
+                        opacity: 1 !important;
+                        height: auto !important;
+                        max-height: none !important;
+                        clip: auto !important;
+                        clip-path: none !important;
+                        transform: none !important;
+                        pointer-events: auto !important;
+                        overflow: visible !important;
+                    }
+                    [hidden][data-uw-a11y-reveal] { display: block !important; }
                 `;
                 document.head.appendChild(globalStyle);
             }
@@ -706,6 +720,72 @@
             } catch (_) {
                 return '';
             }
+        },
+
+        // Ensure an element and its hidden ancestors are temporarily visible
+        ensureElementVisible: function(el) {
+            const changed = [];
+            try {
+                const chain = [];
+                let n = el;
+                while (n && n.nodeType === 1 && n !== document.body) {
+                    chain.push(n);
+                    n = n.parentElement;
+                }
+
+                chain.forEach(node => {
+                    if (!(node instanceof Element)) return;
+
+                    // Expand <details> blocks
+                    if (node.tagName === 'DETAILS' && !node.hasAttribute('open')) {
+                        node.setAttribute('open', '');
+                        node.setAttribute('data-uw-a11y-details-opened', '');
+                        changed.push({ node, type: 'details' });
+                    }
+
+                    const cs = getComputedStyle(node);
+                    const isHiddenCss = cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity || '1') === 0;
+                    const hasHiddenAttr = node.hasAttribute('hidden');
+                    const ariaHiddenTrue = node.getAttribute('aria-hidden') === 'true';
+
+                    if (isHiddenCss) {
+                        node.setAttribute('data-uw-a11y-reveal', '');
+                        changed.push({ node, type: 'reveal' });
+                    }
+                    if (hasHiddenAttr) {
+                        node.removeAttribute('hidden');
+                        node.setAttribute('data-uw-a11y-removed-hidden', '');
+                        changed.push({ node, type: 'hidden-attr' });
+                    }
+                    if (ariaHiddenTrue) {
+                        node.setAttribute('aria-hidden', 'false');
+                        node.setAttribute('data-uw-a11y-aria-hidden-prev', 'true');
+                        changed.push({ node, type: 'aria-hidden' });
+                    }
+                });
+            } catch (_) { /* ignore */ }
+
+            // Return cleanup function
+            return function cleanup() {
+                try {
+                    changed.forEach(({ node, type }) => {
+                        if (!node) return;
+                        if (type === 'reveal') node.removeAttribute('data-uw-a11y-reveal');
+                        if (type === 'hidden-attr' && node.hasAttribute('data-uw-a11y-removed-hidden')) {
+                            node.setAttribute('hidden', '');
+                            node.removeAttribute('data-uw-a11y-removed-hidden');
+                        }
+                        if (type === 'aria-hidden' && node.getAttribute('data-uw-a11y-aria-hidden-prev') === 'true') {
+                            node.setAttribute('aria-hidden', 'true');
+                            node.removeAttribute('data-uw-a11y-aria-hidden-prev');
+                        }
+                        if (type === 'details' && node.hasAttribute('data-uw-a11y-details-opened')) {
+                            node.removeAttribute('open');
+                            node.removeAttribute('data-uw-a11y-details-opened');
+                        }
+                    });
+                } catch (_) { /* ignore */ }
+            };
         },
         
         // Validate and escape URLs
@@ -2561,21 +2641,21 @@
                 }
                 
                 #uw-a11y-panel .uw-a11y-issue.error:hover {
-                    background: #f5c2c7;
+                    background: #f7eaebff;
                     box-shadow: 0 4px 20px 0 rgba(211, 23, 41, 0.35);
-                    border-color: rgba(220, 53, 69, 0.3);
+                    border-color: rgba(182, 25, 41, 0.96);
                 }
                 
                 #uw-a11y-panel .uw-a11y-issue.warning:hover {
-                    background: #F6EBC7;
+                    background: #faf6e9ff;
                     box-shadow: 0 4px 20px 0 rgba(211, 133, 23, 0.35);
-                    border-color: rgba(255, 193, 7, 0.4);
+                    border-color: rgba(255, 193, 7, 0.87);
                 }
                 
                 #uw-a11y-panel .uw-a11y-issue.info:hover {
-                    background: #b8daff;
+                    background: #f5f9feff;
                     box-shadow: 0 4px 20px 0 rgba(23, 104, 211, 0.35);
-                    border-color: rgba(23, 162, 184, 0.3);
+                    border-color: rgba(23, 162, 184, 0.93);
                     cursor: default;
                 }
                 
@@ -2589,19 +2669,19 @@
                 
                 #uw-a11y-panel .uw-a11y-issue.error:focus {
                     outline-color: #dc3545;
-                    background: #f5c2c7;
-                    box-shadow: 0 4px 20px 0 rgba(211, 23, 41, 0.35);
+                    background: #fbe6e8ff;
+                    box-shadow: 0 4px 20px 0 rgba(211, 23, 42, 0.38);
                 }
                 
                 #uw-a11y-panel .uw-a11y-issue.warning:focus {
                     outline-color: #ffc107;
-                    background: #F6EBC7;
+                    background: #fbf5e1ff;
                     box-shadow: 0 4px 20px 0 rgba(211, 133, 23, 0.35);
                 }
                 
                 #uw-a11y-panel .uw-a11y-issue.info:focus {
                     outline-color: #17a2b8;
-                    background: #b8daff;
+                    background: #dcedffff;
                     box-shadow: 0 4px 20px 0 rgba(23, 104, 211, 0.35);
                 }
                 
@@ -2623,17 +2703,17 @@
                 }
                #uw-a11y-panel .uw-a11y-issue.error {
                     border-left-color: #dc3545;
-                    background: #f8d7da;
+                    background: #f9ebecff;
                     box-shadow: 0 2px 10px 0 rgba(211, 23, 41, 0.22);
                 }
                 #uw-a11y-panel .uw-a11y-issue.warning {
                     border-left-color: #ffc107;
-                    background: #fff3cd;
+                    background: #fffbecff;
                     box-shadow: 0 2px 10px 0 rgba(211, 133, 23, 0.22);
                 }
                 #uw-a11y-panel .uw-a11y-issue.info {
                     border-left-color: #17a2b8;
-                    background: #d1ecf1;
+                    background: #e5f4f7ff;
                     box-shadow: 0 2px 10px 0 rgba(23, 104, 211, 0.22);
                 }
                 #uw-a11y-panel .uw-a11y-issue h4 {
@@ -4395,6 +4475,8 @@
             }
             
             if (el && el instanceof Element) {
+                // Reveal hidden ancestors temporarily
+                const cleanupReveal = this.ensureElementVisible(el);
                 // Add highlight and focus
                 el.classList.add('uw-a11y-highlight');
                 const needsTempTabIndex = !el.matches('a, button, input, textarea, select, [tabindex], [contenteditable="true"]');
@@ -4413,6 +4495,8 @@
                         el.removeAttribute('tabindex');
                         el.removeAttribute('data-uw-a11y-temp-tabindex');
                     }
+                    // Re-hide previously hidden ancestors
+                    try { if (typeof cleanupReveal === 'function') cleanupReveal(); } catch (_) { /* ignore */ }
                 }, 3000);
             }
         },

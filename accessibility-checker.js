@@ -670,6 +670,44 @@
                 .replace(/\t/g, "\\t");
         },
         
+        // Compute a reasonably specific CSS selector for an element
+        computeElementSelector: function(el) {
+            try {
+                if (!el || !(el instanceof Element)) return '';
+                if (el.id) {
+                    // Prefer ID when unique
+                    const sel = `#${CSS.escape(el.id)}`;
+                    if (document.querySelector(sel) === el) return sel;
+                }
+                const parts = [];
+                let node = el;
+                let depth = 0;
+                while (node && node.nodeType === 1 && depth < 6 && node !== document.documentElement) {
+                    const tag = node.tagName.toLowerCase();
+                    let segment = tag;
+                    // If reasonable class present, include one class
+                    if (node.classList && node.classList.length) {
+                        const cls = Array.from(node.classList).find(c => c && c.length <= 32 && !c.startsWith('uw-a11y-'));
+                        if (cls) segment += `.${CSS.escape(cls)}`;
+                    }
+                    // nth-of-type for specificity among siblings
+                    const siblings = Array.from(node.parentNode ? node.parentNode.children : []);
+                    const sameTag = siblings.filter(s => s.tagName === node.tagName);
+                    if (sameTag.length > 1) {
+                        const index = sameTag.indexOf(node) + 1;
+                        segment += `:nth-of-type(${index})`;
+                    }
+                    parts.unshift(segment);
+                    node = node.parentElement;
+                    depth++;
+                }
+                const sel = parts.join(' > ');
+                return sel;
+            } catch (_) {
+                return '';
+            }
+        },
+        
         // Validate and escape URLs
         escapeUrl: function(url) {
             if (!url) return '';
@@ -1750,83 +1788,137 @@
             }
         },
         
-        // Calculate accessibility score (considering manually verified items)
+        // Calculate accessibility score with per-rule caps (Lighthouse-like)
+        // - Count each failed rule once (ignore instance count)
+        // - Weight by impact; manual items deduct half if not verified
+        // - Clamp any single rule’s impact so one type can’t dominate
         calculateAccessibilityScore: function(results) {
-            // Weight different types of issues
-            const weights = {
-                critical: 10,
-                serious: 7,
-                moderate: 3,
-                minor: 1
+            if (!results) {
+                return { score: 100, deductions: 0, maxPossible: 100, verifiedCount: 0, totalManualReview: 0 };
+            }
+
+            // Per-rule weights (approximate Lighthouse feel)
+            const ruleWeights = {
+                critical: 25,
+                serious: 15,
+                moderate: 8,
+                minor: 3
             };
-            
-            let totalDeductions = 0;
-            let totalPossible = results.passes.length + results.violations.length + results.incomplete.length;
-            
-            // Calculate deductions for violations (errors)
-            results.violations.forEach(violation => {
-                const weight = weights[violation.impact] || weights.moderate;
-                totalDeductions += violation.nodes.length * weight;
+
+            // Per-category caps to avoid a single area dominating deductions
+            // Keys use axe tag format (e.g., 'cat.color').
+            const categoryCaps = {
+                'cat.color': 5,
+                'cat.keyboard': 15,
+                'cat.name-role-value': 10,
+                'cat.aria': 10,
+                'cat.forms': 5,
+                'cat.text-alternatives': 5,
+                'cat.tables': 5,
+                'cat.language': 5,
+                'cat.structure': 5,
+                'cat.audio-video': 5,
+                // Non-axe-cat buckets
+                'best-practice': 10,
+                'other': 10
+            };
+
+            // Impact priority helper (to pick the highest when mixed)
+            const impactRank = { critical: 4, serious: 3, moderate: 2, minor: 1 };
+            const maxImpact = (a, b) => {
+                const ia = impactRank[a] || 0;
+                const ib = impactRank[b] || 0;
+                return ia >= ib ? a : b;
+            };
+
+            // Helper to pick a category from axe tags
+            const getCategory = (tags) => {
+                const t = Array.isArray(tags) ? tags : [];
+                const cat = t.find(x => typeof x === 'string' && x.startsWith('cat.'));
+                if (cat) return cat;
+                if (t.includes('best-practice')) return 'best-practice';
+                return 'other';
+            };
+
+            // 1) Violations: count per unique ruleId, weighted by highest impact observed, track category
+            const violationMetaByRule = new Map(); // ruleId -> { impact, category }
+            (results.violations || []).forEach(v => {
+                const impact = (v.impact || 'moderate');
+                const category = getCategory(v.tags);
+                const prev = violationMetaByRule.get(v.id);
+                if (prev) {
+                    violationMetaByRule.set(v.id, { impact: maxImpact(prev.impact, impact), category: prev.category || category });
+                } else {
+                    violationMetaByRule.set(v.id, { impact, category });
+                }
             });
-            
-            // Calculate deductions for incomplete items (manual review) using the
-            // rendered issues list so unique IDs stay stable with verification.
-            let incompleteDeductions = 0;
+
+            // Accumulate deductions per category
+            const categoryDeductions = new Map();
+            const addToCategory = (category, amount) => {
+                const key = category || 'other';
+                categoryDeductions.set(key, (categoryDeductions.get(key) || 0) + amount);
+            };
+
+            violationMetaByRule.forEach(({ impact, category }) => {
+                const amount = (ruleWeights[impact] || ruleWeights.moderate);
+                addToCategory(category, amount);
+            });
+
+            // 2) Manual review: per rule, deduct half weight only if any instance unverified
+            // Keep counts for UI messaging
             let verifiedCount = 0;
-            // Only count manual-review type warnings that have a trackable uniqueId
             const manualIssues = (this.issues || []).filter(i => i.type === 'warning' && i.uniqueId);
             const totalManualReview = manualIssues.length;
+
+            const manualByRule = new Map(); // ruleId -> { impact, unresolved, total, category }
             manualIssues.forEach(issue => {
-                const ruleVerified = this.isRuleVerified(issue.ruleId);
+                const ruleId = issue.ruleId;
+                const impact = (issue.impact || 'moderate');
+                const category = getCategory(issue.tags);
+                const entry = manualByRule.get(ruleId) || { impact: impact, unresolved: 0, total: 0, category };
+                entry.impact = maxImpact(entry.impact, impact);
+                entry.total += 1;
+                entry.category = entry.category || category;
+
+                const ruleVerified = this.isRuleVerified(ruleId);
                 const individuallyVerified = this.checkedItems && this.checkedItems.has(issue.uniqueId);
                 if (individuallyVerified || ruleVerified) {
                     verifiedCount++;
                 } else {
-                    const weight = (weights[issue.impact] || weights.moderate) * 0.5;
-                    incompleteDeductions += weight;
+                    entry.unresolved += 1;
+                }
+                manualByRule.set(ruleId, entry);
+            });
+
+            manualByRule.forEach(({ impact, unresolved, category }) => {
+                if (unresolved > 0) {
+                    const amount = Math.round(((ruleWeights[impact] || ruleWeights.moderate) * 0.5));
+                    addToCategory(category, amount);
                 }
             });
-            
-            totalDeductions += incompleteDeductions;
-            
-            // Calculate score (0-100)
-            if (totalPossible === 0) return {
-                score: 100,
-                deductions: 0,
-                maxPossible: 0,
-                verifiedCount: 0,
-                totalManualReview: 0
-            };
-            
-            // If there are no deductions (all violations fixed and all manual items verified), give perfect score
-            if (totalDeductions === 0) {
-                return {
-                    score: 100,
-                    deductions: 0,
-                    maxPossible: totalPossible * weights.critical,
-                    verifiedCount: verifiedCount,
-                    totalManualReview: totalManualReview,
-                    details: {
-                        violations: results.violations.length,
-                        incomplete: results.incomplete.length,
-                        passes: results.passes.length
-                    }
-                };
-            }
-            
-            const maxPossibleDeductions = totalPossible * weights.critical;
-            const score = Math.max(0, Math.round(100 - (totalDeductions / maxPossibleDeductions) * 100));
-            
+
+            // 3) Apply per-category caps
+            let totalDeductions = 0;
+            categoryDeductions.forEach((amount, cat) => {
+                const cap = categoryCaps[cat] != null ? categoryCaps[cat] : categoryCaps.other;
+                totalDeductions += Math.min(amount, cap);
+            });
+
+            // 4) Compute final score from a 100-point budget
+            const rawScore = 100 - totalDeductions;
+            const score = Math.max(0, Math.min(100, Math.round(rawScore)));
+
             return {
                 score: score,
                 deductions: totalDeductions,
-                maxPossible: maxPossibleDeductions,
+                maxPossible: 100,
                 verifiedCount: verifiedCount,
                 totalManualReview: totalManualReview,
                 details: {
-                    violations: results.violations.length,
-                    incomplete: results.incomplete.length,
-                    passes: results.passes.length
+                    uniqueFailedRules: violationMetaByRule.size,
+                    incomplete: (results.incomplete || []).length,
+                    passes: (results.passes || []).length
                 }
             };
         },
@@ -3808,12 +3900,21 @@
         
         addIssue: function(type, title, description, element, recommendation, helpUrl, impact, tags, detailedInfo, ruleId) {
             const issueId = this.issues.length; // Use array index as unique ID
+            // Attempt to compute a selector for resilience if the DOM re-renders
+            let selector = '';
+            if (element && element instanceof Element) {
+                selector = this.computeElementSelector(element);
+            } else if (Array.isArray(detailedInfo)) {
+                const selEntry = detailedInfo.find(d => d && d.type === 'selector' && typeof d.value === 'string');
+                if (selEntry) selector = selEntry.value;
+            }
             this.issues.push({
                 id: issueId,
                 type: type,
                 title: title,
                 description: description,
                 element: element,
+                selector: selector || '',
                 recommendation: recommendation,
                 helpUrl: helpUrl,
                 impact: impact,
@@ -4279,14 +4380,38 @@
             const currentIndex = this.currentInstances[ruleId] || 0;
             const currentIssue = issueGroup[currentIndex];
             
-            if (currentIssue.element) {
-                currentIssue.element.classList.add('uw-a11y-highlight');
-                currentIssue.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Resolve element if our reference is stale
+            let el = currentIssue.element;
+            if (!el || !(el instanceof Element) || !el.isConnected) {
+                if (currentIssue.selector) {
+                    try {
+                        const found = document.querySelector(currentIssue.selector);
+                        if (found) {
+                            el = found;
+                            currentIssue.element = found; // update cache
+                        }
+                    } catch (_) { /* ignore */ }
+                }
+            }
+            
+            if (el && el instanceof Element) {
+                // Add highlight and focus
+                el.classList.add('uw-a11y-highlight');
+                const needsTempTabIndex = !el.matches('a, button, input, textarea, select, [tabindex], [contenteditable="true"]');
+                if (needsTempTabIndex) {
+                    el.setAttribute('tabindex', '-1');
+                    el.setAttribute('data-uw-a11y-temp-tabindex', '');
+                }
+                try { el.focus({ preventScroll: true }); } catch (_) { /* ignore */ }
+                // Scroll into center for visibility
+                try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) { /* ignore */ }
                 
-                // Remove highlight after 3 seconds
+                // Cleanup highlight and temporary tabindex after a delay
                 setTimeout(() => {
-                    if (currentIssue.element) {
-                        currentIssue.element.classList.remove('uw-a11y-highlight');
+                    if (el && el.classList) el.classList.remove('uw-a11y-highlight');
+                    if (el && el.hasAttribute && el.hasAttribute('data-uw-a11y-temp-tabindex')) {
+                        el.removeAttribute('tabindex');
+                        el.removeAttribute('data-uw-a11y-temp-tabindex');
                     }
                 }, 3000);
             }

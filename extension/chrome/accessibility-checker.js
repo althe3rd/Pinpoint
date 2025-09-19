@@ -9,12 +9,16 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.4.8', // Current version
+            version: '1.5.4', // Current version
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
             isMinimized: false, // Track minimized state
             shadowRoot: null, // Shadow DOM root
+            heightPadding: 35, // Extra pixels added to content height to avoid tiny scrollbars
+            scoreAnimationPlayed: false, // Run score animation only once
+            // Visibility filters for list rendering
+            filters: { errors: true, warnings: true, info: true },
         
         // Initialize the checker
         init: function() {
@@ -44,6 +48,20 @@
                         border: 2px solid red !important;
                         box-shadow: 0 0 0 2px yellow !important;
                     }
+                    /* Temporarily reveal hidden ancestors during highlight */
+                    [data-uw-a11y-reveal] {
+                        display: block !important;
+                        visibility: visible !important;
+                        opacity: 1 !important;
+                        height: auto !important;
+                        max-height: none !important;
+                        clip: auto !important;
+                        clip-path: none !important;
+                        transform: none !important;
+                        pointer-events: auto !important;
+                        overflow: visible !important;
+                    }
+                    [hidden][data-uw-a11y-reveal] { display: block !important; }
                 `;
                 document.head.appendChild(globalStyle);
             }
@@ -56,51 +74,10 @@
                 <div id="uw-a11y-panel">
                     <div id="uw-a11y-header">
                         <div class="uw-a11y-title-container">
-                            <svg viewBox="0 0 404 404" fill="none" xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo">
-                                <g filter="url(#filter0_d_1_19)">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M201 349C288.261 349 359 278.261 359 191C359 103.739 288.261 33 201 33C113.739 33 43 103.739 43 191C43 278.261 113.739 349 201 349ZM201 373C301.516 373 383 291.516 383 191C383 90.4842 301.516 9 201 9C100.484 9 19 90.4842 19 191C19 291.516 100.484 373 201 373Z" fill="url(#paint0_linear_1_19)"/>
-                                </g>
-                                <g filter="url(#filter1_d_1_19)">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M200.5 302C262.08 302 312 252.08 312 190.5C312 128.92 262.08 79 200.5 79C138.92 79 89 128.92 89 190.5C89 252.08 138.92 302 200.5 302ZM200.5 326C275.335 326 336 265.335 336 190.5C336 115.665 275.335 55 200.5 55C125.665 55 65 115.665 65 190.5C65 265.335 125.665 326 200.5 326Z" fill="url(#paint1_linear_1_19)"/>
-                                </g>
-                                <defs>
-                                <filter id="filter0_d_1_19" x="0.4" y="0.4" width="403.2" height="403.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-                                <feOffset dx="1" dy="11"/>
-                                <feGaussianBlur stdDeviation="9.8"/>
-                                <feComposite in2="hardAlpha" operator="out"/>
-                                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
-                                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
-                                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
-                                </filter>
-                                <filter id="filter1_d_1_19" x="46.4" y="46.4" width="310.2" height="310.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-                                <feOffset dx="1" dy="11"/>
-                                <feGaussianBlur stdDeviation="9.8"/>
-                                <feComposite in2="hardAlpha" operator="out"/>
-                                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
-                                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
-                                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
-                                </filter>
-                                <linearGradient id="paint0_linear_1_19" x1="78.7712" y1="51.9816" x2="324.572" y2="313.9" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#35CD9C"/>
-                                <stop offset="0.465" stop-color="#43FFFC"/>
-                                <stop offset="0.545" stop-color="#C2F6F9"/>
-                                <stop offset="1" stop-color="#33BFF1"/>
-                                </linearGradient>
-                                <linearGradient id="paint1_linear_1_19" x1="109.5" y1="87" x2="292.5" y2="282" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#35CD9C"/>
-                                <stop offset="0.465" stop-color="#43FFFC"/>
-                                <stop offset="0.545" stop-color="#C2F6F9"/>
-                                <stop offset="1" stop-color="#33BFF1"/>
-                                </linearGradient>
-                                </defs>
-                            </svg>
-                            <h2>Pinpoint Accessibility Checker</h2>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo" viewBox="0 0 404 404" fill="none"><g filter="url(#a)"><path fill="url(#b)" fill-rule="evenodd" d="M201 349c87.261 0 158-70.739 158-158S288.261 33 201 33 43 103.739 43 191s70.739 158 158 158Zm0 24c100.516 0 182-81.484 182-182S301.516 9 201 9 19 90.484 19 191s81.484 182 182 182Z" clip-rule="evenodd"/></g><g filter="url(#c)"><path fill="url(#d)" fill-rule="evenodd" d="M200.5 302c61.58 0 111.5-49.92 111.5-111.5S262.08 79 200.5 79 89 128.92 89 190.5 138.92 302 200.5 302Zm0 24c74.835 0 135.5-60.665 135.5-135.5C336 115.665 275.335 55 200.5 55 125.665 55 65 115.665 65 190.5 65 265.335 125.665 326 200.5 326Z" clip-rule="evenodd"/></g><defs><linearGradient id="b" x1="78.771" x2="324.572" y1="51.982" y2="313.9" gradientUnits="userSpaceOnUse"><stop stop-color="#7435CD"/><stop offset="1" stop-color="#33BFF1"/></linearGradient><linearGradient id="d" x1="109.5" x2="292.5" y1="87" y2="282" gradientUnits="userSpaceOnUse"><stop stop-color="#9A35CD"/><stop offset="1" stop-color="#33D1F1"/></linearGradient><filter id="a" width="403.2" height="403.2" x=".4" y=".4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.401609 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter><filter id="c" width="310.2" height="310.2" x="46.4" y="46.4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.670614 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter></defs></svg>
+                            <h2 id="uw-a11y-title">Pinpoint Accessibility Checker</h2>
                         </div>
-                        <button id="uw-a11y-close">✕</button>
+                        <button id="uw-a11y-close">✕</button> 
                     </div>
                     <div id="uw-a11y-content">
                         <div style="text-align: center; padding: 2rem;">
@@ -145,37 +122,367 @@
                 return;
             }
             
-            // Configure axe for WCAG 2.1 AA
+            // Configure axe with selected WCAG spec/level (defaults to 2.1 AA)
+            const { wcagSpec, wcagLevel } = this.getSelectedWcag();
+            const tags = this.buildWcagTags(wcagSpec, wcagLevel);
+            const isAAA = (wcagLevel || '').toUpperCase() === 'AAA';
             const axeConfig = {
                 rules: {
                     // Disable the region rule which often creates false positives
                     // for "Ensures all page content is contained by landmarks"
                     'region': { enabled: false },
-                    // Disable AAA-level color contrast rule (7:1 ratio) - we only want AA level (4.5:1)
-                    'color-contrast-enhanced': { enabled: false }
+                    // Disable AAA color contrast unless user asks for AAA
+                    'color-contrast-enhanced': { enabled: isAAA }
                 },
-                tags: ['wcag2a', 'wcag2aa', 'wcag21aa'],
-                // Exclude the accessibility checker's own UI elements from analysis
-                exclude: [
-                    '#uw-a11y-container',    // Shadow DOM container
-                    '#uw-a11y-panel',        // Main panel container (inside shadow DOM)
-                    '.uw-a11y-highlight',    // Highlighted elements (temporary styling)
-                    '[id^="uw-a11y-"]',      // Any element with ID starting with uw-a11y-
-                    '[class*="uw-a11y-"]',   // Any element with class containing uw-a11y-
-                    '#wpadminbar',           // WordPress admin bar (frontend toolbar)
-                    '#uw-a11y-global-styles' // Global styles element
-                ]
+                runOnly: { type: 'tag', values: tags }
             };
             
-            // Run axe-core analysis (excluding our own UI elements)
-            window.axe.run(document, axeConfig, (err, results) => {
+            // Build context with excludes
+            const context = { exclude: this.getEffectiveExcludeSelectors() };
+
+            // Run axe-core analysis with context (excluding configured selectors)
+            window.axe.run(context, axeConfig, (err, results) => {
                 if (err) {
                     this.showError('Error running accessibility analysis: ' + err.message);
                     return;
                 }
                 
                 this.processAxeResults(results);
+                // Run additional best-practices checks if enabled
+                try {
+                    if (this.isBestPracticesEnabled()) {
+                        this.runBestPracticeChecks();
+                    }
+                } catch (e) {
+                    // Don't let best-practice scan break the main flow
+                    console.warn('Best-practices scan failed:', e);
+                }
                 this.displayResults();
+            });
+        },
+
+        // Additional best-practices checks beyond axe rules
+        runBestPracticeChecks: function() {
+            // Helper: compute an approximate accessible name for links/buttons
+            const getAccessibleName = (el) => {
+                if (!el) return '';
+                // aria-label has highest precedence
+                const ariaLabel = el.getAttribute && el.getAttribute('aria-label');
+                if (ariaLabel && ariaLabel.trim()) return ariaLabel.trim();
+
+                // aria-labelledby
+                const labelledby = el.getAttribute && el.getAttribute('aria-labelledby');
+                if (labelledby) {
+                    const ids = labelledby.split(/\s+/);
+                    const text = ids.map(id => {
+                        const ref = document.getElementById(id);
+                        return ref ? (ref.innerText || ref.textContent || '').trim() : '';
+                    }).join(' ').trim();
+                    if (text) return text;
+                }
+
+                // img alt inside link
+                const img = el.querySelector && el.querySelector('img[alt]');
+                if (img && img.getAttribute('alt') && img.getAttribute('alt').trim()) {
+                    return img.getAttribute('alt').trim();
+                }
+
+                // input value for input buttons/submit
+                if (el.tagName === 'INPUT') {
+                    const type = (el.getAttribute('type') || '').toLowerCase();
+                    const val = el.getAttribute('value');
+                    if (val && val.trim() && ['button','submit','reset'].includes(type)) {
+                        return val.trim();
+                    }
+                }
+
+                // Fallback: text content
+                const text = (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim();
+                return text;
+            };
+
+            // Helper: basic visibility filter to reduce noise
+            const isVisible = (el) => {
+                try {
+                    if (!el || !(el instanceof Element)) return false;
+                    if (el.hidden) return false;
+                    const style = window.getComputedStyle(el);
+                    if (!style || style.display === 'none' || style.visibility === 'hidden' || parseFloat(style.opacity) === 0) return false;
+                    // Exclude our own UI container
+                    if (el.closest && el.closest('#uw-a11y-container')) return false;
+                    // Respect user/essential excludes for best-practice checks too
+                    if (this.shouldExcludeElement && this.shouldExcludeElement(el)) return false;
+                    return true;
+                } catch (_) {
+                    return true;
+                }
+            };
+
+            // 1) Non-descriptive link text
+            const genericPhrases = [
+                'click here', 'here', 'learn more', 'read more', 'more', 'details',
+                'this', 'this link', 'continue', 'link', 'info'
+            ];
+            const anchors = Array.from(document.querySelectorAll('a[href]'));
+            anchors.forEach(a => {
+                if (!isVisible(a)) return;
+                const name = getAccessibleName(a).toLowerCase();
+                if (!name) return;
+                const isGeneric = genericPhrases.includes(name);
+                if (isGeneric) {
+                    this.addIssue(
+                        'info',
+                        'Best Practice: Use contextual link text',
+                        `The link text "${name}" is not descriptive out of context.`,
+                        a,
+                        'Use meaningful, specific link text that communicates the destination or action. For example, instead of <code>click here</code>, use <code>Download annual report (PDF)</code> or <code>Read more about financial aid</code>. You can also add context with <code>aria-label</code> when needed.',
+                        'https://www.w3.org/WAI/GL/UNDERSTANDING-WCAG20/navigation-mechanisms-meaningful-sequence.html',
+                        'minor',
+                        ['best-practice', 'links'],
+                        [
+                            { label: 'Detected Text', value: name },
+                            { label: 'Href', value: a.getAttribute('href') || '' }
+                        ],
+                        'bp-contextual-link-text'
+                    );
+                }
+            });
+
+            // 2) Multiple generic link texts that go to different destinations
+            const mapByText = new Map();
+            anchors.forEach(a => {
+                if (!isVisible(a)) return;
+                const name = getAccessibleName(a).toLowerCase();
+                if (!genericPhrases.includes(name)) return; // only for generic texts
+                const href = (a.getAttribute('href') || '').trim();
+                if (!mapByText.has(name)) mapByText.set(name, new Set());
+                mapByText.get(name).add(href);
+            });
+            mapByText.forEach((hrefs, text) => {
+                if (hrefs.size > 1) {
+                    // Flag once, reference examples
+                    const examples = anchors.filter(a => genericPhrases.includes(getAccessibleName(a).toLowerCase()))
+                        .slice(0, 3)
+                        .map(a => ({ text: getAccessibleName(a), href: a.getAttribute('href') || '' }));
+                    this.addIssue(
+                        'info',
+                        'Best Practice: Avoid repeated generic links',
+                        `Found multiple "${text}" links pointing to different destinations.`,
+                        null,
+                        'Provide unique, contextual link text for each destination. For example, replace repeated <code>Read more</code> with <code>Read more about scholarships</code>, <code>Read more about housing</code>, etc.',
+                        'https://www.w3.org/WAI/tutorials/page-structure/links/',
+                        'minor',
+                        ['best-practice', 'links'],
+                        [
+                            { label: 'Link Text', value: text },
+                            { label: 'Unique Destinations', value: Array.from(hrefs).join(', ') },
+                            { label: 'Examples (first 3)', value: examples.map(e => `${e.text} → ${e.href}`).join(' | ') }
+                        ],
+                        'bp-duplicate-generic-links'
+                    );
+                }
+            });
+
+            // 3) New tab/window behavior not communicated and missing rel security
+            anchors.forEach(a => {
+                if (!isVisible(a)) return;
+                const target = a.getAttribute('target');
+                if (target && target.toLowerCase() === '_blank') {
+                    const name = getAccessibleName(a);
+                    const nameLc = name.toLowerCase();
+                    const mentionsNewTab = nameLc.includes('opens in new tab') || nameLc.includes('opens in a new tab') || nameLc.includes('(new tab)');
+                    const rel = (a.getAttribute('rel') || '').toLowerCase();
+                    const hasNoopener = rel.includes('noopener');
+                    const hasNoreferrer = rel.includes('noreferrer');
+
+                    if (!mentionsNewTab || !hasNoopener || !hasNoreferrer) {
+                        const recommendations = [];
+                        if (!mentionsNewTab) recommendations.push('Inform users the link opens in a new tab/window (e.g., include visually hidden text like <code><span class="sr-only">(opens in new tab)</span></code> or add to <code>aria-label</code>).');
+                        if (!hasNoopener || !hasNoreferrer) recommendations.push('Add <code>rel="noopener noreferrer"</code> for security and privacy.');
+                        this.addIssue(
+                            'info',
+                            'Best Practice: Communicate new-tab behavior',
+                            'Link opens in a new tab/window but may not communicate this behavior or include recommended rel attributes.',
+                            a,
+                            recommendations.join(' '),
+                            'https://www.w3.org/TR/WCAG20-TECHS/G201.html',
+                            'minor',
+                            ['best-practice', 'links'],
+                            [
+                                { label: 'Text', value: name },
+                                { label: 'Href', value: a.getAttribute('href') || '' },
+                                { label: 'Has rel', value: rel || '(none)' }
+                            ],
+                            'bp-new-tab-communication'
+                        );
+                    }
+                }
+            });
+
+            // 4) Inputs using placeholder as the primary label (lack persistent label)
+            const formControls = Array.from(document.querySelectorAll('input, textarea, select'))
+                .filter(el => {
+                    const type = (el.getAttribute('type') || '').toLowerCase();
+                    if (type === 'hidden') return false;
+                    return true;
+                });
+            const hasAssociatedLabel = (el) => {
+                if (!el || !(el instanceof Element)) return false;
+                if (el.closest('label')) return true;
+                const id = el.getAttribute('id');
+                if (id && document.querySelector(`label[for="${CSS.escape(id)}"]`)) return true;
+                if (el.hasAttribute('aria-label') && el.getAttribute('aria-label').trim()) return true;
+                if (el.hasAttribute('aria-labelledby')) {
+                    const ids = el.getAttribute('aria-labelledby').split(/\s+/);
+                    const named = ids.map(i => document.getElementById(i)).filter(Boolean)
+                        .map(n => (n.innerText || n.textContent || '').trim()).join(' ').trim();
+                    if (named) return true;
+                }
+                return false;
+            };
+            formControls.forEach(el => {
+                if (!isVisible(el)) return;
+                const hasPlaceholder = el.hasAttribute('placeholder') && el.getAttribute('placeholder').trim();
+                if (hasPlaceholder && !hasAssociatedLabel(el)) {
+                    this.addIssue(
+                        'info',
+                        'Best Practice: Don\'t rely on placeholder as label',
+                        'This form control appears to rely on placeholder text instead of a persistent label.',
+                        el,
+                        'Provide a visible, persistent <code><label></code> or an accessible name via <code>aria-label</code>/<code>aria-labelledby</code>. Placeholders should be hints, not primary labels, because they disappear on input and can reduce readability.',
+                        'https://www.w3.org/WAI/tutorials/forms/labels/',
+                        'minor',
+                        ['best-practice', 'forms'],
+                        [
+                            { label: 'Control', value: el.tagName.toLowerCase() + (el.getAttribute('type') ? ` [type=${el.getAttribute('type')}]` : '') },
+                            { label: 'Placeholder', value: el.getAttribute('placeholder') || '' }
+                        ],
+                        'bp-placeholder-only-label'
+                    );
+                }
+            });
+
+            // 5) Generic/unclear button text
+            const buttonSelectors = 'button, input[type="button"], input[type="submit"], input[type="reset"], a[role="button"]';
+            const buttons = Array.from(document.querySelectorAll(buttonSelectors));
+            const genericButtonPhrases = [
+                'submit','go','more','learn more','read more','click here','ok','yes','no','continue','next','previous','prev','send'
+            ];
+            buttons.forEach(btn => {
+                if (!isVisible(btn)) return;
+                const name = getAccessibleName(btn).trim();
+                if (!name) return;
+                if (genericButtonPhrases.includes(name.toLowerCase())) {
+                    this.addIssue(
+                        'info',
+                        'Best Practice: Make button text specific',
+                        `The button label "${name}" is generic and may be unclear.`,
+                        btn,
+                        'Use specific labels that describe the action, e.g., <code>Submit application</code>, <code>Search site</code>, or <code>Download report</code>.',
+                        'https://www.w3.org/WAI/tutorials/forms/labels/#hints-and-instructions',
+                        'minor',
+                        ['best-practice', 'buttons'],
+                        [ { label: 'Detected Text', value: name } ],
+                        'bp-generic-button-text'
+                    );
+                }
+            });
+
+            // 6) Autoplaying media recommendations
+            const autoplayMedia = Array.from(document.querySelectorAll('video[autoplay], audio[autoplay]'));
+            autoplayMedia.forEach(m => {
+                if (!isVisible(m)) return;
+                const hasControls = m.hasAttribute('controls');
+                const isMuted = m.hasAttribute('muted');
+                const label = m.tagName.toLowerCase();
+                const recs = [];
+                if (!hasControls) recs.push('Add <code>controls</code> so users can pause/stop.');
+                if (!isMuted && m.tagName === 'VIDEO') recs.push('Avoid autoplay with sound; consider starting paused or muted.');
+                recs.push('Respect user preference with <code>@media (prefers-reduced-motion: reduce)</code> and avoid distracting motion.');
+                this.addIssue(
+                    'info',
+                    'Best Practice: Avoid autoplay without clear controls',
+                    `${label} element autoplays. Autoplay can be disorienting and should generally be avoided.`,
+                    m,
+                    recs.join(' '),
+                    'https://www.w3.org/WAI/WCAG21/Techniques/general/G19',
+                    'minor',
+                    ['best-practice', 'media'],
+                    [ { label: 'Element', value: `<${label}>` }, { label: 'Controls', value: hasControls ? 'present' : 'missing' } ],
+                    'bp-media-autoplay'
+                );
+            });
+
+            // 7) Infinite or marquee-style animations
+            // Simple tag checks first
+            const marqueeLike = Array.from(document.querySelectorAll('marquee, blink'));
+            marqueeLike.forEach(el => {
+                if (!isVisible(el)) return;
+                this.addIssue(
+                    'info',
+                    'Best Practice: Avoid marquee/blink effects',
+                    'Elements using marquee/blink effects can be distracting and hard to read.',
+                    el,
+                    'Replace with non-moving alternatives or provide user controls and respect <code>prefers-reduced-motion</code>.',
+                    'https://www.w3.org/WAI/WCAG21/Understanding/pause-stop-hide.html',
+                    'minor',
+                    ['best-practice', 'motion'],
+                    [],
+                    'bp-marquee-blink'
+                );
+            });
+            // Computed-style animation scan (limited for performance)
+            try {
+                const allEls = Array.from(document.querySelectorAll('*'));
+                if (allEls.length <= 2500) {
+                    allEls.forEach(el => {
+                        if (!isVisible(el)) return;
+                        const cs = getComputedStyle(el);
+                        if (!cs) return;
+                        const durations = (cs.animationDuration || '').split(',').map(s => (s || '').trim());
+                        const iters = (cs.animationIterationCount || '').split(',').map(s => (s || '').trim());
+                        const running = (cs.animationPlayState || '').split(',').some(s => s.trim() === 'running');
+                        const hasDuration = durations.some(d => d && d !== '0s' && d !== '0ms');
+                        const infinite = iters.some(n => n === 'infinite');
+                        if (running && hasDuration && infinite) {
+                            this.addIssue(
+                                'info',
+                                'Best Practice: Provide motion alternatives',
+                                'Detected an element with continuous animation.',
+                                el,
+                                'Offer a way to pause/stop animation and respect <code>prefers-reduced-motion</code> to reduce or remove motion for users who prefer it.',
+                                'https://www.w3.org/WAI/WCAG21/Understanding/animation-from-interactions.html',
+                                'minor',
+                                ['best-practice', 'motion'],
+                                [],
+                                'bp-infinite-animation'
+                            );
+                        }
+                    });
+                }
+            } catch (_) { /* ignore animation scan errors */ }
+
+            // 8) File-type link labeling (PDF, docs, etc.)
+            const fileExts = ['.pdf','.doc','.docx','.ppt','.pptx','.xls','.xlsx','.zip'];
+            anchors.forEach(a => {
+                if (!isVisible(a)) return;
+                const href = (a.getAttribute('href') || '').toLowerCase();
+                const name = getAccessibleName(a).toLowerCase();
+                const matched = fileExts.find(ext => href.endsWith(ext));
+                if (matched && name && !name.includes(matched.replace('.', ''))) {
+                    this.addIssue(
+                        'info',
+                        'Best Practice: Indicate file type in link',
+                        `This link points to a ${matched.toUpperCase()} file, but the link text may not indicate the file type.`,
+                        a,
+                        'Include the file type (and optionally size) in the link text, e.g., <code>Annual Report (PDF)</code>.',
+                        'https://www.w3.org/WAI/tips/writing/#inform-users-about-what-to-expect',
+                        'minor',
+                        ['best-practice', 'links'],
+                        [ { label: 'Href', value: href } ],
+                        'bp-filetype-link-label'
+                    );
+                }
             });
         },
         
@@ -214,6 +521,14 @@
             incomplete.nodes.forEach((node, nodeIndex) => {
                 // Skip if this node is part of our accessibility checker UI
                 if (this.isOwnUIElement(node)) {
+                    return;
+                }
+
+                // Check if this is a contrast issue that can be auto-resolved
+                const shouldSkipManualReview = this.shouldSkipContrastManualReview(incomplete, node);
+                
+                if (shouldSkipManualReview) {
+                    // Skip entirely - no need to show passing contrast items to user
                     return;
                 }
                 
@@ -367,6 +682,110 @@
                 .replace(/\n/g, "\\n")
                 .replace(/\r/g, "\\r")
                 .replace(/\t/g, "\\t");
+        },
+        
+        // Compute a reasonably specific CSS selector for an element
+        computeElementSelector: function(el) {
+            try {
+                if (!el || !(el instanceof Element)) return '';
+                if (el.id) {
+                    // Prefer ID when unique
+                    const sel = `#${CSS.escape(el.id)}`;
+                    if (document.querySelector(sel) === el) return sel;
+                }
+                const parts = [];
+                let node = el;
+                let depth = 0;
+                while (node && node.nodeType === 1 && depth < 6 && node !== document.documentElement) {
+                    const tag = node.tagName.toLowerCase();
+                    let segment = tag;
+                    // If reasonable class present, include one class
+                    if (node.classList && node.classList.length) {
+                        const cls = Array.from(node.classList).find(c => c && c.length <= 32 && !c.startsWith('uw-a11y-'));
+                        if (cls) segment += `.${CSS.escape(cls)}`;
+                    }
+                    // nth-of-type for specificity among siblings
+                    const siblings = Array.from(node.parentNode ? node.parentNode.children : []);
+                    const sameTag = siblings.filter(s => s.tagName === node.tagName);
+                    if (sameTag.length > 1) {
+                        const index = sameTag.indexOf(node) + 1;
+                        segment += `:nth-of-type(${index})`;
+                    }
+                    parts.unshift(segment);
+                    node = node.parentElement;
+                    depth++;
+                }
+                const sel = parts.join(' > ');
+                return sel;
+            } catch (_) {
+                return '';
+            }
+        },
+
+        // Ensure an element and its hidden ancestors are temporarily visible
+        ensureElementVisible: function(el) {
+            const changed = [];
+            try {
+                const chain = [];
+                let n = el;
+                while (n && n.nodeType === 1 && n !== document.body) {
+                    chain.push(n);
+                    n = n.parentElement;
+                }
+
+                chain.forEach(node => {
+                    if (!(node instanceof Element)) return;
+
+                    // Expand <details> blocks
+                    if (node.tagName === 'DETAILS' && !node.hasAttribute('open')) {
+                        node.setAttribute('open', '');
+                        node.setAttribute('data-uw-a11y-details-opened', '');
+                        changed.push({ node, type: 'details' });
+                    }
+
+                    const cs = getComputedStyle(node);
+                    const isHiddenCss = cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity || '1') === 0;
+                    const hasHiddenAttr = node.hasAttribute('hidden');
+                    const ariaHiddenTrue = node.getAttribute('aria-hidden') === 'true';
+
+                    if (isHiddenCss) {
+                        node.setAttribute('data-uw-a11y-reveal', '');
+                        changed.push({ node, type: 'reveal' });
+                    }
+                    if (hasHiddenAttr) {
+                        node.removeAttribute('hidden');
+                        node.setAttribute('data-uw-a11y-removed-hidden', '');
+                        changed.push({ node, type: 'hidden-attr' });
+                    }
+                    if (ariaHiddenTrue) {
+                        node.setAttribute('aria-hidden', 'false');
+                        node.setAttribute('data-uw-a11y-aria-hidden-prev', 'true');
+                        changed.push({ node, type: 'aria-hidden' });
+                    }
+                });
+            } catch (_) { /* ignore */ }
+
+            // Return cleanup function
+            return function cleanup() {
+                try {
+                    changed.forEach(({ node, type }) => {
+                        if (!node) return;
+                        if (type === 'reveal') node.removeAttribute('data-uw-a11y-reveal');
+                        if (type === 'hidden-attr' && node.hasAttribute('data-uw-a11y-removed-hidden')) {
+                            node.setAttribute('hidden', '');
+                            node.removeAttribute('data-uw-a11y-removed-hidden');
+                        }
+                        if (type === 'aria-hidden' && node.getAttribute('data-uw-a11y-aria-hidden-prev') === 'true') {
+                            node.setAttribute('aria-hidden', 'true');
+                            node.removeAttribute('data-uw-a11y-aria-hidden-prev');
+                        }
+                        if (type === 'details' && node.hasAttribute('data-uw-a11y-details-opened')) {
+                            node.removeAttribute('open');
+                            node.removeAttribute('data-uw-a11y-details-opened');
+                        }
+                    });
+                } catch (_) { /* ignore */ }
+            };
         },
         
         // Validate and escape URLs
@@ -755,7 +1174,7 @@
             return 0;
         },
         
-        // Extract color contrast information
+        // Extract color contrast information with enhanced pixel-based analysis
         extractColorContrastInfo: function(node) {
             try {
                 const element = this.getElementFromNode(node);
@@ -764,6 +1183,7 @@
                 const styles = window.getComputedStyle(element);
                 let fgColor = styles.color;
                 let bgColor = styles.backgroundColor;
+                let analysisMethod = 'computed-style';
                 
                 // Handle transparent or rgba(0,0,0,0) backgrounds by finding the effective background
                 if (!bgColor || bgColor === 'transparent' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor.includes('rgba(0, 0, 0, 0)')) {
@@ -784,6 +1204,14 @@
                         bgColor = '#ffffff';
                     }
                 }
+
+                // Enhanced pixel-based analysis for complex cases
+                const pixelAnalysis = this.analyzeElementPixels(element);
+                if (pixelAnalysis && pixelAnalysis.isMoreAccurate) {
+                    fgColor = pixelAnalysis.foreground;
+                    bgColor = pixelAnalysis.background;
+                    analysisMethod = 'pixel-analysis';
+                }
                 
                 // Calculate contrast ratio if possible
                 const contrast = this.calculateContrastRatio(fgColor, bgColor);
@@ -792,7 +1220,8 @@
                     foreground: fgColor,
                     background: bgColor,
                     contrast: contrast ? contrast.toFixed(2) + ':1' : 'Unable to calculate',
-                    required: 'WCAG AA requires 4.5:1 for normal text, 3:1 for large text'
+                    required: 'WCAG AA requires 4.5:1 for normal text, 3:1 for large text',
+                    analysisMethod: analysisMethod
                 };
             } catch (e) {
                 console.warn('Error extracting color contrast info:', e);
@@ -906,6 +1335,496 @@
                 return null;
             }
         },
+
+        // Analyze element pixels for more accurate color detection
+        analyzeElementPixels: function(element) {
+            try {
+                // Skip pixel analysis for elements that are likely to work fine with computed styles
+                const computedStyles = window.getComputedStyle(element);
+                const hasComplexBackground = this.hasComplexBackground(element, computedStyles);
+                const hasTransparency = this.hasTransparentColors(computedStyles);
+                
+                if (!hasComplexBackground && !hasTransparency) {
+                    return null; // Use computed styles
+                }
+
+                const rect = element.getBoundingClientRect();
+                if (rect.width < 4 || rect.height < 4) {
+                    return null; // Element too small for reliable sampling
+                }
+
+                // Use a simpler approach: sample the rendered element directly
+                const colorSamples = this.sampleElementColors(element, rect);
+                
+                if (colorSamples && this.isPixelAnalysisMoreReliable(colorSamples, computedStyles)) {
+                    return {
+                        foreground: colorSamples.foreground,
+                        background: colorSamples.background,
+                        isMoreAccurate: true,
+                        samplingMethod: colorSamples.method
+                    };
+                }
+
+                return null;
+            } catch (e) {
+                console.warn('Error in pixel analysis:', e);
+                return null;
+            }
+        },
+
+        // Check if element has complex background that might need pixel analysis
+        hasComplexBackground: function(element, styles) {
+            return (
+                styles.backgroundImage !== 'none' ||
+                styles.background.includes('gradient') ||
+                this.hasComplexAncestorBackground(element)
+            );
+        },
+
+        // Check if colors contain transparency
+        hasTransparentColors: function(styles) {
+            const fgColor = styles.color;
+            const bgColor = styles.backgroundColor;
+            
+            return (
+                fgColor.includes('rgba') && this.getAlphaFromRgba(fgColor) < 1 ||
+                bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent'
+            );
+        },
+
+        // Check ancestor elements for complex backgrounds
+        hasComplexAncestorBackground: function(element) {
+            let parent = element.parentElement;
+            let depth = 0;
+            
+            while (parent && depth < 5) { // Check up to 5 levels up
+                const parentStyles = window.getComputedStyle(parent);
+                if (parentStyles.backgroundImage !== 'none' || 
+                    parentStyles.background.includes('gradient')) {
+                    return true;
+                }
+                parent = parent.parentElement;
+                depth++;
+            }
+            return false;
+        },
+
+        // Extract alpha value from rgba string
+        getAlphaFromRgba: function(rgbaString) {
+            const match = rgbaString.match(/rgba?\([^)]+\)/);
+            if (match) {
+                const values = match[0].match(/[\d.]+/g);
+                return values && values.length >= 4 ? parseFloat(values[3]) : 1;
+            }
+            return 1;
+        },
+
+        // Sample colors from element using appropriate method based on complexity
+        sampleElementColors: function(element, rect) {
+            try {
+                // Check if element has background image - use canvas sampling
+                const styles = window.getComputedStyle(element);
+                const hasBackgroundImage = this.hasBackgroundImage(element);
+                
+                if (hasBackgroundImage) {
+                    return this.canvasBasedColorSampling(element, rect);
+                }
+                
+                // For non-image backgrounds, use lightweight DOM sampling
+                return this.domBasedColorSampling(element);
+            } catch (e) {
+                console.warn('Error sampling element colors:', e);
+                return null;
+            }
+        },
+
+        // Check if element or ancestors have background images
+        hasBackgroundImage: function(element) {
+            let current = element;
+            let depth = 0;
+            
+            while (current && depth < 3) { // Check element and 2 levels up
+                const styles = window.getComputedStyle(current);
+                const bgImage = styles.backgroundImage;
+                
+                if (bgImage && bgImage !== 'none' && !bgImage.includes('gradient')) {
+                    return true;
+                }
+                
+                current = current.parentElement;
+                depth++;
+            }
+            return false;
+        },
+
+        // Canvas-based color sampling for complex backgrounds like images
+        canvasBasedColorSampling: function(element, rect) {
+            try {
+                // Create canvas for rendering
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Set reasonable canvas size (limit for performance)
+                const maxDimension = 100;
+                const scale = Math.min(maxDimension / rect.width, maxDimension / rect.height, 1);
+                canvas.width = Math.max(Math.ceil(rect.width * scale), 20);
+                canvas.height = Math.max(Math.ceil(rect.height * scale), 20);
+                
+                // Try to render element area using html2canvas-like approach
+                const elementColors = this.renderElementToCanvas(ctx, element, rect, scale);
+                
+                if (elementColors) {
+                    return {
+                        foreground: elementColors.foreground,
+                        background: elementColors.background,
+                        method: 'canvas-pixel-sampling'
+                    };
+                }
+                
+                // Fallback to DOM sampling if canvas fails
+                return this.domBasedColorSampling(element);
+                
+            } catch (e) {
+                console.warn('Canvas sampling failed, falling back to DOM sampling:', e);
+                return this.domBasedColorSampling(element);
+            }
+        },
+
+        // Render element to canvas and sample colors
+        renderElementToCanvas: function(ctx, element, rect, scale) {
+            try {
+                const canvas = ctx.canvas;
+                
+                // Fill with background
+                this.renderBackground(ctx, element, canvas.width, canvas.height);
+                
+                // Sample background pixels (before text)
+                const bgSamples = this.sampleCanvasPixels(ctx, canvas.width, canvas.height, 'background');
+                
+                // Render text content
+                this.renderTextContent(ctx, element, scale);
+                
+                // Sample foreground pixels (text areas)
+                const fgSamples = this.sampleCanvasPixels(ctx, canvas.width, canvas.height, 'foreground');
+                
+                if (bgSamples && fgSamples) {
+                    return {
+                        background: bgSamples,
+                        foreground: fgSamples
+                    };
+                }
+                
+                return null;
+            } catch (e) {
+                console.warn('Error rendering element to canvas:', e);
+                return null;
+            }
+        },
+
+        // Render background (including images) to canvas
+        renderBackground: function(ctx, element, width, height) {
+            const styles = window.getComputedStyle(element);
+            
+            // Fill with background color first
+            if (styles.backgroundColor !== 'transparent' && styles.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+                ctx.fillStyle = styles.backgroundColor;
+                ctx.fillRect(0, 0, width, height);
+            }
+            
+            // Handle background images
+            const bgImage = styles.backgroundImage;
+            if (bgImage && bgImage !== 'none' && !bgImage.includes('gradient')) {
+                // Extract image URL
+                const urlMatch = bgImage.match(/url\(["']?([^"')]+)["']?\)/);
+                if (urlMatch) {
+                    const imageUrl = urlMatch[1];
+                    // For now, estimate background color from image (simplified approach)
+                    // In a full implementation, we'd load and draw the actual image
+                    ctx.fillStyle = this.estimateImageAverageColor(imageUrl);
+                    ctx.fillRect(0, 0, width, height);
+                }
+            }
+        },
+
+        // Render text content to canvas
+        renderTextContent: function(ctx, element, scale) {
+            const styles = window.getComputedStyle(element);
+            const text = element.textContent?.trim();
+            
+            if (text) {
+                ctx.fillStyle = styles.color;
+                ctx.font = `${parseInt(styles.fontSize) * scale}px ${styles.fontFamily}`;
+                ctx.textBaseline = 'top';
+                
+                // Simple text rendering
+                const maxWidth = ctx.canvas.width - 4;
+                ctx.fillText(text.substring(0, 20), 2, 2, maxWidth);
+            }
+        },
+
+        // Sample pixels from canvas
+        sampleCanvasPixels: function(ctx, width, height, type) {
+            try {
+                const imageData = ctx.getImageData(0, 0, width, height);
+                const data = imageData.data;
+                
+                const samples = [];
+                const sampleCount = Math.min(20, width * height / 4); // Sample up to 20 pixels
+                
+                for (let i = 0; i < sampleCount; i++) {
+                    // Sample from different areas
+                    const x = Math.floor((i % 5) * width / 5) + Math.floor(width / 10);
+                    const y = Math.floor(Math.floor(i / 5) * height / 4) + Math.floor(height / 8);
+                    const index = (y * width + x) * 4;
+                    
+                    if (index < data.length - 3) {
+                        samples.push({
+                            r: data[index],
+                            g: data[index + 1], 
+                            b: data[index + 2],
+                            a: data[index + 3] / 255
+                        });
+                    }
+                }
+                
+                if (samples.length === 0) return null;
+                
+                // Return average color
+                const avg = this.averageColor(samples);
+                return `rgba(${avg.r}, ${avg.g}, ${avg.b}, ${avg.a})`;
+                
+            } catch (e) {
+                console.warn('Error sampling canvas pixels:', e);
+                return null;
+            }
+        },
+
+        // Estimate average color from image URL (simplified)
+        estimateImageAverageColor: function(imageUrl) {
+            // Simple heuristic based on common image types and naming
+            const url = imageUrl.toLowerCase();
+            
+            if (url.includes('dark') || url.includes('black')) {
+                return 'rgb(40, 40, 40)';
+            } else if (url.includes('light') || url.includes('white')) {
+                return 'rgb(240, 240, 240)';
+            } else if (url.includes('hero') || url.includes('banner')) {
+                return 'rgb(100, 100, 120)'; // Assume darker hero images
+            }
+            
+            // Default to neutral gray
+            return 'rgb(128, 128, 128)';
+        },
+
+        // DOM-based color sampling for simple backgrounds
+        domBasedColorSampling: function(element) {
+            try {
+                // Create temporary elements to help with color sampling
+                const tempTextSpan = document.createElement('span');
+                const tempBgDiv = document.createElement('div');
+                
+                // Clone text content for foreground sampling
+                tempTextSpan.textContent = element.textContent?.charAt(0) || 'A';
+                tempTextSpan.style.cssText = `
+                    position: absolute;
+                    left: -9999px;
+                    font: ${window.getComputedStyle(element).font};
+                    color: ${window.getComputedStyle(element).color};
+                    background: transparent;
+                    border: none;
+                    padding: 0;
+                    margin: 0;
+                `;
+                
+                // Create background sample
+                tempBgDiv.style.cssText = `
+                    position: absolute;
+                    left: -9999px;
+                    width: 10px;
+                    height: 10px;
+                    background: ${window.getComputedStyle(element).background};
+                    border: none;
+                    padding: 0;
+                    margin: 0;
+                `;
+                
+                document.body.appendChild(tempTextSpan);
+                document.body.appendChild(tempBgDiv);
+                
+                // Get the actual rendered colors
+                const textStyles = window.getComputedStyle(tempTextSpan);
+                const bgStyles = window.getComputedStyle(tempBgDiv);
+                
+                const result = {
+                    foreground: textStyles.color,
+                    background: bgStyles.backgroundColor !== 'rgba(0, 0, 0, 0)' ? 
+                        bgStyles.backgroundColor : 
+                        this.findEffectiveBackground(element),
+                    method: 'dom-sampling'
+                };
+                
+                // Clean up
+                document.body.removeChild(tempTextSpan);
+                document.body.removeChild(tempBgDiv);
+                
+                return result;
+            } catch (e) {
+                console.warn('Error in DOM sampling:', e);
+                return null;
+            }
+        },
+
+        // Find effective background by examining actual DOM hierarchy
+        findEffectiveBackground: function(element) {
+            let current = element;
+            while (current && current !== document.body) {
+                const styles = window.getComputedStyle(current);
+                const bg = styles.backgroundColor;
+                
+                if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+                    return bg;
+                }
+                
+                // Check for background images or gradients
+                if (styles.backgroundImage !== 'none') {
+                    // For images/gradients, we'll estimate based on common patterns
+                    return this.estimateBackgroundFromImage(styles);
+                }
+                
+                current = current.parentElement;
+            }
+            
+            // Default to white
+            return 'rgb(255, 255, 255)';
+        },
+
+        // Estimate background color from background image (simple heuristics)
+        estimateBackgroundFromImage: function(styles) {
+            const bgImage = styles.backgroundImage;
+            
+            // Check for gradients
+            if (bgImage.includes('gradient')) {
+                // Extract first color from gradient
+                const colorMatch = bgImage.match(/rgba?\([^)]+\)|#[a-fA-F0-9]{3,6}|\b\w+\b/);
+                if (colorMatch) {
+                    return colorMatch[0];
+                }
+            }
+            
+            // For other images, assume a neutral background
+            return 'rgb(240, 240, 240)';
+        },
+
+        // Determine if pixel analysis is more reliable than computed styles
+        isPixelAnalysisMoreReliable: function(colorSamples, computedStyles) {
+            // Pixel analysis is more reliable when:
+            // 1. Computed styles show transparency that we resolved
+            // 2. There's a significant difference in calculated contrast
+            // 3. We detected complex backgrounds
+            
+            const computedBg = computedStyles.backgroundColor;
+            const computedFg = computedStyles.color;
+            
+            // If computed styles show transparency, pixel analysis is likely better
+            if (computedBg === 'rgba(0, 0, 0, 0)' || computedBg === 'transparent') {
+                return true;
+            }
+            
+            // If foreground has transparency, pixel analysis handles blending better
+            if (computedFg.includes('rgba') && this.getAlphaFromRgba(computedFg) < 0.9) {
+                return true;
+            }
+            
+            // Compare contrast ratios
+            const computedContrast = this.calculateContrastRatio(computedFg, computedBg);
+            const sampledContrast = this.calculateContrastRatio(colorSamples.foreground, colorSamples.background);
+            
+            // If sampling gives us a significantly different result, trust it
+            if (computedContrast && sampledContrast) {
+                const difference = Math.abs(computedContrast - sampledContrast);
+                return difference > 1; // Significant difference in contrast ratio
+            }
+            
+            return false;
+        },
+
+        // Determine if a contrast manual review item should be skipped because pixel analysis shows sufficient contrast
+        shouldSkipContrastManualReview: function(axeRule, node) {
+            // Only apply to contrast-related rules
+            const contrastRules = ['color-contrast', 'color-contrast-enhanced'];
+            if (!contrastRules.includes(axeRule.id)) {
+                return false;
+            }
+
+            try {
+                const element = this.getElementFromNode(node);
+                if (!element) return false;
+
+                // Get enhanced color info with pixel analysis
+                const colorInfo = this.extractColorContrastInfo(node);
+                if (!colorInfo || !colorInfo.contrast || colorInfo.contrast === 'Unable to calculate') {
+                    return false;
+                }
+
+                // Parse contrast ratio
+                const contrastValue = parseFloat(colorInfo.contrast.split(':')[0]);
+                if (isNaN(contrastValue)) {
+                    return false;
+                }
+
+                // Determine if this element needs enhanced (AAA) contrast
+                const isEnhanced = axeRule.id === 'color-contrast-enhanced';
+                
+                // Check font size to determine if it's "large text"
+                const isLargeText = this.isLargeText(element);
+                
+                // WCAG contrast requirements
+                let requiredContrast;
+                if (isEnhanced) {
+                    // AAA requirements
+                    requiredContrast = isLargeText ? 4.5 : 7.0;
+                } else {
+                    // AA requirements  
+                    requiredContrast = isLargeText ? 3.0 : 4.5;
+                }
+
+                // Only skip manual review if we have significantly better contrast than required
+                // Use a buffer to account for measurement variations
+                const contrastBuffer = 0.3;
+                const meetsRequirement = contrastValue >= (requiredContrast + contrastBuffer);
+
+                if (meetsRequirement && colorInfo.analysisMethod === 'pixel-analysis') {
+                    console.log(`Auto-resolving contrast issue for element:`, {
+                        selector: node.target?.join(' '),
+                        measured: contrastValue,
+                        required: requiredContrast,
+                        isLargeText: isLargeText,
+                        analysisMethod: colorInfo.analysisMethod
+                    });
+                    return true;
+                }
+
+                return false;
+            } catch (e) {
+                console.warn('Error checking contrast for auto-resolution:', e);
+                return false;
+            }
+        },
+
+        // Check if element has large text (per WCAG definition)
+        isLargeText: function(element) {
+            const styles = window.getComputedStyle(element);
+            const fontSize = parseFloat(styles.fontSize);
+            const fontWeight = styles.fontWeight;
+            
+            // WCAG large text: 18pt+ (24px+) or 14pt+ (18.5px+) bold
+            // Note: 1pt ≈ 1.33px at 96 DPI
+            const isLarge = fontSize >= 24; // 18pt+
+            const isBoldAndMedium = (fontSize >= 18.5) && 
+                (fontWeight === 'bold' || fontWeight === '700' || parseInt(fontWeight) >= 700);
+                
+            return isLarge || isBoldAndMedium;
+        },
         
         // Analyze landmark context
         analyzeLandmarkContext: function(node) {
@@ -949,90 +1868,137 @@
             }
         },
         
-        // Calculate accessibility score (considering manually verified items)
+        // Calculate accessibility score with per-rule caps (Lighthouse-like)
+        // - Count each failed rule once (ignore instance count)
+        // - Weight by impact; manual items deduct half if not verified
+        // - Clamp any single rule’s impact so one type can’t dominate
         calculateAccessibilityScore: function(results) {
-            // Weight different types of issues
-            const weights = {
-                critical: 10,
-                serious: 7,
-                moderate: 3,
-                minor: 1
-            };
-            
-            let totalDeductions = 0;
-            let totalPossible = results.passes.length + results.violations.length + results.incomplete.length;
-            
-            // Calculate deductions for violations (errors)
-            results.violations.forEach(violation => {
-                const weight = weights[violation.impact] || weights.moderate;
-                totalDeductions += violation.nodes.length * weight;
-            });
-            
-            // Calculate deductions for incomplete items, considering manually verified status
-            let incompleteDeductions = 0;
-            let totalManualReview = 0;
-            let verifiedCount = 0;
-            
-            results.incomplete.forEach((incomplete, incompleteIndex) => {
-                incomplete.nodes.forEach((node, nodeIndex) => {
-                    totalManualReview++;
-                    const uniqueId = `incomplete-${incompleteIndex}-${nodeIndex}`;
-                    
-                    // Check if this specific item is verified OR if the entire rule is verified
-                    const isRuleVerified = this.isRuleVerified(incomplete.id);
-                    const isIndividuallyVerified = this.checkedItems && this.checkedItems.has(uniqueId);
-                    
-                    if (isIndividuallyVerified || isRuleVerified) {
-                        verifiedCount++;
-                        // No deduction for verified items
-                    } else {
-                        // Half weight for unverified manual review items
-                        const weight = (weights[incomplete.impact] || weights.moderate) * 0.5;
-                        incompleteDeductions += weight;
-                    }
-                });
-            });
-            
-            totalDeductions += incompleteDeductions;
-            
-            // Calculate score (0-100)
-            if (totalPossible === 0) return {
-                score: 100,
-                deductions: 0,
-                maxPossible: 0,
-                verifiedCount: 0,
-                totalManualReview: 0
-            };
-            
-            // If there are no deductions (all violations fixed and all manual items verified), give perfect score
-            if (totalDeductions === 0) {
-                return {
-                    score: 100,
-                    deductions: 0,
-                    maxPossible: totalPossible * weights.critical,
-                    verifiedCount: verifiedCount,
-                    totalManualReview: totalManualReview,
-                    details: {
-                        violations: results.violations.length,
-                        incomplete: results.incomplete.length,
-                        passes: results.passes.length
-                    }
-                };
+            if (!results) {
+                return { score: 100, deductions: 0, maxPossible: 100, verifiedCount: 0, totalManualReview: 0 };
             }
-            
-            const maxPossibleDeductions = totalPossible * weights.critical;
-            const score = Math.max(0, Math.round(100 - (totalDeductions / maxPossibleDeductions) * 100));
-            
+
+            // Per-rule weights (approximate Lighthouse feel)
+            const ruleWeights = {
+                critical: 25,
+                serious: 15,
+                moderate: 8,
+                minor: 3
+            };
+
+            // Per-category caps to avoid a single area dominating deductions
+            // Keys use axe tag format (e.g., 'cat.color').
+            const categoryCaps = {
+                'cat.color': 5,
+                'cat.keyboard': 15,
+                'cat.name-role-value': 10,
+                'cat.aria': 10,
+                'cat.forms': 5,
+                'cat.text-alternatives': 5,
+                'cat.tables': 5,
+                'cat.language': 5,
+                'cat.structure': 5,
+                'cat.audio-video': 5,
+                // Non-axe-cat buckets
+                'best-practice': 10,
+                'other': 10
+            };
+
+            // Impact priority helper (to pick the highest when mixed)
+            const impactRank = { critical: 4, serious: 3, moderate: 2, minor: 1 };
+            const maxImpact = (a, b) => {
+                const ia = impactRank[a] || 0;
+                const ib = impactRank[b] || 0;
+                return ia >= ib ? a : b;
+            };
+
+            // Helper to pick a category from axe tags
+            const getCategory = (tags) => {
+                const t = Array.isArray(tags) ? tags : [];
+                const cat = t.find(x => typeof x === 'string' && x.startsWith('cat.'));
+                if (cat) return cat;
+                if (t.includes('best-practice')) return 'best-practice';
+                return 'other';
+            };
+
+            // 1) Violations: count per unique ruleId, weighted by highest impact observed, track category
+            const violationMetaByRule = new Map(); // ruleId -> { impact, category }
+            (results.violations || []).forEach(v => {
+                const impact = (v.impact || 'moderate');
+                const category = getCategory(v.tags);
+                const prev = violationMetaByRule.get(v.id);
+                if (prev) {
+                    violationMetaByRule.set(v.id, { impact: maxImpact(prev.impact, impact), category: prev.category || category });
+                } else {
+                    violationMetaByRule.set(v.id, { impact, category });
+                }
+            });
+
+            // Accumulate deductions per category
+            const categoryDeductions = new Map();
+            const addToCategory = (category, amount) => {
+                const key = category || 'other';
+                categoryDeductions.set(key, (categoryDeductions.get(key) || 0) + amount);
+            };
+
+            violationMetaByRule.forEach(({ impact, category }) => {
+                const amount = (ruleWeights[impact] || ruleWeights.moderate);
+                addToCategory(category, amount);
+            });
+
+            // 2) Manual review: per rule, deduct half weight only if any instance unverified
+            // Keep counts for UI messaging
+            let verifiedCount = 0;
+            const manualIssues = (this.issues || []).filter(i => i.type === 'warning' && i.uniqueId);
+            const totalManualReview = manualIssues.length;
+
+            const manualByRule = new Map(); // ruleId -> { impact, unresolved, total, category }
+            manualIssues.forEach(issue => {
+                const ruleId = issue.ruleId;
+                const impact = (issue.impact || 'moderate');
+                const category = getCategory(issue.tags);
+                const entry = manualByRule.get(ruleId) || { impact: impact, unresolved: 0, total: 0, category };
+                entry.impact = maxImpact(entry.impact, impact);
+                entry.total += 1;
+                entry.category = entry.category || category;
+
+                const ruleVerified = this.isRuleVerified(ruleId);
+                const individuallyVerified = this.checkedItems && this.checkedItems.has(issue.uniqueId);
+                if (individuallyVerified || ruleVerified) {
+                    verifiedCount++;
+                } else {
+                    entry.unresolved += 1;
+                }
+                manualByRule.set(ruleId, entry);
+            });
+
+            manualByRule.forEach(({ impact, unresolved, category }) => {
+                if (unresolved > 0) {
+                    const amount = Math.round(((ruleWeights[impact] || ruleWeights.moderate) * 0.5));
+                    addToCategory(category, amount);
+                }
+            });
+
+            // 3) Apply per-category caps
+            let totalDeductions = 0;
+            categoryDeductions.forEach((amount, cat) => {
+                const cap = categoryCaps[cat] != null ? categoryCaps[cat] : categoryCaps.other;
+                totalDeductions += Math.min(amount, cap);
+            });
+
+            // 4) Compute final score from a 100-point budget
+            const rawScore = 100 - totalDeductions;
+            const score = Math.max(0, Math.min(100, Math.round(rawScore)));
+
             return {
                 score: score,
                 deductions: totalDeductions,
-                maxPossible: maxPossibleDeductions,
+                maxPossible: 100,
                 verifiedCount: verifiedCount,
                 totalManualReview: totalManualReview,
                 details: {
-                    violations: results.violations.length,
-                    incomplete: results.incomplete.length,
-                    passes: results.passes.length
+                    uniqueFailedRules: violationMetaByRule.size,
+                    incomplete: (results.incomplete || []).length,
+                    passes: (results.passes || []).length
                 }
             };
         },
@@ -1057,56 +2023,121 @@
             }
         },
         
+        // Show score calculation explanation
+        showScoreExplanation: function() {
+            // Create a modal-like overlay
+            const existing = this.shadowRoot.querySelector('.uw-a11y-score-explanation');
+            if (existing) {
+                existing.remove();
+                return; // Toggle off if already shown
+            }
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'uw-a11y-score-explanation';
+            overlay.innerHTML = `
+                <div class="uw-a11y-explanation-content">
+                    <div class="uw-a11y-explanation-header">
+                        <h3>How the Accessibility Score is Calculated</h3>
+                        <button class="uw-a11y-explanation-close" aria-label="Close explanation">×</button>
+                    </div>
+                    <div class="uw-a11y-explanation-body">
+                        <p>The accessibility score starts at 100 points and deducts points based on the severity and type of issues found:</p>
+                        
+                        <h4>Violation Deductions:</h4>
+                        <ul>
+                            <li><strong>Critical issues:</strong> -25 points per rule</li>
+                            <li><strong>Serious issues:</strong> -15 points per rule</li>
+                            <li><strong>Moderate issues:</strong> -8 points per rule</li>
+                            <li><strong>Minor issues:</strong> -3 points per rule</li>
+                        </ul>
+                        
+                        <h4>Manual Review Items:</h4>
+                        <p>Items requiring human verification deduct <strong>half points</strong> if not manually verified or approved.</p>
+                        
+                        <h4>Category Caps:</h4>
+                        <p>Each accessibility category (color, keyboard, forms, etc.) has a maximum deduction cap to prevent any single area from dominating the score.</p>
+                        
+                        <div class="uw-a11y-explanation-note">
+                            <strong>Note:</strong> This scoring system is inspired by other axe-core tool scoring methodology and focuses on unique rule failures rather than individual element counts.
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add to shadow root
+            this.shadowRoot.appendChild(overlay);
+            
+            // Add event listeners
+            const closeBtn = overlay.querySelector('.uw-a11y-explanation-close');
+            const handleClose = () => overlay.remove();
+            
+            closeBtn.addEventListener('click', handleClose);
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) handleClose();
+            });
+            
+            // Handle keyboard events
+            overlay.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    handleClose();
+                }
+            });
+            
+            // Focus the close button for accessibility
+            closeBtn.focus();
+        },
+        
         // Create and show the results panel
         createPanel: function() {
             this.shadowRoot.innerHTML = `
                 ${this.getStyles()}
-                <div id="uw-a11y-panel">
+                <div id="uw-a11y-wrapper">
+                <div id="uw-a11y-nav">
+                    <nav>
+                        <ul>
+                            <li>
+                                <a id="uw-a11y-nav-results" href="#uw-a11y-view-results" title="Results">
+                                    <svg class="feather feather-pie-chart" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+                                    <span class="uw-a11y-nav-label">Results</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="uw-a11y-nav-inspector" href="#uw-a11y-view-inspector" title="Inspector Tools">
+                                    <svg class="feather feather-search" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                                    <span class="uw-a11y-nav-label">Inspector</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="uw-a11y-nav-settings" href="#uw-a11y-view-settings" title="Settings">
+                                    <svg class="feather feather-toggle-left" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><rect height="14" rx="7" ry="7" width="22" x="1" y="5"/><circle cx="8" cy="12" r="3"/></svg>
+                                    <span class="uw-a11y-nav-label">Settings</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="uw-a11y-nav-help" href="#uw-a11y-view-help" title="Help">
+                                    <svg class="feather feather-alert-triangle" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+                                    <span class="uw-a11y-nav-label">Help</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="uw-a11y-nav-about" href="#uw-a11y-view-about" title="About">
+                                    <svg class="feather feather-info" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>
+                                    <span class="uw-a11y-nav-label">About</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                <div id="uw-a11y-panel" tabindex="-1" role="dialog" aria-labelledby="uw-a11y-title">
+                    <div class="accentcolors">
+                        <div class="color1"></div>
+                        <div class="color2"></div>
+                        <div class="color3"></div>
+                    </div>
                     <div id="uw-a11y-header">
                         <div class="uw-a11y-title-container">
-                            <svg viewBox="0 0 404 404" fill="none" xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo">
-                                <g filter="url(#filter0_d_1_19)">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M201 349C288.261 349 359 278.261 359 191C359 103.739 288.261 33 201 33C113.739 33 43 103.739 43 191C43 278.261 113.739 349 201 349ZM201 373C301.516 373 383 291.516 383 191C383 90.4842 301.516 9 201 9C100.484 9 19 90.4842 19 191C19 291.516 100.484 373 201 373Z" fill="url(#paint0_linear_1_19)"/>
-                                </g>
-                                <g filter="url(#filter1_d_1_19)">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M200.5 302C262.08 302 312 252.08 312 190.5C312 128.92 262.08 79 200.5 79C138.92 79 89 128.92 89 190.5C89 252.08 138.92 302 200.5 302ZM200.5 326C275.335 326 336 265.335 336 190.5C336 115.665 275.335 55 200.5 55C125.665 55 65 115.665 65 190.5C65 265.335 125.665 326 200.5 326Z" fill="url(#paint1_linear_1_19)"/>
-                                </g>
-                                <defs>
-                                <filter id="filter0_d_1_19" x="0.4" y="0.4" width="403.2" height="403.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-                                <feOffset dx="1" dy="11"/>
-                                <feGaussianBlur stdDeviation="9.8"/>
-                                <feComposite in2="hardAlpha" operator="out"/>
-                                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
-                                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
-                                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
-                                </filter>
-                                <filter id="filter1_d_1_19" x="46.4" y="46.4" width="310.2" height="310.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-                                <feOffset dx="1" dy="11"/>
-                                <feGaussianBlur stdDeviation="9.8"/>
-                                <feComposite in2="hardAlpha" operator="out"/>
-                                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/>
-                                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_19"/>
-                                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_19" result="shape"/>
-                                </filter>
-                                <linearGradient id="paint0_linear_1_19" x1="78.7712" y1="51.9816" x2="324.572" y2="313.9" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#35CD9C"/>
-                                <stop offset="0.465" stop-color="#43FFFC"/>
-                                <stop offset="0.545" stop-color="#C2F6F9"/>
-                                <stop offset="1" stop-color="#33BFF1"/>
-                                </linearGradient>
-                                <linearGradient id="paint1_linear_1_19" x1="109.5" y1="87" x2="292.5" y2="282" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#35CD9C"/>
-                                <stop offset="0.465" stop-color="#43FFFC"/>
-                                <stop offset="0.545" stop-color="#C2F6F9"/>
-                                <stop offset="1" stop-color="#33BFF1"/>
-                                </linearGradient>
-                                </defs>
-                            </svg>
-                            <h2>Pinpoint Accessibility Checker</h2>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo" viewBox="0 0 404 404" fill="none"><g filter="url(#a)"><path fill="url(#b)" fill-rule="evenodd" d="M201 349c87.261 0 158-70.739 158-158S288.261 33 201 33 43 103.739 43 191s70.739 158 158 158Zm0 24c100.516 0 182-81.484 182-182S301.516 9 201 9 19 90.484 19 191s81.484 182 182 182Z" clip-rule="evenodd"/></g><g filter="url(#c)"><path fill="url(#d)" fill-rule="evenodd" d="M200.5 302c61.58 0 111.5-49.92 111.5-111.5S262.08 79 200.5 79 89 128.92 89 190.5 138.92 302 200.5 302Zm0 24c74.835 0 135.5-60.665 135.5-135.5C336 115.665 275.335 55 200.5 55 125.665 55 65 115.665 65 190.5 65 265.335 125.665 326 200.5 326Z" clip-rule="evenodd"/></g><defs><linearGradient id="b" x1="78.771" x2="324.572" y1="51.982" y2="313.9" gradientUnits="userSpaceOnUse"><stop stop-color="#7435CD"/><stop offset="1" stop-color="#33BFF1"/></linearGradient><linearGradient id="d" x1="109.5" x2="292.5" y1="87" y2="282" gradientUnits="userSpaceOnUse"><stop stop-color="#9A35CD"/><stop offset="1" stop-color="#33D1F1"/></linearGradient><filter id="a" width="403.2" height="403.2" x=".4" y=".4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.401609 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter><filter id="c" width="310.2" height="310.2" x="46.4" y="46.4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.670614 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter></defs></svg>
+                            <h2 id="uw-a11y-title">Pinpoint Accessibility Checker</h2>
                         </div>
                         <div class="uw-a11y-header-buttons">
                             <button id="uw-a11y-minimize" title="Minimize">−</button>
@@ -1114,16 +2145,123 @@
                         </div>
                     </div>
                     <div id="uw-a11y-content">
-                        <div id="uw-a11y-summary"></div>
-                        <div id="uw-a11y-results"></div>
+                        <div id="uw-a11y-view-results" class="uw-a11y-view">
+                            <div id="uw-a11y-summary"></div>
+                            <p class="if-issues">
+                                <div class="mouse-icon"></div>
+                                <small>Select any item below to highlight the element on the page.</small>
+                            </p>
+                            <div id="uw-a11y-results"></div>
+                        </div>
+
+                        <div id="uw-a11y-view-inspector" class="uw-a11y-view" hidden>
+                            <div class="uw-a11y-inspector">
+                                <h3>Inspector Tools</h3>
+                                <p>Visual debugging tools to help you understand your page's accessibility structure.</p>
+                                
+                                <div class="uw-a11y-inspector-section">
+                                    <h4>Tab Order Visualization</h4>
+                                    <p>Display numbered indicators showing the keyboard tab order of focusable elements on your page.</p>
+                                    <div class="uw-a11y-inspector-controls">
+                                        <button id="uw-a11y-tab-order-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
+                                            <svg class="feather feather-move" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>
+                                            </svg>
+                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                            </svg>
+                                            <span class="uw-a11y-btn-text">Show Tab Order</span>
+                                        </button>
+                                        <span id="uw-a11y-tab-order-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Placeholder for future inspector tools -->
+                                <div class="uw-a11y-inspector-section uw-a11y-inspector-placeholder" style="opacity: 0.6;">
+                                    <h4>Focus Indicators <span class="uw-a11y-coming-soon">Coming Soon</span></h4>
+                                    <p>Visualize focus indicators and keyboard navigation paths.</p>
+                                    <div class="uw-a11y-inspector-controls">
+                                        <button class="uw-a11y-btn uw-a11y-btn-secondary" disabled>
+                                            <svg class="feather feather-eye" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"/>
+                                                <circle cx="12" cy="12" r="3"/>
+                                            </svg>
+                                            Show Focus Indicators
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="uw-a11y-inspector-section uw-a11y-inspector-placeholder" style="opacity: 0.6;">
+                                    <h4>Landmark Structure <span class="uw-a11y-coming-soon">Coming Soon</span></h4>
+                                    <p>Highlight page landmarks and heading hierarchy.</p>
+                                    <div class="uw-a11y-inspector-controls">
+                                        <button class="uw-a11y-btn uw-a11y-btn-secondary" disabled>
+                                            <svg class="feather feather-map" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                                <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                                                <line x1="9" x2="9" y1="3" y2="18"/>
+                                                <line x1="15" x2="15" y1="6" y2="21"/>
+                                            </svg>
+                                            Show Landmarks
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="uw-a11y-view-about" class="uw-a11y-view" hidden>
+                            <div class="uw-a11y-about">
+                                <h3>About Pinpoint</h3>
+                                <p>Version: <strong>${this.version}</strong> · Engine: axe-core v${this.getAxeVersion ? (this.getAxeVersion() || 'unknown') : 'unknown'}</p>
+                                <p>Pinpoint Accessibility Checker helps quickly find accessibility issues and best-practice improvements, pairing automated results with guidance.</p>
+                                <p><a href="https://github.com/althe3rd/Pinpoint" target="_blank" rel="noopener noreferrer">Project on GitHub</a> | <a href="https://github.com/althe3rd/Pinpoint/issues" target="_blank" rel="noopener noreferrer">Report an Issue</a> | <a href="https://github.com/althe3rd/Pinpoint/releases" target="_blank" rel="noopener noreferrer">Changelog</a></p>
+                                
+                            </div>
+                        </div>
+
+                        <div id="uw-a11y-view-settings" class="uw-a11y-view" hidden>
+                            <div class="uw-a11y-settings">
+                                <h3>Settings</h3>
+                                <p>Lightweight options will appear here. For now, results filters and checked items persist for this session.</p>
+                            </div>
+                        </div>
+
+                        <div id="uw-a11y-view-help" class="uw-a11y-view" hidden>
+                            <div class="uw-a11y-help">
+                                <h3>Help</h3>
+                                <ul>
+                                    <li>Click a result to highlight it on the page.</li>
+                                    <li>Use the eye icons to filter categories.</li>
+                                    <li>Open “Learn more” links for WCAG details.</li>
+                                </ul>
+                                <p>Need more? Visit the <a href="https://github.com/althe3rd/Pinpoint#readme" target="_blank" rel="noopener noreferrer">documentation</a>.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
             `;
             
             // Add event listeners
             this.shadowRoot.getElementById('uw-a11y-close').onclick = () => this.remove();
-            this.shadowRoot.getElementById('uw-a11y-minimize').onclick = () => this.toggleMinimize();
+            // Hide deprecated minimize control; panel is now draggable
+            const minBtn = this.shadowRoot.getElementById('uw-a11y-minimize');
+            if (minBtn) minBtn.style.display = 'none';
+            // Enable drag on header
+            this.initDrag();
+            this.initNavigation();
+            this.renderSettings();
             
+            // Load GSAP and animate panel
+            this.loadGSAP().then(() => {
+                this.setupInitialHeight();
+                this.animatePanel();
+                // Small delay to ensure panel animation starts before nav animation
+                setTimeout(() => {
+                    this.animateNavigation();
+                }, 100);
+                this.setupResizeHandler();
+            });
+
             return this.shadowRoot.getElementById('uw-a11y-panel');
         },
         
@@ -1135,14 +2273,129 @@
                     font-family: "Red Hat Display", "Red Hat Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
                 }
                 
+                /* ===== Scrollbar CSS ===== */
+                /* Firefox */
+                * {
+                    scrollbar-width: auto;
+                    scrollbar-color:rgb(132, 132, 132) rgba(255,255,255,0.0) ;
+                }
 
-                #uw-a11y-panel {
+                /* Chrome, Edge, and Safari */
+                *::-webkit-scrollbar {
+                    width: 8px;
+                   
+                }
+
+                *::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+
+                *::-webkit-scrollbar-thumb {
+                    background-color:rgb(188, 188, 188);
+                    border-radius: 10px;
+                   
+                }
+
+                #uw-a11y-wrapper {
+                    display: grid;
+                    grid-template-columns: 60px 1fr;
                     position: fixed;
                     top: 20px;
                     right: 20px;
                     width: 450px;
-                    max-height: 85vh;
-                    background: rgba(255,255,255,0.8);
+                    
+                    z-index: 999999;
+                    gap: .4rem;
+                    background: rgba(0,0,0,0.7);
+                    backdrop-filter: blur(20px);
+                    padding: 4px;
+                    border-radius: 16px;
+                    transition: height 0.4s;
+                }
+
+                #uw-a11y-nav {
+                    justify-content: center;
+                    color: #fff;
+
+                }
+
+                #uw-a11y-nav ul {
+                    list-style: none;
+                    padding: 0;
+                    margin: 0;
+                    display: flex;
+                    gap: 1rem;
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                #uw-a11y-nav ul li {
+                    position: relative;
+                    /* Prevent FOUC: start hidden; GSAP/CSS will reveal */
+                    opacity: 0;
+                }
+
+                #uw-a11y-nav ul li a {
+                    display: block;
+                    color: #fff;
+                    text-decoration: none;
+                    padding: 0.5rem .5rem;
+                    border-radius: 12px;
+                    transition: background 0.3s ease;
+                    font-size: 0.7rem;
+                    text-align: center
+                }
+
+                #uw-a11y-nav ul li a:hover {
+                    background: rgba(255, 255, 255, 0.1);
+                }
+
+                #uw-a11y-nav ul li a.active {
+                    background: rgba(255,255,255,0.18);
+                }
+
+                #uw-a11y-nav ul li a svg {
+                    width: 20px;
+                    height: 20px;
+                    margin: 0 auto;
+                    margin-bottom: 4px;
+                    display: block;
+                
+                }
+
+                .uw-a11y-nav-icon {
+                    width: 22px;
+                    height: 22px;
+                    display: block;
+                    margin: 0 auto 4px auto;
+                }
+
+                .uw-a11y-nav-label {
+                    display: block;
+                    line-height: 1.1;
+                }
+
+                /* View switching */
+                .uw-a11y-view[hidden] { display: none; }
+
+                /* Settings styles */
+                .uw-a11y-settings { margin-bottom: 3rem; }
+                .uw-a11y-settings h3 { margin: 0 0 .5rem 0; }
+                .uw-a11y-form-row { margin: .75rem 0; }
+                .uw-a11y-input { width: 80%; padding: 8px 14px; border-radius: 6px; border: 1px solid #cbd3da; font-size: 14px; border-radius: 50rem; }
+                .uw-a11y-helptext { font-size: 12px; color: #555; margin-top: 4px; }
+                .uw-a11y-actions { display: flex; gap: .5rem; margin-top: .75rem; }
+                .uw-a11y-btn { appearance: none; border: 1px solid #b6bcc2; background: #fff; color: #111; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+                .uw-a11y-btn.primary { background: #0d6efd; border-color: #0d6efd; color: #fff; }
+                .uw-a11y-btn:disabled { opacity: .6; cursor: not-allowed; }
+                .uw-a11y-reset-icon { width: 16px; height: 16px; vertical-align: text-bottom; margin-right: 6px; }
+                .uw-a11y-msg { font-size: 12px; margin-top: 6px; }
+                .uw-a11y-msg.ok { color: #155724; }
+                .uw-a11y-msg.err { color: #721c24; }
+
+                #uw-a11y-panel {
+                    
+                    background: rgba(239, 239, 239, 0.9);
                     border: 1px solid rgba(255,255,255,0.85);
                     border-radius: 12px;
                     backdrop-filter: blur(12px);
@@ -1152,8 +2405,96 @@
                     font-size: 14px;
                     overflow: hidden;
                     transition: all 0.3s ease;
-                    
+                    outline: none;
                 }
+                
+                #uw-a11y-panel:focus {
+                    outline: 3px solid #007cba;
+                    outline-offset: 2px;
+                }
+                
+                /* Screen reader only text */
+                .sr-only {
+                    position: absolute;
+                    width: 1px;
+                    height: 1px;
+                    padding: 0;
+                    margin: -1px;
+                    overflow: hidden;
+                    clip: rect(0, 0, 0, 0);
+                    white-space: nowrap;
+                    border: 0;
+                }
+                
+                /* Animated click icon */
+                .uw-a11y-click-icon {
+                    display: inline-block;
+                    margin-right: 8px;
+                    color: #007cba;
+                    animation: uw-pulse 2s ease-in-out infinite;
+                    vertical-align: middle;
+                }
+                
+                @keyframes uw-pulse {
+                    0% {
+                        transform: scale(1);
+                        opacity: 1;
+                    }
+                    50% {
+                        transform: scale(1.1);
+                        opacity: 0.8;
+                    }
+                    100% {
+                        transform: scale(1);
+                        opacity: 1;
+                    }
+                }
+
+                #uw-a11y-panel .accentcolors {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: -1;
+                }
+
+                #uw-a11y-panel .accentcolors .color1 {
+                    content: "";
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 30%;
+                    height: 60px;
+                    filter: blur(60px);
+                    background: rgba(121, 20, 222, 0.6);
+                    z-index: -1;
+                }
+
+                #uw-a11y-panel .accentcolors .color2 {
+                    content: "";
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    width: 30%;
+                    height: 50px;
+                    filter: blur(60px);
+                    background: rgba(52, 126, 223, 0.6);
+                    z-index: -1;
+                }
+
+                #uw-a11y-panel .accentcolors .color3 {
+                    content: "";
+                    position: absolute;
+                    top: 0;
+                    left: 30%;
+                    width: 40%;
+                    height: 20px;
+                    filter: blur(60px);
+                    background: rgba(23, 72, 248, 0.6);
+                    z-index: -1;
+                }
+
                 
                 #uw-a11y-panel.minimized {
                     bottom: -1px;
@@ -1162,6 +2503,59 @@
                     width: 400px;
                     max-height: 180px;
                     border-radius: 8px 8px 0 0;
+                }
+
+                .violationtype {
+                    margin-bottom: 0.5rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                }
+                #uw-a11y-panel .info-with-tooltip {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    position: relative;
+                }
+                #uw-a11y-panel .info-btn {
+                    background: white;
+                    border: 1px solid rgba(0,0,0,0.2);
+                    color: #333;
+                    width: 18px;
+                    height: 18px;
+                    border-radius: 50%;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 12px;
+                    line-height: 1;
+                    cursor: pointer;
+                    padding: 0;
+                }
+                #uw-a11y-panel .info-btn:focus {
+                    outline: 2px solid #007cba;
+                    outline-offset: 2px;
+                }
+                #uw-a11y-panel .tooltip {
+                    position: absolute;
+                    left: 0;
+                    top: 140%;
+                    background: #212529;
+                    color: #fff;
+                    padding: 6px 8px;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    max-width: 260px;
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+                    opacity: 0;
+                    visibility: hidden;
+                    transition: opacity 0.15s ease;
+                    z-index: 10;
+                }
+                #uw-a11y-panel .info-btn:hover + .tooltip,
+                #uw-a11y-panel .info-btn:focus + .tooltip {
+                    opacity: 1;
+                    visibility: visible;
                 }
 
                 
@@ -1204,6 +2598,14 @@
                     font-size: 8px;
                 }
                 
+                #uw-a11y-panel.minimized .uw-a11y-score-info {
+                    width: 14px;
+                    height: 14px;
+                    font-size: 9px;
+                    top: -3px;
+                    right: -3px;
+                }
+                
                 #uw-a11y-panel.minimized h3 {
                     font-size: 14px;
                     margin-bottom: 0.5rem;
@@ -1213,18 +2615,16 @@
                     transform: rotate(180deg);
                 }
                 #uw-a11y-panel #uw-a11y-header {
-                    
                     color: #000;
                     padding: 12px 16px;
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                                            cursor: default;
+                    cursor: grab; /* drag handle */
+                    user-select: none;
                 }
                 
-                #uw-a11y-panel #uw-a11y-header:active {
-                   
-                }
+                #uw-a11y-panel #uw-a11y-header:active { cursor: grabbing; }
                 
                 #uw-a11y-panel .uw-a11y-header-buttons {
                     display: flex;
@@ -1278,18 +2678,77 @@
                     background: rgba(255,255,255,0.3);
                 }
                 
-                #uw-a11y-panel #uw-a11y-minimize {
-                    font-size: 20px;
-                    font-weight: bold;
-                }
+                #uw-a11y-panel #uw-a11y-minimize { display: none; }
                 #uw-a11y-panel #uw-a11y-content {
                     max-height: calc(85vh - 60px);
                     overflow-y: auto;
                     padding: 16px;
+                    transition: height 0.4s ease-in-out;
+                    box-sizing: border-box;
+                }
+
+                /* Initial animation states to prevent flash - fast transitions for GSAP override */
+                #uw-a11y-wrapper {
+                    opacity: 0;
+                    transform: scale(0.9) translateY(20px);
+                }
+
+                /* Important: Only apply the initial offset when using the CSS fallback.
+                   GSAP handles transforms when available, so the base <li> should not be offset. */
+                #uw-a11y-nav ul li.uw-a11y-css-animate {
+                    opacity: 0;
+                    transform: translateX(-30px) scale(0.9);
+                }
+
+                /* CSS-only animations (fallback when GSAP not available) */
+                #uw-a11y-wrapper.uw-a11y-css-animate {
+                    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+                }
+
+                #uw-a11y-nav ul li.uw-a11y-css-animate {
+                    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+                }
+
+                /* Stagger delays for CSS-only animations */
+                #uw-a11y-nav ul li.uw-a11y-css-animate:nth-child(1) { transition-delay: 0.3s; }
+                #uw-a11y-nav ul li.uw-a11y-css-animate:nth-child(2) { transition-delay: 0.4s; }
+                #uw-a11y-nav ul li.uw-a11y-css-animate:nth-child(3) { transition-delay: 0.5s; }
+                #uw-a11y-nav ul li.uw-a11y-css-animate:nth-child(4) { transition-delay: 0.6s; }
+                #uw-a11y-nav ul li.uw-a11y-css-animate:nth-child(5) { transition-delay: 0.7s; }
+
+                /* Show elements when animations are ready */
+                #uw-a11y-wrapper.uw-a11y-animate-in {
+                    opacity: 1;
+                    transform: scale(1) translateY(0);
+                }
+
+                #uw-a11y-nav ul li.uw-a11y-animate-in {
+                    opacity: 1;
+                    transform: translateX(0) scale(1);
+                }
+
+                /* Respect reduced motion preference */
+                @media (prefers-reduced-motion: reduce) {
+                    #uw-a11y-panel #uw-a11y-content {
+                        transition: none;
+                    }
+                    
+                    #uw-a11y-nav ul li a {
+                        transition: none;
+                    }
+
+                    /* Immediately show elements when reduced motion is preferred */
+                    #uw-a11y-wrapper,
+                    #uw-a11y-nav ul li {
+                        opacity: 1 !important;
+                        transform: none !important;
+                        transition: none !important;
+                    }
                 }
                 #uw-a11y-panel #uw-a11y-summary {
                     background: #f8f9fa;
-                    border: 1px solid #dee2e6;
+                    /*border: 1px solid #dee2e6;*/
+                    box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.12);
                     border-radius: 10px;
                     padding: 10px;
                     margin-bottom: 16px;
@@ -1315,21 +2774,22 @@
                 }
                 
                 #uw-a11y-panel .uw-a11y-issue.error:hover {
-                    background: #f5c2c7;
+                    background: #f7eaebff;
                     box-shadow: 0 4px 20px 0 rgba(211, 23, 41, 0.35);
-                    border-color: rgba(220, 53, 69, 0.3);
+                    border-color: rgba(182, 25, 41, 0.96);
                 }
                 
                 #uw-a11y-panel .uw-a11y-issue.warning:hover {
-                    background: #F6EBC7;
+                    background: #faf6e9ff;
                     box-shadow: 0 4px 20px 0 rgba(211, 133, 23, 0.35);
-                    border-color: rgba(255, 193, 7, 0.4);
+                    border-color: rgba(255, 193, 7, 0.87);
                 }
                 
                 #uw-a11y-panel .uw-a11y-issue.info:hover {
-                    background: #b8daff;
+                    background: #f5f9feff;
                     box-shadow: 0 4px 20px 0 rgba(23, 104, 211, 0.35);
-                    border-color: rgba(23, 162, 184, 0.3);
+                    border-color: rgba(23, 162, 184, 0.93);
+                    cursor: default;
                 }
                 
                 /* Focus states for keyboard accessibility */
@@ -1342,19 +2802,19 @@
                 
                 #uw-a11y-panel .uw-a11y-issue.error:focus {
                     outline-color: #dc3545;
-                    background: #f5c2c7;
-                    box-shadow: 0 4px 20px 0 rgba(211, 23, 41, 0.35);
+                    background: #fbe6e8ff;
+                    box-shadow: 0 4px 20px 0 rgba(211, 23, 42, 0.38);
                 }
                 
                 #uw-a11y-panel .uw-a11y-issue.warning:focus {
                     outline-color: #ffc107;
-                    background: #F6EBC7;
+                    background: #fbf5e1ff;
                     box-shadow: 0 4px 20px 0 rgba(211, 133, 23, 0.35);
                 }
                 
                 #uw-a11y-panel .uw-a11y-issue.info:focus {
                     outline-color: #17a2b8;
-                    background: #b8daff;
+                    background: #dcedffff;
                     box-shadow: 0 4px 20px 0 rgba(23, 104, 211, 0.35);
                 }
                 
@@ -1376,17 +2836,17 @@
                 }
                #uw-a11y-panel .uw-a11y-issue.error {
                     border-left-color: #dc3545;
-                    background: #f8d7da;
+                    background: #f9ebecff;
                     box-shadow: 0 2px 10px 0 rgba(211, 23, 41, 0.22);
                 }
                 #uw-a11y-panel .uw-a11y-issue.warning {
                     border-left-color: #ffc107;
-                    background: #fff3cd;
+                    background: #fffbecff;
                     box-shadow: 0 2px 10px 0 rgba(211, 133, 23, 0.22);
                 }
                 #uw-a11y-panel .uw-a11y-issue.info {
                     border-left-color: #17a2b8;
-                    background: #d1ecf1;
+                    background: #e5f4f7ff;
                     box-shadow: 0 2px 10px 0 rgba(23, 104, 211, 0.22);
                 }
                 #uw-a11y-panel .uw-a11y-issue h4 {
@@ -1401,12 +2861,12 @@
                      gap: 8px;
                  }
                  
-                 #uw-a11y-panel .uw-a11y-issue-icon {
-                     width: 16px;
-                     height: 16px;
-                     flex-shrink: 0;
-                     align-self: flex-start;
-                 }
+                #uw-a11y-panel .uw-a11y-issue-icon {
+                    width: 18px;
+                    height: 18px;
+                    flex-shrink: 0;
+                    align-self: flex-start;
+                }
                  
                  #uw-a11y-panel .uw-a11y-error-icon {
                      color: #dc3545;
@@ -1418,13 +2878,28 @@
                      margin-top: 2px;
                  }
                  
-                 #uw-a11y-panel .uw-a11y-issue.checked .uw-a11y-warning-icon {
+                 #uw-a11y-panel .uw-a11y-issue.checked .uw-a11y-issue-icon.type-warning {
                      color: #155724;
                  }
                  
                  #uw-a11y-panel .uw-a11y-issue-title {
                      flex: 1;
                  }
+
+                /* Unified icon styles for summary + issue items */
+                #uw-a11y-panel .issue-type-icon svg {
+                    width: 18px;
+                    height: 18px;
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+                #uw-a11y-panel .issue-type-icon { display: inline-flex; align-items: center; margin: 0 4px 0 6px; }
+                #uw-a11y-panel .issue-type-icon.type-error svg,
+                #uw-a11y-panel .uw-a11y-issue-icon.type-error { color: #dc3545; }
+                #uw-a11y-panel .issue-type-icon.type-warning svg,
+                #uw-a11y-panel .uw-a11y-issue-icon.type-warning { color: #e0a800; }
+                #uw-a11y-panel .issue-type-icon.type-info svg,
+                #uw-a11y-panel .uw-a11y-issue-icon.type-info { color: #17a2b8; }
                 #uw-a11y-panel .uw-a11y-issue p {
                     margin: 4px 0;
                     line-height: 1.4;
@@ -1498,6 +2973,32 @@
                 #uw-a11y-panel .count-warning { background: #ffc107; color: #212529; }
                 #uw-a11y-panel .count-info { background: #17a2b8; }
                 #uw-a11y-panel .count-verified { background: #28a745; }
+                #uw-a11y-panel .filter-toggle .icon-eye-off { display: none; }
+                #uw-a11y-panel .filter-toggle[aria-pressed="false"] .icon-eye { display: none; }
+                #uw-a11y-panel .filter-toggle[aria-pressed="false"] .icon-eye-off { display: inline; }
+                #uw-a11y-panel .filter-toggle {
+                    background: none;
+                    border: 1px solid rgba(0,0,0,0.15);
+                    border-radius: 6px;
+                    padding: 2px 6px;
+                    cursor: pointer;
+                    color: #333;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    font-size: 12px;
+                }
+                #uw-a11y-panel .filter-toggle:hover {
+                    background: rgba(0,0,0,0.05);
+                }
+                #uw-a11y-panel .filter-toggle:focus {
+                    outline: 2px solid #007cba;
+                    outline-offset: 2px;
+                }
+                #uw-a11y-panel .filter-toggle[aria-pressed="false"] {
+                    opacity: 0.45;
+                }
+                #uw-a11y-panel .filter-icon { width: 16px; height: 16px; }
                 #uw-a11y-panel .uw-a11y-manual-check {
                     margin: 8px 0;
                     padding: 8px;
@@ -1575,7 +3076,7 @@
                 }
                 #uw-a11y-panel .uw-a11y-score-inner {
                     width: 90px;
-                    height: 90px;
+                    height: 90px; 
                     background: white;
                     border-radius: 50%;
                     display: flex;
@@ -1592,6 +3093,34 @@
                     font-size: 10px;
                     color: #666;
                     text-transform: uppercase;
+                }
+                #uw-a11y-panel .uw-a11y-score-info {
+                    position: absolute;
+                    top: -5px;
+                    right: -25px;
+                    width: 18px;
+                    height: 18px;
+                    background: #fff;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-size: 11px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    color: #000;
+                    border: 2px solid white;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                    transition: all 0.2s ease;
+                }
+                #uw-a11y-panel .uw-a11y-score-info:hover,
+                #uw-a11y-panel .uw-a11y-score-info:focus {
+                    background: #0056b3;
+                    transform: scale(1.1);
+                    color: #fff;
+                    outline: none;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
                 }
                 #uw-a11y-panel .uw-a11y-details {
                     margin-top: 1rem;
@@ -1731,7 +3260,1543 @@
         #uw-a11y-panel .how-to-fix code:not(:last-child) {
             margin-right: 2px;
         }
+        
+        /* Score explanation modal styles */
+        .uw-a11y-score-explanation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000001;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .uw-a11y-explanation-content {
+            background: white;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .uw-a11y-explanation-header {
+            padding: 20px 20px 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+        
+        .uw-a11y-explanation-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .uw-a11y-explanation-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            color: #666;
+            transition: color 0.2s ease;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .uw-a11y-explanation-close:hover,
+        .uw-a11y-explanation-close:focus {
+            color: #333;
+            outline: 2px solid #007bff;
+            outline-offset: 2px;
+        }
+        
+        .uw-a11y-explanation-body {
+            padding: 0 20px 20px 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .uw-a11y-explanation-body h4 {
+            color: #007bff;
+            margin: 20px 0 10px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .uw-a11y-explanation-body ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .uw-a11y-explanation-body li {
+            margin: 8px 0;
+        }
+        
+        .uw-a11y-explanation-note {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .uw-a11y-explanation-content {
+                margin: 10px;
+                max-height: 90vh;
+            }
+            
+            .uw-a11y-explanation-header,
+            .uw-a11y-explanation-body {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+        }
+        
+        /* Tab order visualization styles */
+        .uw-a11y-tab-order-overlay {
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999998;
+        }
+        
+        .uw-a11y-tab-indicator {
+            position: absolute;
+            background: #ff6b35;
+            color: white;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            z-index: 999999;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            animation: uw-tab-indicator-appear 0.3s ease-out forwards;
+        }
+        
+        .uw-a11y-tab-indicator:nth-child(odd) {
+            background: #ff6b35;
+        }
+        
+        .uw-a11y-tab-indicator:nth-child(even) {
+            background: #4285f4;
+        }
+        
+        @keyframes uw-tab-indicator-appear {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        
+        /* Enhanced navigation button state for tab order */
+        #uw-a11y-nav ul li a.active {
+            background: rgba(255,255,255,0.25);
+            box-shadow: inset 0 0 0 2px rgba(255,255,255,0.3);
+        }
+        
+        /* Inspector Tools styles */
+        .uw-a11y-inspector {
+            padding: 0;
+        }
+        
+        .uw-a11y-inspector h3 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .uw-a11y-inspector > p {
+            margin: 0 0 1.5rem 0;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .uw-a11y-inspector-section {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .uw-a11y-inspector-section h4 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .uw-a11y-inspector-section p {
+            margin: 0 0 1rem 0;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .uw-a11y-inspector-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .uw-a11y-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        
+        .uw-a11y-btn-secondary {
+            background: white;
+            color: #495057;
+            border: 1px solid #ced4da;
+        }
+        
+        .uw-a11y-btn-secondary:hover:not(:disabled) {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+        
+        .uw-a11y-btn-secondary:focus:not(:disabled) {
+            outline: 2px solid #007bff;
+            outline-offset: 2px;
+        }
+        
+        .uw-a11y-btn-secondary.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .uw-a11y-btn-secondary.active:hover {
+            background: #0056b3;
+            border-color: #0056b3;
+        }
+        
+        .uw-a11y-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .uw-a11y-inspector-status {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .uw-a11y-coming-soon {
+            background: #ffc107;
+            color: #212529;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .uw-a11y-inspector-placeholder {
+            position: relative;
+        }
+        
+        .uw-a11y-inspector-placeholder::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.8) 50%, transparent 60%);
+            pointer-events: none;
+            border-radius: 8px;
+        }
         </style>`;
+        },
+
+        // Check if user prefers reduced motion
+        prefersReducedMotion: function() {
+            return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        },
+
+        // Load GSAP and initialize animations
+        loadGSAP: function() {
+            return new Promise((resolve, reject) => {
+                // Check if user prefers reduced motion
+                if (this.prefersReducedMotion()) {
+                    console.log('🎯 Reduced motion preferred - animations disabled');
+                    resolve(null);
+                    return;
+                }
+                
+                // Check if GSAP is already loaded
+                if (window.gsap) {
+                    resolve(window.gsap);
+                    return;
+                }
+                
+                // Load GSAP from CDN
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js';
+                script.onload = () => {
+                    console.log('✨ GSAP loaded successfully');
+                    resolve(window.gsap);
+                };
+                script.onerror = () => {
+                    console.warn('❌ Failed to load GSAP, animations will be disabled');
+                    resolve(null);
+                };
+                document.head.appendChild(script);
+            });
+        },
+
+        // Setup initial height for smooth transitions
+        setupInitialHeight: function() {
+            const content = this.shadowRoot.getElementById('uw-a11y-content');
+            if (!content) return;
+            
+            // Set initial height based on the first view (results)
+            const initialHeight = this.measureViewHeight('results');
+            const maxAllowedHeight = this.getMaxContentHeight();
+            
+            if (initialHeight) {
+                content.style.height = initialHeight + 'px';
+                content.style.maxHeight = maxAllowedHeight + 'px'; // Maintain max-height constraint
+                // Keep vertical scrolling available; rely on CSS to show only when needed
+                content.style.overflowY = 'auto';
+            }
+        },
+
+        // Setup window resize handler to recalculate max heights
+        setupResizeHandler: function() {
+            if (this.resizeHandler) {
+                window.removeEventListener('resize', this.resizeHandler);
+            }
+            
+            this.resizeHandler = () => {
+                const content = this.shadowRoot.getElementById('uw-a11y-content');
+                if (!content) return;
+                
+                const maxAllowedHeight = this.getMaxContentHeight();
+                const currentView = this.currentView || 'results';
+                const idealHeight = this.measureViewHeight(currentView);
+                const newHeight = Math.min(idealHeight, maxAllowedHeight);
+                
+                // Update max-height and current height if needed
+                content.style.maxHeight = maxAllowedHeight + 'px';
+                if (window.gsap && !this.prefersReducedMotion()) {
+                    window.gsap.to(content, {
+                        height: newHeight,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                } else {
+                    content.style.height = newHeight + 'px';
+                }
+                
+                // Always allow vertical scroll so long lists remain accessible
+                content.style.overflowY = 'auto';
+            };
+            
+            window.addEventListener('resize', this.resizeHandler);
+        },
+
+        // Make the panel draggable by its header
+        initDrag: function() {
+            const wrapper = this.shadowRoot.getElementById('uw-a11y-wrapper');
+            const header = this.shadowRoot.getElementById('uw-a11y-header');
+            if (!wrapper || !header) return;
+
+            let startX = 0, startY = 0, startLeft = 0, startTop = 0;
+            const onPointerDown = (e) => {
+                // Only left-click/primary pointer drags
+                if (e.button !== undefined && e.button !== 0) return;
+                // Do not start a drag when clicking header controls (close, etc.)
+                if (e.target && e.target.closest && e.target.closest('.uw-a11y-header-buttons')) {
+                    return; // allow normal button clicks
+                }
+                e.preventDefault();
+                try { header.setPointerCapture(e.pointerId); } catch (_) {}
+
+                const rect = wrapper.getBoundingClientRect();
+                // Switch to left/top positioning for free dragging
+                wrapper.style.right = 'auto';
+                wrapper.style.left = rect.left + 'px';
+                wrapper.style.top = rect.top + 'px';
+
+                startX = e.clientX; startY = e.clientY;
+                startLeft = rect.left; startTop = rect.top;
+
+                const onPointerMove = (ev) => {
+                    const dx = ev.clientX - startX;
+                    const dy = ev.clientY - startY;
+                    let newLeft = startLeft + dx;
+                    let newTop = startTop + dy;
+                    // Constrain within viewport
+                    const maxLeft = Math.max(0, window.innerWidth - wrapper.offsetWidth);
+                    const maxTop = Math.max(0, window.innerHeight - 40); // keep header reachable
+                    newLeft = Math.min(Math.max(0, newLeft), maxLeft);
+                    newTop = Math.min(Math.max(0, newTop), maxTop);
+                    wrapper.style.left = newLeft + 'px';
+                    wrapper.style.top = newTop + 'px';
+                };
+
+                const onPointerUp = () => {
+                    document.removeEventListener('pointermove', onPointerMove);
+                    document.removeEventListener('pointerup', onPointerUp);
+                    try { header.releasePointerCapture(e.pointerId); } catch (_) {}
+                    // Persist position
+                    try {
+                        const pos = { left: parseInt(wrapper.style.left || '0', 10) || 0, top: parseInt(wrapper.style.top || '0', 10) || 0 };
+                        sessionStorage.setItem('uw-a11y-pos', JSON.stringify(pos));
+                    } catch (_) {}
+                };
+
+                document.addEventListener('pointermove', onPointerMove);
+                document.addEventListener('pointerup', onPointerUp);
+            };
+
+            header.addEventListener('pointerdown', onPointerDown);
+        },
+
+        // Apply previously saved position to the wrapper, if present
+        applySavedPosition: function() {
+            try {
+                const raw = sessionStorage.getItem('uw-a11y-pos');
+                if (!raw) return;
+                const pos = JSON.parse(raw);
+                const wrapper = this.shadowRoot.getElementById('uw-a11y-wrapper');
+                if (!wrapper || typeof pos !== 'object') return;
+                if (typeof pos.left === 'number' && typeof pos.top === 'number') {
+                    wrapper.style.right = 'auto';
+                    wrapper.style.left = `${pos.left}px`;
+                    wrapper.style.top = `${pos.top}px`;
+                }
+            } catch (_) { /* ignore */ }
+        },
+
+        // Animate the entire panel entrance
+        animatePanel: function() {
+            const wrapper = this.shadowRoot.getElementById('uw-a11y-wrapper');
+            if (!wrapper) return;
+            
+            if (window.gsap && !this.prefersReducedMotion()) {
+                // Use GSAP for enhanced animations - no delay needed
+                window.gsap.to(wrapper, {
+                    scale: 1,
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.5,
+                    ease: "power3.out"
+                });
+            } else {
+                // Use CSS animations as fallback or for reduced motion
+                wrapper.classList.add('uw-a11y-css-animate');
+                // Small delay to ensure DOM is ready
+                setTimeout(() => {
+                    wrapper.classList.add('uw-a11y-animate-in');
+                }, 50);
+            }
+        },
+
+        // Animate navigation items with stagger effect
+        animateNavigation: function() {
+            const navItems = this.shadowRoot.querySelectorAll('#uw-a11y-nav ul li');
+            console.log('🎯 animateNavigation called, found', navItems.length, 'nav items');
+            
+            if (navItems.length === 0) {
+                console.warn('❌ No navigation items found for animation');
+                return;
+            }
+            
+            if (window.gsap && !this.prefersReducedMotion()) {
+                console.log('✨ Starting GSAP navigation animation');
+                
+                // Clear CSS transforms and let GSAP take full control
+                navItems.forEach((item, index) => {
+                    item.style.transform = '';
+                    item.style.opacity = '';
+                    console.log(`🔧 Cleared styles for nav item ${index + 1}`);
+                });
+                
+                // Use GSAP for enhanced animations - set initial state and animate
+                const tl = window.gsap.fromTo(navItems, 
+                    {
+                        x: -30, 
+                        opacity: 0,
+                        scale: 0.9
+                    },
+                    {
+                        x: 0,
+                        opacity: 1,
+                        scale: 1,
+                        duration: 0.6,
+                        stagger: 0.1,
+                        ease: "back.out(1.7)",
+                        delay: 0.3,
+                        onStart: () => console.log('🚀 GSAP nav animation started'),
+                        onComplete: () => console.log('✅ GSAP nav animation completed')
+                    }
+                );
+                
+                console.log('📝 GSAP timeline created:', tl);
+                
+                // Add subtle hover animations with conflict prevention
+                navItems.forEach(item => {
+                    const link = item.querySelector('a');
+                    if (!link) return;
+                    
+                    link.addEventListener('mouseenter', () => {
+                        // Don't animate during view transitions or if reduced motion is preferred
+                        if (this.isAnimating || this.prefersReducedMotion()) return;
+                        
+                        window.gsap.to(item, {
+                            scale: 1.05,
+                            duration: 0.3,
+                            ease: "power2.out",
+                            overwrite: "auto"
+                        });
+                    });
+                    
+                    link.addEventListener('mouseleave', () => {
+                        // Don't animate if reduced motion is preferred
+                        if (this.prefersReducedMotion()) return;
+                        
+                        window.gsap.to(item, {
+                            scale: 1,
+                            duration: 0.3,
+                            ease: "power2.out",
+                            overwrite: "auto"
+                        });
+                    });
+                });
+            } else {
+                // Use CSS animations as fallback or for reduced motion
+                navItems.forEach(item => {
+                    item.classList.add('uw-a11y-css-animate');
+                });
+                
+                // Small delay to ensure DOM is ready, then trigger staggered animation
+                setTimeout(() => {
+                    navItems.forEach((item, index) => {
+                        setTimeout(() => {
+                            item.classList.add('uw-a11y-animate-in');
+                        }, index * 100); // 100ms stagger
+                    });
+                }, 100);
+            }
+        },
+
+        // Calculate the maximum allowed content height
+        getMaxContentHeight: function() {
+            // Calculate 85vh minus the header height (approximately 60px)
+            const maxHeight = Math.floor(window.innerHeight * 0.85) - 60;
+            return Math.max(200, maxHeight); // Minimum height of 200px
+        },
+
+        // Measure the height of a specific view section with max-height constraint
+        measureViewHeight: function(viewName) {
+            const viewEl = this.shadowRoot.getElementById(`uw-a11y-view-${viewName}`);
+            if (!viewEl) return null;
+            
+            // Temporarily show the element to measure its height
+            const wasHidden = viewEl.hasAttribute('hidden');
+            const originalStyles = {
+                position: viewEl.style.position,
+                visibility: viewEl.style.visibility,
+                height: viewEl.style.height
+            };
+            
+            // Make it measurable but invisible
+            viewEl.removeAttribute('hidden');
+            viewEl.style.position = 'absolute';
+            viewEl.style.visibility = 'hidden';
+            viewEl.style.height = 'auto';
+            
+            // Measure the natural height
+            const naturalHeight = viewEl.scrollHeight;
+            const maxAllowedHeight = this.getMaxContentHeight();
+            
+            // Add a small padding so short rounding differences don't cause tiny scrollbars
+            const padded = naturalHeight + (this.heightPadding || 0);
+            // Use the smaller of padded height or max allowed height
+            const targetHeight = Math.min(padded, maxAllowedHeight);
+            
+            // Restore original state
+            if (wasHidden) viewEl.setAttribute('hidden', '');
+            viewEl.style.position = originalStyles.position;
+            viewEl.style.visibility = originalStyles.visibility;
+            viewEl.style.height = originalStyles.height;
+            
+            return targetHeight;
+        },
+
+        // Animate the panel height transition
+        animatePanelHeight: function(targetHeight) {
+            if (!window.gsap) return Promise.resolve();
+            
+            const content = this.shadowRoot.getElementById('uw-a11y-content');
+            if (!content) return Promise.resolve();
+            
+            // Kill any existing height animations
+            window.gsap.killTweensOf(content);
+            
+            return new Promise((resolve) => {
+                window.gsap.to(content, {
+                    height: targetHeight,
+                    duration: 0.4,
+                    ease: "power2.inOut",
+                    onComplete: resolve
+                });
+            });
+        },
+
+        // Animate navigation view transitions with height changes
+        animateViewTransition: function(currentView, newView) {
+            if (!window.gsap) return Promise.resolve();
+            
+            const currentEl = this.shadowRoot.getElementById(`uw-a11y-view-${currentView}`);
+            const newEl = this.shadowRoot.getElementById(`uw-a11y-view-${newView}`);
+            const content = this.shadowRoot.getElementById('uw-a11y-content');
+            
+            return new Promise((resolve) => {
+                // Kill any existing animations on these elements
+                if (currentEl) window.gsap.killTweensOf(currentEl);
+                if (newEl) window.gsap.killTweensOf(newEl);
+                if (content) window.gsap.killTweensOf(content);
+                
+                if (!currentEl || !newEl || currentView === newView) {
+                    resolve();
+                    return;
+                }
+                
+                // Measure the target height for the new view
+                const targetHeight = this.measureViewHeight(newView);
+                if (!targetHeight) {
+                    resolve();
+                    return;
+                }
+                
+                // Animate current view out and start height transition
+                window.gsap.to(currentEl, {
+                    opacity: 0,
+                    y: -10,
+                    duration: 0.2,
+                    ease: "power2.in",
+                    onComplete: () => {
+                        // Switch visibility
+                        currentEl.setAttribute('hidden', '');
+                        newEl.removeAttribute('hidden');
+                        
+                        // Ensure we don't exceed max height and manage overflow
+                        const maxAllowedHeight = this.getMaxContentHeight();
+                        const finalHeight = Math.min(targetHeight, maxAllowedHeight);
+                        
+                        // Keep vertical scrolling enabled; browser will show scrollbar only if needed
+                        content.style.overflowY = 'auto';
+                        
+                        // Animate height change and new view in simultaneously
+                        const heightTween = window.gsap.to(content, {
+                            height: finalHeight,
+                            duration: 0.4,
+                            ease: "power2.inOut"
+                        });
+                        
+                        // Animate new view in
+                        window.gsap.fromTo(newEl, 
+                            { opacity: 0, y: 10 },
+                            { 
+                                opacity: 1, 
+                                y: 0,
+                                duration: 0.3,
+                                ease: "power2.out",
+                                delay: 0.1,
+                                onComplete: resolve
+                            }
+                        );
+                    }
+                });
+            });
+        },
+
+        // Initialize left-hand navigation
+        initNavigation: function() {
+            // Initialize current view tracker
+            this.currentView = null;
+            this.isAnimating = false;
+            
+            const map = [
+                { id: 'uw-a11y-nav-results', view: 'results' },
+                { id: 'uw-a11y-nav-inspector', view: 'inspector' },
+                { id: 'uw-a11y-nav-settings', view: 'settings' },
+                { id: 'uw-a11y-nav-help', view: 'help' },
+                { id: 'uw-a11y-nav-about', view: 'about' }
+            ];
+            map.forEach(({ id, view }) => {
+                const link = this.shadowRoot.getElementById(id);
+                if (link) {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        // Prevent rapid clicking during animations
+                        if (this.isAnimating) return;
+                        this.showView(view);
+                    });
+                }
+            });
+            
+            // Default to results
+            this.showView('results');
+        },
+
+        // Show a specific view and update nav state
+        showView: function(view) {
+            const views = ['results', 'inspector', 'settings', 'help', 'about'];
+            const currentView = this.currentView;
+            
+            // Don't do anything if we're already on this view or currently animating
+            if (currentView === view || this.isAnimating) return;
+            
+            // Update current view tracker
+            this.currentView = view;
+            
+            // Update nav links active state first (without animation conflicts)
+            this.updateNavActiveState(view);
+            
+            // Check if animations should be used
+            const shouldAnimate = window.gsap && currentView && currentView !== view && !this.prefersReducedMotion();
+            
+            if (shouldAnimate) {
+                this.isAnimating = true;
+                this.animateViewTransition(currentView, view).then(() => {
+                    this.isAnimating = false;
+                    if (view === 'results') {
+                        // Run score animation after the results view is visible
+                        this.startResultsScoreAnimation();
+                    }
+                });
+            } else {
+                // Instant transition for reduced motion or no GSAP
+                views.forEach(v => {
+                    const el = this.shadowRoot.getElementById(`uw-a11y-view-${v}`);
+                    if (!el) return;
+                    if (v === view) {
+                        el.removeAttribute('hidden');
+                    } else {
+                        el.setAttribute('hidden', '');
+                    }
+                });
+                
+                // Instantly adjust height if needed
+                if (currentView && currentView !== view) {
+                    const content = this.shadowRoot.getElementById('uw-a11y-content');
+                    if (content) {
+                        const targetHeight = this.measureViewHeight(view);
+                        const maxAllowedHeight = this.getMaxContentHeight();
+                        const finalHeight = Math.min(targetHeight, maxAllowedHeight);
+                        
+                        content.style.height = finalHeight + 'px';
+                        content.style.overflowY = 'auto';
+                    }
+                }
+
+                if (view === 'results') {
+                    this.startResultsScoreAnimation();
+                }
+            }
+        },
+
+        // Update navigation active state without animation conflicts
+        updateNavActiveState: function(activeView) {
+            const views = ['results', 'inspector', 'settings', 'help', 'about'];
+            
+            views.forEach(v => {
+                const link = this.shadowRoot.getElementById(`uw-a11y-nav-${v}`);
+                if (!link) return;
+                
+                // Kill any existing GSAP animations on this link
+                if (window.gsap) {
+                    window.gsap.killTweensOf(link);
+                }
+                
+                if (v === activeView) {
+                    link.classList.add('active');
+                    link.setAttribute('aria-current', 'page');
+                } else {
+                    link.classList.remove('active');
+                    link.removeAttribute('aria-current');
+                    // Reset any inline styles that GSAP might have added
+                    if (window.gsap) {
+                        window.gsap.set(link, { backgroundColor: '' });
+                    }
+                }
+            });
+        },
+
+        // SETTINGS: defaults and persistence
+        // Always-excluded internal selectors (not user-configurable)
+        getEssentialExcludeSelectors: function() {
+            return [
+                '#uw-a11y-container',
+                '#uw-a11y-panel',
+                '.uw-a11y-highlight',
+                '[id^="uw-a11y-"]',
+                '[class*="uw-a11y-"]',
+                '#uw-a11y-global-styles'
+            ];
+        },
+        // Default user-adjustable excludes (shown in Settings)
+        getDefaultExcludeSelectors: function() {
+            return [
+                '#wpadminbar'
+            ];
+        },
+
+        getSettingsKey: function() { return 'uw-a11y-settings'; },
+
+        loadSettings: function() {
+            try {
+                const json = localStorage.getItem(this.getSettingsKey());
+                if (!json) return {};
+                const parsed = JSON.parse(json);
+                return parsed && typeof parsed === 'object' ? parsed : {};
+            } catch (_) { return {}; }
+        },
+
+        saveSettings: function(settings) {
+            try {
+                localStorage.setItem(this.getSettingsKey(), JSON.stringify(settings || {}));
+            } catch (_) { /* ignore quota errors */ }
+        },
+
+        // Whether best-practice suggestions are enabled (default: true)
+        isBestPracticesEnabled: function() {
+            const s = this.loadSettings();
+            return s.enableBestPractices !== false; // default true unless explicitly false
+        },
+
+        // Combine user excludes with enforced internal ones
+        getEffectiveExcludeSelectors: function() {
+            const essentials = this.getEssentialExcludeSelectors();
+            const defaults = this.getDefaultExcludeSelectors();
+            const s = this.loadSettings();
+            const user = Array.isArray(s.excludeSelectors) ? s.excludeSelectors : (typeof s.excludeSelectors === 'string' ? s.excludeSelectors.split(',') : []);
+            const clean = (user || [])
+                .map(v => (v || '').toString().trim())
+                .filter(Boolean);
+            // Merge in order: essentials (always), defaults, then user additions
+            return [...new Set([ ...essentials, ...defaults, ...clean ])];
+        },
+
+        // Check if an element should be excluded by settings
+        shouldExcludeElement: function(el) {
+            try {
+                const selectors = this.getEffectiveExcludeSelectors();
+                for (const sel of selectors) {
+                    if (!sel) continue;
+                    try {
+                        if (el.matches(sel)) return true;
+                        if (el.closest && el.closest(sel)) return true;
+                    } catch (_) { /* invalid selector safety */ }
+                }
+            } catch (_) { /* ignore */ }
+            return false;
+        },
+
+        // WCAG selection helpers
+        getDefaultWcag: function() { return { wcagSpec: '2.1', wcagLevel: 'AA' }; },
+        getSelectedWcag: function() {
+            const s = this.loadSettings();
+            const d = this.getDefaultWcag();
+            return { wcagSpec: s.wcagSpec || d.wcagSpec, wcagLevel: s.wcagLevel || d.wcagLevel };
+        },
+        buildWcagTags: function(spec, level) {
+            const lvl = (level || 'AA').toUpperCase();
+            const levelKey = lvl.toLowerCase(); // 'a' | 'aa' | 'aaa'
+            const specs = ['2.0','2.1','2.2'];
+            const chosenIdx = Math.max(0, specs.indexOf(spec || '2.1'));
+            const tags = [];
+            for (let i = 0; i <= chosenIdx; i++) {
+                const s = specs[i].replace('.', ''); // '20','21','22'
+                const prefix = i === 0 ? 'wcag2' : `wcag${s}`;
+                tags.push(`${prefix}${levelKey}`);
+            }
+            // Also include lower levels implicitly when AA/AAA chosen
+            if (lvl === 'AA' || lvl === 'AAA') {
+                for (let i = 0; i <= chosenIdx; i++) {
+                    const s = specs[i].replace('.', '');
+                    const prefix = i === 0 ? 'wcag2' : `wcag${s}`;
+                    if (!tags.includes(`${prefix}a`)) tags.push(`${prefix}a`);
+                }
+            }
+            if (lvl === 'AAA') {
+                for (let i = 0; i <= chosenIdx; i++) {
+                    const s = specs[i].replace('.', '');
+                    const prefix = i === 0 ? 'wcag2' : `wcag${s}`;
+                    if (!tags.includes(`${prefix}aa`)) tags.push(`${prefix}aa`);
+                }
+            }
+            return tags;
+        },
+
+        getWcagLabel: function() {
+            const { wcagSpec, wcagLevel } = this.getSelectedWcag();
+            return `WCAG ${wcagSpec} ${String(wcagLevel || '').toUpperCase()}`;
+        },
+
+        // Initialize inspector tools event handlers
+        initInspectorTools: function() {
+            // Tab order toggle button
+            const tabOrderToggle = this.shadowRoot.getElementById('uw-a11y-tab-order-toggle');
+            if (tabOrderToggle) {
+                tabOrderToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.toggleTabOrderVisualization();
+                });
+            }
+        },
+
+        // Toggle tab order visualization
+        toggleTabOrderVisualization: function() {
+            const isActive = this.isTabOrderActive || false;
+            
+            if (isActive) {
+                this.hideTabOrderVisualization();
+            } else {
+                this.showTabOrderVisualization();
+            }
+            
+            // Update button state
+            const tabOrderBtn = this.shadowRoot.getElementById('uw-a11y-tab-order-toggle');
+            const tabOrderCount = this.shadowRoot.getElementById('uw-a11y-tab-order-count');
+            
+            if (tabOrderBtn) {
+                tabOrderBtn.setAttribute('aria-pressed', String(!isActive));
+                
+                // Get the icons and text
+                const moveIcon = tabOrderBtn.querySelector('.feather-move');
+                const eyeOffIcon = tabOrderBtn.querySelector('.feather-eye-off');
+                const btnText = tabOrderBtn.querySelector('.uw-a11y-btn-text');
+                
+                if (!isActive) {
+                    // Activating tab order - show "Hide" state
+                    tabOrderBtn.classList.add('active');
+                    
+                    // Switch icons
+                    if (moveIcon) moveIcon.style.display = 'none';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'inline';
+                    
+                    // Update text
+                    if (btnText) btnText.textContent = 'Hide Tab Order';
+                } else {
+                    // Deactivating tab order - show "Show" state
+                    tabOrderBtn.classList.remove('active');
+                    
+                    // Switch icons
+                    if (moveIcon) moveIcon.style.display = 'inline';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'none';
+                    
+                    // Update text
+                    if (btnText) btnText.textContent = 'Show Tab Order';
+                }
+                
+                // Update count display
+                if (tabOrderCount) {
+                    if (!isActive) {
+                        // Will be updated in showTabOrderVisualization
+                        tabOrderCount.style.display = 'inline';
+                    } else {
+                        tabOrderCount.style.display = 'none';
+                    }
+                }
+            }
+            
+            this.isTabOrderActive = !isActive;
+        },
+
+        // Show tab order visualization
+        showTabOrderVisualization: function() {
+            // Remove existing overlay if any
+            this.hideTabOrderVisualization();
+            
+            // Get all focusable elements in the main document
+            const focusableElements = this.getFocusableElements();
+            
+            // Cache focusable elements for scroll performance
+            this.cachedFocusableElements = focusableElements;
+            
+            // Create overlay container
+            const overlay = document.createElement('div');
+            overlay.className = 'uw-a11y-tab-order-overlay';
+            overlay.setAttribute('data-uw-a11y-overlay', 'true');
+            
+            // Add tab order indicators with staggered animation delay
+            focusableElements.forEach((element, index) => {
+                const indicator = this.createTabOrderIndicator(element, index + 1);
+                if (indicator) {
+                    // Add slight stagger to create a wave effect
+                    const delay = Math.min(index * 20, 1000); // Max 1 second total delay
+                    indicator.style.animationDelay = `${delay}ms`;
+                    overlay.appendChild(indicator);
+                }
+            });
+            
+            // Add overlay to document body
+            document.body.appendChild(overlay);
+            
+            // Ensure tab order styles are available in the main document
+            this.injectTabOrderStyles();
+            
+            // Store reference to overlay
+            this.tabOrderOverlay = overlay;
+            
+            // Set up mutation observer to update tab order when DOM changes
+            this.setupTabOrderMutationObserver();
+            
+            // Set up scroll and resize handlers to update positions
+            this.setupTabOrderEventHandlers();
+            
+            // Update count display
+            const tabOrderCount = this.shadowRoot.getElementById('uw-a11y-tab-order-count');
+            if (tabOrderCount) {
+                tabOrderCount.textContent = `${focusableElements.length} focusable elements found`;
+            }
+            
+            // Debug logging
+            console.log(`Tab order visualization: ${focusableElements.length} focusable elements found`);
+            console.log(`Created ${overlay.children.length} indicators`);
+            
+            // Log first few elements for debugging
+            focusableElements.slice(0, 5).forEach((el, i) => {
+                const rect = el.getBoundingClientRect();
+                console.log(`Element ${i + 1}: ${el.tagName.toLowerCase()} at (${rect.left}, ${rect.top}) size: ${rect.width}x${rect.height}`);
+            });
+        },
+
+        // Hide tab order visualization
+        hideTabOrderVisualization: function() {
+            if (this.tabOrderOverlay) {
+                this.tabOrderOverlay.remove();
+                this.tabOrderOverlay = null;
+            }
+            
+            // Clear cached elements
+            this.cachedFocusableElements = null;
+            
+            // Disconnect mutation observer
+            if (this.tabOrderMutationObserver) {
+                this.tabOrderMutationObserver.disconnect();
+                this.tabOrderMutationObserver = null;
+            }
+            
+            // Clean up event handlers
+            this.cleanupTabOrderEventHandlers();
+            
+            // Also remove any orphaned overlays
+            const existingOverlays = document.querySelectorAll('.uw-a11y-tab-order-overlay');
+            existingOverlays.forEach(overlay => overlay.remove());
+            
+            // Remove injected styles
+            this.removeTabOrderStyles();
+        },
+
+        // Set up mutation observer to refresh tab order when DOM changes
+        setupTabOrderMutationObserver: function() {
+            if (!this.isTabOrderActive || this.tabOrderMutationObserver) return;
+            
+            this.tabOrderMutationObserver = new MutationObserver((mutations) => {
+                let shouldRefresh = false;
+                
+                mutations.forEach(mutation => {
+                    // Check if any focusable elements were added or removed
+                    if (mutation.type === 'childList') {
+                        const hasRelevantChanges = Array.from(mutation.addedNodes)
+                            .concat(Array.from(mutation.removedNodes))
+                            .some(node => {
+                                if (node.nodeType !== Node.ELEMENT_NODE) return false;
+                                
+                                // Skip changes within the accessibility checker
+                                if (node.closest && (
+                                    node.closest('[data-uw-a11y-overlay]') ||
+                                    node.closest('uw-accessibility-checker') ||
+                                    node.closest('#uw-a11y-panel')
+                                )) {
+                                    return false;
+                                }
+                                
+                                // Check if the node or its children are focusable
+                                return node.matches && (
+                                    node.matches('a[href], button, input, select, textarea, [tabindex], [contenteditable="true"]') ||
+                                    node.querySelector('a[href], button, input, select, textarea, [tabindex], [contenteditable="true"]')
+                                );
+                            });
+                        
+                        if (hasRelevantChanges) shouldRefresh = true;
+                    }
+                    
+                    // Check for attribute changes that affect tabindex
+                    if (mutation.type === 'attributes' && 
+                        (mutation.attributeName === 'tabindex' || 
+                         mutation.attributeName === 'disabled' ||
+                         mutation.attributeName === 'hidden' ||
+                         mutation.attributeName === 'style')) {
+                        shouldRefresh = true;
+                    }
+                });
+                
+                if (shouldRefresh) {
+                    // Debounce refreshes to avoid excessive updates
+                    clearTimeout(this.tabOrderRefreshTimeout);
+                    this.tabOrderRefreshTimeout = setTimeout(() => {
+                        if (this.isTabOrderActive) {
+                            this.showTabOrderVisualization();
+                        }
+                    }, 100);
+                }
+            });
+            
+            // Observe the entire document for changes
+            this.tabOrderMutationObserver.observe(document.body, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['tabindex', 'disabled', 'hidden', 'style']
+            });
+        },
+
+        // Set up event handlers for tab order visualization
+        setupTabOrderEventHandlers: function() {
+            if (this.tabOrderScrollHandler || this.tabOrderResizeHandler) return;
+            
+            // Throttled scroll handler with better performance
+            let scrollTimeout;
+            let isScrolling = false;
+            
+            this.tabOrderScrollHandler = () => {
+                // Use requestAnimationFrame for smoother updates
+                // Skip updates if panel animations are running to prevent conflicts
+                if (!isScrolling && this.isTabOrderActive && !this.isAnimating) {
+                    isScrolling = true;
+                    requestAnimationFrame(() => {
+                        // Double-check animation state before updating
+                        if (!this.isAnimating) {
+                            this.updateTabOrderPositions();
+                        }
+                        isScrolling = false;
+                    });
+                }
+            };
+            
+            // Throttled resize handler
+            let resizeTimeout;
+            this.tabOrderResizeHandler = () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    if (this.isTabOrderActive) {
+                        this.showTabOrderVisualization(); // Full refresh on resize
+                    }
+                }, 100);
+            };
+            
+            window.addEventListener('scroll', this.tabOrderScrollHandler, { passive: true });
+            window.addEventListener('resize', this.tabOrderResizeHandler);
+        },
+
+        // Clean up tab order event handlers
+        cleanupTabOrderEventHandlers: function() {
+            if (this.tabOrderScrollHandler) {
+                window.removeEventListener('scroll', this.tabOrderScrollHandler);
+                this.tabOrderScrollHandler = null;
+            }
+            if (this.tabOrderResizeHandler) {
+                window.removeEventListener('resize', this.tabOrderResizeHandler);
+                this.tabOrderResizeHandler = null;
+            }
+        },
+
+        // Update positions of existing tab order indicators
+        updateTabOrderPositions: function() {
+            if (!this.tabOrderOverlay || !this.cachedFocusableElements) return;
+            
+            const indicators = this.tabOrderOverlay.querySelectorAll('.uw-a11y-tab-indicator');
+            
+            // Use cached elements to avoid expensive DOM queries on scroll
+            indicators.forEach((indicator, index) => {
+                const element = this.cachedFocusableElements[index];
+                if (element && element.isConnected) { // Check if element still exists in DOM
+                    const rect = element.getBoundingClientRect();
+                    if (rect.width > 0 && rect.height > 0) {
+                        const x = rect.left + window.scrollX;
+                        const y = rect.top + window.scrollY;
+                        indicator.style.left = `${x}px`;
+                        indicator.style.top = `${y}px`;
+                        indicator.style.display = 'flex';
+                    } else {
+                        indicator.style.display = 'none';
+                    }
+                } else {
+                    indicator.style.display = 'none';
+                }
+            });
+        },
+
+        // Get all focusable elements in the document
+        getFocusableElements: function() {
+            const focusableSelectors = [
+                'a[href]',
+                'button:not([disabled])',
+                'input:not([disabled]):not([type="hidden"])',
+                'select:not([disabled])',
+                'textarea:not([disabled])',
+                'audio[controls]',
+                'video[controls]',
+                'iframe',
+                'object',
+                'embed',
+                'area[href]',
+                'details > summary',
+                '[tabindex]:not([tabindex="-1"])',
+                '[contenteditable="true"]'
+            ];
+            
+            const elements = Array.from(document.querySelectorAll(focusableSelectors.join(', ')));
+            
+            // Filter out elements that are not visible or are part of this accessibility checker
+            return elements.filter(element => {
+                // Skip elements inside the accessibility checker
+                if (element.closest('[data-uw-a11y-overlay]') || 
+                    element.closest('uw-accessibility-checker') ||
+                    element.closest('#uw-a11y-panel')) {
+                    return false;
+                }
+                
+                // Skip invisible elements
+                const style = window.getComputedStyle(element);
+                if (style.display === 'none' || 
+                    style.visibility === 'hidden' || 
+                    style.opacity === '0') {
+                    return false;
+                }
+                
+                // Skip elements with negative tabindex (except -1 which we already excluded)
+                const tabindex = element.getAttribute('tabindex');
+                if (tabindex && parseInt(tabindex, 10) < 0) {
+                    return false;
+                }
+                
+                return true;
+            }).sort((a, b) => {
+                // Sort by tabindex, then by document order
+                const aTabindex = parseInt(a.getAttribute('tabindex'), 10) || 0;
+                const bTabindex = parseInt(b.getAttribute('tabindex'), 10) || 0;
+                
+                if (aTabindex !== bTabindex) {
+                    // Elements with positive tabindex come first, in numerical order
+                    if (aTabindex > 0 && bTabindex <= 0) return -1;
+                    if (bTabindex > 0 && aTabindex <= 0) return 1;
+                    if (aTabindex > 0 && bTabindex > 0) return aTabindex - bTabindex;
+                }
+                
+                // For elements with same tabindex (including 0), use document order
+                return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+            });
+        },
+
+        // Create a tab order indicator for an element
+        createTabOrderIndicator: function(element, order) {
+            const rect = element.getBoundingClientRect();
+            
+            // Skip elements that have no dimensions (truly hidden)
+            if (rect.width === 0 || rect.height === 0) {
+                return null;
+            }
+            
+            const indicator = document.createElement('div');
+            indicator.className = 'uw-a11y-tab-indicator';
+            indicator.textContent = order;
+            indicator.setAttribute('data-tab-order', order);
+            indicator.setAttribute('data-element-tag', element.tagName.toLowerCase());
+            
+            // Position the indicator
+            indicator.style.position = 'absolute';
+            const x = rect.left + window.scrollX;
+            const y = rect.top + window.scrollY;
+            indicator.style.left = `${x}px`;
+            indicator.style.top = `${y}px`;
+            indicator.style.zIndex = '999999';
+            
+            // Add element info as title
+            const elementInfo = this.getElementDescription(element);
+            indicator.title = `Tab order ${order}: ${elementInfo}`;
+            
+            return indicator;
+        },
+
+        // Inject tab order styles into the main document
+        injectTabOrderStyles: function() {
+            // Check if styles are already injected
+            if (document.getElementById('uw-a11y-tab-order-styles')) {
+                return;
+            }
+            
+            const styleElement = document.createElement('style');
+            styleElement.id = 'uw-a11y-tab-order-styles';
+            styleElement.textContent = `
+                .uw-a11y-tab-order-overlay {
+                    pointer-events: none;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 999998;
+                }
+                
+                .uw-a11y-tab-indicator {
+                    position: absolute;
+                    background: #ff6b35;
+                    color: white;
+                    border-radius: 50%;
+                    width: 28px;
+                    height: 28px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 14px;
+                    font-weight: bold;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+                    border: 3px solid white;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+                    z-index: 999999;
+                    pointer-events: none;
+                    transform: translate(-50%, -50%);
+                    animation: uw-tab-indicator-appear 0.3s ease-out forwards;
+                    will-change: transform;
+                    contain: layout style paint;
+                    opacity: 0;
+                }
+                
+                .uw-a11y-tab-indicator:nth-child(odd) {
+                    background: #ff6b35;
+                }
+                
+                .uw-a11y-tab-indicator:nth-child(even) {
+                    background: #4285f4;
+                }
+                
+                @keyframes uw-tab-indicator-appear {
+                    0% {
+                        opacity: 0;
+                        transform: translate(-50%, -50%) scale(0.5);
+                    }
+                    100% {
+                        opacity: 1;
+                        transform: translate(-50%, -50%) scale(1);
+                    }
+                }
+            `;
+            
+            document.head.appendChild(styleElement);
+        },
+
+        // Remove tab order styles from the main document
+        removeTabOrderStyles: function() {
+            const styleElement = document.getElementById('uw-a11y-tab-order-styles');
+            if (styleElement) {
+                styleElement.remove();
+            }
+        },
+
+        // Get a description of an element for accessibility
+        getElementDescription: function(element) {
+            const tag = element.tagName.toLowerCase();
+            const type = element.type || '';
+            const text = element.textContent?.trim().substring(0, 50) || '';
+            const ariaLabel = element.getAttribute('aria-label') || '';
+            const altText = element.getAttribute('alt') || '';
+            const href = element.getAttribute('href') || '';
+            
+            let description = tag;
+            
+            if (type) description += `[${type}]`;
+            if (ariaLabel) description += ` "${ariaLabel}"`;
+            else if (altText) description += ` "${altText}"`;
+            else if (text) description += ` "${text}"`;
+            else if (href) description += ` href="${href.substring(0, 30)}"`;
+            
+            return description;
+        },
+
+        resetSettingsToDefaults: function() {
+            const defaults = { 
+                excludeSelectors: this.getDefaultExcludeSelectors(),
+                enableBestPractices: true,
+                ...this.getDefaultWcag()
+            };
+            this.saveSettings(defaults);
+            return defaults;
+        },
+
+        // Render the Settings view (called after panel creation)
+        renderSettings: function() {
+            const wrap = this.shadowRoot.getElementById('uw-a11y-view-settings');
+            if (!wrap) return;
+
+            const settings = this.loadSettings();
+            // Show only user-adjustable selectors in the input (strip essentials)
+            const renderList = Array.isArray(settings.excludeSelectors) ? settings.excludeSelectors : this.getDefaultExcludeSelectors();
+            const current = this.filterOutEssential(renderList).join(', ');
+            const bp = settings.enableBestPractices !== false; // default true
+            const wcag = { ...(this.getDefaultWcag()), wcagSpec: settings.wcagSpec || '2.1', wcagLevel: (settings.wcagLevel || 'AA').toUpperCase() };
+
+            wrap.innerHTML = `
+                <div class="uw-a11y-settings" role="region" aria-labelledby="uw-a11y-settings-heading">
+                    <h3 id="uw-a11y-settings-heading">Settings</h3>
+                    <div class="uw-a11y-form-row">
+                        <label for="uw-a11y-exclude-input"><strong>Exclude Selectors</strong></label>
+                        <input id="uw-a11y-exclude-input" class="uw-a11y-input" type="text" value="${this.escapeHtmlAttr(current)}" aria-describedby="uw-a11y-exclude-help">
+                        <div id="uw-a11y-exclude-help" class="uw-a11y-helptext">Comma‑separated CSS selectors skipped during scanning. Essential internal UI is always excluded.</div>
+                        <div id="uw-a11y-settings-msg" class="uw-a11y-msg" aria-live="polite"></div>
+                    </div>
+                    <div class="uw-a11y-form-row">
+                        <label for="uw-a11y-wcag-spec"><strong>WCAG Specification</strong></label>
+                        <select id="uw-a11y-wcag-spec" class="uw-a11y-input">
+                            <option value="2.0" ${wcag.wcagSpec==='2.0'?'selected':''}>WCAG 2.0</option>
+                            <option value="2.1" ${wcag.wcagSpec==='2.1'?'selected':''}>WCAG 2.1</option>
+                            <option value="2.2" ${wcag.wcagSpec==='2.2'?'selected':''}>WCAG 2.2</option>
+                        </select>
+                        <div class="uw-a11y-helptext">Choose which WCAG version to target. Default is 2.1.</div>
+                    </div>
+                    <div class="uw-a11y-form-row">
+                        <label for="uw-a11y-wcag-level"><strong>WCAG Level</strong></label>
+                        <select id="uw-a11y-wcag-level" class="uw-a11y-input">
+                            <option value="A" ${wcag.wcagLevel==='A'?'selected':''}>Level A</option>
+                            <option value="AA" ${wcag.wcagLevel==='AA'?'selected':''}>Level AA</option>
+                            <option value="AAA" ${wcag.wcagLevel==='AAA'?'selected':''}>Level AAA</option>
+                        </select>
+                        <div class="uw-a11y-helptext">Default is AA. Selecting AAA enables extra rules like enhanced color contrast.</div>
+                    </div>
+                    <div class="uw-a11y-form-row">
+                        <label>
+                            <input id="uw-a11y-bp-input" type="checkbox" ${bp ? 'checked' : ''}>
+                            <span>Include best‑practice suggestions</span>
+                        </label>
+                        <div class="uw-a11y-helptext">Additional tips beyond WCAG failures, like link text clarity or new‑tab labeling.</div>
+                        <div class="uw-a11y-actions">
+                            <button id="uw-a11y-save-settings" class="uw-a11y-btn primary">Save and Re‑scan</button>
+                            <button id="uw-a11y-reset-settings" class="uw-a11y-btn" title="Reset to defaults">
+                                <svg class="uw-a11y-reset-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 5V1L7 6l5 5V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const input = this.shadowRoot.getElementById('uw-a11y-exclude-input');
+            const msg = this.shadowRoot.getElementById('uw-a11y-settings-msg');
+            const saveBtn = this.shadowRoot.getElementById('uw-a11y-save-settings');
+            const resetBtn = this.shadowRoot.getElementById('uw-a11y-reset-settings');
+            const bpInput = this.shadowRoot.getElementById('uw-a11y-bp-input');
+            const wcagSpecSel = this.shadowRoot.getElementById('uw-a11y-wcag-spec');
+            const wcagLevelSel = this.shadowRoot.getElementById('uw-a11y-wcag-level');
+
+            const parseSelectors = (val) => val.split(',').map(s => s.trim()).filter(Boolean);
+            const validateSelectors = (arr) => {
+                for (const sel of arr) {
+                    try { document.querySelectorAll(sel); } catch (e) { return sel; }
+                }
+                return null;
+            };
+
+            saveBtn.addEventListener('click', () => {
+                const arr = parseSelectors(input.value || '');
+                const bad = validateSelectors(arr);
+                if (bad) {
+                    msg.textContent = `Invalid selector: ${bad}`;
+                    msg.className = 'uw-a11y-msg err';
+                    return;
+                }
+                const toSave = { 
+                    // Persist only non-essential selectors
+                    excludeSelectors: this.filterOutEssential(arr),
+                    enableBestPractices: !!(bpInput && bpInput.checked),
+                    wcagSpec: wcagSpecSel ? wcagSpecSel.value : '2.1',
+                    wcagLevel: wcagLevelSel ? wcagLevelSel.value : 'AA'
+                };
+                this.saveSettings(toSave);
+                msg.textContent = 'Saved. Re‑scanning…';
+                msg.className = 'uw-a11y-msg ok';
+                // Ensure the score dial re-animates after a settings-driven re-scan
+                this.scoreAnimationPlayed = false;
+                // Re-run analysis with new settings
+                this.runAxeChecks();
+                this.showView('results');
+            });
+
+            resetBtn.addEventListener('click', () => {
+                const defaults = this.resetSettingsToDefaults();
+                input.value = this.filterOutEssential(defaults.excludeSelectors).join(', ');
+                if (bpInput) bpInput.checked = !!defaults.enableBestPractices;
+                if (wcagSpecSel) wcagSpecSel.value = defaults.wcagSpec;
+                if (wcagLevelSel) wcagLevelSel.value = defaults.wcagLevel;
+                msg.textContent = 'Settings reset to defaults.';
+                msg.className = 'uw-a11y-msg ok';
+            });
+
+        },
+
+        // Remove essential/selectors from a provided list
+        filterOutEssential: function(list) {
+            const essentials = new Set(this.getEssentialExcludeSelectors());
+            return (list || []).filter(sel => !essentials.has(sel));
+        },
+
+        // Escape for attribute values
+        escapeHtmlAttr: function(str) {
+            return (str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         },
         
         // Get axe-core version dynamically
@@ -1741,15 +4806,135 @@
             }
             return 'unknown';
         },
+
+        // Load and save filter preferences (persisted in localStorage)
+        loadFilters: function() {
+            try {
+                const stored = localStorage.getItem('uw-a11y-filters');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    this.filters = { errors: true, warnings: true, info: true, ...parsed };
+                }
+            } catch (e) { /* ignore */ }
+        },
+        saveFilters: function() {
+            try {
+                localStorage.setItem('uw-a11y-filters', JSON.stringify(this.filters));
+            } catch (e) { /* ignore */ }
+        },
+        toggleFilter: function(kind) {
+            if (!['errors','warnings','info'].includes(kind)) return;
+            this.filters[kind] = !this.filters[kind];
+            this.saveFilters();
+            this.updateFilterUI();
+            this.refreshIssueList();
+        },
+        updateFilterUI: function() {
+            const setState = (id, pressed) => {
+                const btn = this.shadowRoot.getElementById(id);
+                if (btn) btn.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+                const row = btn?.closest('.violationtype');
+                if (row) row.style.color = pressed ? '#000' : '#ccc';
+            };
+            setState('toggle-errors', this.filters.errors);
+            setState('toggle-warnings', this.filters.warnings);
+            setState('toggle-info', this.filters.info);
+        },
+        getIssuesForFilters: function() {
+            return this.issues.filter(i =>
+                (i.type === 'error' && this.filters.errors) ||
+                (i.type === 'warning' && this.filters.warnings) ||
+                (i.type === 'info' && this.filters.info)
+            );
+        },
+        refreshIssueList: function() {
+            const results = this.shadowRoot.getElementById('uw-a11y-results');
+            if (!results) return;
+            const issuesToShow = this.getIssuesForFilters();
+            if (issuesToShow.length === 0) {
+                results.innerHTML = `
+                    <div class="uw-a11y-issue info">
+                        <h4>No issues to display</h4>
+                        <p>Adjust the filters above to show hidden groups.</p>
+                    </div>
+                `;
+                return;
+            }
+            const groupedIssues = this.groupIssuesByRule(issuesToShow);
+            const generatedHtml = Object.keys(groupedIssues).map((ruleId, index) => {
+                const issueGroup = groupedIssues[ruleId];
+                const firstIssue = issueGroup[0];
+                const isManualReview = firstIssue.type === 'warning' && firstIssue.uniqueId;
+                const instanceNavigation = issueGroup.length > 1 ? `
+                        <div class=\"uw-a11y-instance-nav\">
+                            <span class=\"uw-a11y-instance-count\">Instance <span id=\"current-${this.sanitizeHtmlId(ruleId)}\">1</span> of ${issueGroup.length}</span>
+                            <div class=\"uw-a11y-nav-buttons\">
+                                <button onclick=\"window.uwAccessibilityChecker.navigateInstance('${this.escapeJavaScript(ruleId)}', -1); event.stopPropagation();\" 
+                                        id=\"prev-${this.sanitizeHtmlId(ruleId)}\" disabled>‹ Prev</button>
+                                <button onclick=\"window.uwAccessibilityChecker.navigateInstance('${this.escapeJavaScript(ruleId)}', 1); event.stopPropagation();\" 
+                                        id=\"next-${this.sanitizeHtmlId(ruleId)}\">Next ›</button>
+                            </div>
+                        </div>
+                    ` : '';
+                const iconSvg = this.getIssueTypeIcon(firstIssue.type, 'issue');
+                return `
+                    <div class=\"uw-a11y-issue ${firstIssue.type} ${isManualReview && this.isRuleVerified(ruleId) ? 'checked' : ''}\" 
+                         onclick=\"window.uwAccessibilityChecker.highlightCurrentInstance('${this.escapeJavaScript(ruleId)}')\" 
+                         onkeydown=\"if(event.key==='Enter'||event.key===' '){event.preventDefault();window.uwAccessibilityChecker.highlightCurrentInstance('${this.escapeJavaScript(ruleId)}');}\"
+                         tabindex=\"0\"
+                         role=\"button\" 
+                         aria-label=\"Click to highlight ${this.escapeHtmlAttribute(firstIssue.title)} on the page${issueGroup.length > 1 ? ` (${issueGroup.length} instances)` : ''}\"
+                         id=\"issue-${this.sanitizeHtmlId(ruleId)}\">
+                         ${instanceNavigation}
+                        <h4>
+                            <span class=\"uw-a11y-issue-header\">${iconSvg}<span class=\"uw-a11y-issue-title\">${this.escapeHtmlContent(firstIssue.title)} ${issueGroup.length > 1 ? `(${issueGroup.length} instances)` : ''}</span></span>
+                        </h4>
+                        <div class=\"how-to-fix\"><div class=\"how-to-fix-icon\"><svg viewBox=\"0 0 512 512\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M331.8 224.1c28.29 0 54.88 10.99 74.86 30.97l19.59 19.59c40.01-17.74 71.25-53.3 81.62-96.65c5.725-23.92 5.34-47.08 .2148-68.4c-2.613-10.88-16.43-14.51-24.34-6.604l-68.9 68.9h-75.6V97.2l68.9-68.9c7.912-7.912 4.275-21.73-6.604-24.34c-21.32-5.125-44.48-5.51-68.4 .2148c-55.3 13.23-98.39 60.22-107.2 116.4C224.5 128.9 224.2 137 224.3 145l82.78 82.86C315.2 225.1 323.5 224.1 331.8 224.1zM384 278.6c-23.16-23.16-57.57-27.57-85.39-13.9L191.1 158L191.1 95.99l-127.1-95.99L0 63.1l96 127.1l62.04 .0077l106.7 106.6c-13.67 27.82-9.251 62.23 13.91 85.39l117 117.1c14.62 14.5 38.21 14.5 52.71-.0016l52.75-52.75c14.5-14.5 14.5-38.08-.0016-52.71L384 278.6zM227.9 307L168.7 247.9l-148.9 148.9c-26.37 26.37-26.37 69.08 0 95.45C32.96 505.4 50.21 512 67.5 512s34.54-6.592 47.72-19.78l119.1-119.1C225.5 352.3 222.6 329.4 227.9 307zM64 472c-13.25 0-24-10.75-24-24c0-13.26 10.75-24 24-24S88 434.7 88 448C88 461.3 77.25 472 64 472z\"/></svg></div><div><strong>How to fix:</strong> <span id=\"recommendation-${this.sanitizeHtmlId(ruleId)}\"></span></div></div>
+                        ${isManualReview ? `
+                        <div class=\"uw-a11y-manual-check\"> 
+                          <label class=\"uw-a11y-checkbox\"> 
+                            <input type=\"checkbox\" id=\"check-${this.sanitizeHtmlId(ruleId)}\" ${this.isRuleVerified(ruleId) ? 'checked' : ''} 
+                                   onchange=\"window.uwAccessibilityChecker.toggleRuleVerification('${this.escapeJavaScript(ruleId)}'); event.stopPropagation();\"> 
+                            <span class=\"uw-a11y-checkmark\"></span>
+                            <span class=\"uw-a11y-check-label\">${this.isRuleVerified(ruleId) ? `All ${issueGroup.length} instances manually verified ✓` : `Mark all ${issueGroup.length} instances as verified`}</span>
+                          </label>
+                        </div>` : ''}
+                        ${firstIssue.detailedInfo && firstIssue.detailedInfo.length > 0 ? `
+                            <button class=\"uw-a11y-details-toggle\" onclick=\"window.uwAccessibilityChecker.toggleDetails('${this.escapeJavaScript(ruleId)}'); event.stopPropagation();\">Show technical details</button>
+                            <div class=\"uw-a11y-details\" id=\"details-${this.sanitizeHtmlId(ruleId)}\"><div id=\"detailed-content-${this.sanitizeHtmlId(ruleId)}\">${this.renderDetailedInfo(firstIssue.detailedInfo)}</div></div>
+                        ` : ''}
+                        <div class=\"issue-meta\"><div><strong>Impact:</strong> ${this.escapeHtmlContent(firstIssue.impact || 'unknown')}
+                        ${firstIssue.helpUrl ? `<br><a href=\"${this.escapeUrl(firstIssue.helpUrl)}\" target=\"_blank\" class=\"learn-more\">Learn more about this rule</a>` : ''}
+                        </div></div>
+                    </div>`;
+            }).join('');
+            results.innerHTML = generatedHtml;
+            // initialize rec content
+            Object.keys(groupedIssues).forEach(ruleId => {
+                const issueGroup = groupedIssues[ruleId];
+                const firstIssue = issueGroup[0];
+                const recElement = this.shadowRoot.getElementById(`recommendation-${ruleId}`);
+                if (recElement) recElement.innerHTML = firstIssue.recommendation;
+            });
+        },
         
         addIssue: function(type, title, description, element, recommendation, helpUrl, impact, tags, detailedInfo, ruleId) {
             const issueId = this.issues.length; // Use array index as unique ID
+            // Attempt to compute a selector for resilience if the DOM re-renders
+            let selector = '';
+            if (element && element instanceof Element) {
+                selector = this.computeElementSelector(element);
+            } else if (Array.isArray(detailedInfo)) {
+                const selEntry = detailedInfo.find(d => d && d.type === 'selector' && typeof d.value === 'string');
+                if (selEntry) selector = selEntry.value;
+            }
             this.issues.push({
                 id: issueId,
                 type: type,
                 title: title,
                 description: description,
                 element: element,
+                selector: selector || '',
                 recommendation: recommendation,
                 helpUrl: helpUrl,
                 impact: impact,
@@ -1759,13 +4944,82 @@
             });
         },
         
+        // Announce results to screen readers via ARIA live region
+        announceResults: function(scoreData, counts) {
+            const announcements = this.shadowRoot.getElementById('uw-a11y-announcements');
+            if (!announcements) return;
+            
+            let message = '';
+            
+            if (scoreData) {
+                const score = scoreData.score;
+                const ratingText = score >= 97 ? 'Excellent' : 
+                                  score >= 90 ? 'Very Good' : 
+                                  score >= 70 ? 'Good' : 
+                                  score >= 50 ? 'Fair' : 
+                                  'Needs immediate attention';
+                
+                message += `Accessibility test complete. Score: ${score} out of 100, rated as ${ratingText}. `;
+            }
+            
+            const totalIssues = counts.error + counts.warning;
+            if (totalIssues === 0) {
+                message += 'No accessibility violations found. Excellent work!';
+            } else {
+                message += `Found ${totalIssues} total issues: `;
+                if (counts.error > 0) {
+                    message += `${counts.error} violation${counts.error === 1 ? '' : 's'} requiring immediate attention`;
+                }
+                if (counts.warning > 0) {
+                    if (counts.error > 0) message += ' and ';
+                    message += `${counts.warning} item${counts.warning === 1 ? '' : 's'} requiring manual review`;
+                }
+                if (counts.warningChecked > 0) {
+                    message += `. ${counts.warningChecked} item${counts.warningChecked === 1 ? '' : 's'} already verified`;
+                }
+                message += '. Navigate through the list below to review each issue.';
+            }
+            
+            // Use setTimeout to ensure the live region is ready
+            setTimeout(() => {
+                announcements.textContent = message;
+            }, 500);
+        },
+        
+        // Set focus to the accessibility checker panel for keyboard navigation
+        setFocusToPanel: function() {
+            // Use a small delay to ensure DOM is fully rendered
+            setTimeout(() => {
+                const panel = this.shadowRoot.getElementById('uw-a11y-panel');
+                if (panel) {
+                    panel.focus();
+                    // Scroll into view if needed
+                    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }, 100);
+        },
+        
+        // Update visibility of elements with if-issues class
+        updateIfIssuesVisibility: function() {
+            const hasIssues = this.issues.length > 0;
+            const ifIssuesElements = this.shadowRoot.querySelectorAll('.if-issues');
+            
+            ifIssuesElements.forEach(element => {
+                if (hasIssues) {
+                    element.style.display = '';
+                } else {
+                    element.style.display = 'none';
+                }
+            });
+        },
+        
         displayResults: function() {
             const panel = this.createPanel();
             const summary = this.shadowRoot.getElementById('uw-a11y-summary');
             const results = this.shadowRoot.getElementById('uw-a11y-results');
             
-            // Load minimize state after panel is created
-            this.loadMinimizeState();
+            // Apply saved position for draggable panel (replaces minimize feature)
+            this.applySavedPosition();
             
             // Count issues by type
             const counts = {
@@ -1775,180 +5029,286 @@
                 info: this.issues.filter(i => i.type === 'info').length
             };
             
+            // Update visibility of elements with if-issues class
+            this.updateIfIssuesVisibility();
+            
 
             
             // Get accessibility score
             const scoreData = this.axeResults ? this.axeResults.score : null;
             
-            // Display summary with score dial
+            // Load and apply saved filter preferences
+            this.loadFilters();
+
+            // Display summary with score dial and accessibility announcements
             summary.innerHTML = `
+                <!-- ARIA live region for screen reader announcements -->
+                <div id="uw-a11y-announcements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+                
                 ${scoreData ? this.renderScoreDial(scoreData) : ''}
-                <p><strong>Total Issues Found:</strong> ${this.issues.length}</p>
-                                    <div style="margin: 8px 0;">
-                        <span class="uw-a11y-count count-error">${counts.error}</span>Violations
-                        <span class="uw-a11y-count count-warning">${counts.warning}</span>Manual Review
-                        ${counts.warningChecked > 0 ? `<span class="uw-a11y-count count-verified">${counts.warningChecked}</span>Verified` : ''}
+                
+                <!-- Accessible summary section -->
+                <div role="region" aria-labelledby="uw-a11y-summary-heading">
+                    <h3 id="uw-a11y-summary-heading" class="sr-only">Accessibility Test Results Summary</h3>
+                    
+                    <p><strong>Total Issues Found:</strong> ${this.issues.length}</p>
+                    
+                    <div style="margin: 8px 0;" role="list" aria-label="Issue breakdown by type">
+                        <div role="listitem" class="violationtype">
+                            <div class="info-with-tooltip">
+                                <span id="count-error" class="uw-a11y-count count-error" aria-label="${counts.error} violations requiring immediate attention">${counts.error}</span> <span class="issue-type-icon type-error">${this.getIssueTypeIcon('error','summary')}</span>Violations
+                                <button class="info-btn" aria-label="What does Violations mean?" aria-describedby="tip-violations">i</button>
+                                <span id="tip-violations" class="tooltip" role="tooltip">These are accessibility failures that must be fixed.</span>
+                            </div>
+                            <button id="toggle-errors" class="filter-toggle" aria-pressed="true" aria-label="Toggle showing violations" onclick="window.uwAccessibilityChecker.toggleFilter('errors')">
+                                <svg class="filter-icon icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                                <svg class="filter-icon icon-eye-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88" stroke="currentColor" stroke-width="2"/></svg>
+                            </button>
+                        </div>
+                        <div role="listitem" class="violationtype">
+                            <div class="info-with-tooltip">
+                                <span id="count-warning" class="uw-a11y-count count-warning" aria-label="${counts.warning} manual review items">${counts.warning}</span> <span class="issue-type-icon type-warning">${this.getIssueTypeIcon('warning','summary')}</span>Manual Review
+                                <button class="info-btn" aria-label="What does Manual Review mean?" aria-describedby="tip-manual">i</button>
+                                <span id="tip-manual" class="tooltip" role="tooltip">These items need human verification.</span>
+                            </div>
+                            <button id="toggle-warnings" class="filter-toggle" aria-pressed="true" aria-label="Toggle showing manual review" onclick="window.uwAccessibilityChecker.toggleFilter('warnings')">
+                                <svg class="filter-icon icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                                <svg class="filter-icon icon-eye-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88" stroke="currentColor" stroke-width="2"/></svg>
+                            </button>
+                        </div>
+                        <div role="listitem" class="violationtype">
+                            <div class="info-with-tooltip">
+                                <span id="count-info" class="uw-a11y-count count-info" aria-label="${counts.info} best-practice suggestions">${counts.info}</span> <span class="issue-type-icon type-info">${this.getIssueTypeIcon('info','summary')}</span>Best Practices
+                                <button class="info-btn" aria-label="What does Best Practices mean?" aria-describedby="tip-best">i</button>
+                                <span id="tip-best" class="tooltip" role="tooltip">Suggestions to improve usability and clarity.</span>
+                            </div>
+                            <button id="toggle-info" class="filter-toggle" aria-pressed="true" aria-label="Toggle showing best practices" onclick="window.uwAccessibilityChecker.toggleFilter('info')">
+                                <svg class="filter-icon icon-eye" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                                <svg class="filter-icon icon-eye-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88" stroke="currentColor" stroke-width="2"/></svg>
+                            </button>
+                        </div>
+                        ${counts.warningChecked > 0 ? `
+                            <div role="listitem" class="violationtype">
+                                <div>
+                                    <span id="count-verified" class="uw-a11y-count count-verified" aria-label="${counts.warningChecked} verified items">${counts.warningChecked}</span>Verified
+                                    <span class="sr-only"> - These manual review items have been checked and confirmed</span>
+                                </div>
+                            </div>
+                        ` : ''}
                     </div>
-                <p><small>Click on any issue to highlight the element on the page.</small></p>
+                </div>
+                
                 ${this.axeResults ? `
                     <div class="axe-summary">
-                        <!--<strong>Test Summary:</strong> ${this.axeResults.violations} violations, 
-                        ${this.axeResults.passes} passes, ${this.axeResults.incomplete} need review, 
-                        ${this.axeResults.inapplicable} not applicable<br>-->
-                        <strong>Standard:</strong> WCAG 2.1 AA | <strong>Engine:</strong> axe-core v${this.getAxeVersion()} | <strong>Checker:</strong> v${this.version}
+                        <strong>Standard:</strong> ${this.getWcagLabel()}
                     </div>
                 ` : ''}
             `;
+            // Animate the score dial and number on initial render
+            this.startResultsScoreAnimation();
             
+            // Add event listener for score info icon
+            const scoreInfo = this.shadowRoot.querySelector('.uw-a11y-score-info');
+            if (scoreInfo) {
+                const handleInfoClick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.showScoreExplanation();
+                };
+                
+                scoreInfo.addEventListener('click', handleInfoClick);
+                scoreInfo.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleInfoClick(e);
+                    }
+                });
+            }
+            
+            // Initialize filter toggle UI state
+            this.updateFilterUI();
+
             // Display issues
             if (this.issues.length === 0) {
                 results.innerHTML = `
                     <div class="uw-a11y-issue info">
                         <h4>Excellent Accessibility!</h4>
-                        <p>No accessibility violations detected by axe-core. Your page meets WCAG 2.1 AA automated testing standards.</p>
+                        <p>No accessibility violations detected by axe-core. Your page meets ${this.getWcagLabel()} automated testing standards.</p>
                         <p><strong>Next Steps:</strong> Consider manual testing with screen readers and keyboard navigation for complete accessibility validation.</p>
                     </div>
                 `;
             } else {
-                // Group issues by rule for better organization
-                const groupedIssues = this.groupIssuesByRule(this.issues);
-                
-                const generatedHtml = Object.keys(groupedIssues).map((ruleId, index) => {
-                    const issueGroup = groupedIssues[ruleId];
-                    const firstIssue = issueGroup[0];
-                    const isManualReview = firstIssue.type === 'warning' && firstIssue.uniqueId;
-                    
-
-                    
-
-                    
-
-                    
-                    // Create navigation for multiple instances
-                    const instanceNavigation = issueGroup.length > 1 ? `
-                        <div class="uw-a11y-instance-nav">
-                            <span class="uw-a11y-instance-count">Instance <span id="current-${this.sanitizeHtmlId(ruleId)}">1</span> of ${issueGroup.length}</span>
-                            <div class="uw-a11y-nav-buttons">
-                                <button onclick="window.uwAccessibilityChecker.navigateInstance('${this.escapeJavaScript(ruleId)}', -1); event.stopPropagation();" 
-                                        id="prev-${this.sanitizeHtmlId(ruleId)}" disabled>‹ Prev</button>
-                                <button onclick="window.uwAccessibilityChecker.navigateInstance('${this.escapeJavaScript(ruleId)}', 1); event.stopPropagation();" 
-                                        id="next-${this.sanitizeHtmlId(ruleId)}">Next ›</button>
-                            </div>
-                        </div>
-                    ` : '';
-                    
-                    // Create checkbox for manual review items (affects all instances of this rule)
-                    const checkboxHtml = isManualReview ? 
-                        `<div class="uw-a11y-manual-check">
-                            <label class="uw-a11y-checkbox">
-                                <input type="checkbox" 
-                                       id="check-${this.sanitizeHtmlId(ruleId)}" 
-                                       ${this.isRuleVerified(ruleId) ? 'checked' : ''}
-                                       onchange="window.uwAccessibilityChecker.toggleRuleVerification('${this.escapeJavaScript(ruleId)}'); event.stopPropagation();">
-                                <span class="uw-a11y-checkmark"></span>
-                                <span class="uw-a11y-check-label">
-                                    ${this.isRuleVerified(ruleId) ? `All ${issueGroup.length} instances manually verified ✓` : `Mark all ${issueGroup.length} instances as verified`}
-                                </span>
-                            </label>
-                        </div>` : '';
-
-                    const iconSvg = firstIssue.type === 'error' 
-                        ? `<svg class="uw-a11y-issue-icon uw-a11y-error-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                           </svg>`
-                        : `<svg class="uw-a11y-issue-icon uw-a11y-warning-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                           </svg>`;
-                    
-
-                    
-                    const htmlResult = `
-                        <div class="uw-a11y-issue ${firstIssue.type} ${isManualReview && this.isRuleVerified(ruleId) ? 'checked' : ''}" 
-                             onclick="window.uwAccessibilityChecker.highlightCurrentInstance('${this.escapeJavaScript(ruleId)}')" 
-                             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.uwAccessibilityChecker.highlightCurrentInstance('${this.escapeJavaScript(ruleId)}');}"
-                             tabindex="0"
-                             role="button" 
-                             aria-label="Click to highlight ${this.escapeHtmlAttribute(firstIssue.title)} on the page${issueGroup.length > 1 ? ` (${issueGroup.length} instances)` : ''}"
-                             id="issue-${this.sanitizeHtmlId(ruleId)}">
-                             ${instanceNavigation}
-                            <h4>
-                                <span class="uw-a11y-issue-header">
-                                    ${iconSvg}
-                                    <span class="uw-a11y-issue-title">${this.escapeHtmlContent(firstIssue.title)} ${issueGroup.length > 1 ? `(${issueGroup.length} instances)` : ''}</span>
-                                </span>
-                            </h4>
-                            <!--<p id="description-${this.sanitizeHtmlId(ruleId)}">${this.escapeHtmlContent(firstIssue.description.split('\n')[0])}</p>-->
-                            <div class="how-to-fix"><div class="how-to-fix-icon"><svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M331.8 224.1c28.29 0 54.88 10.99 74.86 30.97l19.59 19.59c40.01-17.74 71.25-53.3 81.62-96.65c5.725-23.92 5.34-47.08 .2148-68.4c-2.613-10.88-16.43-14.51-24.34-6.604l-68.9 68.9h-75.6V97.2l68.9-68.9c7.912-7.912 4.275-21.73-6.604-24.34c-21.32-5.125-44.48-5.51-68.4 .2148c-55.3 13.23-98.39 60.22-107.2 116.4C224.5 128.9 224.2 137 224.3 145l82.78 82.86C315.2 225.1 323.5 224.1 331.8 224.1zM384 278.6c-23.16-23.16-57.57-27.57-85.39-13.9L191.1 158L191.1 95.99l-127.1-95.99L0 63.1l96 127.1l62.04 .0077l106.7 106.6c-13.67 27.82-9.251 62.23 13.91 85.39l117 117.1c14.62 14.5 38.21 14.5 52.71-.0016l52.75-52.75c14.5-14.5 14.5-38.08-.0016-52.71L384 278.6zM227.9 307L168.7 247.9l-148.9 148.9c-26.37 26.37-26.37 69.08 0 95.45C32.96 505.4 50.21 512 67.5 512s34.54-6.592 47.72-19.78l119.1-119.1C225.5 352.3 222.6 329.4 227.9 307zM64 472c-13.25 0-24-10.75-24-24c0-13.26 10.75-24 24-24S88 434.7 88 448C88 461.3 77.25 472 64 472z"/></svg></div><div><strong>How to fix:</strong> <span id="recommendation-${this.sanitizeHtmlId(ruleId)}"></span></div></div>
-                            
-                            ${checkboxHtml}
-                            ${firstIssue.detailedInfo && firstIssue.detailedInfo.length > 0 ? `
-                                <button class="uw-a11y-details-toggle" onclick="window.uwAccessibilityChecker.toggleDetails('${this.escapeJavaScript(ruleId)}'); event.stopPropagation();">
-                                   Show technical details
-                                </button>
-                                <div class="uw-a11y-details" id="details-${this.sanitizeHtmlId(ruleId)}">
-                                    <div id="detailed-content-${this.sanitizeHtmlId(ruleId)}">
-                                        ${this.renderDetailedInfo(firstIssue.detailedInfo)}
-                                    </div>
-                                </div>
-                            ` : ''}
-                            <div class="issue-meta">
-                                <div><strong>Impact:</strong> ${this.escapeHtmlContent(firstIssue.impact || 'unknown')}
-                                ${firstIssue.helpUrl ? `<br><a href="${this.escapeUrl(firstIssue.helpUrl)}" target="_blank" class="learn-more">Learn more about this rule</a>` : ''}
-                                </div>
-                                <!--<strong>Tags:</strong> ${firstIssue.tags.join(', ')}-->
-                            </div>
-                        </div>
-                    `;
-                    
-
-                    return htmlResult;
-                }).join('');
-                
-
-                
-                results.innerHTML = generatedHtml;
-                
-                // Initialize recommendation content after HTML is created
-                Object.keys(groupedIssues).forEach(ruleId => {
-                    const issueGroup = groupedIssues[ruleId];
-                    const firstIssue = issueGroup[0];
-                    const recElement = this.shadowRoot.getElementById(`recommendation-${ruleId}`);
-                    if (recElement) {
-                        recElement.innerHTML = firstIssue.recommendation;
-                    }
-                });
+                // Render issue list using current filters
+                this.refreshIssueList();
             }
+            
+            // Announce results to screen readers
+            this.announceResults(scoreData, counts);
+            
+            // Initialize inspector tools after DOM is ready
+            this.initInspectorTools();
+            
+            // Set focus to the panel for keyboard accessibility
+            this.setFocusToPanel();
         },
         
 
         
         // Render the accessibility score dial
+        // Helper function to create gradient with multiple stops
+        createScoreGradient: function(score, percentage) {
+            let gradientStops;
+            
+            if (score >= 90) {
+                // Dark green to light green for excellent scores
+                gradientStops = `#1e7e34 0deg, #28a745 ${percentage * 0.3}deg, #34ce57 ${percentage * 0.6}deg, #40d969 ${percentage}deg`;
+            } else if (score >= 70) {
+                // Dark yellow/amber to light yellow
+                gradientStops = `#e6a800 0deg, #ffc107 ${percentage * 0.3}deg, #ffce3a ${percentage * 0.6}deg, #ffd96a ${percentage}deg`;
+            } else if (score >= 50) {
+                // Dark orange to light orange
+                gradientStops = `#dc6002 0deg, #fd7e14 ${percentage * 0.3}deg, #ff8c42 ${percentage * 0.6}deg, #ff9a56 ${percentage}deg`;
+            } else {
+                // Dark red to light red
+                gradientStops = `#a71e2a 0deg, #dc3545 ${percentage * 0.3}deg, #e55666 ${percentage * 0.6}deg, #ee6674 ${percentage}deg`;
+            }
+            
+            return `conic-gradient(from 0deg, ${gradientStops}, #e9ecef ${percentage}deg 360deg)`;
+        },
+
+        // Return a consistent SVG icon for a given issue type
+        // variant: 'issue' | 'summary' (controls class names)
+        getIssueTypeIcon: function(type, variant) {
+            const cls = variant === 'issue' ? 'uw-a11y-issue-icon' : '';
+            const base = (extra) => extra ? `${cls} ${extra}` : cls;
+            if (type === 'error') {
+                // Alert triangle
+                return `<svg class="${base('type-error')}" viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 9v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+            }
+            if (type === 'warning') {
+                // Magnifying glass (manual review)
+                return `<svg class="${base('type-warning')}" viewBox="0 0 512 512" width="18" height="18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="currentColor" d="M456.69,421.39,362.6,327.3a173.81,173.81,0,0,0,34.84-104.58C397.44,126.38,319.06,48,222.72,48S48,126.38,48,222.72s78.38,174.72,174.72,174.72A173.81,173.81,0,0,0,327.3,362.6l94.09,94.09a25,25,0,0,0,35.3-35.3ZM97.92,222.72a124.8,124.8,0,1,1,124.8,124.8A124.95,124.95,0,0,1,97.92,222.72Z"/></svg>`;
+            }
+            // Info / Best Practices — check circle
+            return `<svg class="${base('type-info')}" viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 4L12 14.01 9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        },
+
         renderScoreDial: function(scoreData) {
             const score = scoreData.score;
             const percentage = (score / 100) * 360; // Convert to degrees
-            const color = score >= 90 ? '#28a745' : score >= 70 ? '#ffc107' : score >= 50 ? '#fd7e14' : '#dc3545';
+            const gradient = this.createScoreGradient(score, percentage);
+            
+            // Generate accessibility rating text
+            const ratingText = score >= 97 ? 'Excellent' : 
+                              score >= 90 ? 'Very Good - just a few issues to address' : 
+                              score >= 70 ? 'Fair accessibility with room for improvement' : 
+                              score >= 50 ? 'Several issues to address' : 
+                              'Immediate attention needed';
             
             return `
-                <div class="uw-a11y-score-container">
-                    <div class="uw-a11y-score-dial">
-                        <div class="uw-a11y-score-circle" style="background: conic-gradient(from 0deg, ${color} 0deg ${percentage}deg, #e9ecef ${percentage}deg 360deg);">
+                <div class="uw-a11y-score-container" role="region" aria-labelledby="uw-a11y-score-heading">
+                    <h3 id="uw-a11y-score-heading" class="sr-only">Accessibility Score</h3>
+                    
+                    <!-- Screen reader accessible score announcement -->
+                    <div class="sr-only">
+                        Accessibility score: ${score} out of 100. Rating: ${ratingText}
+                    </div>
+                    
+                    <div class="uw-a11y-score-dial" role="img" aria-label="Accessibility score ${score} out of 100, rated as ${ratingText}">
+                        <div class="uw-a11y-score-circle" style="background: ${this.createScoreGradient(0, 0)};">
                             <div class="uw-a11y-score-inner">
-                                <div class="uw-a11y-score-number">${score}</div>
-                                <div class="uw-a11y-score-label">Score</div>
+                                <div class="uw-a11y-score-number" aria-hidden="true">0</div>
+                                <div class="uw-a11y-score-label" aria-hidden="true">Score</div>
                             </div>
+                        </div>
+                        <div class="uw-a11y-score-info" 
+                             role="button" 
+                             tabindex="0"
+                             aria-label="Score calculation information"
+                             title="Score is calculated from failed accessibility rules. Critical issues: -25 points, Serious: -15 points, Moderate: -8 points, Minor: -3 points. Manual review items deduct half points if unverified. Category caps prevent single areas from dominating the score.">
+                            <span aria-hidden="true">ⓘ</span>
                         </div>
                     </div>
                     <div style="font-size: 14px;">
-                        <span style="font-size: 12px; color: #666;">
-                            ${score >= 97 ? 'Excellent' : 
-                              score >= 90 ? 'Very Good - just a few issues to address' : 
-                              score >= 70 ? 'Good accessibility with room for improvement' : 
-                              score >= 50 ? 'Fair accessibility - several issues to address' : 
-                              'Immediate attention needed'}
+                        <span style="font-size: 12px; color: #666;" aria-hidden="true">
+                            ${ratingText}
                         </span>
                     </div>
                 </div>
             `;
+        },
+
+        // Animate the results score dial fill and count-up
+        startResultsScoreAnimation: function() {
+            try {
+                // Guard: only animate once per session
+                if (this.scoreAnimationPlayed) return;
+                if (this.prefersReducedMotion()) { this.scoreAnimationPlayed = true; return; } // Respect user preference
+                const scoreObj = this.axeResults && this.axeResults.score ? this.axeResults.score : null;
+                if (!scoreObj) return;
+                const finalScore = Math.max(0, Math.min(100, parseInt(scoreObj.score, 10) || 0));
+                const scoreDial = this.shadowRoot.querySelector('.uw-a11y-score-dial');
+                const scoreCircle = this.shadowRoot.querySelector('.uw-a11y-score-circle');
+                const scoreNumber = this.shadowRoot.querySelector('.uw-a11y-score-number');
+                if (!scoreCircle || !scoreNumber || !scoreDial) return;
+                // Mark as played now to avoid double-starts if called rapidly
+                this.scoreAnimationPlayed = true;
+
+                // Reset start state
+                scoreNumber.textContent = '0';
+                scoreCircle.style.background = this.createScoreGradient(0, 0);
+
+                // Kill prior animation if any
+                if (this._scoreTween && window.gsap) {
+                    this._scoreTween.kill();
+                    this._scoreTween = null;
+                }
+
+                const updateAria = (val) => {
+                    const current = Math.round(val);
+                    const ratingText = current >= 97 ? 'Excellent' :
+                        current >= 90 ? 'Very Good - just a few issues to address' :
+                        current >= 70 ? 'Good accessibility with room for improvement' :
+                        current >= 50 ? 'Fair accessibility - several issues to address' :
+                        'Immediate attention needed';
+                    scoreDial.setAttribute('aria-label', `Accessibility score ${current} out of 100, rated as ${ratingText}`);
+                };
+
+                const endDeg = (finalScore / 100) * 360;
+                if (window.gsap) {
+                    const state = { n: 0, deg: 0 };
+                    this._scoreTween = window.gsap.to(state, {
+                        n: finalScore,
+                        deg: endDeg,
+                        duration: 1.2,
+                        ease: 'power2.out',
+                        onUpdate: () => {
+                            const currentScore = Math.round(state.n);
+                            scoreNumber.textContent = String(currentScore);
+                            // Use currentScore for color banding and state.deg for fill
+                            scoreCircle.style.background = this.createScoreGradient(currentScore, state.deg);
+                            updateAria(state.n);
+                        }
+                    });
+                } else {
+                    // Simple JS fallback
+                    const start = performance.now();
+                    const dur = 1200;
+                    const step = (t) => {
+                        const p = Math.min(1, (t - start) / dur);
+                        const val = Math.round(finalScore * p);
+                        const deg = endDeg * p;
+                        scoreNumber.textContent = String(val);
+                        scoreCircle.style.background = this.createScoreGradient(val, deg);
+                        updateAria(val);
+                        if (p < 1) requestAnimationFrame(step);
+                    };
+                    requestAnimationFrame(step);
+                }
+            } catch (e) {
+                // Non-fatal; animation is cosmetic
+                console.warn('Score animation failed:', e);
+            }
         },
         
         // Render detailed technical information
@@ -2069,15 +5429,43 @@
             const currentIndex = this.currentInstances[ruleId] || 0;
             const currentIssue = issueGroup[currentIndex];
             
-            if (currentIssue.element) {
-                currentIssue.element.classList.add('uw-a11y-highlight');
-                currentIssue.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Resolve element if our reference is stale
+            let el = currentIssue.element;
+            if (!el || !(el instanceof Element) || !el.isConnected) {
+                if (currentIssue.selector) {
+                    try {
+                        const found = document.querySelector(currentIssue.selector);
+                        if (found) {
+                            el = found;
+                            currentIssue.element = found; // update cache
+                        }
+                    } catch (_) { /* ignore */ }
+                }
+            }
+            
+            if (el && el instanceof Element) {
+                // Reveal hidden ancestors temporarily
+                const cleanupReveal = this.ensureElementVisible(el);
+                // Add highlight and focus
+                el.classList.add('uw-a11y-highlight');
+                const needsTempTabIndex = !el.matches('a, button, input, textarea, select, [tabindex], [contenteditable="true"]');
+                if (needsTempTabIndex) {
+                    el.setAttribute('tabindex', '-1');
+                    el.setAttribute('data-uw-a11y-temp-tabindex', '');
+                }
+                try { el.focus({ preventScroll: true }); } catch (_) { /* ignore */ }
+                // Scroll into center for visibility
+                try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) { /* ignore */ }
                 
-                // Remove highlight after 3 seconds
+                // Cleanup highlight and temporary tabindex after a delay
                 setTimeout(() => {
-                    if (currentIssue.element) {
-                        currentIssue.element.classList.remove('uw-a11y-highlight');
+                    if (el && el.classList) el.classList.remove('uw-a11y-highlight');
+                    if (el && el.hasAttribute && el.hasAttribute('data-uw-a11y-temp-tabindex')) {
+                        el.removeAttribute('tabindex');
+                        el.removeAttribute('data-uw-a11y-temp-tabindex');
                     }
+                    // Re-hide previously hidden ancestors
+                    try { if (typeof cleanupReveal === 'function') cleanupReveal(); } catch (_) { /* ignore */ }
                 }, 3000);
             }
         },
@@ -2215,31 +5603,39 @@
             if (scoreNumber && scoreCircle) {
                 scoreNumber.textContent = newScore.score;
                 
-                // Update color based on score
+                // Update gradient based on score
                 const score = newScore.score;
-                const color = score >= 90 ? '#28a745' : score >= 70 ? '#ffc107' : score >= 50 ? '#fd7e14' : '#dc3545';
                 const percentage = (score / 100) * 360;
-                scoreCircle.style.background = `conic-gradient(from 0deg, ${color} 0deg ${percentage}deg, #e9ecef ${percentage}deg 360deg)`;
+                const gradient = this.createScoreGradient(score, percentage);
+                scoreCircle.style.background = gradient;
             }
             
             // Update the counts
             const counts = {
                 error: this.issues.filter(i => i.type === 'error').length,
-                warning: this.issues.filter(i => i.type === 'warning' && i.uniqueId).length, // Only count manual review items with uniqueId
-                warningChecked: this.issues.filter(i => i.type === 'warning' && i.uniqueId && this.checkedItems.has(i.uniqueId)).length
+                warning: this.issues.filter(i => i.type === 'warning' && i.uniqueId).length, // Only count manual review with uniqueId
+                warningChecked: this.issues.filter(i => i.type === 'warning' && i.uniqueId && this.checkedItems.has(i.uniqueId)).length,
+                info: this.issues.filter(i => i.type === 'info').length
             };
             
-            // Update count display
-            const summaryDiv = this.shadowRoot.getElementById('uw-a11y-summary');
-            if (summaryDiv) {
-                const countDisplay = summaryDiv.querySelector('div[style*="margin: 8px 0"]');
-                if (countDisplay) {
-                    countDisplay.innerHTML = `
-                        <span class="uw-a11y-count count-error">${counts.error}</span>Violations
-                        <span class="uw-a11y-count count-warning">${counts.warning}</span>Manual Review
-                        ${counts.warningChecked > 0 ? `<span class="uw-a11y-count count-verified">${counts.warningChecked}</span>Verified` : ''}
-                    `;
-                }
+            // Update count display numbers without removing toggles
+            const setText = (id, value) => {
+                const el = this.shadowRoot.getElementById(id);
+                if (el) el.textContent = value;
+            };
+            setText('count-error', counts.error);
+            setText('count-warning', counts.warning);
+            setText('count-info', counts.info);
+            setText('count-verified', counts.warningChecked);
+            
+            // Update visibility of if-issues elements
+            this.updateIfIssuesVisibility();
+            
+            // Announce score update to screen readers
+            const announcements = this.shadowRoot.getElementById('uw-a11y-announcements');
+            if (announcements && counts.warningChecked > 0) {
+                const message = `Score updated to ${newScore.score}. ${counts.warningChecked} item${counts.warningChecked === 1 ? '' : 's'} verified.`;
+                announcements.textContent = message;
             }
         },
 
@@ -2272,6 +5668,8 @@
                 panel.classList.remove('minimized');
                 minimizeBtn.textContent = '−';
                 minimizeBtn.title = 'Minimize';
+                // Set focus when restoring for keyboard users
+                this.setFocusToPanel();
             }
             
             // Store minimize state in sessionStorage
@@ -2375,6 +5773,27 @@
 
         
         remove: function() {
+            // Clean up tab order visualization
+            this.hideTabOrderVisualization();
+            
+            // Clean up injected styles
+            this.removeTabOrderStyles();
+            
+            // Clean up any remaining timeouts
+            if (this.tabOrderRefreshTimeout) {
+                clearTimeout(this.tabOrderRefreshTimeout);
+                this.tabOrderRefreshTimeout = null;
+            }
+            
+            // Clean up tab order event handlers
+            this.cleanupTabOrderEventHandlers();
+            
+            // Clean up resize handler
+            if (this.resizeHandler) {
+                window.removeEventListener('resize', this.resizeHandler);
+                this.resizeHandler = null;
+            }
+            
             // Remove the shadow DOM container
             const container = document.getElementById('uw-a11y-container');
             if (container) container.remove();

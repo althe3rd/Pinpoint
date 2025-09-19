@@ -1,0 +1,236 @@
+/* Popup styles for Pinpoint Accessibility Checker */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 320px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    background: #ffffff;
+}
+
+.popup-container {
+    padding: 0;
+    min-height: 300px;
+}
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, #35CD9C 0%, #43FFFC 46.5%, #C2F6F9 54.5%, #33BFF1 100%);
+    color: white;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px;
+}
+
+.title h1 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.title p {
+    font-size: 12px;
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+/* Content */
+.content {
+    padding: 20px 16px;
+}
+
+.action-section {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.primary-button {
+    background: #c5050c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(197, 5, 12, 0.2);
+}
+
+.primary-button:hover {
+    background: #a00408;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(197, 5, 12, 0.3);
+}
+
+.primary-button:active {
+    transform: translateY(0);
+}
+
+.primary-button:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.button-icon {
+    font-size: 16px;
+}
+
+.description {
+    margin-top: 8px;
+    color: #666;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+/* Features */
+.info-section {
+    border-top: 1px solid #eee;
+    padding-top: 16px;
+    margin-bottom: 16px;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #555;
+}
+
+.feature-icon {
+    font-size: 14px;
+    width: 20px;
+    text-align: center;
+}
+
+/* Shortcut info */
+.shortcut-info {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 10px;
+    text-align: center;
+    font-size: 11px;
+    color: #666;
+    line-height: 1.3;
+}
+
+.shortcut-info kbd {
+    background: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 3px;
+    padding: 2px 4px;
+    font-size: 10px;
+    font-family: monospace;
+    color: #495057;
+}
+
+.mac-shortcut {
+    display: block;
+    margin-top: 2px;
+}
+
+/* Footer */
+.footer {
+    border-top: 1px solid #eee;
+    padding: 12px 16px;
+    background: #f8f9fa;
+}
+
+.status {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 8px;
+    min-height: 16px;
+}
+
+.status.success {
+    color: #28a745;
+}
+
+.status.error {
+    color: #dc3545;
+}
+
+.links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+}
+
+.link {
+    color: #007cba;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.link:hover {
+    color: #005a87;
+    text-decoration: underline;
+}
+
+.separator {
+    color: #ccc;
+}
+
+/* Loading state */
+.loading .primary-button {
+    background: #cccccc;
+    cursor: wait;
+}
+
+.loading .button-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Success state */
+.success .primary-button {
+    background: #28a745;
+}
+
+.success .button-icon::before {
+    content: "✓";
+}
+
+/* Focus styles for accessibility */
+.primary-button:focus {
+    outline: 2px solid #007cba;
+    outline-offset: 2px;
+}
+
+.link:focus {
+    outline: 2px solid #007cba;
+    outline-offset: 1px;
+    border-radius: 2px;
+}

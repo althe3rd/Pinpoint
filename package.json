@@ -1,6 +1,6 @@
 {
   "name": "testmark-accessibility-checker",
-  "version": "1.4.8",
+  "version": "1.5.4",
   "description": "Pinpoint Accessibility Checker - A bookmarklet for WCAG testing",
   "main": "accessibility-checker.js",
   "scripts": {

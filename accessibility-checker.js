@@ -2023,6 +2023,70 @@
             }
         },
         
+        // Show score calculation explanation
+        showScoreExplanation: function() {
+            // Create a modal-like overlay
+            const existing = this.shadowRoot.querySelector('.uw-a11y-score-explanation');
+            if (existing) {
+                existing.remove();
+                return; // Toggle off if already shown
+            }
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'uw-a11y-score-explanation';
+            overlay.innerHTML = `
+                <div class="uw-a11y-explanation-content">
+                    <div class="uw-a11y-explanation-header">
+                        <h3>How the Accessibility Score is Calculated</h3>
+                        <button class="uw-a11y-explanation-close" aria-label="Close explanation">×</button>
+                    </div>
+                    <div class="uw-a11y-explanation-body">
+                        <p>The accessibility score starts at 100 points and deducts points based on the severity and type of issues found:</p>
+                        
+                        <h4>Violation Deductions:</h4>
+                        <ul>
+                            <li><strong>Critical issues:</strong> -25 points per rule</li>
+                            <li><strong>Serious issues:</strong> -15 points per rule</li>
+                            <li><strong>Moderate issues:</strong> -8 points per rule</li>
+                            <li><strong>Minor issues:</strong> -3 points per rule</li>
+                        </ul>
+                        
+                        <h4>Manual Review Items:</h4>
+                        <p>Items requiring human verification deduct <strong>half points</strong> if not manually verified or approved.</p>
+                        
+                        <h4>Category Caps:</h4>
+                        <p>Each accessibility category (color, keyboard, forms, etc.) has a maximum deduction cap to prevent any single area from dominating the score.</p>
+                        
+                        <div class="uw-a11y-explanation-note">
+                            <strong>Note:</strong> This scoring system is inspired by Lighthouse methodology and focuses on unique rule failures rather than individual element counts.
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add to shadow root
+            this.shadowRoot.appendChild(overlay);
+            
+            // Add event listeners
+            const closeBtn = overlay.querySelector('.uw-a11y-explanation-close');
+            const handleClose = () => overlay.remove();
+            
+            closeBtn.addEventListener('click', handleClose);
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) handleClose();
+            });
+            
+            // Handle keyboard events
+            overlay.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    handleClose();
+                }
+            });
+            
+            // Focus the close button for accessibility
+            closeBtn.focus();
+        },
+        
         // Create and show the results panel
         createPanel: function() {
             this.shadowRoot.innerHTML = `
@@ -2472,6 +2536,14 @@
                 
                 #uw-a11y-panel.minimized .uw-a11y-score-label {
                     font-size: 8px;
+                }
+                
+                #uw-a11y-panel.minimized .uw-a11y-score-info {
+                    width: 14px;
+                    height: 14px;
+                    font-size: 9px;
+                    top: -3px;
+                    right: -3px;
                 }
                 
                 #uw-a11y-panel.minimized h3 {
@@ -2961,6 +3033,34 @@
                     color: #666;
                     text-transform: uppercase;
                 }
+                #uw-a11y-panel .uw-a11y-score-info {
+                    position: absolute;
+                    top: -5px;
+                    right: -25px;
+                    width: 18px;
+                    height: 18px;
+                    background: #fff;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-size: 11px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    color: #000;
+                    border: 2px solid white;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                    transition: all 0.2s ease;
+                }
+                #uw-a11y-panel .uw-a11y-score-info:hover,
+                #uw-a11y-panel .uw-a11y-score-info:focus {
+                    background: #0056b3;
+                    transform: scale(1.1);
+                    color: #fff;
+                    outline: none;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                }
                 #uw-a11y-panel .uw-a11y-details {
                     margin-top: 1rem;
                     padding: 0.5rem;
@@ -3098,6 +3198,114 @@
         
         #uw-a11y-panel .how-to-fix code:not(:last-child) {
             margin-right: 2px;
+        }
+        
+        /* Score explanation modal styles */
+        .uw-a11y-score-explanation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000001;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .uw-a11y-explanation-content {
+            background: white;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .uw-a11y-explanation-header {
+            padding: 20px 20px 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+        
+        .uw-a11y-explanation-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .uw-a11y-explanation-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            color: #666;
+            transition: color 0.2s ease;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .uw-a11y-explanation-close:hover,
+        .uw-a11y-explanation-close:focus {
+            color: #333;
+            outline: 2px solid #007bff;
+            outline-offset: 2px;
+        }
+        
+        .uw-a11y-explanation-body {
+            padding: 0 20px 20px 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .uw-a11y-explanation-body h4 {
+            color: #007bff;
+            margin: 20px 0 10px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .uw-a11y-explanation-body ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .uw-a11y-explanation-body li {
+            margin: 8px 0;
+        }
+        
+        .uw-a11y-explanation-note {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .uw-a11y-explanation-content {
+                margin: 10px;
+                max-height: 90vh;
+            }
+            
+            .uw-a11y-explanation-header,
+            .uw-a11y-explanation-body {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
         }
         </style>`;
         },
@@ -4166,6 +4374,25 @@
             `;
             // Animate the score dial and number on initial render
             this.startResultsScoreAnimation();
+            
+            // Add event listener for score info icon
+            const scoreInfo = this.shadowRoot.querySelector('.uw-a11y-score-info');
+            if (scoreInfo) {
+                const handleInfoClick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.showScoreExplanation();
+                };
+                
+                scoreInfo.addEventListener('click', handleInfoClick);
+                scoreInfo.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleInfoClick(e);
+                    }
+                });
+            }
+            
             // Initialize filter toggle UI state
             this.updateFilterUI();
 
@@ -4258,6 +4485,13 @@
                                 <div class="uw-a11y-score-number" aria-hidden="true">0</div>
                                 <div class="uw-a11y-score-label" aria-hidden="true">Score</div>
                             </div>
+                        </div>
+                        <div class="uw-a11y-score-info" 
+                             role="button" 
+                             tabindex="0"
+                             aria-label="Score calculation information"
+                             title="Score is calculated from failed accessibility rules. Critical issues: -25 points, Serious: -15 points, Moderate: -8 points, Minor: -3 points. Manual review items deduct half points if unverified. Category caps prevent single areas from dominating the score.">
+                            <span aria-hidden="true">ⓘ</span>
                         </div>
                     </div>
                     <div style="font-size: 14px;">

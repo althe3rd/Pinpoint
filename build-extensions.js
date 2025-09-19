@@ -288,41 +288,56 @@ function configureAppStoreProject(safariProjectDir) {
         log('⚙️  Configuring project for App Store...', 'blue');
         
         const projectName = 'Pinpoint Accessibility Checker';
-        const appInfoPlistPath = path.join(safariProjectDir, projectName, 'Shared (App)', 'Info.plist');
-        const macOSInfoPlistPath = path.join(safariProjectDir, projectName, 'macOS (App)', 'Info.plist');
-        const iOSInfoPlistPath = path.join(safariProjectDir, projectName, 'iOS (App)', 'Info.plist');
         
-        // Update App Info.plist with App Store metadata
-        if (fs.existsSync(appInfoPlistPath)) {
-            updateInfoPlist(appInfoPlistPath, {
-                'CFBundleDisplayName': 'Pinpoint Accessibility Checker',
-                'CFBundleShortVersionString': VERSION,
-                'CFBundleVersion': VERSION,
-                'NSHumanReadableCopyright': `© ${new Date().getFullYear()} Pinpoint Accessibility Checker. All rights reserved.`,
-                'LSApplicationCategoryType': 'public.app-category.developer-tools',
-                'ITSAppUsesNonExemptEncryption': false
-            });
-        }
+        // All Info.plist files that need version updates
+        const plistFiles = [
+            { path: path.join(safariProjectDir, projectName, 'iOS (App)', 'Info.plist'), type: 'iOS App' },
+            { path: path.join(safariProjectDir, projectName, 'macOS (App)', 'Info.plist'), type: 'macOS App' },
+            { path: path.join(safariProjectDir, projectName, 'iOS (Extension)', 'Info.plist'), type: 'iOS Extension' },
+            { path: path.join(safariProjectDir, projectName, 'macOS (Extension)', 'Info.plist'), type: 'macOS Extension' }
+        ];
         
-        // Update macOS specific settings
-        if (fs.existsSync(macOSInfoPlistPath)) {
-            updateInfoPlist(macOSInfoPlistPath, {
-                'LSMinimumSystemVersion': '10.14',
-                'NSAppTransportSecurity': {
-                    'NSAllowsArbitraryLoads': false
+        // Update all Info.plist files with consistent versioning
+        plistFiles.forEach(({ path: plistPath, type }) => {
+            if (fs.existsSync(plistPath)) {
+                log(`📝 Updating ${type} Info.plist`, 'blue');
+                
+                // Base configuration for all plists
+                const baseConfig = {
+                    'CFBundleShortVersionString': VERSION,
+                    'CFBundleVersion': VERSION
+                };
+                
+                // Additional configuration based on type
+                if (type.includes('App')) {
+                    Object.assign(baseConfig, {
+                        'CFBundleDisplayName': 'Pinpoint Accessibility Checker',
+                        'NSHumanReadableCopyright': `© ${new Date().getFullYear()} Pinpoint Accessibility Checker. All rights reserved.`,
+                        'ITSAppUsesNonExemptEncryption': false
+                    });
+                    
+                    if (type === 'macOS App') {
+                        Object.assign(baseConfig, {
+                            'LSMinimumSystemVersion': '10.14',
+                            'LSApplicationCategoryType': 'public.app-category.developer-tools'
+                        });
+                    }
+                    
+                    if (type === 'iOS App') {
+                        Object.assign(baseConfig, {
+                            'MinimumOSVersion': '14.0'
+                        });
+                    }
                 }
-            });
-        }
-        
-        // Update iOS specific settings  
-        if (fs.existsSync(iOSInfoPlistPath)) {
-            updateInfoPlist(iOSInfoPlistPath, {
-                'MinimumOSVersion': '14.0',
-                'UIRequiredDeviceCapabilities': ['arm64']
-            });
-        }
+                
+                updateInfoPlist(plistPath, baseConfig);
+            } else {
+                log(`⚠️  ${type} Info.plist not found at ${plistPath}`, 'yellow');
+            }
+        });
         
         log('✅ App Store configuration completed', 'green');
+        log(`📱 All components updated to version ${VERSION}`, 'blue');
         
     } catch (error) {
         log(`⚠️  App Store configuration warning: ${error.message}`, 'yellow');
@@ -334,21 +349,48 @@ function updateInfoPlist(plistPath, updates) {
         // Read the plist file
         let plistContent = fs.readFileSync(plistPath, 'utf8');
         
-        // Simple plist key replacement (for basic string values)
+        // Update each key-value pair
         for (const [key, value] of Object.entries(updates)) {
-            if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-                const regex = new RegExp(`(<key>${key}</key>\\s*<[^>]+>)[^<]*(<\\/[^>]+>)`, 'g');
-                const replacement = typeof value === 'boolean' 
-                    ? `<key>${key}</key>\n\t<${value}/>`
-                    : `<key>${key}</key>\n\t<string>${value}</string>`;
-                    
+            if (typeof value === 'string' || typeof value === 'number') {
+                // Look for existing key and replace its value
+                const keyPattern = new RegExp(`(<key>${key}</key>\\s*<string>)[^<]*(<\\/string>)`, 'g');
+                const keyPatternNumber = new RegExp(`(<key>${key}</key>\\s*<real>)[^<]*(<\\/real>)`, 'g');
+                const keyPatternInteger = new RegExp(`(<key>${key}</key>\\s*<integer>)[^<]*(<\\/integer>)`, 'g');
+                
+                const replacement = `$1${value}$2`;
+                
                 if (plistContent.includes(`<key>${key}</key>`)) {
-                    plistContent = plistContent.replace(regex, replacement);
+                    // Try different value types
+                    if (plistContent.match(keyPattern)) {
+                        plistContent = plistContent.replace(keyPattern, replacement);
+                    } else if (plistContent.match(keyPatternNumber)) {
+                        plistContent = plistContent.replace(keyPatternNumber, replacement);
+                    } else if (plistContent.match(keyPatternInteger)) {
+                        plistContent = plistContent.replace(keyPatternInteger, replacement);
+                    } else {
+                        // Generic replacement - find the key and replace the next value
+                        const genericPattern = new RegExp(`(<key>${key}</key>\\s*<[^>]+>)[^<]*(<\\/[^>]+>)`, 'g');
+                        plistContent = plistContent.replace(genericPattern, `<key>${key}</key>\n\t<string>${value}</string>`);
+                    }
                 } else {
                     // Add new key before closing </dict>
+                    const dictClosePattern = /(\s*)<\/dict>(\s*<\/plist>)/;
                     plistContent = plistContent.replace(
-                        '</dict>\n</plist>',
-                        `\t<key>${key}</key>\n\t<string>${value}</string>\n</dict>\n</plist>`
+                        dictClosePattern,
+                        `$1\t<key>${key}</key>\n$1\t<string>${value}</string>\n$1</dict>$2`
+                    );
+                }
+            } else if (typeof value === 'boolean') {
+                // Handle boolean values
+                const boolValue = value ? 'true' : 'false';
+                if (plistContent.includes(`<key>${key}</key>`)) {
+                    const boolPattern = new RegExp(`(<key>${key}</key>\\s*<)(true|false)(\\/?>)`, 'g');
+                    plistContent = plistContent.replace(boolPattern, `$1${boolValue}$3`);
+                } else {
+                    const dictClosePattern = /(\s*)<\/dict>(\s*<\/plist>)/;
+                    plistContent = plistContent.replace(
+                        dictClosePattern,
+                        `$1\t<key>${key}</key>\n$1\t<${boolValue}/>\n$1</dict>$2`
                     );
                 }
             }
@@ -357,7 +399,7 @@ function updateInfoPlist(plistPath, updates) {
         fs.writeFileSync(plistPath, plistContent);
         
     } catch (error) {
-        log(`⚠️  Could not update ${plistPath}: ${error.message}`, 'yellow');
+        log(`⚠️  Could not update ${path.basename(plistPath)}: ${error.message}`, 'yellow');
     }
 }
 

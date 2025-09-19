@@ -2,77 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.14</string>
 	<key>SFSafariWebExtensionConverterVersion</key>
 	<string>26.0</string>
-	<key>CFBundleShortVersionString</key>
-
-	<string>1.5.5</string>
-
-	<key>CFBundleVersion</key>
-
-
-	<string>1.5.5</string>
-
-
-	<key>CFBundleDisplayName</key>
-
-
-
-	<string>Pinpoint Accessibility Checker</string>
-
-
-
-	<key>NSHumanReadableCopyright</key>
-
-
-
-
-	<string>© 2025 Pinpoint Accessibility Checker. All rights reserved.</string>
-
-
-
-
-	<key>ITSAppUsesNonExemptEncryption</key>
-
-
-
-
-
-	<false/>
-
-
-
-
-
-	<key>LSMinimumSystemVersion</key>
-
-
-
-
-
-
-	<string>10.14</string>
-
-
-
-
-
-
-	<key>LSApplicationCategoryType</key>
-
-
-
-
-
-
-
-	<string>public.app-category.developer-tools</string>
-
-
-
-
-
-
-
 </dict>
 </plist>

@@ -229,7 +229,7 @@ function buildSafariExtension(isAppStoreReady = false) {
         }
         
         // Generate Safari extension using Apple's converter
-        const bundleId = isAppStoreReady ? 'com.pinpoint.accessibility-checker' : 'com.pinpoint.accessibility-checker.dev';
+        const bundleId = isAppStoreReady ? 'com.pinpoint.accessibilitychecker' : 'com.pinpoint.accessibilitychecker.dev';
         
         const convertCommand = [
             'xcrun safari-web-extension-converter',
@@ -249,6 +249,10 @@ function buildSafariExtension(isAppStoreReady = false) {
         if (isAppStoreReady) {
             // Configure for App Store submission
             configureAppStoreProject(safariProjectDir);
+            // Update Xcode project version settings
+            updateXcodeProjectVersions(safariProjectDir);
+            // Update Safari extension manifest for App Store validation
+            updateSafariExtensionManifest(safariProjectDir);
         }
         
         // Create a zip of the Safari project for easy distribution
@@ -400,6 +404,89 @@ function updateInfoPlist(plistPath, updates) {
         
     } catch (error) {
         log(`⚠️  Could not update ${path.basename(plistPath)}: ${error.message}`, 'yellow');
+    }
+}
+
+function updateXcodeProjectVersions(safariProjectDir) {
+    try {
+        log('🔧 Updating Xcode project version settings...', 'blue');
+        
+        const projectName = 'Pinpoint Accessibility Checker';
+        const projectFilePath = path.join(safariProjectDir, projectName, `${projectName}.xcodeproj`, 'project.pbxproj');
+        
+        if (!fs.existsSync(projectFilePath)) {
+            log('⚠️  Xcode project file not found', 'yellow');
+            return;
+        }
+        
+        let projectContent = fs.readFileSync(projectFilePath, 'utf8');
+        
+        // Update MARKETING_VERSION (user-facing version)
+        projectContent = projectContent.replace(
+            /MARKETING_VERSION = [^;]+;/g,
+            `MARKETING_VERSION = ${VERSION};`
+        );
+        
+        // Update CURRENT_PROJECT_VERSION (build version)
+        projectContent = projectContent.replace(
+            /CURRENT_PROJECT_VERSION = [^;]+;/g,
+            `CURRENT_PROJECT_VERSION = ${VERSION};`
+        );
+        
+        fs.writeFileSync(projectFilePath, projectContent);
+        
+        log(`✅ Xcode project versions updated to ${VERSION}`, 'green');
+        
+    } catch (error) {
+        log(`⚠️  Could not update Xcode project versions: ${error.message}`, 'yellow');
+    }
+}
+
+function updateSafariExtensionManifest(safariProjectDir) {
+    try {
+        log('📝 Updating Safari extension manifest for App Store validation...', 'blue');
+        
+        const projectName = 'Pinpoint Accessibility Checker';
+        const manifestPaths = [
+            path.join(safariProjectDir, projectName, 'Shared (Extension)', 'Resources', 'manifest.json'),
+            path.join(safariProjectDir, projectName, 'iOS (Extension)', 'Resources', 'manifest.json'),
+            path.join(safariProjectDir, projectName, 'macOS (Extension)', 'Resources', 'manifest.json')
+        ];
+        
+        // Safari-compliant description (112 characters or fewer)
+        const safariDescription = "WCAG 2.1 AA accessibility testing powered by axe-core. Get detailed reports and recommendations.";
+        
+        // Verify the description length
+        if (safariDescription.length > 112) {
+            log(`⚠️  Warning: Description is ${safariDescription.length} characters, Safari limit is 112`, 'yellow');
+        } else {
+            log(`✅ Description length: ${safariDescription.length}/112 characters`, 'blue');
+        }
+        
+        manifestPaths.forEach(manifestPath => {
+            if (fs.existsSync(manifestPath)) {
+                try {
+                    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+                    
+                    // Update description for Safari validation
+                    manifest.description = safariDescription;
+                    
+                    // Also ensure version is current
+                    manifest.version = VERSION;
+                    
+                    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+                    log(`✅ Updated ${path.basename(path.dirname(manifestPath))} manifest`, 'blue');
+                    
+                } catch (error) {
+                    log(`⚠️  Could not update ${manifestPath}: ${error.message}`, 'yellow');
+                }
+            }
+        });
+        
+        log('✅ Safari extension manifests updated for App Store validation', 'green');
+        
+    } catch (error) {
+        log(`⚠️  Could not update Safari extension manifests: ${error.message}`, 'yellow');
     }
 }
 

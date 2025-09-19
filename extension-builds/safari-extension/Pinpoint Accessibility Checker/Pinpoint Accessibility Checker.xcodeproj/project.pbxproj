@@ -7,82 +7,82 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1F1696E92E7DC7D6008D9DA5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1696E82E7DC7D6008D9DA5 /* AppDelegate.swift */; };
-		1F1696EB2E7DC7D6008D9DA5 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1696EA2E7DC7D6008D9DA5 /* SceneDelegate.swift */; };
-		1F1696EE2E7DC7D6008D9DA5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F1696EC2E7DC7D6008D9DA5 /* LaunchScreen.storyboard */; };
-		1F1696F12E7DC7D6008D9DA5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F1696EF2E7DC7D6008D9DA5 /* Main.storyboard */; };
-		1F1696FA2E7DC7D6008D9DA5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1696F92E7DC7D6008D9DA5 /* AppDelegate.swift */; };
-		1F1696FD2E7DC7D6008D9DA5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F1696FB2E7DC7D6008D9DA5 /* Main.storyboard */; };
-		1F1697042E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1F1697032E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		1F16970E2E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1F16970D2E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		1F1697132E7DC7D6008D9DA5 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F1696D82E7DC7D5008D9DA5 /* Main.html */; };
-		1F1697142E7DC7D6008D9DA5 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F1696D82E7DC7D5008D9DA5 /* Main.html */; };
-		1F1697152E7DC7D6008D9DA5 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F1696DA2E7DC7D5008D9DA5 /* Icon.png */; };
-		1F1697162E7DC7D6008D9DA5 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F1696DA2E7DC7D5008D9DA5 /* Icon.png */; };
-		1F1697172E7DC7D6008D9DA5 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F1696DB2E7DC7D5008D9DA5 /* Style.css */; };
-		1F1697182E7DC7D6008D9DA5 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F1696DB2E7DC7D5008D9DA5 /* Style.css */; };
-		1F1697192E7DC7D6008D9DA5 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F1696DC2E7DC7D5008D9DA5 /* Script.js */; };
-		1F16971A2E7DC7D6008D9DA5 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F1696DC2E7DC7D5008D9DA5 /* Script.js */; };
-		1F16971B2E7DC7D6008D9DA5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1696DD2E7DC7D5008D9DA5 /* ViewController.swift */; };
-		1F16971C2E7DC7D6008D9DA5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1696DD2E7DC7D5008D9DA5 /* ViewController.swift */; };
-		1F16971D2E7DC7D6008D9DA5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F1696DE2E7DC7D6008D9DA5 /* Assets.xcassets */; };
-		1F16971E2E7DC7D6008D9DA5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F1696DE2E7DC7D6008D9DA5 /* Assets.xcassets */; };
-		1F16971F2E7DC7D6008D9DA5 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1696E02E7DC7D6008D9DA5 /* SafariWebExtensionHandler.swift */; };
-		1F1697202E7DC7D6008D9DA5 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1696E02E7DC7D6008D9DA5 /* SafariWebExtensionHandler.swift */; };
-		1F16973A2E7DC7D7008D9DA5 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F1697322E7DC7D7008D9DA5 /* popup.js */; };
-		1F16973B2E7DC7D7008D9DA5 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F1697332E7DC7D7008D9DA5 /* background.js */; };
-		1F16973C2E7DC7D7008D9DA5 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F1697342E7DC7D7008D9DA5 /* popup.html */; };
-		1F16973D2E7DC7D7008D9DA5 /* accessibility-checker.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F1697352E7DC7D7008D9DA5 /* accessibility-checker.js */; };
-		1F16973E2E7DC7D7008D9DA5 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = 1F1697362E7DC7D7008D9DA5 /* icons */; };
-		1F16973F2E7DC7D7008D9DA5 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F1697372E7DC7D7008D9DA5 /* manifest.json */; };
-		1F1697402E7DC7D7008D9DA5 /* content-script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F1697382E7DC7D7008D9DA5 /* content-script.js */; };
-		1F1697412E7DC7D7008D9DA5 /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F1697392E7DC7D7008D9DA5 /* popup.css */; };
-		1F1697422E7DC7D7008D9DA5 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F1697322E7DC7D7008D9DA5 /* popup.js */; };
-		1F1697432E7DC7D7008D9DA5 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F1697332E7DC7D7008D9DA5 /* background.js */; };
-		1F1697442E7DC7D7008D9DA5 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F1697342E7DC7D7008D9DA5 /* popup.html */; };
-		1F1697452E7DC7D7008D9DA5 /* accessibility-checker.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F1697352E7DC7D7008D9DA5 /* accessibility-checker.js */; };
-		1F1697462E7DC7D7008D9DA5 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = 1F1697362E7DC7D7008D9DA5 /* icons */; };
-		1F1697472E7DC7D7008D9DA5 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F1697372E7DC7D7008D9DA5 /* manifest.json */; };
-		1F1697482E7DC7D7008D9DA5 /* content-script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F1697382E7DC7D7008D9DA5 /* content-script.js */; };
-		1F1697492E7DC7D7008D9DA5 /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F1697392E7DC7D7008D9DA5 /* popup.css */; };
+		1FBB6B6A2E7DD0860032DE4F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FBB6B692E7DD0860032DE4F /* AppDelegate.swift */; };
+		1FBB6B6C2E7DD0860032DE4F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FBB6B6B2E7DD0860032DE4F /* SceneDelegate.swift */; };
+		1FBB6B6F2E7DD0860032DE4F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6B6D2E7DD0860032DE4F /* LaunchScreen.storyboard */; };
+		1FBB6B722E7DD0860032DE4F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6B702E7DD0860032DE4F /* Main.storyboard */; };
+		1FBB6B7B2E7DD0860032DE4F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FBB6B7A2E7DD0860032DE4F /* AppDelegate.swift */; };
+		1FBB6B7E2E7DD0860032DE4F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6B7C2E7DD0860032DE4F /* Main.storyboard */; };
+		1FBB6B852E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1FBB6B842E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1FBB6B8F2E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1FBB6B8E2E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1FBB6B942E7DD0860032DE4F /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6B592E7DD0850032DE4F /* Main.html */; };
+		1FBB6B952E7DD0860032DE4F /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6B592E7DD0850032DE4F /* Main.html */; };
+		1FBB6B962E7DD0860032DE4F /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6B5B2E7DD0850032DE4F /* Icon.png */; };
+		1FBB6B972E7DD0860032DE4F /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6B5B2E7DD0850032DE4F /* Icon.png */; };
+		1FBB6B982E7DD0860032DE4F /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6B5C2E7DD0850032DE4F /* Style.css */; };
+		1FBB6B992E7DD0860032DE4F /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6B5C2E7DD0850032DE4F /* Style.css */; };
+		1FBB6B9A2E7DD0860032DE4F /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6B5D2E7DD0850032DE4F /* Script.js */; };
+		1FBB6B9B2E7DD0860032DE4F /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6B5D2E7DD0850032DE4F /* Script.js */; };
+		1FBB6B9C2E7DD0860032DE4F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FBB6B5E2E7DD0850032DE4F /* ViewController.swift */; };
+		1FBB6B9D2E7DD0860032DE4F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FBB6B5E2E7DD0850032DE4F /* ViewController.swift */; };
+		1FBB6B9E2E7DD0860032DE4F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6B5F2E7DD0860032DE4F /* Assets.xcassets */; };
+		1FBB6B9F2E7DD0860032DE4F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6B5F2E7DD0860032DE4F /* Assets.xcassets */; };
+		1FBB6BA02E7DD0860032DE4F /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FBB6B612E7DD0860032DE4F /* SafariWebExtensionHandler.swift */; };
+		1FBB6BA12E7DD0860032DE4F /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FBB6B612E7DD0860032DE4F /* SafariWebExtensionHandler.swift */; };
+		1FBB6BBB2E7DD0870032DE4F /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6BB32E7DD0870032DE4F /* popup.js */; };
+		1FBB6BBC2E7DD0870032DE4F /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6BB42E7DD0870032DE4F /* background.js */; };
+		1FBB6BBD2E7DD0870032DE4F /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6BB52E7DD0870032DE4F /* popup.html */; };
+		1FBB6BBE2E7DD0870032DE4F /* accessibility-checker.js in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6BB62E7DD0870032DE4F /* accessibility-checker.js */; };
+		1FBB6BBF2E7DD0870032DE4F /* icons in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6BB72E7DD0870032DE4F /* icons */; };
+		1FBB6BC02E7DD0870032DE4F /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6BB82E7DD0870032DE4F /* manifest.json */; };
+		1FBB6BC12E7DD0870032DE4F /* content-script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6BB92E7DD0870032DE4F /* content-script.js */; };
+		1FBB6BC22E7DD0870032DE4F /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6BBA2E7DD0870032DE4F /* popup.css */; };
+		1FBB6BC32E7DD0870032DE4F /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6BB32E7DD0870032DE4F /* popup.js */; };
+		1FBB6BC42E7DD0870032DE4F /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6BB42E7DD0870032DE4F /* background.js */; };
+		1FBB6BC52E7DD0870032DE4F /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6BB52E7DD0870032DE4F /* popup.html */; };
+		1FBB6BC62E7DD0870032DE4F /* accessibility-checker.js in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6BB62E7DD0870032DE4F /* accessibility-checker.js */; };
+		1FBB6BC72E7DD0870032DE4F /* icons in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6BB72E7DD0870032DE4F /* icons */; };
+		1FBB6BC82E7DD0870032DE4F /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6BB82E7DD0870032DE4F /* manifest.json */; };
+		1FBB6BC92E7DD0870032DE4F /* content-script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6BB92E7DD0870032DE4F /* content-script.js */; };
+		1FBB6BCA2E7DD0870032DE4F /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 1FBB6BBA2E7DD0870032DE4F /* popup.css */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		1F1697052E7DC7D6008D9DA5 /* PBXContainerItemProxy */ = {
+		1FBB6B862E7DD0860032DE4F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 1F1696D22E7DC7D5008D9DA5 /* Project object */;
+			containerPortal = 1FBB6B532E7DD0850032DE4F /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 1F1697022E7DC7D6008D9DA5;
+			remoteGlobalIDString = 1FBB6B832E7DD0860032DE4F;
 			remoteInfo = "Pinpoint Accessibility Checker Extension (iOS)";
 		};
-		1F16970F2E7DC7D6008D9DA5 /* PBXContainerItemProxy */ = {
+		1FBB6B902E7DD0860032DE4F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 1F1696D22E7DC7D5008D9DA5 /* Project object */;
+			containerPortal = 1FBB6B532E7DD0850032DE4F /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 1F16970C2E7DC7D6008D9DA5;
+			remoteGlobalIDString = 1FBB6B8D2E7DD0860032DE4F;
 			remoteInfo = "Pinpoint Accessibility Checker Extension (macOS)";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		1F1697262E7DC7D6008D9DA5 /* Embed Foundation Extensions */ = {
+		1FBB6BA72E7DD0860032DE4F /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				1F1697042E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */,
+				1FBB6B852E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F16972D2E7DC7D6008D9DA5 /* Embed Foundation Extensions */ = {
+		1FBB6BAE2E7DD0860032DE4F /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				1F16970E2E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */,
+				1FBB6B8F2E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -90,60 +90,60 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		1F1696D92E7DC7D5008D9DA5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
-		1F1696DA2E7DC7D5008D9DA5 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
-		1F1696DB2E7DC7D5008D9DA5 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
-		1F1696DC2E7DC7D5008D9DA5 /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
-		1F1696DD2E7DC7D5008D9DA5 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		1F1696DE2E7DC7D6008D9DA5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		1F1696E02E7DC7D6008D9DA5 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
-		1F1696E52E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pinpoint Accessibility Checker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		1F1696E82E7DC7D6008D9DA5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		1F1696EA2E7DC7D6008D9DA5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		1F1696ED2E7DC7D6008D9DA5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		1F1696F02E7DC7D6008D9DA5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		1F1696F22E7DC7D6008D9DA5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1F1696F72E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pinpoint Accessibility Checker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		1F1696F92E7DC7D6008D9DA5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		1F1696FC2E7DC7D6008D9DA5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		1F1696FE2E7DC7D6008D9DA5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1F1697032E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Pinpoint Accessibility Checker Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		1F1697082E7DC7D6008D9DA5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1F16970D2E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Pinpoint Accessibility Checker Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		1F1697122E7DC7D6008D9DA5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1F1697322E7DC7D7008D9DA5 /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = Resources/popup.js; sourceTree = "<group>"; };
-		1F1697332E7DC7D7008D9DA5 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = Resources/background.js; sourceTree = "<group>"; };
-		1F1697342E7DC7D7008D9DA5 /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = Resources/popup.html; sourceTree = "<group>"; };
-		1F1697352E7DC7D7008D9DA5 /* accessibility-checker.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "accessibility-checker.js"; path = "Resources/accessibility-checker.js"; sourceTree = "<group>"; };
-		1F1697362E7DC7D7008D9DA5 /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = icons; path = Resources/icons; sourceTree = "<group>"; };
-		1F1697372E7DC7D7008D9DA5 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = Resources/manifest.json; sourceTree = "<group>"; };
-		1F1697382E7DC7D7008D9DA5 /* content-script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "content-script.js"; path = "Resources/content-script.js"; sourceTree = "<group>"; };
-		1F1697392E7DC7D7008D9DA5 /* popup.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = popup.css; path = Resources/popup.css; sourceTree = "<group>"; };
+		1FBB6B5A2E7DD0850032DE4F /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
+		1FBB6B5B2E7DD0850032DE4F /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		1FBB6B5C2E7DD0850032DE4F /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		1FBB6B5D2E7DD0850032DE4F /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		1FBB6B5E2E7DD0850032DE4F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		1FBB6B5F2E7DD0860032DE4F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1FBB6B612E7DD0860032DE4F /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		1FBB6B662E7DD0860032DE4F /* Pinpoint Accessibility Checker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pinpoint Accessibility Checker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1FBB6B692E7DD0860032DE4F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		1FBB6B6B2E7DD0860032DE4F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		1FBB6B6E2E7DD0860032DE4F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		1FBB6B712E7DD0860032DE4F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		1FBB6B732E7DD0860032DE4F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1FBB6B782E7DD0860032DE4F /* Pinpoint Accessibility Checker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pinpoint Accessibility Checker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1FBB6B7A2E7DD0860032DE4F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		1FBB6B7D2E7DD0860032DE4F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		1FBB6B7F2E7DD0860032DE4F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1FBB6B842E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Pinpoint Accessibility Checker Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1FBB6B892E7DD0860032DE4F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1FBB6B8E2E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Pinpoint Accessibility Checker Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1FBB6B932E7DD0860032DE4F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1FBB6BB32E7DD0870032DE4F /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = Resources/popup.js; sourceTree = "<group>"; };
+		1FBB6BB42E7DD0870032DE4F /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = Resources/background.js; sourceTree = "<group>"; };
+		1FBB6BB52E7DD0870032DE4F /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = Resources/popup.html; sourceTree = "<group>"; };
+		1FBB6BB62E7DD0870032DE4F /* accessibility-checker.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "accessibility-checker.js"; path = "Resources/accessibility-checker.js"; sourceTree = "<group>"; };
+		1FBB6BB72E7DD0870032DE4F /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = icons; path = Resources/icons; sourceTree = "<group>"; };
+		1FBB6BB82E7DD0870032DE4F /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = Resources/manifest.json; sourceTree = "<group>"; };
+		1FBB6BB92E7DD0870032DE4F /* content-script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "content-script.js"; path = "Resources/content-script.js"; sourceTree = "<group>"; };
+		1FBB6BBA2E7DD0870032DE4F /* popup.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = popup.css; path = Resources/popup.css; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		1F1696E22E7DC7D6008D9DA5 /* Frameworks */ = {
+		1FBB6B632E7DD0860032DE4F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F1696F42E7DC7D6008D9DA5 /* Frameworks */ = {
+		1FBB6B752E7DD0860032DE4F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F1697002E7DC7D6008D9DA5 /* Frameworks */ = {
+		1FBB6B812E7DD0860032DE4F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F16970A2E7DC7D6008D9DA5 /* Frameworks */ = {
+		1FBB6B8B2E7DD0860032DE4F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -153,109 +153,109 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1F1696D12E7DC7D5008D9DA5 = {
+		1FBB6B522E7DD0850032DE4F = {
 			isa = PBXGroup;
 			children = (
-				1F1696D62E7DC7D5008D9DA5 /* Shared (App) */,
-				1F1696DF2E7DC7D6008D9DA5 /* Shared (Extension) */,
-				1F1696E72E7DC7D6008D9DA5 /* iOS (App) */,
-				1F1696F82E7DC7D6008D9DA5 /* macOS (App) */,
-				1F1697072E7DC7D6008D9DA5 /* iOS (Extension) */,
-				1F1697112E7DC7D6008D9DA5 /* macOS (Extension) */,
-				1F1696E62E7DC7D6008D9DA5 /* Products */,
+				1FBB6B572E7DD0850032DE4F /* Shared (App) */,
+				1FBB6B602E7DD0860032DE4F /* Shared (Extension) */,
+				1FBB6B682E7DD0860032DE4F /* iOS (App) */,
+				1FBB6B792E7DD0860032DE4F /* macOS (App) */,
+				1FBB6B882E7DD0860032DE4F /* iOS (Extension) */,
+				1FBB6B922E7DD0860032DE4F /* macOS (Extension) */,
+				1FBB6B672E7DD0860032DE4F /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		1F1696D62E7DC7D5008D9DA5 /* Shared (App) */ = {
+		1FBB6B572E7DD0850032DE4F /* Shared (App) */ = {
 			isa = PBXGroup;
 			children = (
-				1F1696DD2E7DC7D5008D9DA5 /* ViewController.swift */,
-				1F1696DE2E7DC7D6008D9DA5 /* Assets.xcassets */,
-				1F1696D72E7DC7D5008D9DA5 /* Resources */,
+				1FBB6B5E2E7DD0850032DE4F /* ViewController.swift */,
+				1FBB6B5F2E7DD0860032DE4F /* Assets.xcassets */,
+				1FBB6B582E7DD0850032DE4F /* Resources */,
 			);
 			path = "Shared (App)";
 			sourceTree = "<group>";
 		};
-		1F1696D72E7DC7D5008D9DA5 /* Resources */ = {
+		1FBB6B582E7DD0850032DE4F /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				1F1696D82E7DC7D5008D9DA5 /* Main.html */,
-				1F1696DA2E7DC7D5008D9DA5 /* Icon.png */,
-				1F1696DB2E7DC7D5008D9DA5 /* Style.css */,
-				1F1696DC2E7DC7D5008D9DA5 /* Script.js */,
+				1FBB6B592E7DD0850032DE4F /* Main.html */,
+				1FBB6B5B2E7DD0850032DE4F /* Icon.png */,
+				1FBB6B5C2E7DD0850032DE4F /* Style.css */,
+				1FBB6B5D2E7DD0850032DE4F /* Script.js */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		1F1696DF2E7DC7D6008D9DA5 /* Shared (Extension) */ = {
+		1FBB6B602E7DD0860032DE4F /* Shared (Extension) */ = {
 			isa = PBXGroup;
 			children = (
-				1F1697312E7DC7D7008D9DA5 /* Resources */,
-				1F1696E02E7DC7D6008D9DA5 /* SafariWebExtensionHandler.swift */,
+				1FBB6BB22E7DD0870032DE4F /* Resources */,
+				1FBB6B612E7DD0860032DE4F /* SafariWebExtensionHandler.swift */,
 			);
 			path = "Shared (Extension)";
 			sourceTree = "<group>";
 		};
-		1F1696E62E7DC7D6008D9DA5 /* Products */ = {
+		1FBB6B672E7DD0860032DE4F /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1F1696E52E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker.app */,
-				1F1696F72E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker.app */,
-				1F1697032E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension.appex */,
-				1F16970D2E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension.appex */,
+				1FBB6B662E7DD0860032DE4F /* Pinpoint Accessibility Checker.app */,
+				1FBB6B782E7DD0860032DE4F /* Pinpoint Accessibility Checker.app */,
+				1FBB6B842E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension.appex */,
+				1FBB6B8E2E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		1F1696E72E7DC7D6008D9DA5 /* iOS (App) */ = {
+		1FBB6B682E7DD0860032DE4F /* iOS (App) */ = {
 			isa = PBXGroup;
 			children = (
-				1F1696E82E7DC7D6008D9DA5 /* AppDelegate.swift */,
-				1F1696EA2E7DC7D6008D9DA5 /* SceneDelegate.swift */,
-				1F1696EC2E7DC7D6008D9DA5 /* LaunchScreen.storyboard */,
-				1F1696EF2E7DC7D6008D9DA5 /* Main.storyboard */,
-				1F1696F22E7DC7D6008D9DA5 /* Info.plist */,
+				1FBB6B692E7DD0860032DE4F /* AppDelegate.swift */,
+				1FBB6B6B2E7DD0860032DE4F /* SceneDelegate.swift */,
+				1FBB6B6D2E7DD0860032DE4F /* LaunchScreen.storyboard */,
+				1FBB6B702E7DD0860032DE4F /* Main.storyboard */,
+				1FBB6B732E7DD0860032DE4F /* Info.plist */,
 			);
 			path = "iOS (App)";
 			sourceTree = "<group>";
 		};
-		1F1696F82E7DC7D6008D9DA5 /* macOS (App) */ = {
+		1FBB6B792E7DD0860032DE4F /* macOS (App) */ = {
 			isa = PBXGroup;
 			children = (
-				1F1696F92E7DC7D6008D9DA5 /* AppDelegate.swift */,
-				1F1696FB2E7DC7D6008D9DA5 /* Main.storyboard */,
-				1F1696FE2E7DC7D6008D9DA5 /* Info.plist */,
+				1FBB6B7A2E7DD0860032DE4F /* AppDelegate.swift */,
+				1FBB6B7C2E7DD0860032DE4F /* Main.storyboard */,
+				1FBB6B7F2E7DD0860032DE4F /* Info.plist */,
 			);
 			path = "macOS (App)";
 			sourceTree = "<group>";
 		};
-		1F1697072E7DC7D6008D9DA5 /* iOS (Extension) */ = {
+		1FBB6B882E7DD0860032DE4F /* iOS (Extension) */ = {
 			isa = PBXGroup;
 			children = (
-				1F1697082E7DC7D6008D9DA5 /* Info.plist */,
+				1FBB6B892E7DD0860032DE4F /* Info.plist */,
 			);
 			path = "iOS (Extension)";
 			sourceTree = "<group>";
 		};
-		1F1697112E7DC7D6008D9DA5 /* macOS (Extension) */ = {
+		1FBB6B922E7DD0860032DE4F /* macOS (Extension) */ = {
 			isa = PBXGroup;
 			children = (
-				1F1697122E7DC7D6008D9DA5 /* Info.plist */,
+				1FBB6B932E7DD0860032DE4F /* Info.plist */,
 			);
 			path = "macOS (Extension)";
 			sourceTree = "<group>";
 		};
-		1F1697312E7DC7D7008D9DA5 /* Resources */ = {
+		1FBB6BB22E7DD0870032DE4F /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				1F1697322E7DC7D7008D9DA5 /* popup.js */,
-				1F1697332E7DC7D7008D9DA5 /* background.js */,
-				1F1697342E7DC7D7008D9DA5 /* popup.html */,
-				1F1697352E7DC7D7008D9DA5 /* accessibility-checker.js */,
-				1F1697362E7DC7D7008D9DA5 /* icons */,
-				1F1697372E7DC7D7008D9DA5 /* manifest.json */,
-				1F1697382E7DC7D7008D9DA5 /* content-script.js */,
-				1F1697392E7DC7D7008D9DA5 /* popup.css */,
+				1FBB6BB32E7DD0870032DE4F /* popup.js */,
+				1FBB6BB42E7DD0870032DE4F /* background.js */,
+				1FBB6BB52E7DD0870032DE4F /* popup.html */,
+				1FBB6BB62E7DD0870032DE4F /* accessibility-checker.js */,
+				1FBB6BB72E7DD0870032DE4F /* icons */,
+				1FBB6BB82E7DD0870032DE4F /* manifest.json */,
+				1FBB6BB92E7DD0870032DE4F /* content-script.js */,
+				1FBB6BBA2E7DD0870032DE4F /* popup.css */,
 			);
 			name = Resources;
 			path = "Shared (Extension)";
@@ -264,55 +264,55 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1F1696E42E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker (iOS) */ = {
+		1FBB6B652E7DD0860032DE4F /* Pinpoint Accessibility Checker (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1F1697272E7DC7D6008D9DA5 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (iOS)" */;
+			buildConfigurationList = 1FBB6BA82E7DD0860032DE4F /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (iOS)" */;
 			buildPhases = (
-				1F1696E12E7DC7D6008D9DA5 /* Sources */,
-				1F1696E22E7DC7D6008D9DA5 /* Frameworks */,
-				1F1696E32E7DC7D6008D9DA5 /* Resources */,
-				1F1697262E7DC7D6008D9DA5 /* Embed Foundation Extensions */,
+				1FBB6B622E7DD0860032DE4F /* Sources */,
+				1FBB6B632E7DD0860032DE4F /* Frameworks */,
+				1FBB6B642E7DD0860032DE4F /* Resources */,
+				1FBB6BA72E7DD0860032DE4F /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				1F1697062E7DC7D6008D9DA5 /* PBXTargetDependency */,
+				1FBB6B872E7DD0860032DE4F /* PBXTargetDependency */,
 			);
 			name = "Pinpoint Accessibility Checker (iOS)";
 			packageProductDependencies = (
 			);
 			productName = "Pinpoint Accessibility Checker (iOS)";
-			productReference = 1F1696E52E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker.app */;
+			productReference = 1FBB6B662E7DD0860032DE4F /* Pinpoint Accessibility Checker.app */;
 			productType = "com.apple.product-type.application";
 		};
-		1F1696F62E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker (macOS) */ = {
+		1FBB6B772E7DD0860032DE4F /* Pinpoint Accessibility Checker (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1F16972E2E7DC7D6008D9DA5 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (macOS)" */;
+			buildConfigurationList = 1FBB6BAF2E7DD0860032DE4F /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (macOS)" */;
 			buildPhases = (
-				1F1696F32E7DC7D6008D9DA5 /* Sources */,
-				1F1696F42E7DC7D6008D9DA5 /* Frameworks */,
-				1F1696F52E7DC7D6008D9DA5 /* Resources */,
-				1F16972D2E7DC7D6008D9DA5 /* Embed Foundation Extensions */,
+				1FBB6B742E7DD0860032DE4F /* Sources */,
+				1FBB6B752E7DD0860032DE4F /* Frameworks */,
+				1FBB6B762E7DD0860032DE4F /* Resources */,
+				1FBB6BAE2E7DD0860032DE4F /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				1F1697102E7DC7D6008D9DA5 /* PBXTargetDependency */,
+				1FBB6B912E7DD0860032DE4F /* PBXTargetDependency */,
 			);
 			name = "Pinpoint Accessibility Checker (macOS)";
 			packageProductDependencies = (
 			);
 			productName = "Pinpoint Accessibility Checker (macOS)";
-			productReference = 1F1696F72E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker.app */;
+			productReference = 1FBB6B782E7DD0860032DE4F /* Pinpoint Accessibility Checker.app */;
 			productType = "com.apple.product-type.application";
 		};
-		1F1697022E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension (iOS) */ = {
+		1FBB6B832E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1F1697232E7DC7D6008D9DA5 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (iOS)" */;
+			buildConfigurationList = 1FBB6BA42E7DD0860032DE4F /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (iOS)" */;
 			buildPhases = (
-				1F1696FF2E7DC7D6008D9DA5 /* Sources */,
-				1F1697002E7DC7D6008D9DA5 /* Frameworks */,
-				1F1697012E7DC7D6008D9DA5 /* Resources */,
+				1FBB6B802E7DD0860032DE4F /* Sources */,
+				1FBB6B812E7DD0860032DE4F /* Frameworks */,
+				1FBB6B822E7DD0860032DE4F /* Resources */,
 			);
 			buildRules = (
 			);
@@ -322,16 +322,16 @@
 			packageProductDependencies = (
 			);
 			productName = "Pinpoint Accessibility Checker Extension (iOS)";
-			productReference = 1F1697032E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension.appex */;
+			productReference = 1FBB6B842E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		1F16970C2E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension (macOS) */ = {
+		1FBB6B8D2E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1F16972A2E7DC7D6008D9DA5 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (macOS)" */;
+			buildConfigurationList = 1FBB6BAB2E7DD0860032DE4F /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (macOS)" */;
 			buildPhases = (
-				1F1697092E7DC7D6008D9DA5 /* Sources */,
-				1F16970A2E7DC7D6008D9DA5 /* Frameworks */,
-				1F16970B2E7DC7D6008D9DA5 /* Resources */,
+				1FBB6B8A2E7DD0860032DE4F /* Sources */,
+				1FBB6B8B2E7DD0860032DE4F /* Frameworks */,
+				1FBB6B8C2E7DD0860032DE4F /* Resources */,
 			);
 			buildRules = (
 			);
@@ -341,195 +341,195 @@
 			packageProductDependencies = (
 			);
 			productName = "Pinpoint Accessibility Checker Extension (macOS)";
-			productReference = 1F16970D2E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension.appex */;
+			productReference = 1FBB6B8E2E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		1F1696D22E7DC7D5008D9DA5 /* Project object */ = {
+		1FBB6B532E7DD0850032DE4F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
-					1F1696E42E7DC7D6008D9DA5 = {
+					1FBB6B652E7DD0860032DE4F = {
 						CreatedOnToolsVersion = 26.0;
 					};
-					1F1696F62E7DC7D6008D9DA5 = {
+					1FBB6B772E7DD0860032DE4F = {
 						CreatedOnToolsVersion = 26.0;
 					};
-					1F1697022E7DC7D6008D9DA5 = {
+					1FBB6B832E7DD0860032DE4F = {
 						CreatedOnToolsVersion = 26.0;
 					};
-					1F16970C2E7DC7D6008D9DA5 = {
+					1FBB6B8D2E7DD0860032DE4F = {
 						CreatedOnToolsVersion = 26.0;
 					};
 				};
 			};
-			buildConfigurationList = 1F1696D52E7DC7D5008D9DA5 /* Build configuration list for PBXProject "Pinpoint Accessibility Checker" */;
+			buildConfigurationList = 1FBB6B562E7DD0850032DE4F /* Build configuration list for PBXProject "Pinpoint Accessibility Checker" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 1F1696D12E7DC7D5008D9DA5;
+			mainGroup = 1FBB6B522E7DD0850032DE4F;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 1F1696E62E7DC7D6008D9DA5 /* Products */;
+			productRefGroup = 1FBB6B672E7DD0860032DE4F /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				1F1696E42E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker (iOS) */,
-				1F1696F62E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker (macOS) */,
-				1F1697022E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension (iOS) */,
-				1F16970C2E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension (macOS) */,
+				1FBB6B652E7DD0860032DE4F /* Pinpoint Accessibility Checker (iOS) */,
+				1FBB6B772E7DD0860032DE4F /* Pinpoint Accessibility Checker (macOS) */,
+				1FBB6B832E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension (iOS) */,
+				1FBB6B8D2E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension (macOS) */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		1F1696E32E7DC7D6008D9DA5 /* Resources */ = {
+		1FBB6B642E7DD0860032DE4F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F1697152E7DC7D6008D9DA5 /* Icon.png in Resources */,
-				1F1696EE2E7DC7D6008D9DA5 /* LaunchScreen.storyboard in Resources */,
-				1F1697132E7DC7D6008D9DA5 /* Main.html in Resources */,
-				1F1697192E7DC7D6008D9DA5 /* Script.js in Resources */,
-				1F16971D2E7DC7D6008D9DA5 /* Assets.xcassets in Resources */,
-				1F1696F12E7DC7D6008D9DA5 /* Main.storyboard in Resources */,
-				1F1697172E7DC7D6008D9DA5 /* Style.css in Resources */,
+				1FBB6B962E7DD0860032DE4F /* Icon.png in Resources */,
+				1FBB6B6F2E7DD0860032DE4F /* LaunchScreen.storyboard in Resources */,
+				1FBB6B942E7DD0860032DE4F /* Main.html in Resources */,
+				1FBB6B9A2E7DD0860032DE4F /* Script.js in Resources */,
+				1FBB6B9E2E7DD0860032DE4F /* Assets.xcassets in Resources */,
+				1FBB6B722E7DD0860032DE4F /* Main.storyboard in Resources */,
+				1FBB6B982E7DD0860032DE4F /* Style.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F1696F52E7DC7D6008D9DA5 /* Resources */ = {
+		1FBB6B762E7DD0860032DE4F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F1697162E7DC7D6008D9DA5 /* Icon.png in Resources */,
-				1F1697182E7DC7D6008D9DA5 /* Style.css in Resources */,
-				1F1696FD2E7DC7D6008D9DA5 /* Main.storyboard in Resources */,
-				1F16971A2E7DC7D6008D9DA5 /* Script.js in Resources */,
-				1F16971E2E7DC7D6008D9DA5 /* Assets.xcassets in Resources */,
-				1F1697142E7DC7D6008D9DA5 /* Main.html in Resources */,
+				1FBB6B972E7DD0860032DE4F /* Icon.png in Resources */,
+				1FBB6B992E7DD0860032DE4F /* Style.css in Resources */,
+				1FBB6B7E2E7DD0860032DE4F /* Main.storyboard in Resources */,
+				1FBB6B9B2E7DD0860032DE4F /* Script.js in Resources */,
+				1FBB6B9F2E7DD0860032DE4F /* Assets.xcassets in Resources */,
+				1FBB6B952E7DD0860032DE4F /* Main.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F1697012E7DC7D6008D9DA5 /* Resources */ = {
+		1FBB6B822E7DD0860032DE4F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F1697482E7DC7D7008D9DA5 /* content-script.js in Resources */,
-				1F1697432E7DC7D7008D9DA5 /* background.js in Resources */,
-				1F1697452E7DC7D7008D9DA5 /* accessibility-checker.js in Resources */,
-				1F1697442E7DC7D7008D9DA5 /* popup.html in Resources */,
-				1F1697492E7DC7D7008D9DA5 /* popup.css in Resources */,
-				1F1697462E7DC7D7008D9DA5 /* icons in Resources */,
-				1F1697472E7DC7D7008D9DA5 /* manifest.json in Resources */,
-				1F1697422E7DC7D7008D9DA5 /* popup.js in Resources */,
+				1FBB6BC92E7DD0870032DE4F /* content-script.js in Resources */,
+				1FBB6BC42E7DD0870032DE4F /* background.js in Resources */,
+				1FBB6BC62E7DD0870032DE4F /* accessibility-checker.js in Resources */,
+				1FBB6BC52E7DD0870032DE4F /* popup.html in Resources */,
+				1FBB6BCA2E7DD0870032DE4F /* popup.css in Resources */,
+				1FBB6BC72E7DD0870032DE4F /* icons in Resources */,
+				1FBB6BC82E7DD0870032DE4F /* manifest.json in Resources */,
+				1FBB6BC32E7DD0870032DE4F /* popup.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F16970B2E7DC7D6008D9DA5 /* Resources */ = {
+		1FBB6B8C2E7DD0860032DE4F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F1697402E7DC7D7008D9DA5 /* content-script.js in Resources */,
-				1F16973B2E7DC7D7008D9DA5 /* background.js in Resources */,
-				1F16973D2E7DC7D7008D9DA5 /* accessibility-checker.js in Resources */,
-				1F16973C2E7DC7D7008D9DA5 /* popup.html in Resources */,
-				1F1697412E7DC7D7008D9DA5 /* popup.css in Resources */,
-				1F16973E2E7DC7D7008D9DA5 /* icons in Resources */,
-				1F16973F2E7DC7D7008D9DA5 /* manifest.json in Resources */,
-				1F16973A2E7DC7D7008D9DA5 /* popup.js in Resources */,
+				1FBB6BC12E7DD0870032DE4F /* content-script.js in Resources */,
+				1FBB6BBC2E7DD0870032DE4F /* background.js in Resources */,
+				1FBB6BBE2E7DD0870032DE4F /* accessibility-checker.js in Resources */,
+				1FBB6BBD2E7DD0870032DE4F /* popup.html in Resources */,
+				1FBB6BC22E7DD0870032DE4F /* popup.css in Resources */,
+				1FBB6BBF2E7DD0870032DE4F /* icons in Resources */,
+				1FBB6BC02E7DD0870032DE4F /* manifest.json in Resources */,
+				1FBB6BBB2E7DD0870032DE4F /* popup.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		1F1696E12E7DC7D6008D9DA5 /* Sources */ = {
+		1FBB6B622E7DD0860032DE4F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F16971B2E7DC7D6008D9DA5 /* ViewController.swift in Sources */,
-				1F1696E92E7DC7D6008D9DA5 /* AppDelegate.swift in Sources */,
-				1F1696EB2E7DC7D6008D9DA5 /* SceneDelegate.swift in Sources */,
+				1FBB6B9C2E7DD0860032DE4F /* ViewController.swift in Sources */,
+				1FBB6B6A2E7DD0860032DE4F /* AppDelegate.swift in Sources */,
+				1FBB6B6C2E7DD0860032DE4F /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F1696F32E7DC7D6008D9DA5 /* Sources */ = {
+		1FBB6B742E7DD0860032DE4F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F16971C2E7DC7D6008D9DA5 /* ViewController.swift in Sources */,
-				1F1696FA2E7DC7D6008D9DA5 /* AppDelegate.swift in Sources */,
+				1FBB6B9D2E7DD0860032DE4F /* ViewController.swift in Sources */,
+				1FBB6B7B2E7DD0860032DE4F /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F1696FF2E7DC7D6008D9DA5 /* Sources */ = {
+		1FBB6B802E7DD0860032DE4F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F16971F2E7DC7D6008D9DA5 /* SafariWebExtensionHandler.swift in Sources */,
+				1FBB6BA02E7DD0860032DE4F /* SafariWebExtensionHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F1697092E7DC7D6008D9DA5 /* Sources */ = {
+		1FBB6B8A2E7DD0860032DE4F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F1697202E7DC7D6008D9DA5 /* SafariWebExtensionHandler.swift in Sources */,
+				1FBB6BA12E7DD0860032DE4F /* SafariWebExtensionHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		1F1697062E7DC7D6008D9DA5 /* PBXTargetDependency */ = {
+		1FBB6B872E7DD0860032DE4F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 1F1697022E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension (iOS) */;
-			targetProxy = 1F1697052E7DC7D6008D9DA5 /* PBXContainerItemProxy */;
+			target = 1FBB6B832E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension (iOS) */;
+			targetProxy = 1FBB6B862E7DD0860032DE4F /* PBXContainerItemProxy */;
 		};
-		1F1697102E7DC7D6008D9DA5 /* PBXTargetDependency */ = {
+		1FBB6B912E7DD0860032DE4F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 1F16970C2E7DC7D6008D9DA5 /* Pinpoint Accessibility Checker Extension (macOS) */;
-			targetProxy = 1F16970F2E7DC7D6008D9DA5 /* PBXContainerItemProxy */;
+			target = 1FBB6B8D2E7DD0860032DE4F /* Pinpoint Accessibility Checker Extension (macOS) */;
+			targetProxy = 1FBB6B902E7DD0860032DE4F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		1F1696D82E7DC7D5008D9DA5 /* Main.html */ = {
+		1FBB6B592E7DD0850032DE4F /* Main.html */ = {
 			isa = PBXVariantGroup;
 			children = (
-				1F1696D92E7DC7D5008D9DA5 /* Base */,
+				1FBB6B5A2E7DD0850032DE4F /* Base */,
 			);
 			name = Main.html;
 			sourceTree = "<group>";
 		};
-		1F1696EC2E7DC7D6008D9DA5 /* LaunchScreen.storyboard */ = {
+		1FBB6B6D2E7DD0860032DE4F /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				1F1696ED2E7DC7D6008D9DA5 /* Base */,
+				1FBB6B6E2E7DD0860032DE4F /* Base */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
-		1F1696EF2E7DC7D6008D9DA5 /* Main.storyboard */ = {
+		1FBB6B702E7DD0860032DE4F /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				1F1696F02E7DC7D6008D9DA5 /* Base */,
+				1FBB6B712E7DD0860032DE4F /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
-		1F1696FB2E7DC7D6008D9DA5 /* Main.storyboard */ = {
+		1FBB6B7C2E7DD0860032DE4F /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				1F1696FC2E7DC7D6008D9DA5 /* Base */,
+				1FBB6B7D2E7DD0860032DE4F /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -537,7 +537,7 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		1F1697212E7DC7D6008D9DA5 /* Debug */ = {
+		1FBB6BA22E7DD0860032DE4F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -598,7 +598,7 @@
 			};
 			name = Debug;
 		};
-		1F1697222E7DC7D6008D9DA5 /* Release */ = {
+		1FBB6BA32E7DD0860032DE4F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -651,11 +651,11 @@
 			};
 			name = Release;
 		};
-		1F1697242E7DC7D6008D9DA5 /* Debug */ = {
+		1FBB6BA52E7DD0860032DE4F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.5.5;
 				DEVELOPMENT_TEAM = HXXRUTU897;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
@@ -667,12 +667,12 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.5.5;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pinpoint.accessibility-checker.Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pinpoint.accessibilitychecker.Extension;
 				PRODUCT_NAME = "Pinpoint Accessibility Checker Extension";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -685,11 +685,11 @@
 			};
 			name = Debug;
 		};
-		1F1697252E7DC7D6008D9DA5 /* Release */ = {
+		1FBB6BA62E7DD0860032DE4F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.5.5;
 				DEVELOPMENT_TEAM = HXXRUTU897;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
@@ -701,12 +701,12 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.5.5;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pinpoint.accessibility-checker.Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pinpoint.accessibilitychecker.Extension;
 				PRODUCT_NAME = "Pinpoint Accessibility Checker Extension";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -720,17 +720,19 @@
 			};
 			name = Release;
 		};
-		1F1697282E7DC7D6008D9DA5 /* Debug */ = {
+		1FBB6BA92E7DD0860032DE4F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.5.5;
 				DEVELOPMENT_TEAM = HXXRUTU897;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (App)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Pinpoint Accessibility Checker";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2025 Pinpoint Accessibility Checker. All rights reserved.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -741,14 +743,14 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.5.5;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pinpoint.accessibility-checker";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pinpoint.accessibilitychecker;
 				PRODUCT_NAME = "Pinpoint Accessibility Checker";
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -761,17 +763,19 @@
 			};
 			name = Debug;
 		};
-		1F1697292E7DC7D6008D9DA5 /* Release */ = {
+		1FBB6BAA2E7DD0860032DE4F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.5.5;
 				DEVELOPMENT_TEAM = HXXRUTU897;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (App)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Pinpoint Accessibility Checker";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2025 Pinpoint Accessibility Checker. All rights reserved.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -782,14 +786,14 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.5.5;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pinpoint.accessibility-checker";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pinpoint.accessibilitychecker;
 				PRODUCT_NAME = "Pinpoint Accessibility Checker";
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -803,12 +807,11 @@
 			};
 			name = Release;
 		};
-		1F16972B2E7DC7D6008D9DA5 /* Debug */ = {
+		1FBB6BAC2E7DD0860032DE4F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.5.5;
 				DEVELOPMENT_TEAM = HXXRUTU897;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -820,7 +823,6 @@
 				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
 				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
 				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
-				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
@@ -834,19 +836,13 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.5.5;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pinpoint.accessibility-checker.Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pinpoint.accessibilitychecker.Extension;
 				PRODUCT_NAME = "Pinpoint Accessibility Checker Extension";
-				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
-				RUNTIME_EXCEPTION_ALLOW_JIT = YES;
-				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
-				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
-				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
-				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -857,12 +853,11 @@
 			};
 			name = Debug;
 		};
-		1F16972C2E7DC7D6008D9DA5 /* Release */ = {
+		1FBB6BAD2E7DD0860032DE4F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.5.5;
 				DEVELOPMENT_TEAM = HXXRUTU897;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -874,7 +869,6 @@
 				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
 				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
 				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
-				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
@@ -888,19 +882,13 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.5.5;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pinpoint.accessibility-checker.Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pinpoint.accessibilitychecker.Extension;
 				PRODUCT_NAME = "Pinpoint Accessibility Checker Extension";
-				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
-				RUNTIME_EXCEPTION_ALLOW_JIT = YES;
-				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
-				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
-				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
-				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -911,13 +899,13 @@
 			};
 			name = Release;
 		};
-		1F16972F2E7DC7D6008D9DA5 /* Debug */ = {
+		1FBB6BB02E7DD0860032DE4F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.5.5;
 				DEVELOPMENT_TEAM = HXXRUTU897;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -926,6 +914,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (App)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Pinpoint Accessibility Checker";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2025 Pinpoint Accessibility Checker. All rights reserved.";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -933,14 +924,14 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.5.5;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pinpoint.accessibility-checker";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pinpoint.accessibilitychecker;
 				PRODUCT_NAME = "Pinpoint Accessibility Checker";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
@@ -953,13 +944,13 @@
 			};
 			name = Debug;
 		};
-		1F1697302E7DC7D6008D9DA5 /* Release */ = {
+		1FBB6BB12E7DD0860032DE4F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.5.5;
 				DEVELOPMENT_TEAM = HXXRUTU897;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -968,6 +959,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (App)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Pinpoint Accessibility Checker";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2025 Pinpoint Accessibility Checker. All rights reserved.";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -975,14 +969,14 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.5.5;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pinpoint.accessibility-checker";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pinpoint.accessibilitychecker;
 				PRODUCT_NAME = "Pinpoint Accessibility Checker";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
@@ -998,52 +992,52 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1F1696D52E7DC7D5008D9DA5 /* Build configuration list for PBXProject "Pinpoint Accessibility Checker" */ = {
+		1FBB6B562E7DD0850032DE4F /* Build configuration list for PBXProject "Pinpoint Accessibility Checker" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1F1697212E7DC7D6008D9DA5 /* Debug */,
-				1F1697222E7DC7D6008D9DA5 /* Release */,
+				1FBB6BA22E7DD0860032DE4F /* Debug */,
+				1FBB6BA32E7DD0860032DE4F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1F1697232E7DC7D6008D9DA5 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (iOS)" */ = {
+		1FBB6BA42E7DD0860032DE4F /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1F1697242E7DC7D6008D9DA5 /* Debug */,
-				1F1697252E7DC7D6008D9DA5 /* Release */,
+				1FBB6BA52E7DD0860032DE4F /* Debug */,
+				1FBB6BA62E7DD0860032DE4F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1F1697272E7DC7D6008D9DA5 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (iOS)" */ = {
+		1FBB6BA82E7DD0860032DE4F /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1F1697282E7DC7D6008D9DA5 /* Debug */,
-				1F1697292E7DC7D6008D9DA5 /* Release */,
+				1FBB6BA92E7DD0860032DE4F /* Debug */,
+				1FBB6BAA2E7DD0860032DE4F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1F16972A2E7DC7D6008D9DA5 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (macOS)" */ = {
+		1FBB6BAB2E7DD0860032DE4F /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1F16972B2E7DC7D6008D9DA5 /* Debug */,
-				1F16972C2E7DC7D6008D9DA5 /* Release */,
+				1FBB6BAC2E7DD0860032DE4F /* Debug */,
+				1FBB6BAD2E7DD0860032DE4F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1F16972E2E7DC7D6008D9DA5 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (macOS)" */ = {
+		1FBB6BAF2E7DD0860032DE4F /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1F16972F2E7DC7D6008D9DA5 /* Debug */,
-				1F1697302E7DC7D6008D9DA5 /* Release */,
+				1FBB6BB02E7DD0860032DE4F /* Debug */,
+				1FBB6BB12E7DD0860032DE4F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 1F1696D22E7DC7D5008D9DA5 /* Project object */;
+	rootObject = 1FBB6B532E7DD0850032DE4F /* Project object */;
 }

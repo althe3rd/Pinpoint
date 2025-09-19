@@ -15,7 +15,7 @@ github:
 # url: "https://your-domain.com"
 
 # Base URL for GitHub Pages (usually your repository name)
-baseurl: "/Pinpoint
+baseurl: "/Pinpoint"
 
 # Exclude files from processing
 exclude:

@@ -84,7 +84,7 @@ This ensures that:
 ## File Structure
 
 ```
-TestMark/
+Pinpoint/
 ├── accessibility-checker.js         # Source code (edit this)
 ├── accessibility-checker.min.js     # Minified output
 ├── index.html                       # Distribution page
@@ -168,7 +168,7 @@ When you're ready to release a new version:
 
 MIT License
 
-**Live Demo**: [Visit Pinpoint Accessibility Checker](https://your-username.github.io/TestMark/)
+**Live Demo**: [Visit Pinpoint Accessibility Checker](https://your-username.github.io/Pinpoint/)
 
 ## Features
 
@@ -183,7 +183,7 @@ MIT License
 ## Quick Start
 
 ### Option 1: Live Website (Recommended)
-Visit the [Pinpoint Accessibility Checker](https://your-username.github.io/TestMark/) and drag the bookmarklet to your bookmarks bar.
+Visit the [Pinpoint Accessibility Checker](https://your-username.github.io/Pinpoint/) and drag the bookmarklet to your bookmarks bar.
 
 ### Option 2: Manual Installation
 1. Copy the bookmarklet code from the website

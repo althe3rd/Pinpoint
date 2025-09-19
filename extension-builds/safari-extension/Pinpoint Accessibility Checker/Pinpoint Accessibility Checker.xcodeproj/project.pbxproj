@@ -1,0 +1,1043 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1F67EA662E7DC762000051BE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F67EA652E7DC762000051BE /* AppDelegate.swift */; };
+		1F67EA682E7DC762000051BE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F67EA672E7DC762000051BE /* SceneDelegate.swift */; };
+		1F67EA6B2E7DC762000051BE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EA692E7DC762000051BE /* LaunchScreen.storyboard */; };
+		1F67EA6E2E7DC762000051BE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EA6C2E7DC762000051BE /* Main.storyboard */; };
+		1F67EA772E7DC762000051BE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F67EA762E7DC762000051BE /* AppDelegate.swift */; };
+		1F67EA7A2E7DC762000051BE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EA782E7DC762000051BE /* Main.storyboard */; };
+		1F67EA812E7DC762000051BE /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1F67EA802E7DC762000051BE /* Pinpoint Accessibility Checker Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1F67EA8B2E7DC762000051BE /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1F67EA8A2E7DC762000051BE /* Pinpoint Accessibility Checker Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1F67EA902E7DC762000051BE /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EA552E7DC761000051BE /* Main.html */; };
+		1F67EA912E7DC762000051BE /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EA552E7DC761000051BE /* Main.html */; };
+		1F67EA922E7DC762000051BE /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EA572E7DC761000051BE /* Icon.png */; };
+		1F67EA932E7DC762000051BE /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EA572E7DC761000051BE /* Icon.png */; };
+		1F67EA942E7DC762000051BE /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EA582E7DC761000051BE /* Style.css */; };
+		1F67EA952E7DC762000051BE /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EA582E7DC761000051BE /* Style.css */; };
+		1F67EA962E7DC762000051BE /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EA592E7DC761000051BE /* Script.js */; };
+		1F67EA972E7DC762000051BE /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EA592E7DC761000051BE /* Script.js */; };
+		1F67EA982E7DC762000051BE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F67EA5A2E7DC761000051BE /* ViewController.swift */; };
+		1F67EA992E7DC762000051BE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F67EA5A2E7DC761000051BE /* ViewController.swift */; };
+		1F67EA9A2E7DC762000051BE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EA5B2E7DC762000051BE /* Assets.xcassets */; };
+		1F67EA9B2E7DC762000051BE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EA5B2E7DC762000051BE /* Assets.xcassets */; };
+		1F67EA9C2E7DC762000051BE /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F67EA5D2E7DC762000051BE /* SafariWebExtensionHandler.swift */; };
+		1F67EA9D2E7DC762000051BE /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F67EA5D2E7DC762000051BE /* SafariWebExtensionHandler.swift */; };
+		1F67EAB72E7DC762000051BE /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EAAF2E7DC762000051BE /* popup.js */; };
+		1F67EAB82E7DC762000051BE /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EAB02E7DC762000051BE /* background.js */; };
+		1F67EAB92E7DC762000051BE /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EAB12E7DC762000051BE /* popup.html */; };
+		1F67EABA2E7DC762000051BE /* accessibility-checker.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EAB22E7DC762000051BE /* accessibility-checker.js */; };
+		1F67EABB2E7DC762000051BE /* icons in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EAB32E7DC762000051BE /* icons */; };
+		1F67EABC2E7DC762000051BE /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EAB42E7DC762000051BE /* manifest.json */; };
+		1F67EABD2E7DC762000051BE /* content-script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EAB52E7DC762000051BE /* content-script.js */; };
+		1F67EABE2E7DC762000051BE /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EAB62E7DC762000051BE /* popup.css */; };
+		1F67EABF2E7DC762000051BE /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EAAF2E7DC762000051BE /* popup.js */; };
+		1F67EAC02E7DC762000051BE /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EAB02E7DC762000051BE /* background.js */; };
+		1F67EAC12E7DC762000051BE /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EAB12E7DC762000051BE /* popup.html */; };
+		1F67EAC22E7DC762000051BE /* accessibility-checker.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EAB22E7DC762000051BE /* accessibility-checker.js */; };
+		1F67EAC32E7DC762000051BE /* icons in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EAB32E7DC762000051BE /* icons */; };
+		1F67EAC42E7DC762000051BE /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EAB42E7DC762000051BE /* manifest.json */; };
+		1F67EAC52E7DC762000051BE /* content-script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EAB52E7DC762000051BE /* content-script.js */; };
+		1F67EAC62E7DC762000051BE /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F67EAB62E7DC762000051BE /* popup.css */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1F67EA822E7DC762000051BE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1F67EA4F2E7DC761000051BE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1F67EA7F2E7DC762000051BE;
+			remoteInfo = "Pinpoint Accessibility Checker Extension (iOS)";
+		};
+		1F67EA8C2E7DC762000051BE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1F67EA4F2E7DC761000051BE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1F67EA892E7DC762000051BE;
+			remoteInfo = "Pinpoint Accessibility Checker Extension (macOS)";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1F67EAA32E7DC762000051BE /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				1F67EA812E7DC762000051BE /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F67EAAA2E7DC762000051BE /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				1F67EA8B2E7DC762000051BE /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		1F67EA562E7DC761000051BE /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
+		1F67EA572E7DC761000051BE /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		1F67EA582E7DC761000051BE /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		1F67EA592E7DC761000051BE /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		1F67EA5A2E7DC761000051BE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		1F67EA5B2E7DC762000051BE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1F67EA5D2E7DC762000051BE /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		1F67EA622E7DC762000051BE /* Pinpoint Accessibility Checker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pinpoint Accessibility Checker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F67EA652E7DC762000051BE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		1F67EA672E7DC762000051BE /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		1F67EA6A2E7DC762000051BE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		1F67EA6D2E7DC762000051BE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		1F67EA6F2E7DC762000051BE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1F67EA742E7DC762000051BE /* Pinpoint Accessibility Checker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pinpoint Accessibility Checker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F67EA762E7DC762000051BE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		1F67EA792E7DC762000051BE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		1F67EA7B2E7DC762000051BE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1F67EA802E7DC762000051BE /* Pinpoint Accessibility Checker Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Pinpoint Accessibility Checker Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F67EA852E7DC762000051BE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1F67EA8A2E7DC762000051BE /* Pinpoint Accessibility Checker Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Pinpoint Accessibility Checker Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F67EA8F2E7DC762000051BE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1F67EAAF2E7DC762000051BE /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = Resources/popup.js; sourceTree = "<group>"; };
+		1F67EAB02E7DC762000051BE /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = Resources/background.js; sourceTree = "<group>"; };
+		1F67EAB12E7DC762000051BE /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = Resources/popup.html; sourceTree = "<group>"; };
+		1F67EAB22E7DC762000051BE /* accessibility-checker.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "accessibility-checker.js"; path = "Resources/accessibility-checker.js"; sourceTree = "<group>"; };
+		1F67EAB32E7DC762000051BE /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = icons; path = Resources/icons; sourceTree = "<group>"; };
+		1F67EAB42E7DC762000051BE /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = Resources/manifest.json; sourceTree = "<group>"; };
+		1F67EAB52E7DC762000051BE /* content-script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "content-script.js"; path = "Resources/content-script.js"; sourceTree = "<group>"; };
+		1F67EAB62E7DC762000051BE /* popup.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = popup.css; path = Resources/popup.css; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1F67EA5F2E7DC762000051BE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F67EA712E7DC762000051BE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F67EA7D2E7DC762000051BE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F67EA872E7DC762000051BE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1F67EA4E2E7DC761000051BE = {
+			isa = PBXGroup;
+			children = (
+				1F67EA532E7DC761000051BE /* Shared (App) */,
+				1F67EA5C2E7DC762000051BE /* Shared (Extension) */,
+				1F67EA642E7DC762000051BE /* iOS (App) */,
+				1F67EA752E7DC762000051BE /* macOS (App) */,
+				1F67EA842E7DC762000051BE /* iOS (Extension) */,
+				1F67EA8E2E7DC762000051BE /* macOS (Extension) */,
+				1F67EA632E7DC762000051BE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1F67EA532E7DC761000051BE /* Shared (App) */ = {
+			isa = PBXGroup;
+			children = (
+				1F67EA5A2E7DC761000051BE /* ViewController.swift */,
+				1F67EA5B2E7DC762000051BE /* Assets.xcassets */,
+				1F67EA542E7DC761000051BE /* Resources */,
+			);
+			path = "Shared (App)";
+			sourceTree = "<group>";
+		};
+		1F67EA542E7DC761000051BE /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				1F67EA552E7DC761000051BE /* Main.html */,
+				1F67EA572E7DC761000051BE /* Icon.png */,
+				1F67EA582E7DC761000051BE /* Style.css */,
+				1F67EA592E7DC761000051BE /* Script.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		1F67EA5C2E7DC762000051BE /* Shared (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				1F67EAAE2E7DC762000051BE /* Resources */,
+				1F67EA5D2E7DC762000051BE /* SafariWebExtensionHandler.swift */,
+			);
+			path = "Shared (Extension)";
+			sourceTree = "<group>";
+		};
+		1F67EA632E7DC762000051BE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1F67EA622E7DC762000051BE /* Pinpoint Accessibility Checker.app */,
+				1F67EA742E7DC762000051BE /* Pinpoint Accessibility Checker.app */,
+				1F67EA802E7DC762000051BE /* Pinpoint Accessibility Checker Extension.appex */,
+				1F67EA8A2E7DC762000051BE /* Pinpoint Accessibility Checker Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1F67EA642E7DC762000051BE /* iOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				1F67EA652E7DC762000051BE /* AppDelegate.swift */,
+				1F67EA672E7DC762000051BE /* SceneDelegate.swift */,
+				1F67EA692E7DC762000051BE /* LaunchScreen.storyboard */,
+				1F67EA6C2E7DC762000051BE /* Main.storyboard */,
+				1F67EA6F2E7DC762000051BE /* Info.plist */,
+			);
+			path = "iOS (App)";
+			sourceTree = "<group>";
+		};
+		1F67EA752E7DC762000051BE /* macOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				1F67EA762E7DC762000051BE /* AppDelegate.swift */,
+				1F67EA782E7DC762000051BE /* Main.storyboard */,
+				1F67EA7B2E7DC762000051BE /* Info.plist */,
+			);
+			path = "macOS (App)";
+			sourceTree = "<group>";
+		};
+		1F67EA842E7DC762000051BE /* iOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				1F67EA852E7DC762000051BE /* Info.plist */,
+			);
+			path = "iOS (Extension)";
+			sourceTree = "<group>";
+		};
+		1F67EA8E2E7DC762000051BE /* macOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				1F67EA8F2E7DC762000051BE /* Info.plist */,
+			);
+			path = "macOS (Extension)";
+			sourceTree = "<group>";
+		};
+		1F67EAAE2E7DC762000051BE /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				1F67EAAF2E7DC762000051BE /* popup.js */,
+				1F67EAB02E7DC762000051BE /* background.js */,
+				1F67EAB12E7DC762000051BE /* popup.html */,
+				1F67EAB22E7DC762000051BE /* accessibility-checker.js */,
+				1F67EAB32E7DC762000051BE /* icons */,
+				1F67EAB42E7DC762000051BE /* manifest.json */,
+				1F67EAB52E7DC762000051BE /* content-script.js */,
+				1F67EAB62E7DC762000051BE /* popup.css */,
+			);
+			name = Resources;
+			path = "Shared (Extension)";
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1F67EA612E7DC762000051BE /* Pinpoint Accessibility Checker (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1F67EAA42E7DC762000051BE /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (iOS)" */;
+			buildPhases = (
+				1F67EA5E2E7DC762000051BE /* Sources */,
+				1F67EA5F2E7DC762000051BE /* Frameworks */,
+				1F67EA602E7DC762000051BE /* Resources */,
+				1F67EAA32E7DC762000051BE /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1F67EA832E7DC762000051BE /* PBXTargetDependency */,
+			);
+			name = "Pinpoint Accessibility Checker (iOS)";
+			packageProductDependencies = (
+			);
+			productName = "Pinpoint Accessibility Checker (iOS)";
+			productReference = 1F67EA622E7DC762000051BE /* Pinpoint Accessibility Checker.app */;
+			productType = "com.apple.product-type.application";
+		};
+		1F67EA732E7DC762000051BE /* Pinpoint Accessibility Checker (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1F67EAAB2E7DC762000051BE /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (macOS)" */;
+			buildPhases = (
+				1F67EA702E7DC762000051BE /* Sources */,
+				1F67EA712E7DC762000051BE /* Frameworks */,
+				1F67EA722E7DC762000051BE /* Resources */,
+				1F67EAAA2E7DC762000051BE /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1F67EA8D2E7DC762000051BE /* PBXTargetDependency */,
+			);
+			name = "Pinpoint Accessibility Checker (macOS)";
+			packageProductDependencies = (
+			);
+			productName = "Pinpoint Accessibility Checker (macOS)";
+			productReference = 1F67EA742E7DC762000051BE /* Pinpoint Accessibility Checker.app */;
+			productType = "com.apple.product-type.application";
+		};
+		1F67EA7F2E7DC762000051BE /* Pinpoint Accessibility Checker Extension (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1F67EAA02E7DC762000051BE /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (iOS)" */;
+			buildPhases = (
+				1F67EA7C2E7DC762000051BE /* Sources */,
+				1F67EA7D2E7DC762000051BE /* Frameworks */,
+				1F67EA7E2E7DC762000051BE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Pinpoint Accessibility Checker Extension (iOS)";
+			packageProductDependencies = (
+			);
+			productName = "Pinpoint Accessibility Checker Extension (iOS)";
+			productReference = 1F67EA802E7DC762000051BE /* Pinpoint Accessibility Checker Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		1F67EA892E7DC762000051BE /* Pinpoint Accessibility Checker Extension (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1F67EAA72E7DC762000051BE /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (macOS)" */;
+			buildPhases = (
+				1F67EA862E7DC762000051BE /* Sources */,
+				1F67EA872E7DC762000051BE /* Frameworks */,
+				1F67EA882E7DC762000051BE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Pinpoint Accessibility Checker Extension (macOS)";
+			packageProductDependencies = (
+			);
+			productName = "Pinpoint Accessibility Checker Extension (macOS)";
+			productReference = 1F67EA8A2E7DC762000051BE /* Pinpoint Accessibility Checker Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1F67EA4F2E7DC761000051BE /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					1F67EA612E7DC762000051BE = {
+						CreatedOnToolsVersion = 26.0;
+					};
+					1F67EA732E7DC762000051BE = {
+						CreatedOnToolsVersion = 26.0;
+					};
+					1F67EA7F2E7DC762000051BE = {
+						CreatedOnToolsVersion = 26.0;
+					};
+					1F67EA892E7DC762000051BE = {
+						CreatedOnToolsVersion = 26.0;
+					};
+				};
+			};
+			buildConfigurationList = 1F67EA522E7DC761000051BE /* Build configuration list for PBXProject "Pinpoint Accessibility Checker" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 1F67EA4E2E7DC761000051BE;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 1F67EA632E7DC762000051BE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1F67EA612E7DC762000051BE /* Pinpoint Accessibility Checker (iOS) */,
+				1F67EA732E7DC762000051BE /* Pinpoint Accessibility Checker (macOS) */,
+				1F67EA7F2E7DC762000051BE /* Pinpoint Accessibility Checker Extension (iOS) */,
+				1F67EA892E7DC762000051BE /* Pinpoint Accessibility Checker Extension (macOS) */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1F67EA602E7DC762000051BE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F67EA922E7DC762000051BE /* Icon.png in Resources */,
+				1F67EA6B2E7DC762000051BE /* LaunchScreen.storyboard in Resources */,
+				1F67EA902E7DC762000051BE /* Main.html in Resources */,
+				1F67EA962E7DC762000051BE /* Script.js in Resources */,
+				1F67EA9A2E7DC762000051BE /* Assets.xcassets in Resources */,
+				1F67EA6E2E7DC762000051BE /* Main.storyboard in Resources */,
+				1F67EA942E7DC762000051BE /* Style.css in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F67EA722E7DC762000051BE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F67EA932E7DC762000051BE /* Icon.png in Resources */,
+				1F67EA952E7DC762000051BE /* Style.css in Resources */,
+				1F67EA7A2E7DC762000051BE /* Main.storyboard in Resources */,
+				1F67EA972E7DC762000051BE /* Script.js in Resources */,
+				1F67EA9B2E7DC762000051BE /* Assets.xcassets in Resources */,
+				1F67EA912E7DC762000051BE /* Main.html in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F67EA7E2E7DC762000051BE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F67EAC52E7DC762000051BE /* content-script.js in Resources */,
+				1F67EAC02E7DC762000051BE /* background.js in Resources */,
+				1F67EAC22E7DC762000051BE /* accessibility-checker.js in Resources */,
+				1F67EAC12E7DC762000051BE /* popup.html in Resources */,
+				1F67EAC62E7DC762000051BE /* popup.css in Resources */,
+				1F67EAC32E7DC762000051BE /* icons in Resources */,
+				1F67EAC42E7DC762000051BE /* manifest.json in Resources */,
+				1F67EABF2E7DC762000051BE /* popup.js in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F67EA882E7DC762000051BE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F67EABD2E7DC762000051BE /* content-script.js in Resources */,
+				1F67EAB82E7DC762000051BE /* background.js in Resources */,
+				1F67EABA2E7DC762000051BE /* accessibility-checker.js in Resources */,
+				1F67EAB92E7DC762000051BE /* popup.html in Resources */,
+				1F67EABE2E7DC762000051BE /* popup.css in Resources */,
+				1F67EABB2E7DC762000051BE /* icons in Resources */,
+				1F67EABC2E7DC762000051BE /* manifest.json in Resources */,
+				1F67EAB72E7DC762000051BE /* popup.js in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1F67EA5E2E7DC762000051BE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F67EA982E7DC762000051BE /* ViewController.swift in Sources */,
+				1F67EA662E7DC762000051BE /* AppDelegate.swift in Sources */,
+				1F67EA682E7DC762000051BE /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F67EA702E7DC762000051BE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F67EA992E7DC762000051BE /* ViewController.swift in Sources */,
+				1F67EA772E7DC762000051BE /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F67EA7C2E7DC762000051BE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F67EA9C2E7DC762000051BE /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F67EA862E7DC762000051BE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F67EA9D2E7DC762000051BE /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1F67EA832E7DC762000051BE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1F67EA7F2E7DC762000051BE /* Pinpoint Accessibility Checker Extension (iOS) */;
+			targetProxy = 1F67EA822E7DC762000051BE /* PBXContainerItemProxy */;
+		};
+		1F67EA8D2E7DC762000051BE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1F67EA892E7DC762000051BE /* Pinpoint Accessibility Checker Extension (macOS) */;
+			targetProxy = 1F67EA8C2E7DC762000051BE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		1F67EA552E7DC761000051BE /* Main.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1F67EA562E7DC761000051BE /* Base */,
+			);
+			name = Main.html;
+			sourceTree = "<group>";
+		};
+		1F67EA692E7DC762000051BE /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1F67EA6A2E7DC762000051BE /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		1F67EA6C2E7DC762000051BE /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1F67EA6D2E7DC762000051BE /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		1F67EA782E7DC762000051BE /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1F67EA792E7DC762000051BE /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		1F67EA9E2E7DC762000051BE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		1F67EA9F2E7DC762000051BE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		1F67EAA12E7DC762000051BE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pinpoint Accessibility Checker Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pinpoint.accessibility-checker.Extension";
+				PRODUCT_NAME = "Pinpoint Accessibility Checker Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1F67EAA22E7DC762000051BE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pinpoint Accessibility Checker Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pinpoint.accessibility-checker.Extension";
+				PRODUCT_NAME = "Pinpoint Accessibility Checker Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		1F67EAA52E7DC762000051BE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pinpoint Accessibility Checker";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pinpoint.accessibility-checker";
+				PRODUCT_NAME = "Pinpoint Accessibility Checker";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1F67EAA62E7DC762000051BE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pinpoint Accessibility Checker";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pinpoint.accessibility-checker";
+				PRODUCT_NAME = "Pinpoint Accessibility Checker";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		1F67EAA82E7DC762000051BE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				AUTOMATION_APPLE_EVENTS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HXXRUTU897;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pinpoint Accessibility Checker Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pinpoint.accessibility-checker.Extension";
+				PRODUCT_NAME = "Pinpoint Accessibility Checker Extension";
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
+				RUNTIME_EXCEPTION_ALLOW_JIT = YES;
+				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
+				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
+				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		1F67EAA92E7DC762000051BE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				AUTOMATION_APPLE_EVENTS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HXXRUTU897;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pinpoint Accessibility Checker Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pinpoint.accessibility-checker.Extension";
+				PRODUCT_NAME = "Pinpoint Accessibility Checker Extension";
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
+				RUNTIME_EXCEPTION_ALLOW_JIT = YES;
+				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
+				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
+				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		1F67EAAC2E7DC762000051BE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pinpoint Accessibility Checker";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pinpoint.accessibility-checker";
+				PRODUCT_NAME = "Pinpoint Accessibility Checker";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		1F67EAAD2E7DC762000051BE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pinpoint Accessibility Checker";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pinpoint.accessibility-checker";
+				PRODUCT_NAME = "Pinpoint Accessibility Checker";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1F67EA522E7DC761000051BE /* Build configuration list for PBXProject "Pinpoint Accessibility Checker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1F67EA9E2E7DC762000051BE /* Debug */,
+				1F67EA9F2E7DC762000051BE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1F67EAA02E7DC762000051BE /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1F67EAA12E7DC762000051BE /* Debug */,
+				1F67EAA22E7DC762000051BE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1F67EAA42E7DC762000051BE /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1F67EAA52E7DC762000051BE /* Debug */,
+				1F67EAA62E7DC762000051BE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1F67EAA72E7DC762000051BE /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1F67EAA82E7DC762000051BE /* Debug */,
+				1F67EAA92E7DC762000051BE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1F67EAAB2E7DC762000051BE /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1F67EAAC2E7DC762000051BE /* Debug */,
+				1F67EAAD2E7DC762000051BE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1F67EA4F2E7DC761000051BE /* Project object */;
+}

@@ -1,4 +1,4 @@
-# TestMark Development Guide
+# Pinpoint Development Guide
 
 ## Enhanced Development Workflow
 
@@ -92,7 +92,7 @@ This automatically rebuilds whenever you save changes to `accessibility-checker.
 ## File Structure
 
 ```
-TestMark/
+Pinpoint/
 ├── accessibility-checker.js      # ← Edit this (source code)
 ├── accessibility-checker.min.js  # ← Generated (minified)
 ├── index.html                    # ← Production bookmarklet page

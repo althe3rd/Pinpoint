@@ -44,20 +44,19 @@ extensionAPI.browserAction.onClicked.addListener(async (tab) => {
             return;
         }
         
-        // Send message to content script to run accessibility check
-        const response = await extensionAPI.tabs.sendMessage(tab.id, {
-            action: 'runAccessibilityCheck'
+        // Inject content script programmatically (more privacy-friendly)
+        // Firefox uses tabs.executeScript for programmatic injection
+        await extensionAPI.tabs.executeScript(tab.id, {
+            file: 'content-script.js'
         });
         
-        if (response && response.success) {
-            // Show success badge temporarily
-            extensionAPI.browserAction.setBadgeText({ text: '✓', tabId: tab.id });
-            extensionAPI.browserAction.setBadgeBackgroundColor({ color: '#28a745', tabId: tab.id });
-            
-            setTimeout(() => {
-                extensionAPI.browserAction.setBadgeText({ text: '', tabId: tab.id });
-            }, 3000);
-        }
+        // Show success badge temporarily
+        extensionAPI.browserAction.setBadgeText({ text: '✓', tabId: tab.id });
+        extensionAPI.browserAction.setBadgeBackgroundColor({ color: '#28a745', tabId: tab.id });
+        
+        setTimeout(() => {
+            extensionAPI.browserAction.setBadgeText({ text: '', tabId: tab.id });
+        }, 3000);
         
     } catch (error) {
         console.error('Error handling toolbar click:', error);
@@ -81,8 +80,9 @@ if (extensionAPI.commands && extensionAPI.commands.onCommand) {
             
             if (tab) {
                 try {
-                    await extensionAPI.tabs.sendMessage(tab.id, {
-                        action: 'runAccessibilityCheck'
+                    // Use same programmatic injection for keyboard shortcuts
+                    await extensionAPI.tabs.executeScript(tab.id, {
+                        file: 'content-script.js'
                     });
                 } catch (error) {
                     console.error('Error handling keyboard shortcut:', error);
@@ -155,8 +155,9 @@ if (extensionAPI.contextMenus && extensionAPI.contextMenus.onClicked) {
     extensionAPI.contextMenus.onClicked.addListener(async (info, tab) => {
         if (info.menuItemId === 'pinpoint-check' && tab) {
             try {
-                await extensionAPI.tabs.sendMessage(tab.id, {
-                    action: 'runAccessibilityCheck'
+                // Use same programmatic injection for context menu
+                await extensionAPI.tabs.executeScript(tab.id, {
+                    file: 'content-script.js'
                 });
             } catch (error) {
                 console.error('Error from context menu:', error);

@@ -1,11 +1,13 @@
 {
-  "name": "testmark-accessibility-checker",
-  "version": "1.5.4",
+  "name": "pinpoint-accessibility-checker",
+  "version": "1.5.5",
   "description": "Pinpoint Accessibility Checker - A bookmarklet for WCAG testing",
   "main": "accessibility-checker.js",
   "scripts": {
     "build": "node build.js",
     "build:extensions": "node build-extensions.js",
+    "build:safari": "node -e \"require('./build-extensions.js').buildSafariOnly()\"",
+    "build:safari:appstore": "node -e \"require('./build-extensions.js').buildSafariAppStore()\"",
     "watch": "node build.js --watch",
     "dev": "npm run watch",
     "serve": "python3 -m http.server 8000 || python -m http.server 8000"

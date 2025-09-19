@@ -47,8 +47,8 @@ We welcome suggestions for improving the tool:
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/YOUR-USERNAME/TestMark.git
-   cd TestMark
+   git clone https://github.com/YOUR-USERNAME/Pinpoint.git
+   cd Pinpoint
    ```
 
 3. **Start a local server** for testing:
@@ -113,7 +113,7 @@ We welcome suggestions for improving the tool:
 #### File Structure
 
 ```
-TestMark/
+Pinpoint/
 ├── index.html              # Main installation page (keep this clean)
 ├── local-test.html         # Local testing environment
 ├── bookmarklet-simple.html # Alternative installation method

@@ -41,20 +41,19 @@ chrome.action.onClicked.addListener(async (tab) => {
             return;
         }
         
-        // Send message to content script to run accessibility check
-        const response = await chrome.tabs.sendMessage(tab.id, {
-            action: 'runAccessibilityCheck'
+        // Inject content script programmatically (more privacy-friendly)
+        await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['content-script.js']
         });
         
-        if (response && response.success) {
-            // Show success badge temporarily
-            chrome.action.setBadgeText({ text: '✓', tabId: tab.id });
-            chrome.action.setBadgeBackgroundColor({ color: '#28a745', tabId: tab.id });
-            
-            setTimeout(() => {
-                chrome.action.setBadgeText({ text: '', tabId: tab.id });
-            }, 3000);
-        }
+        // Show success badge temporarily
+        chrome.action.setBadgeText({ text: '✓', tabId: tab.id });
+        chrome.action.setBadgeBackgroundColor({ color: '#28a745', tabId: tab.id });
+        
+        setTimeout(() => {
+            chrome.action.setBadgeText({ text: '', tabId: tab.id });
+        }, 3000);
         
     } catch (error) {
         console.error('Error handling toolbar click:', error);
@@ -75,8 +74,10 @@ chrome.commands.onCommand.addListener(async (command) => {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         if (tab) {
             try {
-                await chrome.tabs.sendMessage(tab.id, {
-                    action: 'runAccessibilityCheck'
+                // Use same programmatic injection for keyboard shortcuts
+                await chrome.scripting.executeScript({
+                    target: { tabId: tab.id },
+                    files: ['content-script.js']
                 });
             } catch (error) {
                 console.error('Error handling keyboard shortcut:', error);
@@ -140,8 +141,10 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     if (info.menuItemId === 'pinpoint-check' && tab) {
         try {
-            await chrome.tabs.sendMessage(tab.id, {
-                action: 'runAccessibilityCheck'
+            // Use same programmatic injection for context menu
+            await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                files: ['content-script.js']
             });
         } catch (error) {
             console.error('Error from context menu:', error);

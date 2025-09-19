@@ -2102,6 +2102,12 @@
                                 </a>
                             </li>
                             <li>
+                                <a id="uw-a11y-nav-inspector" href="#uw-a11y-view-inspector" title="Inspector Tools">
+                                    <svg class="feather feather-search" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                                    <span class="uw-a11y-nav-label">Inspector</span>
+                                </a>
+                            </li>
+                            <li>
                                 <a id="uw-a11y-nav-settings" href="#uw-a11y-view-settings" title="Settings">
                                     <svg class="feather feather-toggle-left" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><rect height="14" rx="7" ry="7" width="22" x="1" y="5"/><circle cx="8" cy="12" r="3"/></svg>
                                     <span class="uw-a11y-nav-label">Settings</span>
@@ -2146,6 +2152,60 @@
                                 <small>Select any item below to highlight the element on the page.</small>
                             </p>
                             <div id="uw-a11y-results"></div>
+                        </div>
+
+                        <div id="uw-a11y-view-inspector" class="uw-a11y-view" hidden>
+                            <div class="uw-a11y-inspector">
+                                <h3>Inspector Tools</h3>
+                                <p>Visual debugging tools to help you understand your page's accessibility structure.</p>
+                                
+                                <div class="uw-a11y-inspector-section">
+                                    <h4>Tab Order Visualization</h4>
+                                    <p>Display numbered indicators showing the keyboard tab order of focusable elements on your page.</p>
+                                    <div class="uw-a11y-inspector-controls">
+                                        <button id="uw-a11y-tab-order-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
+                                            <svg class="feather feather-move" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>
+                                            </svg>
+                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                            </svg>
+                                            <span class="uw-a11y-btn-text">Show Tab Order</span>
+                                        </button>
+                                        <span id="uw-a11y-tab-order-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Placeholder for future inspector tools -->
+                                <div class="uw-a11y-inspector-section uw-a11y-inspector-placeholder" style="opacity: 0.6;">
+                                    <h4>Focus Indicators <span class="uw-a11y-coming-soon">Coming Soon</span></h4>
+                                    <p>Visualize focus indicators and keyboard navigation paths.</p>
+                                    <div class="uw-a11y-inspector-controls">
+                                        <button class="uw-a11y-btn uw-a11y-btn-secondary" disabled>
+                                            <svg class="feather feather-eye" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"/>
+                                                <circle cx="12" cy="12" r="3"/>
+                                            </svg>
+                                            Show Focus Indicators
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="uw-a11y-inspector-section uw-a11y-inspector-placeholder" style="opacity: 0.6;">
+                                    <h4>Landmark Structure <span class="uw-a11y-coming-soon">Coming Soon</span></h4>
+                                    <p>Highlight page landmarks and heading hierarchy.</p>
+                                    <div class="uw-a11y-inspector-controls">
+                                        <button class="uw-a11y-btn uw-a11y-btn-secondary" disabled>
+                                            <svg class="feather feather-map" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                                <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                                                <line x1="9" x2="9" y1="3" y2="18"/>
+                                                <line x1="15" x2="15" y1="6" y2="21"/>
+                                            </svg>
+                                            Show Landmarks
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div id="uw-a11y-view-about" class="uw-a11y-view" hidden>
@@ -2654,6 +2714,7 @@
                 #uw-a11y-nav ul li.uw-a11y-css-animate:nth-child(2) { transition-delay: 0.4s; }
                 #uw-a11y-nav ul li.uw-a11y-css-animate:nth-child(3) { transition-delay: 0.5s; }
                 #uw-a11y-nav ul li.uw-a11y-css-animate:nth-child(4) { transition-delay: 0.6s; }
+                #uw-a11y-nav ul li.uw-a11y-css-animate:nth-child(5) { transition-delay: 0.7s; }
 
                 /* Show elements when animations are ready */
                 #uw-a11y-wrapper.uw-a11y-animate-in {
@@ -3015,7 +3076,7 @@
                 }
                 #uw-a11y-panel .uw-a11y-score-inner {
                     width: 90px;
-                    height: 90px;
+                    height: 90px; 
                     background: white;
                     border-radius: 50%;
                     display: flex;
@@ -3306,6 +3367,192 @@
                 padding-left: 15px;
                 padding-right: 15px;
             }
+        }
+        
+        /* Tab order visualization styles */
+        .uw-a11y-tab-order-overlay {
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999998;
+        }
+        
+        .uw-a11y-tab-indicator {
+            position: absolute;
+            background: #ff6b35;
+            color: white;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            z-index: 999999;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            animation: uw-tab-indicator-appear 0.3s ease-out;
+        }
+        
+        .uw-a11y-tab-indicator:nth-child(odd) {
+            background: #ff6b35;
+        }
+        
+        .uw-a11y-tab-indicator:nth-child(even) {
+            background: #4285f4;
+        }
+        
+        @keyframes uw-tab-indicator-appear {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        
+        /* Enhanced navigation button state for tab order */
+        #uw-a11y-nav ul li a.active {
+            background: rgba(255,255,255,0.25);
+            box-shadow: inset 0 0 0 2px rgba(255,255,255,0.3);
+        }
+        
+        /* Inspector Tools styles */
+        .uw-a11y-inspector {
+            padding: 0;
+        }
+        
+        .uw-a11y-inspector h3 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .uw-a11y-inspector > p {
+            margin: 0 0 1.5rem 0;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .uw-a11y-inspector-section {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .uw-a11y-inspector-section h4 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .uw-a11y-inspector-section p {
+            margin: 0 0 1rem 0;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .uw-a11y-inspector-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .uw-a11y-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        
+        .uw-a11y-btn-secondary {
+            background: white;
+            color: #495057;
+            border: 1px solid #ced4da;
+        }
+        
+        .uw-a11y-btn-secondary:hover:not(:disabled) {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+        
+        .uw-a11y-btn-secondary:focus:not(:disabled) {
+            outline: 2px solid #007bff;
+            outline-offset: 2px;
+        }
+        
+        .uw-a11y-btn-secondary.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .uw-a11y-btn-secondary.active:hover {
+            background: #0056b3;
+            border-color: #0056b3;
+        }
+        
+        .uw-a11y-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .uw-a11y-inspector-status {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .uw-a11y-coming-soon {
+            background: #ffc107;
+            color: #212529;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .uw-a11y-inspector-placeholder {
+            position: relative;
+        }
+        
+        .uw-a11y-inspector-placeholder::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.8) 50%, transparent 60%);
+            pointer-events: none;
+            border-radius: 8px;
         }
         </style>`;
         },
@@ -3723,6 +3970,7 @@
             
             const map = [
                 { id: 'uw-a11y-nav-results', view: 'results' },
+                { id: 'uw-a11y-nav-inspector', view: 'inspector' },
                 { id: 'uw-a11y-nav-settings', view: 'settings' },
                 { id: 'uw-a11y-nav-help', view: 'help' },
                 { id: 'uw-a11y-nav-about', view: 'about' }
@@ -3738,13 +3986,14 @@
                     });
                 }
             });
+            
             // Default to results
             this.showView('results');
         },
 
         // Show a specific view and update nav state
         showView: function(view) {
-            const views = ['results', 'settings', 'help', 'about'];
+            const views = ['results', 'inspector', 'settings', 'help', 'about'];
             const currentView = this.currentView;
             
             // Don't do anything if we're already on this view or currently animating
@@ -3801,7 +4050,7 @@
 
         // Update navigation active state without animation conflicts
         updateNavActiveState: function(activeView) {
-            const views = ['results', 'settings', 'help', 'about'];
+            const views = ['results', 'inspector', 'settings', 'help', 'about'];
             
             views.forEach(v => {
                 const link = this.shadowRoot.getElementById(`uw-a11y-nav-${v}`);
@@ -3935,6 +4184,463 @@
         getWcagLabel: function() {
             const { wcagSpec, wcagLevel } = this.getSelectedWcag();
             return `WCAG ${wcagSpec} ${String(wcagLevel || '').toUpperCase()}`;
+        },
+
+        // Initialize inspector tools event handlers
+        initInspectorTools: function() {
+            // Tab order toggle button
+            const tabOrderToggle = this.shadowRoot.getElementById('uw-a11y-tab-order-toggle');
+            if (tabOrderToggle) {
+                tabOrderToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.toggleTabOrderVisualization();
+                });
+            }
+        },
+
+        // Toggle tab order visualization
+        toggleTabOrderVisualization: function() {
+            const isActive = this.isTabOrderActive || false;
+            
+            if (isActive) {
+                this.hideTabOrderVisualization();
+            } else {
+                this.showTabOrderVisualization();
+            }
+            
+            // Update button state
+            const tabOrderBtn = this.shadowRoot.getElementById('uw-a11y-tab-order-toggle');
+            const tabOrderCount = this.shadowRoot.getElementById('uw-a11y-tab-order-count');
+            
+            if (tabOrderBtn) {
+                tabOrderBtn.setAttribute('aria-pressed', String(!isActive));
+                
+                // Get the icons and text
+                const moveIcon = tabOrderBtn.querySelector('.feather-move');
+                const eyeOffIcon = tabOrderBtn.querySelector('.feather-eye-off');
+                const btnText = tabOrderBtn.querySelector('.uw-a11y-btn-text');
+                
+                if (!isActive) {
+                    // Activating tab order - show "Hide" state
+                    tabOrderBtn.classList.add('active');
+                    
+                    // Switch icons
+                    if (moveIcon) moveIcon.style.display = 'none';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'inline';
+                    
+                    // Update text
+                    if (btnText) btnText.textContent = 'Hide Tab Order';
+                } else {
+                    // Deactivating tab order - show "Show" state
+                    tabOrderBtn.classList.remove('active');
+                    
+                    // Switch icons
+                    if (moveIcon) moveIcon.style.display = 'inline';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'none';
+                    
+                    // Update text
+                    if (btnText) btnText.textContent = 'Show Tab Order';
+                }
+                
+                // Update count display
+                if (tabOrderCount) {
+                    if (!isActive) {
+                        // Will be updated in showTabOrderVisualization
+                        tabOrderCount.style.display = 'inline';
+                    } else {
+                        tabOrderCount.style.display = 'none';
+                    }
+                }
+            }
+            
+            this.isTabOrderActive = !isActive;
+        },
+
+        // Show tab order visualization
+        showTabOrderVisualization: function() {
+            // Remove existing overlay if any
+            this.hideTabOrderVisualization();
+            
+            // Get all focusable elements in the main document
+            const focusableElements = this.getFocusableElements();
+            
+            // Create overlay container
+            const overlay = document.createElement('div');
+            overlay.className = 'uw-a11y-tab-order-overlay';
+            overlay.setAttribute('data-uw-a11y-overlay', 'true');
+            
+            // Add tab order indicators
+            focusableElements.forEach((element, index) => {
+                const indicator = this.createTabOrderIndicator(element, index + 1);
+                if (indicator) {
+                    overlay.appendChild(indicator);
+                }
+            });
+            
+            // Add overlay to document body
+            document.body.appendChild(overlay);
+            
+            // Ensure tab order styles are available in the main document
+            this.injectTabOrderStyles();
+            
+            // Store reference to overlay
+            this.tabOrderOverlay = overlay;
+            
+            // Set up mutation observer to update tab order when DOM changes
+            this.setupTabOrderMutationObserver();
+            
+            // Set up scroll and resize handlers to update positions
+            this.setupTabOrderEventHandlers();
+            
+            // Update count display
+            const tabOrderCount = this.shadowRoot.getElementById('uw-a11y-tab-order-count');
+            if (tabOrderCount) {
+                tabOrderCount.textContent = `${focusableElements.length} focusable elements found`;
+            }
+            
+            // Debug logging
+            console.log(`Tab order visualization: ${focusableElements.length} focusable elements found`);
+            console.log(`Created ${overlay.children.length} indicators`);
+            
+            // Log first few elements for debugging
+            focusableElements.slice(0, 5).forEach((el, i) => {
+                const rect = el.getBoundingClientRect();
+                console.log(`Element ${i + 1}: ${el.tagName.toLowerCase()} at (${rect.left}, ${rect.top}) size: ${rect.width}x${rect.height}`);
+            });
+        },
+
+        // Hide tab order visualization
+        hideTabOrderVisualization: function() {
+            if (this.tabOrderOverlay) {
+                this.tabOrderOverlay.remove();
+                this.tabOrderOverlay = null;
+            }
+            
+            // Disconnect mutation observer
+            if (this.tabOrderMutationObserver) {
+                this.tabOrderMutationObserver.disconnect();
+                this.tabOrderMutationObserver = null;
+            }
+            
+            // Clean up event handlers
+            this.cleanupTabOrderEventHandlers();
+            
+            // Also remove any orphaned overlays
+            const existingOverlays = document.querySelectorAll('.uw-a11y-tab-order-overlay');
+            existingOverlays.forEach(overlay => overlay.remove());
+            
+            // Remove injected styles
+            this.removeTabOrderStyles();
+        },
+
+        // Set up mutation observer to refresh tab order when DOM changes
+        setupTabOrderMutationObserver: function() {
+            if (!this.isTabOrderActive || this.tabOrderMutationObserver) return;
+            
+            this.tabOrderMutationObserver = new MutationObserver((mutations) => {
+                let shouldRefresh = false;
+                
+                mutations.forEach(mutation => {
+                    // Check if any focusable elements were added or removed
+                    if (mutation.type === 'childList') {
+                        const hasRelevantChanges = Array.from(mutation.addedNodes)
+                            .concat(Array.from(mutation.removedNodes))
+                            .some(node => {
+                                if (node.nodeType !== Node.ELEMENT_NODE) return false;
+                                
+                                // Skip changes within the accessibility checker
+                                if (node.closest && (
+                                    node.closest('[data-uw-a11y-overlay]') ||
+                                    node.closest('uw-accessibility-checker') ||
+                                    node.closest('#uw-a11y-panel')
+                                )) {
+                                    return false;
+                                }
+                                
+                                // Check if the node or its children are focusable
+                                return node.matches && (
+                                    node.matches('a[href], button, input, select, textarea, [tabindex], [contenteditable="true"]') ||
+                                    node.querySelector('a[href], button, input, select, textarea, [tabindex], [contenteditable="true"]')
+                                );
+                            });
+                        
+                        if (hasRelevantChanges) shouldRefresh = true;
+                    }
+                    
+                    // Check for attribute changes that affect tabindex
+                    if (mutation.type === 'attributes' && 
+                        (mutation.attributeName === 'tabindex' || 
+                         mutation.attributeName === 'disabled' ||
+                         mutation.attributeName === 'hidden' ||
+                         mutation.attributeName === 'style')) {
+                        shouldRefresh = true;
+                    }
+                });
+                
+                if (shouldRefresh) {
+                    // Debounce refreshes to avoid excessive updates
+                    clearTimeout(this.tabOrderRefreshTimeout);
+                    this.tabOrderRefreshTimeout = setTimeout(() => {
+                        if (this.isTabOrderActive) {
+                            this.showTabOrderVisualization();
+                        }
+                    }, 100);
+                }
+            });
+            
+            // Observe the entire document for changes
+            this.tabOrderMutationObserver.observe(document.body, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['tabindex', 'disabled', 'hidden', 'style']
+            });
+        },
+
+        // Set up event handlers for tab order visualization
+        setupTabOrderEventHandlers: function() {
+            if (this.tabOrderScrollHandler || this.tabOrderResizeHandler) return;
+            
+            // Throttled scroll handler
+            let scrollTimeout;
+            this.tabOrderScrollHandler = () => {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    if (this.isTabOrderActive) {
+                        this.updateTabOrderPositions();
+                    }
+                }, 16); // ~60fps
+            };
+            
+            // Throttled resize handler
+            let resizeTimeout;
+            this.tabOrderResizeHandler = () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    if (this.isTabOrderActive) {
+                        this.showTabOrderVisualization(); // Full refresh on resize
+                    }
+                }, 100);
+            };
+            
+            window.addEventListener('scroll', this.tabOrderScrollHandler, { passive: true });
+            window.addEventListener('resize', this.tabOrderResizeHandler);
+        },
+
+        // Clean up tab order event handlers
+        cleanupTabOrderEventHandlers: function() {
+            if (this.tabOrderScrollHandler) {
+                window.removeEventListener('scroll', this.tabOrderScrollHandler);
+                this.tabOrderScrollHandler = null;
+            }
+            if (this.tabOrderResizeHandler) {
+                window.removeEventListener('resize', this.tabOrderResizeHandler);
+                this.tabOrderResizeHandler = null;
+            }
+        },
+
+        // Update positions of existing tab order indicators
+        updateTabOrderPositions: function() {
+            if (!this.tabOrderOverlay) return;
+            
+            const indicators = this.tabOrderOverlay.querySelectorAll('.uw-a11y-tab-indicator');
+            const focusableElements = this.getFocusableElements();
+            
+            indicators.forEach((indicator, index) => {
+                const element = focusableElements[index];
+                if (element) {
+                    const rect = element.getBoundingClientRect();
+                    if (rect.width > 0 && rect.height > 0) {
+                        indicator.style.left = `${rect.left + window.scrollX}px`;
+                        indicator.style.top = `${rect.top + window.scrollY}px`;
+                        indicator.style.display = 'flex';
+                    } else {
+                        indicator.style.display = 'none';
+                    }
+                }
+            });
+        },
+
+        // Get all focusable elements in the document
+        getFocusableElements: function() {
+            const focusableSelectors = [
+                'a[href]',
+                'button:not([disabled])',
+                'input:not([disabled]):not([type="hidden"])',
+                'select:not([disabled])',
+                'textarea:not([disabled])',
+                'audio[controls]',
+                'video[controls]',
+                'iframe',
+                'object',
+                'embed',
+                'area[href]',
+                'details > summary',
+                '[tabindex]:not([tabindex="-1"])',
+                '[contenteditable="true"]'
+            ];
+            
+            const elements = Array.from(document.querySelectorAll(focusableSelectors.join(', ')));
+            
+            // Filter out elements that are not visible or are part of this accessibility checker
+            return elements.filter(element => {
+                // Skip elements inside the accessibility checker
+                if (element.closest('[data-uw-a11y-overlay]') || 
+                    element.closest('uw-accessibility-checker') ||
+                    element.closest('#uw-a11y-panel')) {
+                    return false;
+                }
+                
+                // Skip invisible elements
+                const style = window.getComputedStyle(element);
+                if (style.display === 'none' || 
+                    style.visibility === 'hidden' || 
+                    style.opacity === '0') {
+                    return false;
+                }
+                
+                // Skip elements with negative tabindex (except -1 which we already excluded)
+                const tabindex = element.getAttribute('tabindex');
+                if (tabindex && parseInt(tabindex, 10) < 0) {
+                    return false;
+                }
+                
+                return true;
+            }).sort((a, b) => {
+                // Sort by tabindex, then by document order
+                const aTabindex = parseInt(a.getAttribute('tabindex'), 10) || 0;
+                const bTabindex = parseInt(b.getAttribute('tabindex'), 10) || 0;
+                
+                if (aTabindex !== bTabindex) {
+                    // Elements with positive tabindex come first, in numerical order
+                    if (aTabindex > 0 && bTabindex <= 0) return -1;
+                    if (bTabindex > 0 && aTabindex <= 0) return 1;
+                    if (aTabindex > 0 && bTabindex > 0) return aTabindex - bTabindex;
+                }
+                
+                // For elements with same tabindex (including 0), use document order
+                return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+            });
+        },
+
+        // Create a tab order indicator for an element
+        createTabOrderIndicator: function(element, order) {
+            const rect = element.getBoundingClientRect();
+            
+            // Skip elements that have no dimensions (truly hidden)
+            if (rect.width === 0 || rect.height === 0) {
+                return null;
+            }
+            
+            const indicator = document.createElement('div');
+            indicator.className = 'uw-a11y-tab-indicator';
+            indicator.textContent = order;
+            indicator.setAttribute('data-tab-order', order);
+            indicator.setAttribute('data-element-tag', element.tagName.toLowerCase());
+            
+            // Position the indicator
+            indicator.style.position = 'absolute';
+            indicator.style.left = `${rect.left + window.scrollX}px`;
+            indicator.style.top = `${rect.top + window.scrollY}px`;
+            indicator.style.zIndex = '999999';
+            
+            // Add element info as title
+            const elementInfo = this.getElementDescription(element);
+            indicator.title = `Tab order ${order}: ${elementInfo}`;
+            
+            return indicator;
+        },
+
+        // Inject tab order styles into the main document
+        injectTabOrderStyles: function() {
+            // Check if styles are already injected
+            if (document.getElementById('uw-a11y-tab-order-styles')) {
+                return;
+            }
+            
+            const styleElement = document.createElement('style');
+            styleElement.id = 'uw-a11y-tab-order-styles';
+            styleElement.textContent = `
+                .uw-a11y-tab-order-overlay {
+                    pointer-events: none;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 999998;
+                }
+                
+                .uw-a11y-tab-indicator {
+                    position: absolute;
+                    background: #ff6b35;
+                    color: white;
+                    border-radius: 50%;
+                    width: 28px;
+                    height: 28px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 14px;
+                    font-weight: bold;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+                    border: 3px solid white;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+                    z-index: 999999;
+                    pointer-events: none;
+                    transform: translate(-50%, -50%);
+                    animation: uw-tab-indicator-appear 0.3s ease-out;
+                }
+                
+                .uw-a11y-tab-indicator:nth-child(odd) {
+                    background: #ff6b35;
+                }
+                
+                .uw-a11y-tab-indicator:nth-child(even) {
+                    background: #4285f4;
+                }
+                
+                @keyframes uw-tab-indicator-appear {
+                    from {
+                        opacity: 0;
+                        transform: translate(-50%, -50%) scale(0.5);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translate(-50%, -50%) scale(1);
+                    }
+                }
+            `;
+            
+            document.head.appendChild(styleElement);
+        },
+
+        // Remove tab order styles from the main document
+        removeTabOrderStyles: function() {
+            const styleElement = document.getElementById('uw-a11y-tab-order-styles');
+            if (styleElement) {
+                styleElement.remove();
+            }
+        },
+
+        // Get a description of an element for accessibility
+        getElementDescription: function(element) {
+            const tag = element.tagName.toLowerCase();
+            const type = element.type || '';
+            const text = element.textContent?.trim().substring(0, 50) || '';
+            const ariaLabel = element.getAttribute('aria-label') || '';
+            const altText = element.getAttribute('alt') || '';
+            const href = element.getAttribute('href') || '';
+            
+            let description = tag;
+            
+            if (type) description += `[${type}]`;
+            if (ariaLabel) description += ` "${ariaLabel}"`;
+            else if (altText) description += ` "${altText}"`;
+            else if (text) description += ` "${text}"`;
+            else if (href) description += ` href="${href.substring(0, 30)}"`;
+            
+            return description;
         },
 
         resetSettingsToDefaults: function() {
@@ -4412,6 +5118,9 @@
             
             // Announce results to screen readers
             this.announceResults(scoreData, counts);
+            
+            // Initialize inspector tools after DOM is ready
+            this.initInspectorTools();
             
             // Set focus to the panel for keyboard accessibility
             this.setFocusToPanel();
@@ -5038,6 +5747,21 @@
 
         
         remove: function() {
+            // Clean up tab order visualization
+            this.hideTabOrderVisualization();
+            
+            // Clean up injected styles
+            this.removeTabOrderStyles();
+            
+            // Clean up any remaining timeouts
+            if (this.tabOrderRefreshTimeout) {
+                clearTimeout(this.tabOrderRefreshTimeout);
+                this.tabOrderRefreshTimeout = null;
+            }
+            
+            // Clean up tab order event handlers
+            this.cleanupTabOrderEventHandlers();
+            
             // Clean up resize handler
             if (this.resizeHandler) {
                 window.removeEventListener('resize', this.resizeHandler);

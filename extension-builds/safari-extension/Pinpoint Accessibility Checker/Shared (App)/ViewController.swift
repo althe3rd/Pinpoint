@@ -16,7 +16,7 @@ import SafariServices
 typealias PlatformViewController = NSViewController
 #endif
 
-let extensionBundleIdentifier = "com.pinpoint.accessibilitychecker.Extension"
+let extensionBundleIdentifier = "com.pinpoint.accessibilitychecker.dev.Extension"
 
 class ViewController: PlatformViewController, WKNavigationDelegate, WKScriptMessageHandler {
 

@@ -10,6 +10,7 @@
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
             version: '1.5.5', // Current version
+            websiteUrl: 'https://pinpoint.heroicpixel.com/', // Main website URL
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -5754,7 +5755,7 @@
                         <a href="${releaseUrl}" target="_blank" style="color: #ffffff; text-decoration: underline; font-size: 12px;">
                             View release notes →
                         </a>
-                        <a href="https://althe3rd.github.io/Pinpoint/" target="_blank" style="color: #ffffff; text-decoration: underline; font-size: 12px;">
+                        <a href="${this.websiteUrl}" target="_blank" style="color: #ffffff; text-decoration: underline; font-size: 12px;">
                             Get latest bookmarklet →
                         </a>
                     </div>

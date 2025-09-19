@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinpoint Has Moved! - New Location</title>
+    <style>
+        :root {
+            --bg1: #1b1f3a;
+            --bg2: #0f1226;
+            --accent-a: #5eead4;
+            --accent-b: #60a5fa;
+            --text-on-dark: #ffffff;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
+            color: var(--text-on-dark);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--accent-a), var(--accent-b));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        .new-url {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: var(--accent-a);
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            border: 1px solid var(--accent-a);
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, var(--accent-a), var(--accent-b));
+            color: var(--bg1);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(94, 234, 212, 0.3);
+        }
+        .countdown {
+            margin-top: 30px;
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+        .auto-redirect {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-b);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🚀</div>
+        <h1>We've Moved!</h1>
+        <div class="subtitle">Pinpoint Accessibility Checker has a new home</div>
+        
+        <div class="new-url">pinpoint.heroicpixel.com</div>
+        
+        <p style="margin: 20px 0; line-height: 1.6;">
+            We've moved to a faster, more reliable hosting platform! 
+            All your favorite accessibility testing features are waiting for you at our new location.
+        </p>
+        
+        <a href="https://pinpoint.heroicpixel.com/" class="btn">
+            🎯 Go to New Site
+        </a>
+        
+        <div class="auto-redirect">
+            <strong>📝 Update Your Bookmarks!</strong><br>
+            Please update any saved bookmarks to point to our new domain. 
+            The old GitHub Pages site will be discontinued in the future.
+        </div>
+        
+        <div class="countdown">
+            <strong>⏰ Auto-redirect in <span id="countdown">10</span> seconds...</strong>
+        </div>
+    </div>
+
+    <script>
+        // Auto-redirect countdown
+        let timeLeft = 10;
+        const countdownEl = document.getElementById('countdown');
+        
+        const timer = setInterval(() => {
+            timeLeft--;
+            countdownEl.textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                window.location.href = 'https://pinpoint.heroicpixel.com/';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

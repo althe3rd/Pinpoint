@@ -502,6 +502,14 @@
                     if (this.isOwnUIElement(node)) {
                         return;
                     }
+
+                    // Check if this is a contrast violation that can be auto-resolved
+                    const shouldSkipViolation = this.shouldSkipContrastViolation(violation, node);
+                    
+                    if (shouldSkipViolation) {
+                        // Skip entirely - no need to show resolved contrast violations to user
+                        return;
+                    }
                     
                                     this.addIssue(
                     'error',
@@ -1809,6 +1817,69 @@
                 return false;
             } catch (e) {
                 console.warn('Error checking contrast for auto-resolution:', e);
+                return false;
+            }
+        },
+
+        // Determine if a contrast violation should be skipped because pixel analysis shows sufficient contrast
+        shouldSkipContrastViolation: function(axeRule, node) {
+            // Only apply to contrast-related rules
+            const contrastRules = ['color-contrast', 'color-contrast-enhanced'];
+            if (!contrastRules.includes(axeRule.id)) {
+                return false;
+            }
+
+            try {
+                const element = this.getElementFromNode(node);
+                if (!element) return false;
+
+                // Get enhanced color info with pixel analysis
+                const colorInfo = this.extractColorContrastInfo(node);
+                if (!colorInfo || !colorInfo.contrast || colorInfo.contrast === 'Unable to calculate') {
+                    return false;
+                }
+
+                // Parse contrast ratio
+                const contrastValue = parseFloat(colorInfo.contrast.split(':')[0]);
+                if (isNaN(contrastValue)) {
+                    return false;
+                }
+
+                // Determine if this element needs enhanced (AAA) contrast
+                const isEnhanced = axeRule.id === 'color-contrast-enhanced';
+                
+                // Check font size to determine if it's "large text"
+                const isLargeText = this.isLargeText(element);
+                
+                // WCAG contrast requirements
+                let requiredContrast;
+                if (isEnhanced) {
+                    // AAA requirements
+                    requiredContrast = isLargeText ? 4.5 : 7.0;
+                } else {
+                    // AA requirements  
+                    requiredContrast = isLargeText ? 3.0 : 4.5;
+                }
+
+                // Only skip violation if we have significantly better contrast than required
+                // Use a buffer to account for measurement variations
+                const contrastBuffer = 0.3;
+                const meetsRequirement = contrastValue >= (requiredContrast + contrastBuffer);
+
+                if (meetsRequirement && colorInfo.analysisMethod === 'pixel-analysis') {
+                    console.log(`Auto-resolving contrast violation for element:`, {
+                        selector: node.target?.join(' '),
+                        measured: contrastValue,
+                        required: requiredContrast,
+                        isLargeText: isLargeText,
+                        analysisMethod: colorInfo.analysisMethod
+                    });
+                    return true;
+                }
+
+                return false;
+            } catch (e) {
+                console.warn('Error checking contrast violation for auto-resolution:', e);
                 return false;
             }
         },

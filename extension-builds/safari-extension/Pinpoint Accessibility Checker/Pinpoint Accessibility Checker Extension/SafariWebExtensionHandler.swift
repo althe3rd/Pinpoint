@@ -1,8 +1,8 @@
 //
 //  SafariWebExtensionHandler.swift
-//  Shared (Extension)
+//  Pinpoint Accessibility Checker Extension
 //
-//  Created by Al Nemec on 9/19/25.
+//  Created by Al Nemec on 9/26/25.
 //
 
 import SafariServices

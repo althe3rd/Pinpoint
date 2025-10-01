@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.5.7', // Current version
+            version: '1.5.75', // Current version
             websiteUrl: 'https://pinpoint.heroicpixel.com/', // Main website URL
             legacyDomainUrl: 'https://althe3rd.github.io/Pinpoint/', // Legacy domain for transition
             issues: [],
@@ -97,14 +97,52 @@
         
         // Load axe-core dynamically
         loadAxeCore: function() {
-            // Check if axe is already loaded
+            // Check if axe is already loaded (pre-loaded by content script)
             if (window.axe) {
+                console.log('✅ axe-core already available (pre-loaded by extension)');
                 this.axeLoaded = true;
                 this.runAxeChecks();
                 return;
             }
             
-            // Load axe-core from CDN
+            // Try to load axe-core from local bundle first (for browser extensions)
+            this.tryLoadAxeFromExtension().then(success => {
+                if (success) {
+                    this.axeLoaded = true;
+                    this.runAxeChecks();
+                } else {
+                    // Fallback to CDN for bookmarklet usage
+                    this.loadAxeFromCDN();
+                }
+            }).catch(() => {
+                // Fallback to CDN if extension loading fails
+                this.loadAxeFromCDN();
+            });
+        },
+
+        // Try to load axe-core from extension bundle
+        tryLoadAxeFromExtension: function() {
+            return new Promise((resolve) => {
+                // Check if we're running in a browser extension context
+                if (!chrome || !chrome.runtime || !chrome.runtime.getURL) {
+                    resolve(false);
+                    return;
+                }
+
+                try {
+                    const script = document.createElement('script');
+                    script.src = chrome.runtime.getURL('axe-core.min.js');
+                    script.onload = () => resolve(true);
+                    script.onerror = () => resolve(false);
+                    document.head.appendChild(script);
+                } catch (error) {
+                    resolve(false);
+                }
+            });
+        },
+
+        // Load axe-core from CDN (bookmarklet fallback)
+        loadAxeFromCDN: function() {
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/axe-core@4.10.3/axe.min.js';
             script.onload = () => {
@@ -4456,17 +4494,57 @@
                     return;
                 }
                 
-                // Check if GSAP is already loaded
+                // Check if GSAP is already loaded (pre-loaded by content script)
                 if (window.gsap) {
+                    console.log('✅ GSAP already available (pre-loaded by extension)');
                     resolve(window.gsap);
                     return;
                 }
                 
-                // Load GSAP from CDN
+                // Try to load GSAP from local bundle first (for browser extensions)
+                this.tryLoadGsapFromExtension().then(success => {
+                    if (success) {
+                        console.log('✨ GSAP loaded successfully from extension bundle');
+                        resolve(window.gsap);
+                    } else {
+                        // Fallback to CDN for bookmarklet usage
+                        this.loadGsapFromCDN().then(resolve).catch(resolve);
+                    }
+                }).catch(() => {
+                    // Fallback to CDN if extension loading fails
+                    this.loadGsapFromCDN().then(resolve).catch(resolve);
+                });
+            });
+        },
+
+        // Try to load GSAP from extension bundle
+        tryLoadGsapFromExtension: function() {
+            return new Promise((resolve) => {
+                // Check if we're running in a browser extension context
+                if (!chrome || !chrome.runtime || !chrome.runtime.getURL) {
+                    resolve(false);
+                    return;
+                }
+
+                try {
+                    const script = document.createElement('script');
+                    script.src = chrome.runtime.getURL('gsap.min.js');
+                    script.onload = () => resolve(true);
+                    script.onerror = () => resolve(false);
+                    document.head.appendChild(script);
+                } catch (error) {
+                    resolve(false);
+                }
+            });
+        },
+
+        // Load GSAP from CDN (bookmarklet fallback)
+        loadGsapFromCDN: function() {
+            return new Promise((resolve) => {
                 const script = document.createElement('script');
                 script.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js';
                 script.onload = () => {
-                    console.log('✨ GSAP loaded successfully');
+                    console.log('✨ GSAP loaded successfully from CDN');
                     resolve(window.gsap);
                 };
                 script.onerror = () => {
@@ -6595,6 +6673,12 @@
 
         // Check for updates
         checkForUpdates: function() {
+            // Skip update checks in extension context to avoid CSP issues
+            if (this.isRunningInExtension()) {
+                console.log('🔄 Update check skipped (running in extension context)');
+                return;
+            }
+            
             // Only check once per session to avoid spam
             if (sessionStorage.getItem('uw-a11y-update-checked')) {
                 return;
@@ -6602,7 +6686,7 @@
             
             sessionStorage.setItem('uw-a11y-update-checked', 'true');
             
-            // Fetch latest version info from GitHub
+            // Fetch latest version info from GitHub (bookmarklet only)
             fetch('https://api.github.com/repos/althe3rd/Pinpoint/releases/latest')
                 .then(response => response.json())
                 .then(data => {
@@ -6614,7 +6698,15 @@
                 })
                 .catch(error => {
                     // Silently fail - don't bother users with update check errors
+                    console.log('Update check failed (this is normal in some contexts):', error.message);
                 });
+        },
+        
+        // Check if we're running in a browser extension context
+        isRunningInExtension: function() {
+            // Check if axe or GSAP are already loaded (indicates pre-loading by extension)
+            return window.axe || window.gsap || 
+                   (window.chrome && window.chrome.runtime && window.chrome.runtime.getURL);
         },
 
         // Compare version strings (returns 1 if a > b, -1 if a < b, 0 if equal)

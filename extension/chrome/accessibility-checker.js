@@ -9,8 +9,9 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.5.5', // Current version
+            version: '1.5.7', // Current version
             websiteUrl: 'https://pinpoint.heroicpixel.com/', // Main website URL
+            legacyDomainUrl: 'https://althe3rd.github.io/Pinpoint/', // Legacy domain for transition
             issues: [],
             axeLoaded: false,
             checkedItems: new Set(), // Track manually verified items
@@ -96,14 +97,52 @@
         
         // Load axe-core dynamically
         loadAxeCore: function() {
-            // Check if axe is already loaded
+            // Check if axe is already loaded (pre-loaded by content script)
             if (window.axe) {
+                console.log('✅ axe-core already available (pre-loaded by extension)');
                 this.axeLoaded = true;
                 this.runAxeChecks();
                 return;
             }
             
-            // Load axe-core from CDN
+            // Try to load axe-core from local bundle first (for browser extensions)
+            this.tryLoadAxeFromExtension().then(success => {
+                if (success) {
+                    this.axeLoaded = true;
+                    this.runAxeChecks();
+                } else {
+                    // Fallback to CDN for bookmarklet usage
+                    this.loadAxeFromCDN();
+                }
+            }).catch(() => {
+                // Fallback to CDN if extension loading fails
+                this.loadAxeFromCDN();
+            });
+        },
+
+        // Try to load axe-core from extension bundle
+        tryLoadAxeFromExtension: function() {
+            return new Promise((resolve) => {
+                // Check if we're running in a browser extension context
+                if (!chrome || !chrome.runtime || !chrome.runtime.getURL) {
+                    resolve(false);
+                    return;
+                }
+
+                try {
+                    const script = document.createElement('script');
+                    script.src = chrome.runtime.getURL('axe-core.min.js');
+                    script.onload = () => resolve(true);
+                    script.onerror = () => resolve(false);
+                    document.head.appendChild(script);
+                } catch (error) {
+                    resolve(false);
+                }
+            });
+        },
+
+        // Load axe-core from CDN (bookmarklet fallback)
+        loadAxeFromCDN: function() {
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/axe-core@4.10.3/axe.min.js';
             script.onload = () => {
@@ -1897,6 +1936,345 @@
                 
             return isLarge || isBoldAndMedium;
         },
+
+        // Toggle focus indicators visualization
+        toggleFocusIndicatorsVisualization: function() {
+            const isActive = this.isFocusIndicatorsActive || false;
+            const newState = !isActive;
+            
+            // Update state first
+            this.isFocusIndicatorsActive = newState;
+            
+            if (newState) {
+                this.showFocusIndicatorsVisualization();
+            } else {
+                this.hideFocusIndicatorsVisualization();
+            }
+            
+            // Update button state
+            const focusIndicatorsBtn = this.shadowRoot.getElementById('uw-a11y-focus-indicators-toggle');
+            const focusIndicatorsCount = this.shadowRoot.getElementById('uw-a11y-focus-indicators-count');
+            
+            
+            if (focusIndicatorsBtn) {
+                focusIndicatorsBtn.setAttribute('aria-pressed', String(newState));
+                
+                // Get the icons and text
+                const targetIcon = focusIndicatorsBtn.querySelector('.feather-target');
+                const eyeOffIcon = focusIndicatorsBtn.querySelector('.feather-eye-off');
+                const btnText = focusIndicatorsBtn.querySelector('.uw-a11y-btn-text');
+                
+                
+                if (newState) {
+                    // Activating focus indicators - show "Hide" state
+                    focusIndicatorsBtn.classList.add('active');
+                    
+                    // Switch icons
+                    if (targetIcon) targetIcon.style.display = 'none';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'inline';
+                    
+                    // Update text
+                    if (btnText) btnText.textContent = 'Hide Focus Preview';
+                    
+                    // Show count
+                    if (focusIndicatorsCount) {
+                        focusIndicatorsCount.style.display = 'inline';
+                    }
+                } else {
+                    // Deactivating focus indicators - show "Show" state
+                    focusIndicatorsBtn.classList.remove('active');
+                    
+                    // Switch icons
+                    if (targetIcon) targetIcon.style.display = 'inline';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'none';
+                    
+                    // Update text
+                    if (btnText) btnText.textContent = 'Preview Focus Styles';
+                    
+                    // Hide count
+                    if (focusIndicatorsCount) {
+                        focusIndicatorsCount.style.display = 'none';
+                    }
+                }
+            }
+        },
+
+        // Show focus indicators visualization
+        showFocusIndicatorsVisualization: function() {
+            this.hideFocusIndicatorsVisualization();
+            
+            const focusableElements = this.getFocusableElements();
+            this.cachedFocusableElements = focusableElements;
+            
+            // Apply simulated focus styles to all focusable elements
+            this.injectFocusSimulationStyles();
+            
+            focusableElements.forEach(element => {
+                // Add a class that will trigger the focus styles
+                element.classList.add('uw-a11y-simulated-focus');
+                element.setAttribute('data-uw-a11y-focus-preview', 'true');
+            });
+            
+            // Set up event handlers for scroll/resize
+            this.setupFocusIndicatorsEventHandlers();
+            
+            // Update status
+            const totalFocusable = focusableElements.length;
+            const focusIndicatorsCount = this.shadowRoot.getElementById('uw-a11y-focus-indicators-count');
+            if (focusIndicatorsCount) {
+                focusIndicatorsCount.textContent = `Previewing focus styles on ${totalFocusable} focusable elements`;
+            }
+            
+            console.log(`Focus preview: Showing focus styles on ${totalFocusable} focusable elements`);
+        },
+
+        // Hide focus indicators visualization
+        hideFocusIndicatorsVisualization: function() {
+            // Remove simulated focus classes from all elements
+            if (this.cachedFocusableElements) {
+                this.cachedFocusableElements.forEach(element => {
+                    element.classList.remove('uw-a11y-simulated-focus');
+                    element.removeAttribute('data-uw-a11y-focus-preview');
+                });
+            }
+            
+            // Also clean up any elements that might have been missed
+            document.querySelectorAll('.uw-a11y-simulated-focus').forEach(element => {
+                element.classList.remove('uw-a11y-simulated-focus');
+                element.removeAttribute('data-uw-a11y-focus-preview');
+            });
+            
+            this.cachedFocusableElements = null;
+            this.cleanupFocusIndicatorsEventHandlers();
+            
+            // Remove the focus simulation styles
+            this.removeFocusSimulationStyles();
+        },
+
+
+
+        // Set up event handlers for focus indicators
+        setupFocusIndicatorsEventHandlers: function() {
+            // For the new focus simulation approach, we don't need scroll/resize handlers
+            // since the focus styles move with the elements naturally
+            // This function is kept for potential future enhancements
+        },
+
+        // Clean up focus indicators event handlers
+        cleanupFocusIndicatorsEventHandlers: function() {
+            // Cleanup for future use - currently no handlers to remove
+        },
+
+        // Inject focus simulation styles
+        injectFocusSimulationStyles: function() {
+            if (document.getElementById('uw-a11y-focus-simulation-styles')) return;
+            
+            const style = document.createElement('style');
+            style.id = 'uw-a11y-focus-simulation-styles';
+            style.textContent = `
+                /* Force focus styles to be visible on all elements with the simulation class */
+                .uw-a11y-simulated-focus:focus,
+                .uw-a11y-simulated-focus {
+                    /* Apply default focus outline if none exists */
+                    outline: 2px solid #0066cc !important;
+                    outline-offset: 2px !important;
+                }
+                
+                /* For elements that already have custom focus styles, enhance them */
+                .uw-a11y-simulated-focus:focus {
+                    /* Let existing focus styles show through, but ensure they're visible */
+                    position: relative;
+                }
+                
+                /* Special handling for different element types */
+                input.uw-a11y-simulated-focus,
+                textarea.uw-a11y-simulated-focus,
+                select.uw-a11y-simulated-focus {
+                    /* Form elements get a blue outline */
+                    outline: 2px solid #0066cc !important;
+                    outline-offset: 1px !important;
+                }
+                
+                button.uw-a11y-simulated-focus,
+                [role="button"].uw-a11y-simulated-focus {
+                    /* Buttons get a distinctive style */
+                    outline: 2px solid #0066cc !important;
+                    outline-offset: 2px !important;
+                }
+                
+                a.uw-a11y-simulated-focus {
+                    /* Links get their own style */
+                    outline: 2px solid #0066cc !important;
+                    outline-offset: 2px !important;
+                }
+                
+                /* Override any outline: none declarations */
+                .uw-a11y-simulated-focus[style*="outline: none"],
+                .uw-a11y-simulated-focus[style*="outline:none"] {
+                    outline: 2px solid #ff6b35 !important;
+                    outline-offset: 2px !important;
+                    box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.3) !important;
+                }
+                
+                /* Add a subtle animation to show the simulation is active */
+                .uw-a11y-simulated-focus {
+                    animation: uw-a11y-focus-simulation-pulse 2s ease-in-out infinite;
+                }
+                
+                @keyframes uw-a11y-focus-simulation-pulse {
+                    0%, 100% {
+                        outline-color: #0066cc;
+                    }
+                    50% {
+                        outline-color: #4d9eff;
+                    }
+                }
+                
+                /* For elements that have been explicitly hidden or have outline:none */
+                .uw-a11y-simulated-focus[tabindex="-1"] {
+                    outline: 2px dashed #999 !important;
+                    outline-offset: 2px !important;
+                }
+            `;
+            
+            document.head.appendChild(style);
+        },
+
+        // Remove focus simulation styles
+        removeFocusSimulationStyles: function() {
+            const style = document.getElementById('uw-a11y-focus-simulation-styles');
+            if (style) {
+                style.remove();
+            }
+        },
+
+        // Toggle landmark structure visualization
+        toggleLandmarkStructureVisualization: function() {
+            const isActive = this.isLandmarkStructureActive || false;
+            const newState = !isActive;
+            
+            // Update state first
+            this.isLandmarkStructureActive = newState;
+            
+            if (newState) {
+                this.showLandmarkStructureVisualization();
+            } else {
+                this.hideLandmarkStructureVisualization();
+            }
+            
+            // Update button state
+            const landmarkBtn = this.shadowRoot.getElementById('uw-a11y-landmark-structure-toggle');
+            const landmarkCount = this.shadowRoot.getElementById('uw-a11y-landmark-structure-count');
+            
+            if (landmarkBtn) {
+                landmarkBtn.setAttribute('aria-pressed', String(newState));
+                
+                // Get the icons and text
+                const mapIcon = landmarkBtn.querySelector('.feather-map');
+                const eyeOffIcon = landmarkBtn.querySelector('.feather-eye-off');
+                const btnText = landmarkBtn.querySelector('.uw-a11y-btn-text');
+                
+                if (newState) {
+                    // Activating landmark structure - show "Hide" state
+                    landmarkBtn.classList.add('active');
+                    
+                    // Switch icons
+                    if (mapIcon) mapIcon.style.display = 'none';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'inline';
+                    
+                    // Update text
+                    if (btnText) btnText.textContent = 'Hide Landmarks';
+                    
+                    // Show count
+                    if (landmarkCount) {
+                        landmarkCount.style.display = 'inline';
+                    }
+                } else {
+                    // Deactivating landmark structure - show "Show" state
+                    landmarkBtn.classList.remove('active');
+                    
+                    // Switch icons
+                    if (mapIcon) mapIcon.style.display = 'inline';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'none';
+                    
+                    // Update text
+                    if (btnText) btnText.textContent = 'Show Landmarks';
+                    
+                    // Hide count
+                    if (landmarkCount) {
+                        landmarkCount.style.display = 'none';
+                    }
+                }
+            }
+        },
+
+        // Show landmark structure visualization
+        showLandmarkStructureVisualization: function() {
+            this.hideLandmarkStructureVisualization();
+            
+            const landmarks = this.detectLandmarks();
+            const headings = this.detectHeadings();
+            
+            this.cachedLandmarks = landmarks;
+            this.cachedHeadings = headings;
+            
+            // Create overlay container
+            const overlay = document.createElement('div');
+            overlay.className = 'uw-a11y-landmark-overlay';
+            overlay.setAttribute('data-uw-a11y-overlay', 'true');
+            
+            // Add landmark indicators
+            landmarks.forEach((landmark, index) => {
+                const indicator = this.createLandmarkIndicator(landmark, index + 1);
+                if (indicator) {
+                    const delay = Math.min(50 * index, 1000);
+                    indicator.style.animationDelay = `${delay}ms`;
+                    overlay.appendChild(indicator);
+                }
+            });
+            
+            // Add heading indicators
+            headings.forEach((heading, index) => {
+                const indicator = this.createHeadingIndicator(heading, index + 1);
+                if (indicator) {
+                    const delay = Math.min(30 * index + 200, 1500);
+                    indicator.style.animationDelay = `${delay}ms`;
+                    overlay.appendChild(indicator);
+                }
+            });
+            
+            document.body.appendChild(overlay);
+            this.injectLandmarkStructureStyles();
+            this.landmarkStructureOverlay = overlay;
+            
+            // Set up event handlers for scroll/resize
+            this.setupLandmarkStructureEventHandlers();
+            
+            // Update status
+            const totalElements = landmarks.length + headings.length;
+            const landmarkCount = this.shadowRoot.getElementById('uw-a11y-landmark-structure-count');
+            if (landmarkCount) {
+                landmarkCount.textContent = `${landmarks.length} landmarks, ${headings.length} headings`;
+            }
+            
+            console.log(`Landmark structure: Found ${landmarks.length} landmarks and ${headings.length} headings`);
+        },
+
+        // Hide landmark structure visualization
+        hideLandmarkStructureVisualization: function() {
+            if (this.landmarkStructureOverlay) {
+                this.landmarkStructureOverlay.remove();
+                this.landmarkStructureOverlay = null;
+            }
+            
+            this.cachedLandmarks = null;
+            this.cachedHeadings = null;
+            this.cleanupLandmarkStructureEventHandlers();
+            
+            // Remove any existing overlays
+            document.querySelectorAll('.uw-a11y-landmark-overlay').forEach(el => el.remove());
+            this.removeLandmarkStructureStyles();
+        },
         
         // Analyze landmark context
         analyzeLandmarkContext: function(node) {
@@ -1909,6 +2287,468 @@
                 return `Found ${landmarks.length} landmarks on page. Current element: ${element.tagName.toLowerCase()}${element.getAttribute('role') ? ' (role="' + element.getAttribute('role') + '")' : ''}`;
             } catch (e) {
                 return 'Unable to analyze landmark context';
+            }
+        },
+
+        // Detect landmarks on the page
+        detectLandmarks: function() {
+            const landmarks = [];
+            
+            // Define landmark selectors and their types
+            const landmarkSelectors = [
+                { selector: 'main, [role="main"]', type: 'main', label: 'main' },
+                { selector: 'nav, [role="navigation"]', type: 'navigation', label: 'nav' },
+                { selector: 'header, [role="banner"]', type: 'banner', label: 'header' },
+                { selector: 'footer, [role="contentinfo"]', type: 'contentinfo', label: 'footer' },
+                { selector: 'aside, [role="complementary"]', type: 'complementary', label: 'aside' },
+                { selector: '[role="search"]', type: 'search', label: 'search' },
+                { selector: '[role="form"]', type: 'form', label: 'form' },
+                { selector: '[role="region"][aria-label], [role="region"][aria-labelledby]', type: 'region', label: 'region' },
+                { selector: 'section[aria-label], section[aria-labelledby]', type: 'region', label: 'section' }
+            ];
+            
+            landmarkSelectors.forEach(({ selector, type, label }) => {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach((element, index) => {
+                    // Skip our own UI elements
+                    if (this.isOwnUIElement({ target: element })) {
+                        return;
+                    }
+                    
+                    const landmarkLabel = this.getLandmarkLabel(element);
+                    landmarks.push({
+                        element: element,
+                        type: type,
+                        label: label,
+                        customLabel: landmarkLabel,
+                        selector: selector
+                    });
+                });
+            });
+            
+            return landmarks;
+        },
+
+        // Detect headings on the page
+        detectHeadings: function() {
+            const headings = [];
+            const headingElements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, [role="heading"]');
+            
+            headingElements.forEach((element, index) => {
+                // Skip our own UI elements
+                if (this.isOwnUIElement({ target: element })) {
+                    return;
+                }
+                
+                const level = this.getHeadingLevel(element);
+                const text = element.textContent.trim();
+                
+                headings.push({
+                    element: element,
+                    level: level,
+                    text: text,
+                    index: index + 1
+                });
+            });
+            
+            return headings;
+        },
+
+        // Get landmark label (aria-label or aria-labelledby)
+        getLandmarkLabel: function(element) {
+            const ariaLabel = element.getAttribute('aria-label');
+            if (ariaLabel) return ariaLabel;
+            
+            const ariaLabelledBy = element.getAttribute('aria-labelledby');
+            if (ariaLabelledBy) {
+                const labelElement = document.getElementById(ariaLabelledBy);
+                if (labelElement) {
+                    return labelElement.textContent.trim();
+                }
+            }
+            
+            return null;
+        },
+
+        // Get heading level
+        getHeadingLevel: function(element) {
+            if (element.tagName.match(/^H[1-6]$/)) {
+                return parseInt(element.tagName.charAt(1));
+            }
+            
+            const ariaLevel = element.getAttribute('aria-level');
+            if (ariaLevel) {
+                return parseInt(ariaLevel);
+            }
+            
+            return 1; // Default level
+        },
+
+        // Create landmark indicator
+        createLandmarkIndicator: function(landmark, index) {
+            const rect = landmark.element.getBoundingClientRect();
+            
+            if (rect.width === 0 || rect.height === 0) {
+                return null;
+            }
+            
+            const indicator = document.createElement('div');
+            indicator.className = 'uw-a11y-landmark-indicator';
+            indicator.setAttribute('data-landmark-type', landmark.type);
+            indicator.setAttribute('data-landmark-index', index);
+            
+            // Position the indicator
+            const x = rect.left + window.scrollX;
+            const y = rect.top + window.scrollY;
+            
+            indicator.style.position = 'absolute';
+            indicator.style.left = `${x}px`;
+            indicator.style.top = `${y}px`;
+            indicator.style.width = `${rect.width}px`;
+            indicator.style.height = `${rect.height}px`;
+            indicator.style.zIndex = '999997';
+            
+            // Add landmark badge
+            const badge = document.createElement('div');
+            badge.className = 'uw-a11y-landmark-badge';
+            badge.textContent = landmark.label;
+            
+            const title = `${landmark.label}${landmark.customLabel ? ': ' + landmark.customLabel : ''}`;
+            badge.title = title;
+            badge.setAttribute('aria-label', title);
+            
+            indicator.appendChild(badge);
+            
+            return indicator;
+        },
+
+        // Create heading indicator
+        createHeadingIndicator: function(heading, index) {
+            const rect = heading.element.getBoundingClientRect();
+            
+            if (rect.width === 0 || rect.height === 0) {
+                return null;
+            }
+            
+            const indicator = document.createElement('div');
+            indicator.className = 'uw-a11y-heading-indicator';
+            indicator.setAttribute('data-heading-level', heading.level);
+            indicator.setAttribute('data-heading-index', index);
+            
+            // Position the indicator
+            const x = rect.left + window.scrollX;
+            const y = rect.top + window.scrollY;
+            
+            indicator.style.position = 'absolute';
+            indicator.style.left = `${x}px`;
+            indicator.style.top = `${y}px`;
+            indicator.style.width = `${rect.width}px`;
+            indicator.style.height = `${rect.height}px`;
+            indicator.style.zIndex = '999996';
+            
+            // Add heading badge
+            const badge = document.createElement('div');
+            badge.className = 'uw-a11y-heading-badge';
+            badge.textContent = `H${heading.level}`;
+            
+            const title = `Heading Level ${heading.level}: ${heading.text.substring(0, 100)}${heading.text.length > 100 ? '...' : ''}`;
+            badge.title = title;
+            badge.setAttribute('aria-label', title);
+            
+            indicator.appendChild(badge);
+            
+            return indicator;
+        },
+
+        // Set up event handlers for landmark structure
+        setupLandmarkStructureEventHandlers: function() {
+            if (this.landmarkStructureScrollHandler || this.landmarkStructureResizeHandler) return;
+            
+            // Throttled scroll handler
+            let isScrolling = false;
+            this.landmarkStructureScrollHandler = () => {
+                if (!isScrolling && this.isLandmarkStructureActive && !this.isAnimating) {
+                    isScrolling = true;
+                    requestAnimationFrame(() => {
+                        if (!this.isAnimating) {
+                            this.updateLandmarkStructurePositions();
+                        }
+                        isScrolling = false;
+                    });
+                }
+            };
+            
+            // Throttled resize handler
+            let resizeTimeout;
+            this.landmarkStructureResizeHandler = () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    if (this.isLandmarkStructureActive) {
+                        this.showLandmarkStructureVisualization(); // Full refresh on resize
+                    }
+                }, 100);
+            };
+            
+            window.addEventListener('scroll', this.landmarkStructureScrollHandler, { passive: true });
+            window.addEventListener('resize', this.landmarkStructureResizeHandler);
+        },
+
+        // Clean up landmark structure event handlers
+        cleanupLandmarkStructureEventHandlers: function() {
+            if (this.landmarkStructureScrollHandler) {
+                window.removeEventListener('scroll', this.landmarkStructureScrollHandler);
+                this.landmarkStructureScrollHandler = null;
+            }
+            if (this.landmarkStructureResizeHandler) {
+                window.removeEventListener('resize', this.landmarkStructureResizeHandler);
+                this.landmarkStructureResizeHandler = null;
+            }
+        },
+
+        // Update landmark structure positions on scroll
+        updateLandmarkStructurePositions: function() {
+            if (!this.landmarkStructureOverlay || (!this.cachedLandmarks && !this.cachedHeadings)) return;
+            
+            // Update landmark positions
+            if (this.cachedLandmarks) {
+                this.landmarkStructureOverlay.querySelectorAll('.uw-a11y-landmark-indicator').forEach((indicator, index) => {
+                    const landmark = this.cachedLandmarks[index];
+                    if (landmark && landmark.element && landmark.element.isConnected) {
+                        const rect = landmark.element.getBoundingClientRect();
+                        if (rect.width > 0 && rect.height > 0) {
+                            const x = rect.left + window.scrollX;
+                            const y = rect.top + window.scrollY;
+                            indicator.style.left = `${x}px`;
+                            indicator.style.top = `${y}px`;
+                            indicator.style.width = `${rect.width}px`;
+                            indicator.style.height = `${rect.height}px`;
+                            indicator.style.display = 'block';
+                        } else {
+                            indicator.style.display = 'none';
+                        }
+                    } else {
+                        indicator.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Update heading positions
+            if (this.cachedHeadings) {
+                this.landmarkStructureOverlay.querySelectorAll('.uw-a11y-heading-indicator').forEach((indicator, index) => {
+                    const heading = this.cachedHeadings[index];
+                    if (heading && heading.element && heading.element.isConnected) {
+                        const rect = heading.element.getBoundingClientRect();
+                        if (rect.width > 0 && rect.height > 0) {
+                            const x = rect.left + window.scrollX;
+                            const y = rect.top + window.scrollY;
+                            indicator.style.left = `${x}px`;
+                            indicator.style.top = `${y}px`;
+                            indicator.style.width = `${rect.width}px`;
+                            indicator.style.height = `${rect.height}px`;
+                            indicator.style.display = 'block';
+                        } else {
+                            indicator.style.display = 'none';
+                        }
+                    } else {
+                        indicator.style.display = 'none';
+                    }
+                });
+            }
+        },
+
+        // Inject landmark structure styles
+        injectLandmarkStructureStyles: function() {
+            if (document.getElementById('uw-a11y-landmark-structure-styles')) return;
+            
+            const style = document.createElement('style');
+            style.id = 'uw-a11y-landmark-structure-styles';
+            style.textContent = `
+                .uw-a11y-landmark-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    pointer-events: none;
+                    z-index: 999995;
+                    width: 100%;
+                    height: 100%;
+                }
+                
+                .uw-a11y-landmark-indicator {
+                    position: absolute;
+                    border: 2px solid #007bff;
+                    background-color: rgba(0, 123, 255, 0.1);
+                    border-radius: 4px;
+                    pointer-events: none;
+                    animation: uw-a11y-landmark-appear 0.6s ease-out;
+                    transition: all 0.2s ease-out;
+                }
+                
+                .uw-a11y-heading-indicator {
+                    position: absolute;
+                    border: 2px solid #28a745;
+                    background-color: rgba(40, 167, 69, 0.1);
+                    border-radius: 3px;
+                    pointer-events: none;
+                    animation: uw-a11y-heading-appear 0.5s ease-out;
+                    transition: all 0.2s ease-out;
+                }
+                
+                .uw-a11y-landmark-badge {
+                    position: absolute;
+                    top: -12px;
+                    left: -12px;
+                    min-width: 24px;
+                    height: 24px;
+                    padding: 0 8px;
+                    background: #007bff;
+                    color: white;
+                    border-radius: 4px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 10px;
+                    font-weight: bold;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    border: 2px solid white;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                    z-index: 999998;
+                    white-space: nowrap;
+                }
+                
+                .uw-a11y-heading-badge {
+                    position: absolute;
+                    top: -10px;
+                    right: -10px;
+                    min-width: 20px;
+                    height: 20px;
+                    padding: 0 4px;
+                    background: #28a745;
+                    color: white;
+                    border-radius: 3px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 10px;
+                    font-weight: bold;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    border: 2px solid white;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                    z-index: 999998;
+                }
+                
+                /* Different colors for different landmark types */
+                .uw-a11y-landmark-indicator[data-landmark-type="main"] {
+                    border-color: #007bff;
+                    background-color: rgba(0, 123, 255, 0.15);
+                }
+                .uw-a11y-landmark-indicator[data-landmark-type="main"] .uw-a11y-landmark-badge {
+                    background: #007bff;
+                }
+                
+                .uw-a11y-landmark-indicator[data-landmark-type="navigation"] {
+                    border-color: #6f42c1;
+                    background-color: rgba(111, 66, 193, 0.1);
+                }
+                .uw-a11y-landmark-indicator[data-landmark-type="navigation"] .uw-a11y-landmark-badge {
+                    background: #6f42c1;
+                }
+                
+                .uw-a11y-landmark-indicator[data-landmark-type="banner"] {
+                    border-color: #e83e8c;
+                    background-color: rgba(232, 62, 140, 0.1);
+                }
+                .uw-a11y-landmark-indicator[data-landmark-type="banner"] .uw-a11y-landmark-badge {
+                    background: #e83e8c;
+                }
+                
+                .uw-a11y-landmark-indicator[data-landmark-type="contentinfo"] {
+                    border-color: #fd7e14;
+                    background-color: rgba(253, 126, 20, 0.1);
+                }
+                .uw-a11y-landmark-indicator[data-landmark-type="contentinfo"] .uw-a11y-landmark-badge {
+                    background: #fd7e14;
+                }
+                
+                .uw-a11y-landmark-indicator[data-landmark-type="complementary"] {
+                    border-color: #20c997;
+                    background-color: rgba(32, 201, 151, 0.1);
+                }
+                .uw-a11y-landmark-indicator[data-landmark-type="complementary"] .uw-a11y-landmark-badge {
+                    background: #20c997;
+                }
+                
+                /* Different colors for different heading levels */
+                .uw-a11y-heading-indicator[data-heading-level="1"] {
+                    border-color: #dc3545;
+                    background-color: rgba(220, 53, 69, 0.1);
+                }
+                .uw-a11y-heading-indicator[data-heading-level="1"] .uw-a11y-heading-badge {
+                    background: #dc3545;
+                }
+                
+                .uw-a11y-heading-indicator[data-heading-level="2"] {
+                    border-color: #fd7e14;
+                    background-color: rgba(253, 126, 20, 0.1);
+                }
+                .uw-a11y-heading-indicator[data-heading-level="2"] .uw-a11y-heading-badge {
+                    background: #fd7e14;
+                }
+                
+                .uw-a11y-heading-indicator[data-heading-level="3"] {
+                    border-color: #ffc107;
+                    background-color: rgba(255, 193, 7, 0.1);
+                }
+                .uw-a11y-heading-indicator[data-heading-level="3"] .uw-a11y-heading-badge {
+                    background: #ffc107;
+                    color: #212529;
+                }
+                
+                .uw-a11y-heading-indicator[data-heading-level="4"],
+                .uw-a11y-heading-indicator[data-heading-level="5"],
+                .uw-a11y-heading-indicator[data-heading-level="6"] {
+                    border-color: #28a745;
+                    background-color: rgba(40, 167, 69, 0.1);
+                }
+                
+                @keyframes uw-a11y-landmark-appear {
+                    0% {
+                        opacity: 0;
+                        transform: scale(0.9);
+                        border-width: 4px;
+                    }
+                    100% {
+                        opacity: 1;
+                        transform: scale(1);
+                        border-width: 2px;
+                    }
+                }
+                
+                @keyframes uw-a11y-heading-appear {
+                    0% {
+                        opacity: 0;
+                        transform: scale(0.8);
+                    }
+                    100% {
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                }
+                
+                .uw-a11y-landmark-indicator:hover,
+                .uw-a11y-heading-indicator:hover {
+                    z-index: 999999;
+                    transform: scale(1.02);
+                }
+            `;
+            
+            document.head.appendChild(style);
+        },
+
+        // Remove landmark structure styles
+        removeLandmarkStructureStyles: function() {
+            const style = document.getElementById('uw-a11y-landmark-structure-styles');
+            if (style) {
+                style.remove();
             }
         },
         
@@ -2248,33 +3088,43 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Placeholder for future inspector tools -->
-                                <div class="uw-a11y-inspector-section uw-a11y-inspector-placeholder" style="opacity: 0.6;">
-                                    <h4>Focus Indicators <span class="uw-a11y-coming-soon">Coming Soon</span></h4>
-                                    <p>Visualize focus indicators and keyboard navigation paths.</p>
+                                <!-- Focus Indicators Tool -->
+                                <div class="uw-a11y-inspector-section">
+                                    <h4>Focus Indicators</h4>
+                                    <p>Preview how focus styles appear on all focusable elements simultaneously to test focus visibility.</p>
                                     <div class="uw-a11y-inspector-controls">
-                                        <button class="uw-a11y-btn uw-a11y-btn-secondary" disabled>
-                                            <svg class="feather feather-eye" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"/>
-                                                <circle cx="12" cy="12" r="3"/>
+                                        <button id="uw-a11y-focus-indicators-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
+                                            <svg class="feather feather-target" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                                <circle cx="12" cy="12" r="10"/>
+                                                <circle cx="12" cy="12" r="6"/>
+                                                <circle cx="12" cy="12" r="2"/>
                                             </svg>
-                                            Show Focus Indicators
+                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                            </svg>
+                                            <span class="uw-a11y-btn-text">Preview Focus Styles</span>
                                         </button>
+                                        <span id="uw-a11y-focus-indicators-count" class="uw-a11y-inspector-status" style="display: none;"></span>
                                     </div>
                                 </div>
                                 
-                                <div class="uw-a11y-inspector-section uw-a11y-inspector-placeholder" style="opacity: 0.6;">
-                                    <h4>Landmark Structure <span class="uw-a11y-coming-soon">Coming Soon</span></h4>
-                                    <p>Highlight page landmarks and heading hierarchy.</p>
+                                <!-- Landmark Structure Tool -->
+                                <div class="uw-a11y-inspector-section">
+                                    <h4>Landmark Structure</h4>
+                                    <p>Visualize page landmarks and heading hierarchy to test document structure.</p>
                                     <div class="uw-a11y-inspector-controls">
-                                        <button class="uw-a11y-btn uw-a11y-btn-secondary" disabled>
+                                        <button id="uw-a11y-landmark-structure-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
                                             <svg class="feather feather-map" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
                                                 <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
                                                 <line x1="9" x2="9" y1="3" y2="18"/>
                                                 <line x1="15" x2="15" y1="6" y2="21"/>
                                             </svg>
-                                            Show Landmarks
+                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                            </svg>
+                                            <span class="uw-a11y-btn-text">Show Landmarks</span>
                                         </button>
+                                        <span id="uw-a11y-landmark-structure-count" class="uw-a11y-inspector-status" style="display: none;"></span>
                                     </div>
                                 </div>
                             </div>
@@ -3644,17 +4494,57 @@
                     return;
                 }
                 
-                // Check if GSAP is already loaded
+                // Check if GSAP is already loaded (pre-loaded by content script)
                 if (window.gsap) {
+                    console.log('✅ GSAP already available (pre-loaded by extension)');
                     resolve(window.gsap);
                     return;
                 }
                 
-                // Load GSAP from CDN
+                // Try to load GSAP from local bundle first (for browser extensions)
+                this.tryLoadGsapFromExtension().then(success => {
+                    if (success) {
+                        console.log('✨ GSAP loaded successfully from extension bundle');
+                        resolve(window.gsap);
+                    } else {
+                        // Fallback to CDN for bookmarklet usage
+                        this.loadGsapFromCDN().then(resolve).catch(resolve);
+                    }
+                }).catch(() => {
+                    // Fallback to CDN if extension loading fails
+                    this.loadGsapFromCDN().then(resolve).catch(resolve);
+                });
+            });
+        },
+
+        // Try to load GSAP from extension bundle
+        tryLoadGsapFromExtension: function() {
+            return new Promise((resolve) => {
+                // Check if we're running in a browser extension context
+                if (!chrome || !chrome.runtime || !chrome.runtime.getURL) {
+                    resolve(false);
+                    return;
+                }
+
+                try {
+                    const script = document.createElement('script');
+                    script.src = chrome.runtime.getURL('gsap.min.js');
+                    script.onload = () => resolve(true);
+                    script.onerror = () => resolve(false);
+                    document.head.appendChild(script);
+                } catch (error) {
+                    resolve(false);
+                }
+            });
+        },
+
+        // Load GSAP from CDN (bookmarklet fallback)
+        loadGsapFromCDN: function() {
+            return new Promise((resolve) => {
                 const script = document.createElement('script');
                 script.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js';
                 script.onload = () => {
-                    console.log('✨ GSAP loaded successfully');
+                    console.log('✨ GSAP loaded successfully from CDN');
                     resolve(window.gsap);
                 };
                 script.onerror = () => {
@@ -4266,6 +5156,24 @@
                 tabOrderToggle.addEventListener('click', (e) => {
                     e.preventDefault();
                     this.toggleTabOrderVisualization();
+                });
+            }
+
+            // Focus indicators toggle button
+            const focusIndicatorsToggle = this.shadowRoot.getElementById('uw-a11y-focus-indicators-toggle');
+            if (focusIndicatorsToggle) {
+                focusIndicatorsToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.toggleFocusIndicatorsVisualization();
+                });
+            }
+
+            // Landmark structure toggle button
+            const landmarkStructureToggle = this.shadowRoot.getElementById('uw-a11y-landmark-structure-toggle');
+            if (landmarkStructureToggle) {
+                landmarkStructureToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.toggleLandmarkStructureVisualization();
                 });
             }
         },
@@ -5765,6 +6673,12 @@
 
         // Check for updates
         checkForUpdates: function() {
+            // Skip update checks in extension context to avoid CSP issues
+            if (this.isRunningInExtension()) {
+                console.log('🔄 Update check skipped (running in extension context)');
+                return;
+            }
+            
             // Only check once per session to avoid spam
             if (sessionStorage.getItem('uw-a11y-update-checked')) {
                 return;
@@ -5772,7 +6686,7 @@
             
             sessionStorage.setItem('uw-a11y-update-checked', 'true');
             
-            // Fetch latest version info from GitHub
+            // Fetch latest version info from GitHub (bookmarklet only)
             fetch('https://api.github.com/repos/althe3rd/Pinpoint/releases/latest')
                 .then(response => response.json())
                 .then(data => {
@@ -5784,7 +6698,15 @@
                 })
                 .catch(error => {
                     // Silently fail - don't bother users with update check errors
+                    console.log('Update check failed (this is normal in some contexts):', error.message);
                 });
+        },
+        
+        // Check if we're running in a browser extension context
+        isRunningInExtension: function() {
+            // Check if axe or GSAP are already loaded (indicates pre-loading by extension)
+            return window.axe || window.gsap || 
+                   (window.chrome && window.chrome.runtime && window.chrome.runtime.getURL);
         },
 
         // Compare version strings (returns 1 if a > b, -1 if a < b, 0 if equal)
@@ -5830,6 +6752,12 @@
                             Get latest bookmarklet →
                         </a>
                     </div>
+                    ${this.legacyDomainUrl ? `
+                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.3); font-size: 11px; opacity: 0.9;">
+                        <strong>🚀 We've moved!</strong> New domain: <a href="${this.websiteUrl}" target="_blank" style="color: #ffffff; text-decoration: underline;">pinpoint.heroicpixel.com</a><br>
+                        <span style="font-size: 10px; opacity: 0.8;">Links will automatically redirect to our new home.</span>
+                    </div>
+                    ` : ''}
                 </div>
             `;
             
@@ -5848,8 +6776,16 @@
             // Clean up tab order visualization
             this.hideTabOrderVisualization();
             
+            // Clean up focus indicators visualization
+            this.hideFocusIndicatorsVisualization();
+            
+            // Clean up landmark structure visualization
+            this.hideLandmarkStructureVisualization();
+            
             // Clean up injected styles
             this.removeTabOrderStyles();
+            this.removeFocusSimulationStyles();
+            this.removeLandmarkStructureStyles();
             
             // Clean up any remaining timeouts
             if (this.tabOrderRefreshTimeout) {
@@ -5857,8 +6793,10 @@
                 this.tabOrderRefreshTimeout = null;
             }
             
-            // Clean up tab order event handlers
+            // Clean up event handlers
             this.cleanupTabOrderEventHandlers();
+            this.cleanupFocusIndicatorsEventHandlers();
+            this.cleanupLandmarkStructureEventHandlers();
             
             // Clean up resize handler
             if (this.resizeHandler) {

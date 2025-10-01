@@ -1,11 +1,10 @@
 {
   "manifest_version": 2,
   "name": "Pinpoint Accessibility Checker",
-  "version": "1.5.5",
+  "version": "1.5.7",
   "description": "Comprehensive WCAG 2.1 AA accessibility testing powered by axe-core. Get detailed reports with actionable recommendations.",
   "permissions": [
     "activeTab",
-    "storage",
     "contextMenus"
   ],
   "browser_action": {
@@ -30,7 +29,9 @@
     "128": "icons/icon-128.png"
   },
   "web_accessible_resources": [
-    "accessibility-checker.js"
+    "accessibility-checker.js",
+    "axe-core.min.js",
+    "gsap.min.js"
   ],
   "content_security_policy": "script-src 'self'; object-src 'self';",
   "applications": {

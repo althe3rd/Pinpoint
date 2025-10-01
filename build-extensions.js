@@ -41,6 +41,8 @@ function validateExtensionFiles(extensionDir) {
         'popup.js',
         'background.js',
         'accessibility-checker.js',
+        'axe-core.min.js',
+        'gsap.min.js',
         'icons/icon-16.png',
         'icons/icon-32.png',
         'icons/icon-48.png',
@@ -77,6 +79,44 @@ function syncAccessibilityCheckerSource() {
         log('🔁 Synchronized accessibility-checker.js to extension/chrome/ and extension/firefox/', 'blue');
     } catch (error) {
         log(`❌ Error syncing accessibility-checker.js to extensions: ${error.message}`, 'red');
+        throw error;
+    }
+}
+
+function syncAxeCoreToExtensions() {
+    try {
+        const axeSourcePath = path.resolve('node_modules/axe-core/axe.min.js');
+        const chromeTarget = path.resolve('extension/chrome/axe-core.min.js');
+        const firefoxTarget = path.resolve('extension/firefox/axe-core.min.js');
+
+        if (!fs.existsSync(axeSourcePath)) {
+            throw new Error('axe-core not found in node_modules. Run npm install axe-core first.');
+        }
+
+        fs.copyFileSync(axeSourcePath, chromeTarget);
+        fs.copyFileSync(axeSourcePath, firefoxTarget);
+        log('📦 Bundled axe-core.min.js to extension/chrome/ and extension/firefox/', 'blue');
+    } catch (error) {
+        log(`❌ Error bundling axe-core to extensions: ${error.message}`, 'red');
+        throw error;
+    }
+}
+
+function syncGsapToExtensions() {
+    try {
+        const gsapSourcePath = path.resolve('node_modules/gsap/dist/gsap.min.js');
+        const chromeTarget = path.resolve('extension/chrome/gsap.min.js');
+        const firefoxTarget = path.resolve('extension/firefox/gsap.min.js');
+
+        if (!fs.existsSync(gsapSourcePath)) {
+            throw new Error('GSAP not found in node_modules. Run npm install gsap first.');
+        }
+
+        fs.copyFileSync(gsapSourcePath, chromeTarget);
+        fs.copyFileSync(gsapSourcePath, firefoxTarget);
+        log('🎬 Bundled gsap.min.js to extension/chrome/ and extension/firefox/', 'blue');
+    } catch (error) {
+        log(`❌ Error bundling GSAP to extensions: ${error.message}`, 'red');
         throw error;
     }
 }
@@ -239,12 +279,15 @@ function buildSafariExtension(isAppStoreReady = false) {
             `--bundle-identifier "${bundleId}"`,
             '--swift',
             '--copy-resources',
+            '--macos-only',
             '--no-open',
             '--no-prompt',
             '--force'
         ].join(' ');
         
         execSync(convertCommand, { stdio: 'pipe' });
+        
+        log('🍎 Created macOS-only Safari extension project', 'blue');
         
         if (isAppStoreReady) {
             // Configure for App Store submission
@@ -293,12 +336,10 @@ function configureAppStoreProject(safariProjectDir) {
         
         const projectName = 'Pinpoint Accessibility Checker';
         
-        // All Info.plist files that need version updates
+        // All Info.plist files that need version updates (macOS only)
         const plistFiles = [
-            { path: path.join(safariProjectDir, projectName, 'iOS (App)', 'Info.plist'), type: 'iOS App' },
-            { path: path.join(safariProjectDir, projectName, 'macOS (App)', 'Info.plist'), type: 'macOS App' },
-            { path: path.join(safariProjectDir, projectName, 'iOS (Extension)', 'Info.plist'), type: 'iOS Extension' },
-            { path: path.join(safariProjectDir, projectName, 'macOS (Extension)', 'Info.plist'), type: 'macOS Extension' }
+            { path: path.join(safariProjectDir, projectName, projectName, 'Info.plist'), type: 'macOS App' },
+            { path: path.join(safariProjectDir, projectName, `${projectName} Extension`, 'Info.plist'), type: 'macOS Extension' }
         ];
         
         // Update all Info.plist files with consistent versioning
@@ -326,12 +367,6 @@ function configureAppStoreProject(safariProjectDir) {
                             'LSApplicationCategoryType': 'public.app-category.developer-tools'
                         });
                     }
-                    
-                    if (type === 'iOS App') {
-                        Object.assign(baseConfig, {
-                            'MinimumOSVersion': '14.0'
-                        });
-                    }
                 }
                 
                 updateInfoPlist(plistPath, baseConfig);
@@ -355,7 +390,12 @@ function updateInfoPlist(plistPath, updates) {
         
         // Update each key-value pair
         for (const [key, value] of Object.entries(updates)) {
-            if (typeof value === 'string' || typeof value === 'number') {
+            if (typeof value === 'object' && value !== null) {
+                // Skip complex objects for now (NSExtension, etc.)
+                // These are usually already properly configured by the converter
+                log(`⚠️  Skipping complex object update for ${key}`, 'yellow');
+                continue;
+            } else if (typeof value === 'string' || typeof value === 'number') {
                 // Look for existing key and replace its value
                 const keyPattern = new RegExp(`(<key>${key}</key>\\s*<string>)[^<]*(<\\/string>)`, 'g');
                 const keyPatternNumber = new RegExp(`(<key>${key}</key>\\s*<real>)[^<]*(<\\/real>)`, 'g');
@@ -374,7 +414,7 @@ function updateInfoPlist(plistPath, updates) {
                     } else {
                         // Generic replacement - find the key and replace the next value
                         const genericPattern = new RegExp(`(<key>${key}</key>\\s*<[^>]+>)[^<]*(<\\/[^>]+>)`, 'g');
-                        plistContent = plistContent.replace(genericPattern, `<key>${key}</key>\n\t<string>${value}</string>`);
+                        plistContent = plistContent.replace(genericPattern, `$1${value}$2`);
                     }
                 } else {
                     // Add new key before closing </dict>
@@ -448,9 +488,7 @@ function updateSafariExtensionManifest(safariProjectDir) {
         
         const projectName = 'Pinpoint Accessibility Checker';
         const manifestPaths = [
-            path.join(safariProjectDir, projectName, 'Shared (Extension)', 'Resources', 'manifest.json'),
-            path.join(safariProjectDir, projectName, 'iOS (Extension)', 'Resources', 'manifest.json'),
-            path.join(safariProjectDir, projectName, 'macOS (Extension)', 'Resources', 'manifest.json')
+            path.join(safariProjectDir, projectName, `${projectName} Extension`, 'Resources', 'manifest.json')
         ];
         
         // Safari-compliant description (112 characters or fewer)
@@ -617,6 +655,8 @@ function main() {
         
         // Always sync the shared checker source and icons into both extensions before packaging
         syncAccessibilityCheckerSource();
+        syncAxeCoreToExtensions();
+        syncGsapToExtensions();
         syncIconsToExtensions();
 
         // Validate extension directories
@@ -681,6 +721,8 @@ function buildSafariOnly() {
         
         // Sync the shared checker source and icons to Chrome extension (Safari uses Chrome version)
         syncAccessibilityCheckerSource();
+        syncAxeCoreToExtensions();
+        syncGsapToExtensions();
         syncIconsToExtensions();
         
         // Update Chrome manifest version (Safari uses this as source)
@@ -719,6 +761,8 @@ function buildSafariAppStore() {
         
         // Sync the shared checker source and icons to Chrome extension (Safari uses Chrome version)
         syncAccessibilityCheckerSource();
+        syncAxeCoreToExtensions();
+        syncGsapToExtensions();
         syncIconsToExtensions();
         
         // Update Chrome manifest version (Safari uses this as source)

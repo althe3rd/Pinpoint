@@ -9,8 +9,8 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.5.75', // Current version
-            websiteUrl: 'https://pinpoint.heroicpixel.com/', // Main website URL
+            version: '1.5.76', // Current version
+            websiteUrl: 'https://pinpointchecker.com/', // Main website URL
             legacyDomainUrl: 'https://althe3rd.github.io/Pinpoint/', // Legacy domain for transition
             issues: [],
             axeLoaded: false,
@@ -6754,7 +6754,7 @@
                     </div>
                     ${this.legacyDomainUrl ? `
                     <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.3); font-size: 11px; opacity: 0.9;">
-                        <strong>🚀 We've moved!</strong> New domain: <a href="${this.websiteUrl}" target="_blank" style="color: #ffffff; text-decoration: underline;">pinpoint.heroicpixel.com</a><br>
+                        <strong>🚀 We've moved!</strong> New domain: <a href="${this.websiteUrl}" target="_blank" style="color: #ffffff; text-decoration: underline;">pinpointchecker.com</a><br>
                         <span style="font-size: 10px; opacity: 0.8;">Links will automatically redirect to our new home.</span>
                     </div>
                     ` : ''}

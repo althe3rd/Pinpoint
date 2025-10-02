@@ -633,7 +633,7 @@ This creates an App Store ready project with:
 
 ## Support
 
-- **Website**: https://althe3rd.github.io/Pinpoint/
+- **Website**: https://pinpointchecker.com/
 - **GitHub**: https://github.com/althe3rd/Pinpoint
 - **Issues**: Report bugs and feature requests on GitHub
 

@@ -74,13 +74,63 @@ function syncAccessibilityCheckerSource() {
             throw new Error('Source file accessibility-checker.js not found at project root');
         }
 
-        fs.copyFileSync(sourcePath, chromeTarget);
-        fs.copyFileSync(sourcePath, firefoxTarget);
-        log('🔁 Synchronized accessibility-checker.js to extension/chrome/ and extension/firefox/', 'blue');
+        // Read the source file
+        let content = fs.readFileSync(sourcePath, 'utf8');
+        
+        // Remove CDN loading code for Manifest V3 compliance
+        // This makes extensions use bundled code only, while bookmarklet can still use CDN
+        content = stripCDNLoadingForExtensions(content);
+
+        // Write the modified content to extension directories
+        fs.writeFileSync(chromeTarget, content);
+        fs.writeFileSync(firefoxTarget, content);
+        log('🔁 Synchronized accessibility-checker.js to extensions (CDN code stripped for Manifest V3)', 'blue');
     } catch (error) {
         log(`❌ Error syncing accessibility-checker.js to extensions: ${error.message}`, 'red');
         throw error;
     }
+}
+
+function stripCDNLoadingForExtensions(content) {
+    // Remove the loadAxeFromCDN function entirely (multiline match)
+    const cdnFunctionStart = content.indexOf('// Load axe-core from CDN (bookmarklet usage only)');
+    if (cdnFunctionStart !== -1) {
+        // Find the end of the loadAxeFromCDN function
+        let braceCount = 0;
+        let inFunction = false;
+        let functionEnd = cdnFunctionStart;
+        
+        for (let i = cdnFunctionStart; i < content.length; i++) {
+            if (content.substring(i, i + 'loadAxeFromCDN: function()'.length) === 'loadAxeFromCDN: function()') {
+                inFunction = true;
+            }
+            if (inFunction) {
+                if (content[i] === '{') braceCount++;
+                if (content[i] === '}') {
+                    braceCount--;
+                    if (braceCount === 0) {
+                        functionEnd = i + 1;
+                        // Skip any trailing comma and whitespace
+                        while (functionEnd < content.length && (content[functionEnd] === ',' || content[functionEnd] === ' ' || content[functionEnd] === '\n')) {
+                            functionEnd++;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Remove the function
+        content = content.substring(0, cdnFunctionStart) + content.substring(functionEnd);
+    }
+    
+    // Replace CDN fallback calls with error messages
+    content = content.replace(
+        /this\.loadAxeFromCDN\(\);/g,
+        'this.showError(\'Failed to load axe-core from extension bundle. Please try reloading the page or reinstalling the extension.\');'
+    );
+    
+    return content;
 }
 
 function syncAxeCoreToExtensions() {

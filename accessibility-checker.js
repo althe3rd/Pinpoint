@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.5.76', // Current version
+            version: '1.5.77', // Current version
             websiteUrl: 'https://pinpointchecker.com/', // Main website URL
             legacyDomainUrl: 'https://althe3rd.github.io/Pinpoint/', // Legacy domain for transition
             issues: [],
@@ -105,26 +105,27 @@
                 return;
             }
             
-            // Try to load axe-core from local bundle first (for browser extensions)
+            // Try to load axe-core from local extension bundle first (for browser extensions)
             this.tryLoadAxeFromExtension().then(success => {
                 if (success) {
                     this.axeLoaded = true;
                     this.runAxeChecks();
                 } else {
-                    // Fallback to CDN for bookmarklet usage
+                    // If not in extension context, fallback to CDN for bookmarklet usage
                     this.loadAxeFromCDN();
                 }
             }).catch(() => {
-                // Fallback to CDN if extension loading fails
+                // If extension loading fails, fallback to CDN for bookmarklet usage
                 this.loadAxeFromCDN();
             });
         },
 
-        // Try to load axe-core from extension bundle
+        // Try to load axe-core from extension bundle (Manifest V3 compliant)
         tryLoadAxeFromExtension: function() {
             return new Promise((resolve) => {
                 // Check if we're running in a browser extension context
                 if (!chrome || !chrome.runtime || !chrome.runtime.getURL) {
+                    console.log('Not running in browser extension context - will use CDN fallback');
                     resolve(false);
                     return;
                 }
@@ -132,20 +133,28 @@
                 try {
                     const script = document.createElement('script');
                     script.src = chrome.runtime.getURL('axe-core.min.js');
-                    script.onload = () => resolve(true);
-                    script.onerror = () => resolve(false);
+                    script.onload = () => {
+                        console.log('✅ axe-core loaded from extension bundle');
+                        resolve(true);
+                    };
+                    script.onerror = () => {
+                        console.error('❌ Failed to load axe-core from extension bundle');
+                        resolve(false);
+                    };
                     document.head.appendChild(script);
                 } catch (error) {
+                    console.error('Error loading axe-core:', error);
                     resolve(false);
                 }
             });
         },
 
-        // Load axe-core from CDN (bookmarklet fallback)
+        // Load axe-core from CDN (bookmarklet usage only)
         loadAxeFromCDN: function() {
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/axe-core@4.10.3/axe.min.js';
             script.onload = () => {
+                console.log('✅ axe-core loaded from CDN');
                 this.axeLoaded = true;
                 this.runAxeChecks();
             };

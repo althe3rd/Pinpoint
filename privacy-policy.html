@@ -69,10 +69,10 @@
 <body>
     <div class="container">
         <h1>Privacy Policy</h1>
-        <p class="date">Last updated: <strong>January 2025</strong></p>
+        <p class="date">Last updated: <strong>November 14, 2024</strong></p>
         
         <div class="highlight">
-            <strong>TL;DR:</strong> Pinpoint Accessibility Checker processes all data locally in your browser. We don't collect, store, or transmit any of your personal information, website content, or accessibility testing results to external servers.
+            <strong>TL;DR:</strong> Pinpoint Accessibility Checker processes all data 100% locally in your browser. We don't collect, store, or transmit any of your personal information, website content, or accessibility testing results. All code runs entirely offline with no external connections.
         </div>
 
         <h2>1. Introduction</h2>
@@ -103,39 +103,53 @@
 
         <p><strong>Important:</strong> This data never leaves your browser and is automatically deleted if you uninstall the extension or clear your browser data.</p>
 
-        <h2>4. Third-Party Services</h2>
+        <h2>4. Third-Party Libraries</h2>
         
-        <h3>axe-core Library</h3>
-        <p>The extension loads the axe-core accessibility testing library from the official Deque Systems CDN:</p>
+        <h3>axe-core Library (Bundled)</h3>
+        <p>The extension includes the axe-core accessibility testing library (v4.10.3) bundled directly within the extension package:</p>
         <ul>
-            <li><strong>URL:</strong> https://cdnjs.cloudflare.com/ajax/libs/axe-core/</li>
+            <li><strong>Included:</strong> axe-core v4.10.3 by Deque Systems</li>
             <li><strong>Purpose:</strong> Provides the accessibility testing engine</li>
-            <li><strong>Data Shared:</strong> None - the library runs entirely in your browser</li>
-            <li><strong>Privacy Policy:</strong> <a href="https://www.cloudflare.com/privacy/">Cloudflare Privacy Policy</a></li>
+            <li><strong>Location:</strong> Bundled locally with the extension (no external loading)</li>
+            <li><strong>Data Shared:</strong> None - runs entirely offline in your browser</li>
+            <li><strong>Network Connections:</strong> Zero - no communication with external servers</li>
         </ul>
+        
+        <p><strong>Note:</strong> As of version 1.5.76+, the extension is fully self-contained with all dependencies bundled locally to comply with Manifest V3 requirements and maximize user privacy.</p>
 
         <h2>5. Permissions Explanation</h2>
         <p>The extension requests the following browser permissions:</p>
         
         <h3>activeTab</h3>
-        <p>Allows the extension to run accessibility tests on the currently active tab when you click the extension icon.</p>
+        <p><strong>Why needed:</strong> Allows the extension to run accessibility tests on the currently active tab when you click the extension icon.</p>
+        <p><strong>Data access:</strong> Reads page content to analyze accessibility issues.</p>
+        <p><strong>Privacy impact:</strong> Content is analyzed locally and never transmitted.</p>
         
-        <h3>storage</h3>
-        <p>Stores your preferences locally in your browser (never transmitted to external servers).</p>
+        <h3>scripting</h3>
+        <p><strong>Why needed:</strong> Injects the accessibility testing scripts into web pages.</p>
+        <p><strong>Data access:</strong> Executes analysis code on the current page.</p>
+        <p><strong>Privacy impact:</strong> All processing happens in your browser only.</p>
         
         <h3>contextMenus</h3>
-        <p>Adds a right-click menu option to run accessibility tests (for improved accessibility and user choice).</p>
+        <p><strong>Why needed:</strong> Adds a right-click menu option to run accessibility tests.</p>
+        <p><strong>Data access:</strong> None - only adds menu interface.</p>
+        <p><strong>Privacy impact:</strong> Zero - purely for user convenience.</p>
         
-        <h3>host_permissions</h3>
-        <p>Allows the extension to test accessibility on any website you choose to analyze.</p>
+        <h3>commands</h3>
+        <p><strong>Why needed:</strong> Enables keyboard shortcuts (Ctrl+Shift+A / Cmd+Shift+A).</p>
+        <p><strong>Data access:</strong> None - only keyboard event handling.</p>
+        <p><strong>Privacy impact:</strong> Zero - purely for accessibility features.</p>
 
         <h2>6. Data Security</h2>
-        <p>Since all processing happens locally in your browser:</p>
+        <p>Since all processing happens locally in your browser with no external connections:</p>
         <ul>
-            <li>No data transmission to external servers</li>
-            <li>No risk of data breaches or unauthorized access</li>
-            <li>Complete control over your data</li>
-            <li>No accounts, logins, or authentication required</li>
+            <li><strong>Zero network requests</strong> - Extension operates completely offline</li>
+            <li><strong>No data transmission</strong> - Nothing sent to external servers</li>
+            <li><strong>No tracking or analytics</strong> - We don't know you're using the extension</li>
+            <li><strong>No risk of data breaches</strong> - Your data never leaves your device</li>
+            <li><strong>Complete control</strong> - You own all data on your local machine</li>
+            <li><strong>No accounts required</strong> - No logins, registrations, or authentication</li>
+            <li><strong>Manifest V3 compliant</strong> - Follows strictest browser security standards</li>
         </ul>
 
         <h2>7. Children's Privacy</h2>
@@ -163,11 +177,25 @@
         <h2>12. Compliance</h2>
         <p>This extension is designed to comply with:</p>
         <ul>
-            <li><strong>GDPR:</strong> No personal data processing</li>
-            <li><strong>CCPA:</strong> No personal information collection</li>
-            <li><strong>Chrome Web Store Policies:</strong> Transparent permission usage</li>
-            <li><strong>Privacy by Design:</strong> Local processing ensures user privacy</li>
+            <li><strong>GDPR (General Data Protection Regulation):</strong> No personal data processing or collection</li>
+            <li><strong>CCPA (California Consumer Privacy Act):</strong> No personal information collection</li>
+            <li><strong>Chrome Web Store Policies:</strong> Transparent permission usage and data practices</li>
+            <li><strong>Firefox Add-ons Policies:</strong> Privacy-focused, locally processed data only</li>
+            <li><strong>Manifest V3:</strong> Latest extension security and privacy standards</li>
+            <li><strong>Privacy by Design:</strong> Local-only processing ensures maximum user privacy</li>
         </ul>
+        
+        <h2>13. Summary</h2>
+        <div class="highlight">
+            <p><strong>Bottom Line:</strong> Pinpoint Accessibility Checker is a privacy-first extension that:</p>
+            <ul style="margin-bottom: 0;">
+                <li>✅ Collects ZERO personal data</li>
+                <li>✅ Makes ZERO network requests</li>
+                <li>✅ Stores data ONLY locally in your browser</li>
+                <li>✅ Is completely open source for transparency</li>
+                <li>✅ Complies with all major privacy regulations</li>
+            </ul>
+        </div>
     </div>
 </body>
 </html>

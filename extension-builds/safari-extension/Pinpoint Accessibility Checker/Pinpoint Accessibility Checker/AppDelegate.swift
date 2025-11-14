@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  Pinpoint Accessibility Checker
 //
-//  Created by Al Nemec on 11/11/25.
+//  Created by Al Nemec on 11/14/25.
 //
 
 import Cocoa

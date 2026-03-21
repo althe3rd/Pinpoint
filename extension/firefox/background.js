@@ -34,11 +34,10 @@ extensionAPI.browserAction.onClicked.addListener(async (tab) => {
             tab.url.startsWith('file://')) {
             
             // Show notification for restricted pages
-            extensionAPI.browserAction.setBadgeText({ text: '!', tabId: tab.id });
-            extensionAPI.browserAction.setBadgeBackgroundColor({ color: '#dc3545', tabId: tab.id });
+            await safeSetBadge('!', '#dc3545', tab.id);
             
             setTimeout(() => {
-                extensionAPI.browserAction.setBadgeText({ text: '', tabId: tab.id });
+                safeSetBadge('', null, tab.id);
             }, 3000);
             
             return;
@@ -51,22 +50,20 @@ extensionAPI.browserAction.onClicked.addListener(async (tab) => {
         });
         
         // Show success badge temporarily
-        extensionAPI.browserAction.setBadgeText({ text: '✓', tabId: tab.id });
-        extensionAPI.browserAction.setBadgeBackgroundColor({ color: '#28a745', tabId: tab.id });
+        await safeSetBadge('✓', '#28a745', tab.id);
         
         setTimeout(() => {
-            extensionAPI.browserAction.setBadgeText({ text: '', tabId: tab.id });
+            safeSetBadge('', null, tab.id);
         }, 3000);
         
     } catch (error) {
         console.error('Error handling toolbar click:', error);
         
         // Show error badge
-        extensionAPI.browserAction.setBadgeText({ text: '!', tabId: tab.id });
-        extensionAPI.browserAction.setBadgeBackgroundColor({ color: '#dc3545', tabId: tab.id });
+        await safeSetBadge('!', '#dc3545', tab.id);
         
         setTimeout(() => {
-            extensionAPI.browserAction.setBadgeText({ text: '', tabId: tab.id });
+            safeSetBadge('', null, tab.id);
         }, 3000);
     }
 });
@@ -104,6 +101,25 @@ extensionAPI.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; // Keep message channel open for async response
 });
 
+// Safe badge setting that handles closed tabs (Firefox version)
+async function safeSetBadge(text, color, tabId) {
+    try {
+        // Check if tab still exists
+        await extensionAPI.tabs.get(tabId);
+        
+        // Set badge text
+        await extensionAPI.browserAction.setBadgeText({ text: text, tabId: tabId });
+        
+        // Set badge color if provided
+        if (color) {
+            await extensionAPI.browserAction.setBadgeBackgroundColor({ color: color, tabId: tabId });
+        }
+    } catch (error) {
+        // Tab no longer exists, silently ignore
+        console.log(`Tab ${tabId} no longer exists, skipping badge update`);
+    }
+}
+
 // Show welcome message to active tab
 async function showWelcomeMessage() {
     try {
@@ -118,12 +134,14 @@ async function showWelcomeMessage() {
             // Wait a moment for content script to load
             setTimeout(async () => {
                 try {
+                    // Check if tab still exists before sending message
+                    await extensionAPI.tabs.get(tab.id);
                     await extensionAPI.tabs.sendMessage(tab.id, {
                         action: 'showWelcome'
                     });
                 } catch (error) {
-                    // Content script might not be ready yet, that's okay
-                    console.log('Welcome message not sent - content script not ready');
+                    // Content script might not be ready yet or tab closed, that's okay
+                    console.log('Welcome message not sent - content script not ready or tab closed');
                 }
             }, 1000);
         }
@@ -136,7 +154,7 @@ async function showWelcomeMessage() {
 extensionAPI.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (changeInfo.status === 'loading') {
         // Clear any existing badges when page starts loading
-        extensionAPI.browserAction.setBadgeText({ text: '', tabId: tabId });
+        safeSetBadge('', null, tabId);
     }
 });
 

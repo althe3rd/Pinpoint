@@ -41,6 +41,8 @@ function validateExtensionFiles(extensionDir) {
         'popup.js',
         'background.js',
         'accessibility-checker.js',
+        'axe-core.min.js',
+        'gsap.min.js',
         'icons/icon-16.png',
         'icons/icon-32.png',
         'icons/icon-48.png',
@@ -77,6 +79,44 @@ function syncAccessibilityCheckerSource() {
         log('🔁 Synchronized accessibility-checker.js to extension/chrome/ and extension/firefox/', 'blue');
     } catch (error) {
         log(`❌ Error syncing accessibility-checker.js to extensions: ${error.message}`, 'red');
+        throw error;
+    }
+}
+
+function syncAxeCoreToExtensions() {
+    try {
+        const axeSourcePath = path.resolve('node_modules/axe-core/axe.min.js');
+        const chromeTarget = path.resolve('extension/chrome/axe-core.min.js');
+        const firefoxTarget = path.resolve('extension/firefox/axe-core.min.js');
+
+        if (!fs.existsSync(axeSourcePath)) {
+            throw new Error('axe-core not found in node_modules. Run npm install axe-core first.');
+        }
+
+        fs.copyFileSync(axeSourcePath, chromeTarget);
+        fs.copyFileSync(axeSourcePath, firefoxTarget);
+        log('📦 Bundled axe-core.min.js to extension/chrome/ and extension/firefox/', 'blue');
+    } catch (error) {
+        log(`❌ Error bundling axe-core to extensions: ${error.message}`, 'red');
+        throw error;
+    }
+}
+
+function syncGsapToExtensions() {
+    try {
+        const gsapSourcePath = path.resolve('node_modules/gsap/dist/gsap.min.js');
+        const chromeTarget = path.resolve('extension/chrome/gsap.min.js');
+        const firefoxTarget = path.resolve('extension/firefox/gsap.min.js');
+
+        if (!fs.existsSync(gsapSourcePath)) {
+            throw new Error('GSAP not found in node_modules. Run npm install gsap first.');
+        }
+
+        fs.copyFileSync(gsapSourcePath, chromeTarget);
+        fs.copyFileSync(gsapSourcePath, firefoxTarget);
+        log('🎬 Bundled gsap.min.js to extension/chrome/ and extension/firefox/', 'blue');
+    } catch (error) {
+        log(`❌ Error bundling GSAP to extensions: ${error.message}`, 'red');
         throw error;
     }
 }
@@ -617,6 +657,8 @@ function main() {
         
         // Always sync the shared checker source and icons into both extensions before packaging
         syncAccessibilityCheckerSource();
+        syncAxeCoreToExtensions();
+        syncGsapToExtensions();
         syncIconsToExtensions();
 
         // Validate extension directories
@@ -681,6 +723,8 @@ function buildSafariOnly() {
         
         // Sync the shared checker source and icons to Chrome extension (Safari uses Chrome version)
         syncAccessibilityCheckerSource();
+        syncAxeCoreToExtensions();
+        syncGsapToExtensions();
         syncIconsToExtensions();
         
         // Update Chrome manifest version (Safari uses this as source)
@@ -719,6 +763,8 @@ function buildSafariAppStore() {
         
         // Sync the shared checker source and icons to Chrome extension (Safari uses Chrome version)
         syncAccessibilityCheckerSource();
+        syncAxeCoreToExtensions();
+        syncGsapToExtensions();
         syncIconsToExtensions();
         
         // Update Chrome manifest version (Safari uses this as source)

@@ -183,7 +183,7 @@ All permissions are required for core functionality and are used responsibly.
 ## 📞 Support
 
 - **GitHub Issues**: [Report bugs and feature requests](https://github.com/althe3rd/Pinpoint/issues)
-- **Website**: [https://althe3rd.github.io/Pinpoint/](https://althe3rd.github.io/Pinpoint/)
+- **Website**: [https://pinpointchecker.com/](https://pinpointchecker.com/)
 - **Documentation**: See project README.md for bookmarklet version
 
 ---

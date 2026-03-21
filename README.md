@@ -168,7 +168,7 @@ When you're ready to release a new version:
 
 MIT License
 
-**Live Demo**: [Visit Pinpoint Accessibility Checker](https://your-username.github.io/Pinpoint/)
+**Live Demo**: [Visit Pinpoint Accessibility Checker](https://pinpointchecker.com/)
 
 ## Features
 
@@ -183,7 +183,7 @@ MIT License
 ## Quick Start
 
 ### Option 1: Live Website (Recommended)
-Visit the [Pinpoint Accessibility Checker](https://your-username.github.io/Pinpoint/) and drag the bookmarklet to your bookmarks bar.
+Visit the [Pinpoint Accessibility Checker](https://pinpointchecker.com/) and drag the bookmarklet to your bookmarks bar.
 
 ### Option 2: Manual Installation
 1. Copy the bookmarklet code from the website

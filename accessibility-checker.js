@@ -111,12 +111,19 @@
                     this.axeLoaded = true;
                     this.runAxeChecks();
                 } else {
-                    // Fallback to CDN for bookmarklet usage
-                    this.loadAxeFromCDN();
+                    // Fallback to CDN for bookmarklet usage (not permitted in MV3 extensions)
+                    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) {
+                        this.showError('Failed to load axe-core from extension bundle. Please try reloading the page or reinstalling the extension.');
+                    } else {
+                        this.loadAxeFromCDN();
+                    }
                 }
             }).catch(() => {
-                // Fallback to CDN if extension loading fails
-                this.loadAxeFromCDN();
+                if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) {
+                    this.showError('Failed to load axe-core from extension bundle. Please try reloading the page or reinstalling the extension.');
+                } else {
+                    this.loadAxeFromCDN();
+                }
             });
         },
 
@@ -4507,12 +4514,21 @@
                         console.log('✨ GSAP loaded successfully from extension bundle');
                         resolve(window.gsap);
                     } else {
-                        // Fallback to CDN for bookmarklet usage
-                        this.loadGsapFromCDN().then(resolve).catch(resolve);
+                        // Fallback to CDN for bookmarklet usage (not permitted in MV3 extensions)
+                        if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) {
+                            console.warn('❌ Failed to load GSAP from extension bundle, animations disabled');
+                            resolve(null);
+                        } else {
+                            this.loadGsapFromCDN().then(resolve).catch(resolve);
+                        }
                     }
                 }).catch(() => {
-                    // Fallback to CDN if extension loading fails
-                    this.loadGsapFromCDN().then(resolve).catch(resolve);
+                    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) {
+                        console.warn('❌ Failed to load GSAP from extension bundle, animations disabled');
+                        resolve(null);
+                    } else {
+                        this.loadGsapFromCDN().then(resolve).catch(resolve);
+                    }
                 });
             });
         },

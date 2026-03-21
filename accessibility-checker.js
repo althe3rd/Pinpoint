@@ -1260,7 +1260,45 @@
                     }
                 }
 
-                // Enhanced pixel-based analysis for complex cases
+                // Composite partial-alpha RGBA backgrounds against the nearest solid ancestor.
+                // axe-core can't do this, so it flags them as needing manual review even
+                // when the actual rendered contrast clearly passes.
+                if (bgColor && /^rgba\(/i.test(bgColor)) {
+                    const alphaMatch = bgColor.match(/rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)/i);
+                    if (alphaMatch) {
+                        const alpha = parseFloat(alphaMatch[4]);
+                        if (alpha > 0 && alpha < 1) {
+                            // Walk up to find the nearest solid (non-transparent) ancestor background
+                            let solidAncestor = 'rgb(255, 255, 255)'; // safe fallback
+                            let anc = element.parentElement;
+                            while (anc && anc !== document.documentElement) {
+                                const ancBg = window.getComputedStyle(anc).backgroundColor;
+                                if (ancBg && ancBg !== 'transparent' && ancBg !== 'rgba(0, 0, 0, 0)'
+                                        && !/rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*0\s*\)/i.test(ancBg)) {
+                                    const ancAlphaM = ancBg.match(/rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*([\d.]+)\s*\)/i);
+                                    // Only treat as solid if opaque (or rgb())
+                                    if (!ancAlphaM || parseFloat(ancAlphaM[1]) >= 1) {
+                                        solidAncestor = ancBg;
+                                        break;
+                                    }
+                                }
+                                anc = anc.parentElement;
+                            }
+
+                            const ancMatch = solidAncestor.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+                            if (ancMatch) {
+                                // Porter-Duff over: out = alpha * src + (1-alpha) * dst
+                                const cr = Math.round(parseInt(alphaMatch[1]) * alpha + parseInt(ancMatch[1]) * (1 - alpha));
+                                const cg = Math.round(parseInt(alphaMatch[2]) * alpha + parseInt(ancMatch[2]) * (1 - alpha));
+                                const cb = Math.round(parseInt(alphaMatch[3]) * alpha + parseInt(ancMatch[3]) * (1 - alpha));
+                                bgColor = `rgb(${cr}, ${cg}, ${cb})`;
+                                analysisMethod = 'dom-compositing';
+                            }
+                        }
+                    }
+                }
+
+                // Enhanced pixel-based analysis for complex cases (gradients, images, etc.)
                 const pixelAnalysis = this.analyzeElementPixels(element);
                 if (pixelAnalysis && pixelAnalysis.isMoreAccurate) {
                     fgColor = pixelAnalysis.foreground;
@@ -1848,7 +1886,7 @@
                 const contrastBuffer = 0.3;
                 const meetsRequirement = contrastValue >= (requiredContrast + contrastBuffer);
 
-                if (meetsRequirement && colorInfo.analysisMethod === 'pixel-analysis') {
+                if (meetsRequirement && (colorInfo.analysisMethod === 'pixel-analysis' || colorInfo.analysisMethod === 'dom-compositing')) {
                     console.log(`Auto-resolving contrast issue for element:`, {
                         selector: node.target?.join(' '),
                         measured: contrastValue,
@@ -1911,7 +1949,7 @@
                 const contrastBuffer = 0.3;
                 const meetsRequirement = contrastValue >= (requiredContrast + contrastBuffer);
 
-                if (meetsRequirement && colorInfo.analysisMethod === 'pixel-analysis') {
+                if (meetsRequirement && (colorInfo.analysisMethod === 'pixel-analysis' || colorInfo.analysisMethod === 'dom-compositing')) {
                     console.log(`Auto-resolving contrast violation for element:`, {
                         selector: node.target?.join(' '),
                         measured: contrastValue,

@@ -3211,8 +3211,7 @@
 
                 /* Chrome, Edge, and Safari */
                 *::-webkit-scrollbar {
-                    width: 8px;
-                   
+                    width: 5px;
                 }
 
                 *::-webkit-scrollbar-track {
@@ -3220,9 +3219,8 @@
                 }
 
                 *::-webkit-scrollbar-thumb {
-                    background-color:rgb(188, 188, 188);
-                    border-radius: 10px;
-                   
+                    background-color: rgba(0,0,0,0.18);
+                    border-radius: 50rem;
                 }
 
                 #uw-a11y-wrapper {
@@ -3309,7 +3307,6 @@
 
                 /* Settings styles */
                 .uw-a11y-settings { margin-bottom: 3rem; }
-                .uw-a11y-settings h3 { margin: 0 0 .5rem 0; }
                 .uw-a11y-form-row { margin: .75rem 0; }
                 .uw-a11y-input { width: 80%; padding: 8px 14px; border-radius: 6px; border: 1px solid #cbd3da; font-size: 14px; border-radius: 50rem; }
                 .uw-a11y-helptext { font-size: 12px; color: #555; margin-top: 4px; }
@@ -3322,13 +3319,177 @@
                 .uw-a11y-msg.ok { color: #155724; }
                 .uw-a11y-msg.err { color: #721c24; }
 
-                #uw-a11y-panel {
-                    
-                    background: rgba(239, 239, 239, 0.9);
-                    border: 1px solid rgba(255,255,255,0.85);
+                /* ── Toggle switch (used for sound preference) ── */
+                .uw-a11y-pref-row {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 12px 14px;
+                    background: rgba(255,255,255,0.75);
+                    border: 1px solid rgba(0,0,0,0.07);
                     border-radius: 12px;
-                    backdrop-filter: blur(12px);
-                    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+                    margin: .75rem 0;
+                    grid-gap: 1rem;
+                }
+                .uw-a11y-pref-label {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
+                }
+                .uw-a11y-pref-label strong { font-size: 13px; color: #111; }
+                .uw-a11y-pref-label span { font-size: 11px; color: #666; }
+                .uw-a11y-toggle {
+                    position: relative;
+                    display: inline-block;
+                    width: 44px;
+                    height: 24px;
+                    flex-shrink: 0;
+                }
+                .uw-a11y-toggle input {
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                    position: absolute;
+                }
+                .uw-a11y-toggle-slider {
+                    position: absolute;
+                    inset: 0;
+                    background: #ccc;
+                    border-radius: 50rem;
+                    cursor: pointer;
+                    transition: background 0.2s;
+                }
+                .uw-a11y-toggle-slider::before {
+                    content: '';
+                    position: absolute;
+                    width: 18px;
+                    height: 18px;
+                    left: 3px;
+                    top: 3px;
+                    background: white;
+                    border-radius: 50%;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+                    transition: transform 0.2s;
+                }
+                .uw-a11y-toggle input:checked + .uw-a11y-toggle-slider {
+                    background: #28a745;
+                }
+                .uw-a11y-toggle input:checked + .uw-a11y-toggle-slider::before {
+                    transform: translateX(20px);
+                }
+                .uw-a11y-toggle input:focus-visible + .uw-a11y-toggle-slider {
+                    outline: 2px solid #007cba;
+                    outline-offset: 2px;
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    .uw-a11y-toggle-slider,
+                    .uw-a11y-toggle-slider::before { transition: none; }
+                }
+
+                /* ── Settings card layout ── */
+                .uw-a11y-settings h3 { margin: 0 0 1rem; font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
+                .uw-a11y-section-divider {
+                    font-size: 10px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.08em;
+                    color: #888;
+                    margin: 1.25rem 0 0.5rem;
+                    padding-bottom: 7px;
+                    border-bottom: 1px solid rgba(0,0,0,0.08);
+                }
+                .uw-a11y-setting-card {
+                    background: rgba(255,255,255,0.78);
+                    border: 1px solid rgba(0,0,0,0.07);
+                    border-radius: 12px;
+                    padding: 14px 16px;
+                    margin: 0.55rem 0;
+                }
+                .uw-a11y-setting-label {
+                    display: block;
+                    font-size: 11px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.06em;
+                    color: #666;
+                    margin-bottom: 8px;
+                }
+                .uw-a11y-setting-card .uw-a11y-input {
+                    width: 100%;
+                    box-sizing: border-box;
+                    background: white;
+                    border: 1px solid rgba(0,0,0,0.13);
+                    padding: 9px 13px;
+                    border-radius: 8px;
+                    font-size: 13px;
+                    font-family: inherit;
+                    color: #111;
+                    transition: border-color 0.15s, box-shadow 0.15s;
+                    appearance: none;
+                }
+                .uw-a11y-setting-card .uw-a11y-input:focus {
+                    outline: none;
+                    border-color: #007cba;
+                    box-shadow: 0 0 0 3px rgba(0,124,186,0.14);
+                }
+                .uw-a11y-setting-card select.uw-a11y-input {
+                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 10'%3E%3Cpath fill='%23666' d='M8 10 0 0h16z'/%3E%3C/svg%3E");
+                    background-repeat: no-repeat;
+                    background-position: right 13px center;
+                    background-size: 10px 6px;
+                    padding-right: 34px;
+                    cursor: pointer;
+                }
+                .uw-a11y-settings-2col {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 10px;
+                }
+                .uw-a11y-setting-card .uw-a11y-helptext { margin-top: 8px; }
+                .uw-a11y-actions-bar {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    margin-top: 0.75rem;
+                    padding: 12px 14px;
+                    background: rgba(13,110,253,0.05);
+                    border: 1px solid rgba(13,110,253,0.18);
+                    border-radius: 12px;
+                    animation: uw-a11y-fadein 0.18s ease;
+                }
+                .uw-a11y-actions-bar[hidden] { display: none; }
+                .uw-a11y-actions-bar .uw-a11y-btn {
+                    white-space: nowrap;
+                    padding: 7px 14px;
+                    font-size: 13px;
+                    border-radius: 8px;
+                }
+                .uw-a11y-actions-bar .uw-a11y-btn.primary {
+                    background: #0d6efd;
+                    border-color: #0d6efd;
+                    color: #fff;
+                }
+                .uw-a11y-actions-bar .uw-a11y-msg {
+                    margin: 0;
+                    flex: 1;
+                    text-align: right;
+                    font-size: 12px;
+                }
+                @keyframes uw-a11y-fadein {
+                    from { opacity: 0; transform: translateY(-4px); }
+                    to   { opacity: 1; transform: translateY(0); }
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    .uw-a11y-actions-bar { animation: none; }
+                }
+
+                #uw-a11y-panel {
+
+                    background: rgba(252, 253, 255, 0.97);
+                    border: 1px solid rgba(255,255,255,0.92);
+                    border-radius: 18px;
+                    backdrop-filter: blur(28px) saturate(180%);
+                    box-shadow: 0 24px 64px rgba(0,0,0,0.16), 0 4px 16px rgba(0,0,0,0.07);
                     z-index: 999999;
                     font-family: "Red Hat Display", "Red Hat Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
                     font-size: 14px;
@@ -3435,10 +3596,11 @@
                 }
 
                 .violationtype {
-                    margin-bottom: 0.5rem;
+                    margin-bottom: 0.75rem;
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
+                    padding: 3px 0;
                 }
                 #uw-a11y-panel .info-with-tooltip {
                     display: inline-flex;
@@ -3448,18 +3610,20 @@
                 }
                 #uw-a11y-panel .info-btn {
                     background: white;
-                    border: 1px solid rgba(0,0,0,0.2);
-                    color: #333;
-                    width: 18px;
-                    height: 18px;
+                    border: 1px solid rgba(0,0,0,0.15);
+                    color: #555;
+                    width: 20px;
+                    height: 20px;
                     border-radius: 50%;
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
-                    font-size: 12px;
+                    font-size: 11px;
                     line-height: 1;
                     cursor: pointer;
                     padding: 0;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+                    transition: background 0.15s;
                 }
                 #uw-a11y-panel .info-btn:focus {
                     outline: 2px solid #007cba;
@@ -3545,7 +3709,7 @@
                 }
                 #uw-a11y-panel #uw-a11y-header {
                     color: #000;
-                    padding: 12px 16px;
+                    padding: 14px 18px;
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
@@ -3582,14 +3746,14 @@
                     font-weight: bold;
                 }
                 #uw-a11y-panel #uw-a11y-close, #uw-a11y-panel #uw-a11y-minimize {
-                    background: none;
+                    background: rgba(0,0,0,0.06);
                     border: none;
-                    color: black;
-                    font-size: 18px;
+                    color: #333;
+                    font-size: 16px;
                     cursor: pointer;
                     padding: 0;
-                    width: 24px;
-                    height: 24px;
+                    width: 32px;
+                    height: 32px;
                     border-radius: 50%;
                     display: flex;
                     align-items: center;
@@ -3598,7 +3762,7 @@
                 }
                 
                 #uw-a11y-panel #uw-a11y-close:hover, #uw-a11y-panel #uw-a11y-minimize:hover {
-                    background: rgba(255,255,255,0.2);
+                    background: rgba(0,0,0,0.12);
                 }
                 
                 #uw-a11y-panel #uw-a11y-close:focus, #uw-a11y-panel #uw-a11y-minimize:focus {
@@ -3611,7 +3775,7 @@
                 #uw-a11y-panel #uw-a11y-content {
                     max-height: calc(85vh - 60px);
                     overflow-y: auto;
-                    padding: 16px;
+                    padding: 20px;
                     transition: height 0.4s ease-in-out;
                     box-sizing: border-box;
                 }
@@ -3675,25 +3839,25 @@
                     }
                 }
                 #uw-a11y-panel #uw-a11y-summary {
-                    background: #f8f9fa;
-                    /*border: 1px solid #dee2e6;*/
-                    box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.12);
-                    border-radius: 10px;
-                    padding: 10px;
+                    background: rgba(255,255,255,0.88);
+                    border: 1px solid rgba(0,0,0,0.06);
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+                    border-radius: 14px;
+                    padding: 18px;
                     margin-bottom: 16px;
-                    
+
                 }
                 #uw-a11y-panel .uw-a11y-issue {
-                    margin-bottom: 18px;
-                    padding: 12px;
-                    border-left: 4px solid #ffc107;
-                    background: #fff3cd;
-                    border-radius: 8px;
+                    margin-bottom: 14px;
+                    padding: 16px;
+                    border-left: 3px solid #f0a500;
+                    background: #fdfaf0;
+                    border-radius: 14px;
                     cursor: pointer;
-                    transition: all 0.2s ease;
+                    transition: box-shadow 0.2s ease, transform 0.15s ease;
                     position: relative;
                     outline: none;
-                    
+
                 }
                 
                 /* Hover states for different issue types */
@@ -3764,24 +3928,26 @@
                     background: #c3e6cb !important;
                 }
                #uw-a11y-panel .uw-a11y-issue.error {
-                    border-left-color: #dc3545;
-                    background: #f9ebecff;
-                    box-shadow: 0 2px 10px 0 rgba(211, 23, 41, 0.22);
+                    border-left-color: #e53e51;
+                    background: #fdf4f5;
+                    box-shadow: 0 2px 12px rgba(211, 23, 41, 0.1);
                 }
                 #uw-a11y-panel .uw-a11y-issue.warning {
-                    border-left-color: #ffc107;
-                    background: #fffbecff;
-                    box-shadow: 0 2px 10px 0 rgba(211, 133, 23, 0.22);
+                    border-left-color: #f0a500;
+                    background: #fdfaf0;
+                    box-shadow: 0 2px 12px rgba(211, 133, 23, 0.1);
                 }
                 #uw-a11y-panel .uw-a11y-issue.info {
                     border-left-color: #17a2b8;
-                    background: #e5f4f7ff;
-                    box-shadow: 0 2px 10px 0 rgba(23, 104, 211, 0.22);
+                    background: #f3fafc;
+                    box-shadow: 0 2px 12px rgba(23, 104, 211, 0.1);
                 }
                 #uw-a11y-panel .uw-a11y-issue h4 {
-                    margin: 0 0 8px 0;
+                    margin: 0 0 10px 0;
                     font-size: 14px;
-                    font-weight: bold;
+                    font-weight: 700;
+                    line-height: 1.4;
+                    letter-spacing: -0.01em;
                 }
                  
                  #uw-a11y-panel .uw-a11y-issue-header {
@@ -3861,17 +4027,18 @@
                 }
 
                 #uw-a11y-panel .uw-a11y-issue .how-to-fix {
-                    margin-top: 8px;
-                    border-radius: 4px;
-                    background: rgb(241, 241, 241);
-                    padding: 8px;
+                    margin-top: 12px;
+                    border-radius: 10px;
+                    background: rgba(255,255,255,0.72);
+                    padding: 12px 14px;
                     font-size: 13px;
-                    color: #212529;
-                    font-weight: 500;
-                    border-left: 4px solid rgb(51, 141, 214);
+                    line-height: 1.55;
+                    color: #1a1a2e;
+                    font-weight: 400;
+                    border-left: 3px solid rgb(51, 141, 214);
                     display: flex;
-                    align-items: center;
-                    gap: 8px;
+                    align-items: flex-start;
+                    gap: 10px;
                 }
 
                 #uw-a11y-panel .uw-a11y-issue .how-to-fix-icon {
@@ -3906,16 +4073,17 @@
                 #uw-a11y-panel .filter-toggle[aria-pressed="false"] .icon-eye { display: none; }
                 #uw-a11y-panel .filter-toggle[aria-pressed="false"] .icon-eye-off { display: inline; }
                 #uw-a11y-panel .filter-toggle {
-                    background: none;
-                    border: 1px solid rgba(0,0,0,0.15);
-                    border-radius: 6px;
-                    padding: 2px 6px;
+                    background: rgba(255,255,255,0.7);
+                    border: 1px solid rgba(0,0,0,0.12);
+                    border-radius: 8px;
+                    padding: 5px 10px;
                     cursor: pointer;
                     color: #333;
                     display: inline-flex;
                     align-items: center;
                     gap: 6px;
                     font-size: 12px;
+                    transition: background 0.15s;
                 }
                 #uw-a11y-panel .filter-toggle:hover {
                     background: rgba(0,0,0,0.05);
@@ -3929,11 +4097,11 @@
                 }
                 #uw-a11y-panel .filter-icon { width: 16px; height: 16px; }
                 #uw-a11y-panel .uw-a11y-manual-check {
-                    margin: 8px 0;
-                    padding: 8px;
-                    background: #f8f9fa;
-                    border-radius: 4px;
-                    border: 1px solid #dee2e6;
+                    margin: 12px 0;
+                    padding: 12px 14px;
+                    background: rgba(255,255,255,0.75);
+                    border-radius: 10px;
+                    border: 1px solid rgba(0,0,0,0.08);
                 }
                 #uw-a11y-panel .uw-a11y-checkbox {
                     display: flex;
@@ -3942,9 +4110,11 @@
                     font-size: 13px;
                 }
                 #uw-a11y-panel .uw-a11y-checkbox input[type="checkbox"] {
-                    margin-right: 8px;
-                    width: 16px;
-                    height: 16px;
+                    margin-right: 10px;
+                    width: 18px;
+                    height: 18px;
+                    accent-color: #28a745;
+                    cursor: pointer;
                 }
                 #uw-a11y-panel .uw-a11y-issue.checked {
                     opacity: 0.7;
@@ -3981,11 +4151,12 @@
                 }
                 #uw-a11y-panel .uw-a11y-score-container {
                     text-align: center;
-                    margin: 1rem 0;
-                    padding: 1rem;
-                    background: #f8f9fa;
-                    border-radius: 8px;
-                    border: 2px solid #e9ecef;
+                    margin: 0.5rem 0 1rem;
+                    padding: 1.25rem 1rem;
+                    background: rgba(255,255,255,0.75);
+                    border-radius: 12px;
+                    border: 1px solid rgba(0,0,0,0.05);
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
                 }
                 #uw-a11y-panel .uw-a11y-score-dial {
                     position: relative;
@@ -4004,8 +4175,8 @@
                     position: relative;
                 }
                 #uw-a11y-panel .uw-a11y-score-inner {
-                    width: 90px;
-                    height: 90px; 
+                    width: 92px;
+                    height: 92px;
                     background: white;
                     border-radius: 50%;
                     display: flex;
@@ -4013,10 +4184,13 @@
                     justify-content: center;
                     flex-direction: column;
                     font-weight: bold;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
                 }
                 #uw-a11y-panel .uw-a11y-score-number {
-                    font-size: 24px;
-                    color: #333;
+                    font-size: 28px;
+                    font-weight: 800;
+                    color: #111;
+                    letter-spacing: -0.03em;
                 }
                 #uw-a11y-panel .uw-a11y-score-label {
                     font-size: 10px;
@@ -4065,13 +4239,15 @@
                 }
                 #uw-a11y-panel .uw-a11y-details-toggle {
                     display: block;
-                    background: rgba(0,0,0,0.12);
-                    border: 1px solid rgba(0,0,0,0.3);
+                    background: rgba(0,0,0,0.06);
+                    border: 1px solid rgba(0,0,0,0.1);
                     border-radius: 50rem;
-                    padding: 4px 8px;
-                    color:rgb(28, 28, 28);
+                    padding: 6px 14px;
+                    color: rgb(44, 44, 60);
                     cursor: pointer;
                     font-size: 12px;
+                    font-weight: 500;
+                    transition: background 0.15s, transform 0.1s;
                     text-decoration: none;
                     backdrop-filter: saturate(250%);
                     margin-top: 0.5rem;
@@ -4112,46 +4288,54 @@
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    margin-top: -12px;
-                    margin-left: -12px;
-                    margin-right: -12px;
-                    margin-bottom: 10px;
-                    padding: 8px;
-                    background: rgba(0,0,0,0.1);
-                    backdrop-filter: saturate(200%);
-                    border-top-right-radius: 4px;
+                    margin-top: -16px;
+                    margin-left: -16px;
+                    margin-right: -16px;
+                    margin-bottom: 14px;
+                    padding: 10px 14px;
+                    background: rgba(0,0,0,0.055);
+                    border-bottom: 1px solid rgba(0,0,0,0.07);
+                    border-top-left-radius: 12px;
+                    border-top-right-radius: 12px;
                     font-size: 12px;
                 }
                 #uw-a11y-panel .uw-a11y-instance-count {
-                    font-weight: bold;
-                    color: #495057;
+                    font-weight: 600;
+                    color: #444;
+                    letter-spacing: 0.01em;
                 }
                 #uw-a11y-panel .uw-a11y-nav-buttons {
                     display: flex;
-                    gap: 4px;
+                    gap: 6px;
                 }
                 #uw-a11y-panel .uw-a11y-nav-buttons button {
-                    background:rgba(0,0,0,0.4);
-                    backdrop-filter: saturate(200%);
+                    background: rgba(0,0,0,0.5);
                     color: white;
                     border: none;
-                    padding: 4px 8px;
-                    border-radius: 3px;
+                    padding: 5px 13px;
+                    border-radius: 50rem;
                     font-size: 11px;
+                    font-weight: 600;
                     cursor: pointer;
-                    transition: background 0.2s;
+                    transition: background 0.15s, transform 0.1s;
+                    letter-spacing: 0.02em;
                 }
                 #uw-a11y-panel .uw-a11y-nav-buttons button:hover:not(:disabled) {
-                    background:rgba(0,0,0,0.4);
+                    background: rgba(0,0,0,0.72);
+                    transform: translateY(-1px);
                 }
-                                        #uw-a11y-panel .uw-a11y-nav-buttons button:disabled {
-                    background:rgba(0,0,0,0.1);
+                #uw-a11y-panel .uw-a11y-nav-buttons button:active:not(:disabled) {
+                    transform: translateY(0);
+                }
+                #uw-a11y-panel .uw-a11y-nav-buttons button:disabled {
+                    background: rgba(0,0,0,0.15);
+                    color: rgba(255,255,255,0.45);
                     cursor: not-allowed;
                 }
-                
+
                 #uw-a11y-panel .uw-a11y-nav-buttons button:focus {
                     outline: 2px solid #007cba;
-                    outline-offset: 1px;
+                    outline-offset: 2px;
                 }
                 
                 /* Details toggle button focus */
@@ -5690,54 +5874,119 @@
             wrap.innerHTML = `
                 <div class="uw-a11y-settings" role="region" aria-labelledby="uw-a11y-settings-heading">
                     <h3 id="uw-a11y-settings-heading">Settings</h3>
-                    <div class="uw-a11y-form-row">
-                        <label for="uw-a11y-exclude-input"><strong>Exclude Selectors</strong></label>
-                        <input id="uw-a11y-exclude-input" class="uw-a11y-input" type="text" value="${this.escapeHtmlAttr(current)}" aria-describedby="uw-a11y-exclude-help">
+
+                    <p class="uw-a11y-section-divider">Scanning</p>
+
+                    <div class="uw-a11y-setting-card">
+                        <label for="uw-a11y-exclude-input" class="uw-a11y-setting-label">Exclude Selectors</label>
+                        <input id="uw-a11y-exclude-input" class="uw-a11y-input" type="text" value="${this.escapeHtmlAttr(current)}" aria-describedby="uw-a11y-exclude-help" placeholder="e.g. .my-widget, #sidebar">
                         <div id="uw-a11y-exclude-help" class="uw-a11y-helptext">Comma‑separated CSS selectors skipped during scanning. Essential internal UI is always excluded.</div>
+                    </div>
+
+                    <div class="uw-a11y-setting-card">
+                        <div class="uw-a11y-settings-2col">
+                            <div>
+                                <label for="uw-a11y-wcag-spec" class="uw-a11y-setting-label">WCAG Version</label>
+                                <select id="uw-a11y-wcag-spec" class="uw-a11y-input">
+                                    <option value="2.0" ${wcag.wcagSpec==='2.0'?'selected':''}>WCAG 2.0</option>
+                                    <option value="2.1" ${wcag.wcagSpec==='2.1'?'selected':''}>WCAG 2.1</option>
+                                    <option value="2.2" ${wcag.wcagSpec==='2.2'?'selected':''}>WCAG 2.2</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="uw-a11y-wcag-level" class="uw-a11y-setting-label">Conformance Level</label>
+                                <select id="uw-a11y-wcag-level" class="uw-a11y-input">
+                                    <option value="A" ${wcag.wcagLevel==='A'?'selected':''}>Level A</option>
+                                    <option value="AA" ${wcag.wcagLevel==='AA'?'selected':''}>Level AA</option>
+                                    <option value="AAA" ${wcag.wcagLevel==='AAA'?'selected':''}>Level AAA</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="uw-a11y-helptext">Default is WCAG 2.1 AA. Level AAA enables enhanced color contrast rules.</div>
+                    </div>
+
+                    <div class="uw-a11y-pref-row">
+                        <div class="uw-a11y-pref-label">
+                            <strong>Best Practice Suggestions</strong>
+                            <span>Tips beyond WCAG failures — link text clarity, new‑tab labeling, and more.</span>
+                        </div>
+                        <label class="uw-a11y-toggle" aria-label="Include best practice suggestions">
+                            <input id="uw-a11y-bp-input" type="checkbox" ${bp ? 'checked' : ''}>
+                            <span class="uw-a11y-toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Appears only when scan settings have been changed -->
+                    <div id="uw-a11y-actions-bar" class="uw-a11y-actions-bar" hidden>
+                        <button id="uw-a11y-save-settings" class="uw-a11y-btn primary">Save and Re‑scan</button>
+                        <button id="uw-a11y-reset-settings" class="uw-a11y-btn" title="Reset to defaults">
+                            <svg class="uw-a11y-reset-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 5V1L7 6l5 5V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+                            Reset
+                        </button>
                         <div id="uw-a11y-settings-msg" class="uw-a11y-msg" aria-live="polite"></div>
                     </div>
-                    <div class="uw-a11y-form-row">
-                        <label for="uw-a11y-wcag-spec"><strong>WCAG Specification</strong></label>
-                        <select id="uw-a11y-wcag-spec" class="uw-a11y-input">
-                            <option value="2.0" ${wcag.wcagSpec==='2.0'?'selected':''}>WCAG 2.0</option>
-                            <option value="2.1" ${wcag.wcagSpec==='2.1'?'selected':''}>WCAG 2.1</option>
-                            <option value="2.2" ${wcag.wcagSpec==='2.2'?'selected':''}>WCAG 2.2</option>
-                        </select>
-                        <div class="uw-a11y-helptext">Choose which WCAG version to target. Default is 2.1.</div>
-                    </div>
-                    <div class="uw-a11y-form-row">
-                        <label for="uw-a11y-wcag-level"><strong>WCAG Level</strong></label>
-                        <select id="uw-a11y-wcag-level" class="uw-a11y-input">
-                            <option value="A" ${wcag.wcagLevel==='A'?'selected':''}>Level A</option>
-                            <option value="AA" ${wcag.wcagLevel==='AA'?'selected':''}>Level AA</option>
-                            <option value="AAA" ${wcag.wcagLevel==='AAA'?'selected':''}>Level AAA</option>
-                        </select>
-                        <div class="uw-a11y-helptext">Default is AA. Selecting AAA enables extra rules like enhanced color contrast.</div>
-                    </div>
-                    <div class="uw-a11y-form-row">
-                        <label>
-                            <input id="uw-a11y-bp-input" type="checkbox" ${bp ? 'checked' : ''}>
-                            <span>Include best‑practice suggestions</span>
-                        </label>
-                        <div class="uw-a11y-helptext">Additional tips beyond WCAG failures, like link text clarity or new‑tab labeling.</div>
-                        <div class="uw-a11y-actions">
-                            <button id="uw-a11y-save-settings" class="uw-a11y-btn primary">Save and Re‑scan</button>
-                            <button id="uw-a11y-reset-settings" class="uw-a11y-btn" title="Reset to defaults">
-                                <svg class="uw-a11y-reset-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 5V1L7 6l5 5V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
-                                Reset
-                            </button>
+
+                    <p class="uw-a11y-section-divider">Interface</p>
+
+                    <div class="uw-a11y-pref-row">
+                        <div class="uw-a11y-pref-label">
+                            <strong>UI Sounds</strong>
+                            <span>Subtle audio cues on scan complete, navigation, and interactions.</span>
                         </div>
+                        <label class="uw-a11y-toggle" aria-label="Enable UI sounds">
+                            <input id="uw-a11y-sounds-toggle" type="checkbox" ${localStorage.getItem('uw-a11y-sounds') !== 'off' ? 'checked' : ''}>
+                            <span class="uw-a11y-toggle-slider"></span>
+                        </label>
                     </div>
                 </div>
             `;
 
             const input = this.shadowRoot.getElementById('uw-a11y-exclude-input');
             const msg = this.shadowRoot.getElementById('uw-a11y-settings-msg');
+            const actionsBar = this.shadowRoot.getElementById('uw-a11y-actions-bar');
             const saveBtn = this.shadowRoot.getElementById('uw-a11y-save-settings');
             const resetBtn = this.shadowRoot.getElementById('uw-a11y-reset-settings');
             const bpInput = this.shadowRoot.getElementById('uw-a11y-bp-input');
             const wcagSpecSel = this.shadowRoot.getElementById('uw-a11y-wcag-spec');
             const wcagLevelSel = this.shadowRoot.getElementById('uw-a11y-wcag-level');
+            const soundsToggle = this.shadowRoot.getElementById('uw-a11y-sounds-toggle');
+
+            // Snapshot values at render time for dirty comparison
+            const snap = () => ({
+                exclude: input.value,
+                wcagSpec: wcagSpecSel.value,
+                wcagLevel: wcagLevelSel.value,
+                bp: bpInput.checked,
+            });
+            let initialValues = snap();
+
+            // Show/hide the save bar based on whether anything changed
+            const checkDirty = () => {
+                const now = snap();
+                const dirty = now.exclude !== initialValues.exclude
+                    || now.wcagSpec !== initialValues.wcagSpec
+                    || now.wcagLevel !== initialValues.wcagLevel
+                    || now.bp !== initialValues.bp;
+                actionsBar.hidden = !dirty;
+                if (!dirty && msg) msg.textContent = '';
+            };
+
+            input.addEventListener('input', checkDirty);
+            wcagSpecSel.addEventListener('change', checkDirty);
+            wcagLevelSel.addEventListener('change', checkDirty);
+            bpInput.addEventListener('change', checkDirty);
+
+            // Sound toggle — saves instantly to localStorage, no re-scan needed
+            if (soundsToggle) {
+                soundsToggle.addEventListener('change', () => {
+                    if (soundsToggle.checked) {
+                        localStorage.removeItem('uw-a11y-sounds');
+                        this.playSound('verify');
+                    } else {
+                        localStorage.setItem('uw-a11y-sounds', 'off');
+                    }
+                });
+            }
 
             const parseSelectors = (val) => val.split(',').map(s => s.trim()).filter(Boolean);
             const validateSelectors = (arr) => {
@@ -5755,19 +6004,17 @@
                     msg.className = 'uw-a11y-msg err';
                     return;
                 }
-                const toSave = { 
-                    // Persist only non-essential selectors
+                const toSave = {
                     excludeSelectors: this.filterOutEssential(arr),
                     enableBestPractices: !!(bpInput && bpInput.checked),
                     wcagSpec: wcagSpecSel ? wcagSpecSel.value : '2.1',
                     wcagLevel: wcagLevelSel ? wcagLevelSel.value : 'AA'
                 };
                 this.saveSettings(toSave);
-                msg.textContent = 'Saved. Re‑scanning…';
-                msg.className = 'uw-a11y-msg ok';
-                // Ensure the score dial re-animates after a settings-driven re-scan
+                // Update snapshot so bar hides after save
+                initialValues = snap();
+                actionsBar.hidden = true;
                 this.scoreAnimationPlayed = false;
-                // Re-run analysis with new settings
                 this.runAxeChecks();
                 this.showView('results');
             });
@@ -5778,8 +6025,10 @@
                 if (bpInput) bpInput.checked = !!defaults.enableBestPractices;
                 if (wcagSpecSel) wcagSpecSel.value = defaults.wcagSpec;
                 if (wcagLevelSel) wcagLevelSel.value = defaults.wcagLevel;
-                msg.textContent = 'Settings reset to defaults.';
-                msg.className = 'uw-a11y-msg ok';
+                // Update snapshot to match restored defaults → hides bar
+                initialValues = snap();
+                actionsBar.hidden = true;
+                if (msg) { msg.textContent = 'Reset to defaults.'; msg.className = 'uw-a11y-msg ok'; }
             });
 
         },
@@ -5824,6 +6073,7 @@
             this.saveFilters();
             this.updateFilterUI();
             this.refreshIssueList();
+            this.playSound('ui');
         },
         updateFilterUI: function() {
             const setState = (id, pressed) => {
@@ -6146,6 +6396,9 @@
             
             // Set focus to the panel for keyboard accessibility
             this.setFocusToPanel();
+
+            // Play scan-complete chime
+            this.playSound('complete');
         },
         
 
@@ -6379,7 +6632,8 @@
             if (newIndex >= 0 && newIndex < issueGroup.length) {
                 this.currentInstances[ruleId] = newIndex;
                 this.updateInstanceDisplay(ruleId, issueGroup);
-                this.highlightCurrentInstance(ruleId);
+                this.highlightCurrentInstance(ruleId, true); // silent — navigate already plays its own sound
+                this.playSound('navigate');
             }
         },
 
@@ -6411,7 +6665,8 @@
         },
 
         // Highlight the current instance of a rule
-        highlightCurrentInstance: function(ruleId) {
+        highlightCurrentInstance: function(ruleId, silent) {
+            if (!silent) this.playSound('ui');
             // Remove previous highlights
             document.querySelectorAll('.uw-a11y-highlight').forEach(el => {
                 el.classList.remove('uw-a11y-highlight');
@@ -6522,6 +6777,9 @@
             // Update score and save state
             this.updateScore();
             sessionStorage.setItem('uw-a11y-checked', JSON.stringify(Array.from(this.checkedItems)));
+
+            // Sound feedback
+            this.playSound(newVerificationState ? 'verify' : 'ui');
         },
 
         // Toggle detailed information display
@@ -6529,7 +6787,7 @@
             const sanitizedRuleId = this.sanitizeHtmlId(ruleId);
             const detailsElement = this.shadowRoot.getElementById(`details-${sanitizedRuleId}`);
             const button = detailsElement.previousElementSibling;
-            
+
             if (detailsElement.classList.contains('expanded')) {
                 detailsElement.classList.remove('expanded');
                 // Update only the text portion, preserving the icon
@@ -6539,6 +6797,7 @@
                 // Update only the text portion, preserving the icon
                 this.updateButtonText(button, 'Hide technical details');
             }
+            this.playSound('ui');
         },
         
         // Helper function to update button text while preserving icon
@@ -6786,8 +7045,73 @@
             }, 500);
         },
 
+        // ── Sound System ──────────────────────────────────────────────────────
+        // Generates subtle UI sounds via Web Audio API (no external resources).
+        // Respects prefers-reduced-motion: sounds are kept but can be toggled.
+        // Types: 'ui' | 'navigate' | 'verify' | 'complete'
+        playSound: function(type) {
+            try {
+                // Respect a localStorage mute preference (future settings hook)
+                if (localStorage.getItem('uw-a11y-sounds') === 'off') return;
+                const AudioCtx = window.AudioContext || window['webkitAudioContext'];
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
 
-        
+                const play = (freq, startTime, duration, gain, wave) => {
+                    const osc = ctx.createOscillator();
+                    const amp = ctx.createGain();
+                    osc.connect(amp);
+                    amp.connect(ctx.destination);
+                    osc.type = wave || 'sine';
+                    osc.frequency.setValueAtTime(freq, startTime);
+                    amp.gain.setValueAtTime(0, startTime);
+                    amp.gain.linearRampToValueAtTime(gain, startTime + 0.01);
+                    amp.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+                    osc.start(startTime);
+                    osc.stop(startTime + duration + 0.01);
+                };
+
+                const t = ctx.currentTime;
+
+                if (type === 'ui') {
+                    // Short, crisp click — 880 Hz triangle, 55 ms
+                    play(880, t, 0.055, 0.038, 'triangle');
+
+                } else if (type === 'navigate') {
+                    // Quick upward chirp — 540 → 820 Hz
+                    const osc = ctx.createOscillator();
+                    const amp = ctx.createGain();
+                    osc.connect(amp);
+                    amp.connect(ctx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(540, t);
+                    osc.frequency.linearRampToValueAtTime(820, t + 0.07);
+                    amp.gain.setValueAtTime(0, t);
+                    amp.gain.linearRampToValueAtTime(0.04, t + 0.01);
+                    amp.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+                    osc.start(t);
+                    osc.stop(t + 0.13);
+
+                } else if (type === 'verify') {
+                    // Two-note positive chime — C5 then E5
+                    play(523, t,        0.12, 0.05, 'sine');
+                    play(659, t + 0.10, 0.14, 0.05, 'sine');
+
+                } else if (type === 'complete') {
+                    // Three-note ascending success chime — E5, G5, B5
+                    play(659, t,        0.18, 0.055, 'sine');
+                    play(784, t + 0.14, 0.18, 0.055, 'sine');
+                    play(988, t + 0.28, 0.30, 0.06,  'sine');
+                }
+
+                // Auto-close context after sounds finish
+                setTimeout(() => { try { ctx.close(); } catch(_) {} }, 800);
+            } catch (_) {
+                // Silently fail — sounds are purely cosmetic
+            }
+        },
+
+
         remove: function() {
             // Clean up tab order visualization
             this.hideTabOrderVisualization();

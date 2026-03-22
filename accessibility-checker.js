@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.5.7', // Current version
+            version: '1.5.8', // Current version
             websiteUrl: 'https://pinpoint.heroicpixel.com/', // Main website URL
             legacyDomainUrl: 'https://althe3rd.github.io/Pinpoint/', // Legacy domain for transition
             issues: [],
@@ -531,8 +531,59 @@
                     );
                 }
             });
+
+            // 9) Buttons whose accessible name contains only emoji (no real text).
+            // axe-core passes these because they have a non-empty name, but emoji alone
+            // are ambiguous: their meaning varies by platform, and screen readers
+            // announce them as long Unicode descriptions ("thumbs up sign") rather than
+            // a clear action. A visible text label or a descriptive aria-label is needed.
+            const stripEmojiComponents = (str) => {
+                try {
+                    return str
+                        .replace(/\p{Emoji_Presentation}/gu, '') // base emoji
+                        .replace(/[\u{FE00}-\u{FE0F}]/gu, '')    // variation selectors
+                        .replace(/\u{200D}/gu, '')                // zero-width joiner
+                        .replace(/[\u{1F3FB}-\u{1F3FF}]/gu, '')  // skin-tone modifiers
+                        .replace(/[\u{E0020}-\u{E007F}]/gu, '')  // tag characters (flags)
+                        .trim();
+                } catch (_) {
+                    // Regex with Unicode property escapes unsupported (very old engine)
+                    return str;
+                }
+            };
+
+            buttons.forEach(btn => {
+                if (!isVisible(btn)) return;
+                const name = getAccessibleName(btn).trim();
+                if (!name) return; // empty labels already caught by axe-core button-name rule
+
+                let hasEmoji = false;
+                try { hasEmoji = /\p{Emoji_Presentation}/u.test(name); } catch (_) { return; }
+                if (!hasEmoji) return;
+
+                const stripped = stripEmojiComponents(name);
+                // If no word characters remain after stripping emoji, it's emoji-only
+                const hasRealText = /\w/.test(stripped);
+                if (!hasRealText) {
+                    this.addIssue(
+                        'info',
+                        'Best Practice: Add text label to emoji-only button',
+                        `Button's accessible name appears to be emoji only: "${name}". Emoji labels are ambiguous and announced inconsistently across screen readers.`,
+                        btn,
+                        'Add a visible text label alongside the emoji, or use <code>aria-label</code> with a clear, action-oriented description — e.g. <code>&lt;button aria-label="Approve"&gt;👍&lt;/button&gt;</code>. Avoid relying on emoji alone to convey purpose.',
+                        'https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html',
+                        'moderate',
+                        ['best-practice', 'buttons'],
+                        [
+                            { label: 'Detected Label', value: name },
+                            { label: 'Stripped (no emoji)', value: stripped || '(empty)' }
+                        ],
+                        'bp-emoji-only-button'
+                    );
+                }
+            });
         },
-        
+
         // Process axe-core results into our format
         processAxeResults: function(results) {
             this.issues = [];
@@ -579,14 +630,30 @@
                     return;
                 }
 
-                // Check if this is a contrast issue that can be auto-resolved
+                // Check if this is a contrast issue that can be auto-resolved (passes)
                 const shouldSkipManualReview = this.shouldSkipContrastManualReview(incomplete, node);
-                
                 if (shouldSkipManualReview) {
-                    // Skip entirely - no need to show passing contrast items to user
                     return;
                 }
-                
+
+                // Check if this contrast issue can be escalated to a definite error (fails)
+                const shouldEscalate = this.shouldEscalateContrastToError(incomplete, node);
+                if (shouldEscalate) {
+                    this.addIssue(
+                        'error',
+                        incomplete.description,
+                        this.buildDescription(incomplete, node),
+                        this.getElementFromNode(node),
+                        this.buildRecommendation(incomplete, node, 'error'),
+                        incomplete.helpUrl,
+                        'serious',
+                        incomplete.tags,
+                        this.buildDetailedInfo(incomplete, node),
+                        incomplete.id + '-confirmed'
+                    );
+                    return;
+                }
+
                 const uniqueId = `incomplete-${incompleteIndex}-${nodeIndex}`;
                 this.addIssue(
                     'warning',
@@ -1239,7 +1306,74 @@
                 let fgColor = styles.color;
                 let bgColor = styles.backgroundColor;
                 let analysisMethod = 'computed-style';
-                
+
+                // ── Gradient backgrounds ───────────────────────────────────────
+                // CSS gradients live in backgroundImage, not backgroundColor, so
+                // bgColor is always transparent for gradient elements. We handle
+                // this BEFORE the transparency walk-up to avoid landing on the
+                // wrong ancestor color. We sample all gradient stops + midpoints
+                // and return the worst-case (lowest) contrast position.
+                const checkGradient = (el) => {
+                    const cs = window.getComputedStyle(el);
+                    const bgImg = cs.backgroundImage;
+                    if (!bgImg || bgImg === 'none' || !bgImg.includes('gradient')) return null;
+                    // Skip gradients used as decorative underlines/borders (e.g. background-size: 100% 2px).
+                    // When the background-size height is ≤ 4px the gradient is a CSS trick for a thin
+                    // line, not a real background behind the text, so it should not affect contrast.
+                    const bgSize = cs.backgroundSize;
+                    if (bgSize) {
+                        const parts = bgSize.trim().split(/\s+/);
+                        const heightStr = parts[1] || parts[0];
+                        const pxMatch = heightStr && heightStr.match(/^([\d.]+)px$/);
+                        if (pxMatch && parseFloat(pxMatch[1]) <= 4) return null;
+                    }
+                    return bgImg;
+                };
+
+                // Check element itself first, then up to 3 ancestor levels.
+                // Also track WHICH element owns the gradient for positional sampling.
+                let gradientSource = checkGradient(element);
+                let gradientEl = gradientSource ? element : null;
+                if (!gradientSource) {
+                    let anc = element.parentElement;
+                    for (let d = 0; d < 3 && anc; d++, anc = anc.parentElement) {
+                        const g = checkGradient(anc);
+                        if (g) { gradientSource = g; gradientEl = anc; break; }
+                    }
+                }
+
+                if (gradientSource) {
+                    const gradResult = this.analyzeGradientBackground(gradientSource, fgColor, element, gradientEl);
+                    if (gradResult) {
+                        return {
+                            foreground:    gradResult.foreground,
+                            background:    `${gradResult.background} (worst of ${gradResult.sampleCount} gradient samples)`,
+                            contrast:      gradResult.contrastRatio.toFixed(2) + ':1',
+                            required:      'WCAG AA requires 4.5:1 for normal text, 3:1 for large text',
+                            analysisMethod: 'gradient-analysis'
+                        };
+                    }
+                }
+
+                // ── Image overlap detection ────────────────────────────────────
+                // When text is CSS-positioned over an <img> element the effective
+                // background is the image's pixels, not any ancestor CSS color.
+                // Canvas pixel-sampling works for data: URIs and same-origin images
+                // without CORS restrictions; it gracefully fails for cross-origin src.
+                const isTransparentBg = !bgColor || bgColor === 'transparent'
+                    || bgColor === 'rgba(0, 0, 0, 0)' || bgColor.includes('rgba(0, 0, 0, 0)');
+                if (isTransparentBg) {
+                    const overlappingImgs = this.findOverlappingImages(element);
+                    for (const img of overlappingImgs) {
+                        const sampled = this.sampleImagePixelsAtElement(img, element);
+                        if (sampled) {
+                            bgColor = sampled;
+                            analysisMethod = 'image-pixel-sampling';
+                            break;
+                        }
+                    }
+                }
+
                 // Handle transparent or rgba(0,0,0,0) backgrounds by finding the effective background
                 if (!bgColor || bgColor === 'transparent' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor.includes('rgba(0, 0, 0, 0)')) {
                     // Walk up the DOM tree to find the first non-transparent background
@@ -1794,7 +1928,7 @@
         // Estimate background color from background image (simple heuristics)
         estimateBackgroundFromImage: function(styles) {
             const bgImage = styles.backgroundImage;
-            
+
             // Check for gradients
             if (bgImage.includes('gradient')) {
                 // Extract first color from gradient
@@ -1803,9 +1937,220 @@
                     return colorMatch[0];
                 }
             }
-            
+
             // For other images, assume a neutral background
             return 'rgb(240, 240, 240)';
+        },
+
+        // Analyze a CSS gradient background to find the worst-case contrast position.
+        // Extracts all explicit color stops, interpolates midpoints between each pair,
+        // Return all <img> elements whose rendered bounding box overlaps the given element.
+        // Used to detect text that is CSS-positioned on top of an image.
+        findOverlappingImages: function(element) {
+            try {
+                const rect = element.getBoundingClientRect();
+                if (rect.width < 1 || rect.height < 1) return [];
+
+                const results = [];
+                document.querySelectorAll('img').forEach(img => {
+                    // Exclude images that are part of the checker UI
+                    if (img.closest('#uw-a11y-container')) return;
+                    const ir = img.getBoundingClientRect();
+                    if (rect.right > ir.left && rect.left < ir.right &&
+                        rect.bottom > ir.top  && rect.top  < ir.bottom) {
+                        results.push(img);
+                    }
+                });
+                return results;
+            } catch (e) {
+                return [];
+            }
+        },
+
+        // Sample the average rendered pixel color of the region where an <img>
+        // overlaps the given element. Works for data: URIs and same-origin images.
+        // Returns an rgb() string on success, null if the image is cross-origin
+        // (canvas tainted) or not yet loaded.
+        sampleImagePixelsAtElement: function(img, element) {
+            try {
+                if (!img.complete || img.naturalWidth === 0) return null;
+
+                const elRect  = element.getBoundingClientRect();
+                const imgRect = img.getBoundingClientRect();
+
+                // Overlap region in viewport coords
+                const ol = Math.max(elRect.left,   imgRect.left);
+                const ot = Math.max(elRect.top,    imgRect.top);
+                const or_ = Math.min(elRect.right,  imgRect.right);
+                const ob  = Math.min(elRect.bottom, imgRect.bottom);
+                if (or_ <= ol || ob <= ot) return null;
+
+                // Map overlap region to natural image pixel coords
+                const scaleX = img.naturalWidth  / (imgRect.width  || 1);
+                const scaleY = img.naturalHeight / (imgRect.height || 1);
+                const srcX = Math.round((ol  - imgRect.left) * scaleX);
+                const srcY = Math.round((ot  - imgRect.top)  * scaleY);
+                const srcW = Math.max(1, Math.round((or_ - ol) * scaleX));
+                const srcH = Math.max(1, Math.round((ob  - ot) * scaleY));
+
+                const canvas = document.createElement('canvas');
+                canvas.width  = srcW;
+                canvas.height = srcH;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, srcW, srcH);
+
+                // getImageData throws SecurityError for cross-origin (tainted) canvases
+                const data = ctx.getImageData(0, 0, srcW, srcH).data;
+                let totalR = 0, totalG = 0, totalB = 0;
+                const px = srcW * srcH;
+                for (let i = 0; i < data.length; i += 4) {
+                    totalR += data[i]; totalG += data[i + 1]; totalB += data[i + 2];
+                }
+                return `rgb(${Math.round(totalR / px)}, ${Math.round(totalG / px)}, ${Math.round(totalB / px)})`;
+            } catch (e) {
+                // SecurityError = cross-origin image, or image not yet decoded
+                return null;
+            }
+        },
+
+        // then returns the stop that produces the LOWEST contrast against fgColor
+        // (i.e. the hardest-to-read position on the gradient per WCAG intent).
+        analyzeGradientBackground: function(gradientCss, fgColor, textEl, gradEl) {
+            try {
+                // Pull every color token out of the gradient string.
+                // Matches: rgb(...), rgba(...), #rrggbb, #rgb, named keywords.
+                const colorPattern = /(rgba?\(\s*[\d.,\s/]+\)|#[0-9a-f]{3,8})/gi;
+                const rawStops = gradientCss.match(colorPattern) || [];
+                if (rawStops.length === 0) return null;
+
+                // Parse a color token into { r, g, b } using the existing getLuminance
+                // path (hex + rgb/rgba support). We normalise rgba alpha away since
+                // the gradient itself defines the visual mix.
+                const parseRgb = (color) => {
+                    const m = color.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i)
+                           || color.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+                    if (m) return { r: +m[1], g: +m[2], b: +m[3] };
+                    // hex
+                    const hex = color.replace('#', '');
+                    if (hex.length === 3) return {
+                        r: parseInt(hex[0]+hex[0], 16),
+                        g: parseInt(hex[1]+hex[1], 16),
+                        b: parseInt(hex[2]+hex[2], 16)
+                    };
+                    if (hex.length === 6) return {
+                        r: parseInt(hex.slice(0,2), 16),
+                        g: parseInt(hex.slice(2,4), 16),
+                        b: parseInt(hex.slice(4,6), 16)
+                    };
+                    return null;
+                };
+
+                const stopColors = rawStops.map(parseRgb).filter(Boolean);
+                if (stopColors.length === 0) return null;
+
+                // Build sample set: every explicit stop + midpoint between each pair.
+                let samples = [...stopColors];
+                for (let i = 0; i < stopColors.length - 1; i++) {
+                    const a = stopColors[i], b = stopColors[i + 1];
+                    samples.push({
+                        r: Math.round((a.r + b.r) / 2),
+                        g: Math.round((a.g + b.g) / 2),
+                        b: Math.round((a.b + b.b) / 2)
+                    });
+                }
+
+                // ── Positional filtering ──────────────────────────────────────────
+                // When the gradient lives on an ancestor element (e.g. a row that
+                // spans both a dark icon circle and light text), sampling ALL stops
+                // produces false positives: the worst stop may belong to a region the
+                // text never actually overlaps. We compute the text element's center
+                // as a fraction [0,1] of the gradient element in the primary axis,
+                // then only sample color stops within ±25% of that position.
+                if (textEl && gradEl && stopColors.length > 1) {
+                    try {
+                        const textRect = textEl.getBoundingClientRect();
+                        const gradRect = gradEl.getBoundingClientRect();
+                        const gw = gradRect.width, gh = gradRect.height;
+
+                        if (gw > 0 && gh > 0) {
+                            // Detect primary gradient axis from keyword or angle.
+                            const isHorizontal =
+                                /to right|to left|\b90deg\b|\b270deg\b|-90deg/i.test(gradientCss);
+                            const isVertical =
+                                /to bottom|to top|\b0deg\b|\b180deg\b/i.test(gradientCss);
+
+                            let fraction;
+                            if (isHorizontal) {
+                                fraction = ((textRect.left + textRect.right) / 2 - gradRect.left) / gw;
+                            } else if (isVertical || gh >= gw) {
+                                fraction = ((textRect.top + textRect.bottom) / 2 - gradRect.top) / gh;
+                            } else {
+                                // Diagonal or unknown — use horizontal as best guess
+                                fraction = ((textRect.left + textRect.right) / 2 - gradRect.left) / gw;
+                            }
+                            fraction = Math.max(0, Math.min(1, fraction));
+
+                            const window = 0.25; // ±25% positional tolerance
+                            const minFrac = Math.max(0, fraction - window);
+                            const maxFrac = Math.min(1, fraction + window);
+
+                            // Map stop index → normalised position (0 = first, 1 = last)
+                            const filtered = stopColors.filter((_, i) => {
+                                const pos = stopColors.length === 1 ? 0.5 : i / (stopColors.length - 1);
+                                return pos >= minFrac && pos <= maxFrac;
+                            });
+
+                            // Also add the interpolated color at the exact text center
+                            const fracIdx = fraction * (stopColors.length - 1);
+                            const lo = Math.floor(fracIdx), hi = Math.ceil(fracIdx);
+                            if (lo < stopColors.length && hi < stopColors.length) {
+                                const t = fracIdx - lo;
+                                filtered.push({
+                                    r: Math.round(stopColors[lo].r * (1 - t) + stopColors[hi].r * t),
+                                    g: Math.round(stopColors[lo].g * (1 - t) + stopColors[hi].g * t),
+                                    b: Math.round(stopColors[lo].b * (1 - t) + stopColors[hi].b * t),
+                                });
+                            }
+
+                            if (filtered.length > 0) {
+                                samples = filtered;
+                            }
+                        }
+                    } catch (_) {
+                        // If positional filtering fails, fall through to full sampling
+                    }
+                }
+
+                const fgLum = this.getLuminance(fgColor);
+                if (fgLum === null) return null;
+
+                let minContrast = Infinity;
+                let worstColor = null;
+
+                for (const s of samples) {
+                    const sColor = `rgb(${s.r}, ${s.g}, ${s.b})`;
+                    const sLum = this.getLuminance(sColor);
+                    if (sLum === null) continue;
+                    const lighter = Math.max(fgLum, sLum);
+                    const darker  = Math.min(fgLum, sLum);
+                    const ratio   = (lighter + 0.05) / (darker + 0.05);
+                    if (ratio < minContrast) {
+                        minContrast = ratio;
+                        worstColor  = sColor;
+                    }
+                }
+
+                if (!worstColor || minContrast === Infinity) return null;
+
+                return {
+                    foreground:    fgColor,
+                    background:    worstColor,   // worst-case gradient position within text's region
+                    contrastRatio: minContrast,
+                    sampleCount:   samples.length
+                };
+            } catch (e) {
+                return null;
+            }
         },
 
         // Determine if pixel analysis is more reliable than computed styles
@@ -1886,7 +2231,7 @@
                 const contrastBuffer = 0.3;
                 const meetsRequirement = contrastValue >= (requiredContrast + contrastBuffer);
 
-                if (meetsRequirement && (colorInfo.analysisMethod === 'pixel-analysis' || colorInfo.analysisMethod === 'dom-compositing')) {
+                if (meetsRequirement && (colorInfo.analysisMethod === 'pixel-analysis' || colorInfo.analysisMethod === 'dom-compositing' || colorInfo.analysisMethod === 'gradient-analysis' || colorInfo.analysisMethod === 'image-pixel-sampling')) {
                     console.log(`Auto-resolving contrast issue for element:`, {
                         selector: node.target?.join(' '),
                         measured: contrastValue,
@@ -1949,7 +2294,7 @@
                 const contrastBuffer = 0.3;
                 const meetsRequirement = contrastValue >= (requiredContrast + contrastBuffer);
 
-                if (meetsRequirement && (colorInfo.analysisMethod === 'pixel-analysis' || colorInfo.analysisMethod === 'dom-compositing')) {
+                if (meetsRequirement && (colorInfo.analysisMethod === 'pixel-analysis' || colorInfo.analysisMethod === 'dom-compositing' || colorInfo.analysisMethod === 'gradient-analysis' || colorInfo.analysisMethod === 'image-pixel-sampling')) {
                     console.log(`Auto-resolving contrast violation for element:`, {
                         selector: node.target?.join(' '),
                         measured: contrastValue,
@@ -1963,6 +2308,50 @@
                 return false;
             } catch (e) {
                 console.warn('Error checking contrast violation for auto-resolution:', e);
+                return false;
+            }
+        },
+
+        // Determine if an axe-core "incomplete" (manual review) contrast item should be
+        // escalated to a definite error because the checker can measure a ratio that
+        // clearly fails WCAG. Two escalation paths:
+        //   1. Trusted methods (gradient-analysis, dom-compositing, pixel-analysis):
+        //      escalate when ratio < required - 0.3 buffer.
+        //   2. Computed-style walk-up: escalate only when ratio < 2.0, which catches
+        //      obvious same-colour-on-same-colour failures (e.g. white-on-white = 1:1)
+        //      with minimal false-positive risk.
+        shouldEscalateContrastToError: function(axeRule, node) {
+            const contrastRules = ['color-contrast', 'color-contrast-enhanced'];
+            if (!contrastRules.includes(axeRule.id)) return false;
+
+            try {
+                const element = this.getElementFromNode(node);
+                if (!element) return false;
+
+                const colorInfo = this.extractColorContrastInfo(node);
+                if (!colorInfo || !colorInfo.contrast || colorInfo.contrast === 'Unable to calculate') return false;
+
+                const contrastValue = parseFloat(colorInfo.contrast.split(':')[0]);
+                if (isNaN(contrastValue)) return false;
+
+                const isEnhanced = axeRule.id === 'color-contrast-enhanced';
+                const isLargeText = this.isLargeText(element);
+                const requiredContrast = isEnhanced
+                    ? (isLargeText ? 4.5 : 7.0)
+                    : (isLargeText ? 3.0 : 4.5);
+
+                const isTrustedMethod = ['pixel-analysis', 'dom-compositing', 'gradient-analysis', 'image-pixel-sampling']
+                    .includes(colorInfo.analysisMethod);
+
+                if (isTrustedMethod) {
+                    // Trusted measurement — escalate if it clearly fails (with a buffer)
+                    return contrastValue < (requiredContrast - 0.3);
+                } else {
+                    // Computed-style walk-up — only escalate on extreme failures (≤ 2:1)
+                    // to avoid false positives from ancestor-background mismatches
+                    return contrastValue <= 2.0;
+                }
+            } catch (e) {
                 return false;
             }
         },
@@ -2877,9 +3266,13 @@
                 return 'other';
             };
 
+            // Build dismissed set once so both violations and manual-review loops can filter against it.
+            // Dismissed group keys are stored as "<ruleId>-<type>" (e.g. "color-contrast-error").
+            const dismissed = this.getDismissedIssues ? this.getDismissedIssues() : new Set();
+
             // 1) Violations: count per unique ruleId, weighted by highest impact observed, track category
             const violationMetaByRule = new Map(); // ruleId -> { impact, category }
-            (results.violations || []).forEach(v => {
+            (results.violations || []).filter(v => !dismissed.has(`${v.id}-error`)).forEach(v => {
                 const impact = (v.impact || 'moderate');
                 const category = getCategory(v.tags);
                 const prev = violationMetaByRule.get(v.id);
@@ -2905,7 +3298,9 @@
             // 2) Manual review: per rule, deduct half weight only if any instance unverified
             // Keep counts for UI messaging
             let verifiedCount = 0;
-            const manualIssues = (this.issues || []).filter(i => i.type === 'warning' && i.uniqueId);
+            const manualIssues = (this.issues || []).filter(i =>
+                i.type === 'warning' && i.uniqueId && !dismissed.has(`${i.ruleId}-warning`)
+            );
             const totalManualReview = manualIssues.length;
 
             const manualByRule = new Map(); // ruleId -> { impact, unresolved, total, category }
@@ -3171,6 +3566,25 @@
                                         </button>
                                         <span id="uw-a11y-landmark-structure-count" class="uw-a11y-inspector-status" style="display: none;"></span>
                                     </div>
+                                </div>
+
+                                <!-- Heading Outline View -->
+                                <div class="uw-a11y-inspector-section">
+                                    <h4>Page Outline</h4>
+                                    <p>View the heading hierarchy to verify correct order and nesting. Skipped heading levels are flagged. Click any heading to jump to it on the page.</p>
+                                    <div class="uw-a11y-inspector-controls">
+                                        <button id="uw-a11y-outline-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
+                                            <svg class="feather feather-list" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                <line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>
+                                            </svg>
+                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
+                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                            </svg>
+                                            <span class="uw-a11y-btn-text">Show Outline</span>
+                                        </button>
+                                        <span id="uw-a11y-outline-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                    </div>
+                                    <div id="uw-a11y-outline-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
                                 </div>
                             </div>
                         </div>
@@ -3525,7 +3939,7 @@
 
                     background: rgba(252, 253, 255, 0.97);
                     border: 1px solid rgba(255,255,255,0.92);
-                    border-radius: 18px;
+                    border-radius: 14px;
                     backdrop-filter: blur(28px) saturate(180%);
                     box-shadow: 0 24px 64px rgba(0,0,0,0.16), 0 4px 16px rgba(0,0,0,0.07);
                     z-index: 999999;
@@ -4049,10 +4463,63 @@
                 }
                 #uw-a11y-panel .uw-a11y-issue .learn-more {
                     color: #c5050c;
-                   
+
                     font-size: 12px;
                 }
                 #uw-a11y-panel .uw-a11y-issue .learn-more:hover {
+                    text-decoration: underline;
+                }
+
+                /* Dismiss button */
+                #uw-a11y-panel .uw-a11y-dismiss-btn {
+                    flex-shrink: 0;
+                    background: none;
+                    border: 1px solid rgba(0,0,0,0.18);
+                    border-radius: 5px;
+                    color: #888;
+                    font-size: 11px;
+                    font-family: inherit;
+                    padding: 2px 8px;
+                    cursor: pointer;
+                    transition: background 0.15s, color 0.15s;
+                    white-space: nowrap;
+                }
+                #uw-a11y-panel .uw-a11y-dismiss-btn:hover {
+                    background: #f3f4f6;
+                    color: #374151;
+                    border-color: #adb5bd;
+                }
+                #uw-a11y-panel .uw-a11y-dismiss-btn--confirming {
+                    background: #fffbeb;
+                    color: #92400e;
+                    border-color: #f59e0b;
+                    font-weight: 600;
+                }
+                #uw-a11y-panel .uw-a11y-dismiss-btn--confirming:hover {
+                    background: #fef3c7;
+                    border-color: #d97706;
+                }
+
+                /* Dismissed banner above issue list */
+                #uw-a11y-panel .uw-a11y-dismissed-banner {
+                    font-size: 12px;
+                    color: #6b7280;
+                    background: #f9fafb;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                    padding: 7px 12px;
+                    margin-bottom: 10px;
+                }
+
+                /* Inline link-style button (restore all) */
+                #uw-a11y-panel .uw-a11y-link-btn {
+                    background: none;
+                    border: none;
+                    padding: 0;
+                    color: #2563eb;
+                    font-size: inherit;
+                    font-family: inherit;
+                    cursor: pointer;
                     text-decoration: underline;
                 }
 
@@ -4678,7 +5145,93 @@
             color: #666;
             font-weight: 500;
         }
-        
+
+        /* Outline View styles */
+        .uw-a11y-outline-tree {
+            margin-top: 0.75rem;
+            border-top: 1px solid #e9ecef;
+            padding-top: 0.5rem;
+        }
+
+        .uw-a11y-outline-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .uw-a11y-outline-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            background: none;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 8px;
+            cursor: pointer;
+            text-align: left;
+            font-family: inherit;
+            font-size: 13px;
+            color: #374151;
+            box-sizing: border-box;
+            transition: background 0.12s;
+        }
+
+        .uw-a11y-outline-item:hover {
+            background: rgba(109,40,217,0.06);
+        }
+
+        .uw-a11y-outline-item:focus-visible {
+            outline: 2px solid #6d28d9;
+            outline-offset: 1px;
+        }
+
+        .uw-a11y-outline-badge {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 4px;
+            letter-spacing: 0.04em;
+            min-width: 24px;
+            line-height: 1.4;
+        }
+
+        .uw-a11y-outline-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+            line-height: 1.4;
+        }
+
+        .uw-a11y-outline-empty-text {
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        .uw-a11y-outline-skip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            color: #92400e;
+            background: #fffbeb;
+            border-left: 3px solid #f59e0b;
+            border-radius: 0 6px 6px 0;
+            font-size: 12px;
+            font-weight: 500;
+            margin: 3px 0;
+        }
+
+        .uw-a11y-outline-skip svg {
+            stroke: #d97706;
+            flex-shrink: 0;
+        }
+
         .uw-a11y-coming-soon {
             background: #ffc107;
             color: #212529;
@@ -5414,6 +5967,147 @@
                     this.toggleLandmarkStructureVisualization();
                 });
             }
+
+            // Outline view toggle button
+            const outlineToggle = this.shadowRoot.getElementById('uw-a11y-outline-toggle');
+            if (outlineToggle) {
+                outlineToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.toggleOutlineView();
+                });
+            }
+        },
+
+        // Toggle heading outline view (in-panel, not a page overlay)
+        toggleOutlineView: function() {
+            const isActive = this.isOutlineViewActive || false;
+            this.isOutlineViewActive = !isActive;
+
+            const btn = this.shadowRoot.getElementById('uw-a11y-outline-toggle');
+            const countEl = this.shadowRoot.getElementById('uw-a11y-outline-count');
+            const content = this.shadowRoot.getElementById('uw-a11y-outline-content');
+
+            if (!isActive) {
+                // Show outline
+                if (content) {
+                    content.hidden = false;
+                    this.renderOutlineView(content, countEl);
+                }
+                if (btn) {
+                    btn.setAttribute('aria-pressed', 'true');
+                    btn.setAttribute('aria-expanded', 'true');
+                    btn.classList.add('active');
+                    const listIcon = btn.querySelector('.feather-list');
+                    const eyeOffIcon = btn.querySelector('.feather-eye-off');
+                    if (listIcon) listIcon.style.display = 'none';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'inline';
+                    const btnText = btn.querySelector('.uw-a11y-btn-text');
+                    if (btnText) btnText.textContent = 'Hide Outline';
+                }
+                if (countEl) countEl.style.display = 'inline';
+            } else {
+                // Hide outline
+                if (content) { content.hidden = true; content.innerHTML = ''; }
+                if (btn) {
+                    btn.setAttribute('aria-pressed', 'false');
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.classList.remove('active');
+                    const listIcon = btn.querySelector('.feather-list');
+                    const eyeOffIcon = btn.querySelector('.feather-eye-off');
+                    if (listIcon) listIcon.style.display = 'inline';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'none';
+                    const btnText = btn.querySelector('.uw-a11y-btn-text');
+                    if (btnText) btnText.textContent = 'Show Outline';
+                }
+                if (countEl) countEl.style.display = 'none';
+            }
+        },
+
+        // Render the heading outline tree into the given container
+        renderOutlineView: function(container, countEl) {
+            const headings = this.detectHeadings();
+
+            if (!headings.length) {
+                container.innerHTML = '<p class="uw-a11y-outline-item"><span class="uw-a11y-outline-empty-text">No headings found on this page.</span></p>';
+                if (countEl) countEl.textContent = 'No headings found';
+                return;
+            }
+
+            // Level colors: H1-H6
+            const levelColors = [
+                null,
+                { bg: '#dbeafe', color: '#1d4ed8' }, // H1 blue
+                { bg: '#ede9fe', color: '#6d28d9' }, // H2 purple
+                { bg: '#d1fae5', color: '#065f46' }, // H3 green
+                { bg: '#fef3c7', color: '#92400e' }, // H4 amber
+                { bg: '#fee2e2', color: '#991b1b' }, // H5 red
+                { bg: '#f3f4f6', color: '#374151' }, // H6 gray
+            ];
+
+            // Build items list — interleave skip warnings when level jumps down
+            let issueCount = 0;
+            const items = [];
+            let prevLevel = 0;
+
+            headings.forEach((heading) => {
+                const level = heading.level;
+                if (prevLevel > 0 && level > prevLevel + 1) {
+                    items.push({ type: 'skip', from: prevLevel, to: level });
+                    issueCount++;
+                }
+                items.push({ type: 'heading', heading, level });
+                prevLevel = level;
+            });
+
+            // Build HTML rows
+            const warnSvg = `<svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="13" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
+
+            const rows = items.map((item) => {
+                if (item.type === 'skip') {
+                    return `<div class="uw-a11y-outline-skip" role="alert">${warnSvg}<span>Skipped level: H${item.from} → H${item.to}</span></div>`;
+                }
+                const { heading, level } = item;
+                const col = levelColors[level] || levelColors[6];
+                const indent = (level - 1) * 14;
+                const safeText = heading.text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                const headingDataIdx = headings.indexOf(heading);
+                return `<button class="uw-a11y-outline-item" data-hi="${headingDataIdx}" style="padding-left:${indent + 8}px;" title="Jump to: ${safeText}">
+                    <span class="uw-a11y-outline-badge" style="background:${col.bg};color:${col.color};">H${level}</span>
+                    <span class="uw-a11y-outline-text">${safeText || '<em>(empty)</em>'}</span>
+                </button>`;
+            }).join('');
+
+            container.innerHTML = `<div class="uw-a11y-outline-list">${rows}</div>`;
+
+            // Update summary count
+            if (countEl) {
+                countEl.textContent = issueCount > 0
+                    ? `${headings.length} headings · ${issueCount} order issue${issueCount !== 1 ? 's' : ''}`
+                    : `${headings.length} headings · No order issues`;
+                countEl.style.color = issueCount > 0 ? '#b45309' : '#059669';
+            }
+
+            // Wire click-to-scroll for each heading button
+            container.querySelectorAll('.uw-a11y-outline-item[data-hi]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = parseInt(btn.dataset.hi, 10);
+                    const target = headings[idx] && headings[idx].element;
+                    if (!target) return;
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Briefly highlight the heading on the page
+                    const prevOutline = target.style.outline;
+                    const prevOffset = target.style.outlineOffset;
+                    const prevTransition = target.style.transition;
+                    target.style.transition = 'outline 0.15s';
+                    target.style.outline = '3px solid #6d28d9';
+                    target.style.outlineOffset = '4px';
+                    setTimeout(() => {
+                        target.style.outline = prevOutline;
+                        target.style.outlineOffset = prevOffset;
+                        target.style.transition = prevTransition;
+                    }, 1800);
+                });
+            });
         },
 
         // Toggle tab order visualization
@@ -5836,13 +6530,6 @@
                     opacity: 0;
                 }
                 
-                .uw-a11y-tab-indicator:nth-child(odd) {
-                    background: #ff6b35;
-                }
-                
-                .uw-a11y-tab-indicator:nth-child(even) {
-                    background: #4285f4;
-                }
                 
                 @keyframes uw-tab-indicator-appear {
                     0% {
@@ -5976,6 +6663,18 @@
                             <span class="uw-a11y-toggle-slider"></span>
                         </label>
                     </div>
+
+                    <p class="uw-a11y-section-divider">Results</p>
+
+                    <div class="uw-a11y-setting-card">
+                        <div class="uw-a11y-setting-label">Dismissed False Positives</div>
+                        <div class="uw-a11y-helptext" style="margin-bottom:10px;">Issues you've dismissed as false positives are hidden from results and remembered across sessions.</div>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <span id="uw-a11y-dismissed-count" style="font-size:13px;color:#555;"></span>
+                            <button id="uw-a11y-clear-dismissed" class="uw-a11y-btn uw-a11y-btn-secondary" style="font-size:12px;padding:4px 10px;" hidden
+                                onclick="window.uwAccessibilityChecker.clearDismissedIssues()">Restore all dismissed</button>
+                        </div>
+                    </div>
                 </div>
             `;
 
@@ -6069,6 +6768,9 @@
                 if (msg) { msg.textContent = 'Reset to defaults.'; msg.className = 'uw-a11y-msg ok'; }
             });
 
+            // Populate dismissed count immediately
+            this.updateDismissedCount();
+
         },
 
         // Remove essential/selectors from a provided list
@@ -6135,17 +6837,27 @@
             const results = this.shadowRoot.getElementById('uw-a11y-results');
             if (!results) return;
             const issuesToShow = this.getIssuesForFilters();
-            if (issuesToShow.length === 0) {
+            const dismissed = this.getDismissedIssues();
+            const groupedIssues = this.groupIssuesByRule(issuesToShow);
+            // Filter out dismissed rule groups
+            const visibleRuleIds = Object.keys(groupedIssues).filter(id => !dismissed.has(id));
+            if (visibleRuleIds.length === 0) {
+                const dismissedCount = dismissed.size;
                 results.innerHTML = `
                     <div class="uw-a11y-issue info">
                         <h4>No issues to display</h4>
-                        <p>Adjust the filters above to show hidden groups.</p>
+                        <p>Adjust the filters above to show hidden groups${dismissedCount > 0 ? `, or <button class="uw-a11y-link-btn" onclick="window.uwAccessibilityChecker.clearDismissedIssues()">restore ${dismissedCount} dismissed issue${dismissedCount !== 1 ? 's' : ''}</button>` : ''}.</p>
                     </div>
                 `;
                 return;
             }
-            const groupedIssues = this.groupIssuesByRule(issuesToShow);
-            const generatedHtml = Object.keys(groupedIssues).map((ruleId, index) => {
+            const dismissedBanner = dismissed.size > 0 ? `
+                <div class="uw-a11y-dismissed-banner">
+                    ${dismissed.size} issue${dismissed.size !== 1 ? 's' : ''} dismissed as false positive${dismissed.size !== 1 ? 's' : ''} &mdash;
+                    <button class="uw-a11y-link-btn" onclick="window.uwAccessibilityChecker.clearDismissedIssues()">Restore all</button>
+                </div>
+            ` : '';
+            const generatedHtml = dismissedBanner + visibleRuleIds.map((ruleId) => {
                 const issueGroup = groupedIssues[ruleId];
                 const firstIssue = issueGroup[0];
                 const isManualReview = firstIssue.type === 'warning' && firstIssue.uniqueId;
@@ -6189,7 +6901,9 @@
                         ` : ''}
                         <div class=\"issue-meta\"><div><strong>Impact:</strong> ${this.escapeHtmlContent(firstIssue.impact || 'unknown')}
                         ${firstIssue.helpUrl ? `<br><a href=\"${this.escapeUrl(firstIssue.helpUrl)}\" target=\"_blank\" class=\"learn-more\">Learn more about this rule</a>` : ''}
-                        </div></div>
+                        </div>
+                        <button class=\"uw-a11y-dismiss-btn\" title=\"Mark as false positive and hide from results\" onclick=\"window.uwAccessibilityChecker.dismissIssue('${this.escapeJavaScript(ruleId)}', this); event.stopPropagation();\">Dismiss</button>
+                        </div>
                     </div>`;
             }).join('');
             results.innerHTML = generatedHtml;
@@ -6202,6 +6916,70 @@
             });
         },
         
+        // ── Dismissed (false positive) issue management ──────────────────────
+        getDismissedIssues: function() {
+            try {
+                const stored = localStorage.getItem('uw-a11y-dismissed');
+                return stored ? new Set(JSON.parse(stored)) : new Set();
+            } catch (_) { return new Set(); }
+        },
+
+        saveDismissedIssues: function(dismissed) {
+            try {
+                localStorage.setItem('uw-a11y-dismissed', JSON.stringify([...dismissed]));
+            } catch (_) {}
+        },
+
+        dismissIssue: function(ruleId, btn) {
+            // Two-step confirmation: first click warns, second click within 4s confirms.
+            if (btn && !btn.dataset.confirming) {
+                btn.dataset.confirming = '1';
+                btn.textContent = 'Confirm dismiss';
+                btn.title = 'Only dismiss if this is a confirmed false positive. Click again to confirm.';
+                btn.classList.add('uw-a11y-dismiss-btn--confirming');
+
+                const t = setTimeout(() => {
+                    if (btn.isConnected) {
+                        delete btn.dataset.confirming;
+                        btn.textContent = 'Dismiss';
+                        btn.title = 'Mark as false positive and hide from results';
+                        btn.classList.remove('uw-a11y-dismiss-btn--confirming');
+                    }
+                }, 4000);
+                btn.dataset.confirmTimeout = String(t);
+                return;
+            }
+
+            // Second click (or direct call without btn): actually dismiss
+            if (btn && btn.dataset.confirmTimeout) {
+                clearTimeout(parseInt(btn.dataset.confirmTimeout, 10));
+            }
+
+            const dismissed = this.getDismissedIssues();
+            dismissed.add(ruleId);
+            this.saveDismissedIssues(dismissed);
+            this.refreshIssueList();
+            this.updateScore();
+            this.updateDismissedCount();
+        },
+
+        clearDismissedIssues: function() {
+            localStorage.removeItem('uw-a11y-dismissed');
+            this.refreshIssueList();
+            this.updateScore();
+            this.updateDismissedCount();
+        },
+
+        // Update the dismissed count badge in Settings (if the panel is open)
+        updateDismissedCount: function() {
+            const el = this.shadowRoot.getElementById('uw-a11y-dismissed-count');
+            if (!el) return;
+            const count = this.getDismissedIssues().size;
+            el.textContent = count > 0 ? `${count} dismissed` : 'None';
+            const clearBtn = this.shadowRoot.getElementById('uw-a11y-clear-dismissed');
+            if (clearBtn) clearBtn.hidden = count === 0;
+        },
+
         addIssue: function(type, title, description, element, recommendation, helpUrl, impact, tags, detailedInfo, ruleId) {
             const issueId = this.issues.length; // Use array index as unique ID
             // Attempt to compute a selector for resilience if the DOM re-renders

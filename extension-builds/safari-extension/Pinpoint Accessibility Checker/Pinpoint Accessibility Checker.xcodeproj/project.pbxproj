@@ -7,86 +7,86 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1F790E882E871DF700F5A582 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F790E872E871DF700F5A582 /* AppDelegate.swift */; };
-		1F790E8A2E871DF700F5A582 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F790E892E871DF700F5A582 /* SceneDelegate.swift */; };
-		1F790E8D2E871DF700F5A582 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F790E8B2E871DF700F5A582 /* LaunchScreen.storyboard */; };
-		1F790E902E871DF700F5A582 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F790E8E2E871DF700F5A582 /* Main.storyboard */; };
-		1F790E992E871DF700F5A582 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F790E982E871DF700F5A582 /* AppDelegate.swift */; };
-		1F790E9C2E871DF700F5A582 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F790E9A2E871DF700F5A582 /* Main.storyboard */; };
-		1F790EA32E871DF700F5A582 /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1F790EA22E871DF700F5A582 /* Pinpoint Accessibility Checker Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		1F790EAD2E871DF700F5A582 /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1F790EAC2E871DF700F5A582 /* Pinpoint Accessibility Checker Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		1F790EB22E871DF700F5A582 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F790E772E871DF600F5A582 /* Main.html */; };
-		1F790EB32E871DF700F5A582 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F790E772E871DF600F5A582 /* Main.html */; };
-		1F790EB42E871DF700F5A582 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F790E792E871DF600F5A582 /* Icon.png */; };
-		1F790EB52E871DF700F5A582 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F790E792E871DF600F5A582 /* Icon.png */; };
-		1F790EB62E871DF700F5A582 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F790E7A2E871DF600F5A582 /* Style.css */; };
-		1F790EB72E871DF700F5A582 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F790E7A2E871DF600F5A582 /* Style.css */; };
-		1F790EB82E871DF700F5A582 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F790E7B2E871DF600F5A582 /* Script.js */; };
-		1F790EB92E871DF700F5A582 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F790E7B2E871DF600F5A582 /* Script.js */; };
-		1F790EBA2E871DF700F5A582 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F790E7C2E871DF600F5A582 /* ViewController.swift */; };
-		1F790EBB2E871DF700F5A582 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F790E7C2E871DF600F5A582 /* ViewController.swift */; };
-		1F790EBC2E871DF700F5A582 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F790E7D2E871DF700F5A582 /* Assets.xcassets */; };
-		1F790EBD2E871DF700F5A582 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F790E7D2E871DF700F5A582 /* Assets.xcassets */; };
-		1F790EBE2E871DF700F5A582 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F790E7F2E871DF700F5A582 /* SafariWebExtensionHandler.swift */; };
-		1F790EBF2E871DF700F5A582 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F790E7F2E871DF700F5A582 /* SafariWebExtensionHandler.swift */; };
-		1F790EDB2E871DF700F5A582 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED12E871DF700F5A582 /* popup.js */; };
-		1F790EDC2E871DF700F5A582 /* gsap.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED22E871DF700F5A582 /* gsap.min.js */; };
-		1F790EDD2E871DF700F5A582 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED32E871DF700F5A582 /* background.js */; };
-		1F790EDE2E871DF700F5A582 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED42E871DF700F5A582 /* popup.html */; };
-		1F790EDF2E871DF700F5A582 /* axe-core.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED52E871DF700F5A582 /* axe-core.min.js */; };
-		1F790EE02E871DF700F5A582 /* accessibility-checker.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED62E871DF700F5A582 /* accessibility-checker.js */; };
-		1F790EE12E871DF700F5A582 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED72E871DF700F5A582 /* icons */; };
-		1F790EE22E871DF700F5A582 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED82E871DF700F5A582 /* manifest.json */; };
-		1F790EE32E871DF700F5A582 /* content-script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED92E871DF700F5A582 /* content-script.js */; };
-		1F790EE42E871DF700F5A582 /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F790EDA2E871DF700F5A582 /* popup.css */; };
-		1F790EE52E871DF700F5A582 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED12E871DF700F5A582 /* popup.js */; };
-		1F790EE62E871DF700F5A582 /* gsap.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED22E871DF700F5A582 /* gsap.min.js */; };
-		1F790EE72E871DF700F5A582 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED32E871DF700F5A582 /* background.js */; };
-		1F790EE82E871DF700F5A582 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED42E871DF700F5A582 /* popup.html */; };
-		1F790EE92E871DF700F5A582 /* axe-core.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED52E871DF700F5A582 /* axe-core.min.js */; };
-		1F790EEA2E871DF700F5A582 /* accessibility-checker.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED62E871DF700F5A582 /* accessibility-checker.js */; };
-		1F790EEB2E871DF700F5A582 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED72E871DF700F5A582 /* icons */; };
-		1F790EEC2E871DF700F5A582 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED82E871DF700F5A582 /* manifest.json */; };
-		1F790EED2E871DF700F5A582 /* content-script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F790ED92E871DF700F5A582 /* content-script.js */; };
-		1F790EEE2E871DF700F5A582 /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F790EDA2E871DF700F5A582 /* popup.css */; };
+		1F6BD9302F704A5C00DE9099 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F6BD92F2F704A5C00DE9099 /* AppDelegate.swift */; };
+		1F6BD9322F704A5C00DE9099 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F6BD9312F704A5C00DE9099 /* SceneDelegate.swift */; };
+		1F6BD9352F704A5C00DE9099 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9332F704A5C00DE9099 /* LaunchScreen.storyboard */; };
+		1F6BD9382F704A5C00DE9099 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9362F704A5C00DE9099 /* Main.storyboard */; };
+		1F6BD9412F704A5C00DE9099 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F6BD9402F704A5C00DE9099 /* AppDelegate.swift */; };
+		1F6BD9442F704A5C00DE9099 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9422F704A5C00DE9099 /* Main.storyboard */; };
+		1F6BD94B2F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1F6BD94A2F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1F6BD9552F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1F6BD9542F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1F6BD95A2F704A5C00DE9099 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD91F2F704A5B00DE9099 /* Main.html */; };
+		1F6BD95B2F704A5C00DE9099 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD91F2F704A5B00DE9099 /* Main.html */; };
+		1F6BD95C2F704A5C00DE9099 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9212F704A5B00DE9099 /* Icon.png */; };
+		1F6BD95D2F704A5C00DE9099 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9212F704A5B00DE9099 /* Icon.png */; };
+		1F6BD95E2F704A5C00DE9099 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9222F704A5B00DE9099 /* Style.css */; };
+		1F6BD95F2F704A5C00DE9099 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9222F704A5B00DE9099 /* Style.css */; };
+		1F6BD9602F704A5C00DE9099 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9232F704A5B00DE9099 /* Script.js */; };
+		1F6BD9612F704A5C00DE9099 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9232F704A5B00DE9099 /* Script.js */; };
+		1F6BD9622F704A5C00DE9099 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F6BD9242F704A5B00DE9099 /* ViewController.swift */; };
+		1F6BD9632F704A5C00DE9099 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F6BD9242F704A5B00DE9099 /* ViewController.swift */; };
+		1F6BD9642F704A5C00DE9099 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9252F704A5C00DE9099 /* Assets.xcassets */; };
+		1F6BD9652F704A5C00DE9099 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9252F704A5C00DE9099 /* Assets.xcassets */; };
+		1F6BD9662F704A5C00DE9099 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F6BD9272F704A5C00DE9099 /* SafariWebExtensionHandler.swift */; };
+		1F6BD9672F704A5C00DE9099 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F6BD9272F704A5C00DE9099 /* SafariWebExtensionHandler.swift */; };
+		1F6BD9832F704A5C00DE9099 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9792F704A5C00DE9099 /* popup.js */; };
+		1F6BD9842F704A5C00DE9099 /* gsap.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD97A2F704A5C00DE9099 /* gsap.min.js */; };
+		1F6BD9852F704A5C00DE9099 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD97B2F704A5C00DE9099 /* background.js */; };
+		1F6BD9862F704A5C00DE9099 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD97C2F704A5C00DE9099 /* popup.html */; };
+		1F6BD9872F704A5C00DE9099 /* axe-core.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD97D2F704A5C00DE9099 /* axe-core.min.js */; };
+		1F6BD9882F704A5C00DE9099 /* accessibility-checker.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD97E2F704A5C00DE9099 /* accessibility-checker.js */; };
+		1F6BD9892F704A5C00DE9099 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD97F2F704A5C00DE9099 /* icons */; };
+		1F6BD98A2F704A5C00DE9099 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9802F704A5C00DE9099 /* manifest.json */; };
+		1F6BD98B2F704A5C00DE9099 /* content-script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9812F704A5C00DE9099 /* content-script.js */; };
+		1F6BD98C2F704A5C00DE9099 /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9822F704A5C00DE9099 /* popup.css */; };
+		1F6BD98D2F704A5C00DE9099 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9792F704A5C00DE9099 /* popup.js */; };
+		1F6BD98E2F704A5C00DE9099 /* gsap.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD97A2F704A5C00DE9099 /* gsap.min.js */; };
+		1F6BD98F2F704A5C00DE9099 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD97B2F704A5C00DE9099 /* background.js */; };
+		1F6BD9902F704A5C00DE9099 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD97C2F704A5C00DE9099 /* popup.html */; };
+		1F6BD9912F704A5C00DE9099 /* axe-core.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD97D2F704A5C00DE9099 /* axe-core.min.js */; };
+		1F6BD9922F704A5C00DE9099 /* accessibility-checker.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD97E2F704A5C00DE9099 /* accessibility-checker.js */; };
+		1F6BD9932F704A5C00DE9099 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD97F2F704A5C00DE9099 /* icons */; };
+		1F6BD9942F704A5C00DE9099 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9802F704A5C00DE9099 /* manifest.json */; };
+		1F6BD9952F704A5C00DE9099 /* content-script.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9812F704A5C00DE9099 /* content-script.js */; };
+		1F6BD9962F704A5C00DE9099 /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F6BD9822F704A5C00DE9099 /* popup.css */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		1F790EA42E871DF700F5A582 /* PBXContainerItemProxy */ = {
+		1F6BD94C2F704A5C00DE9099 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 1F790E712E871DF600F5A582 /* Project object */;
+			containerPortal = 1F6BD9192F704A5B00DE9099 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 1F790EA12E871DF700F5A582;
+			remoteGlobalIDString = 1F6BD9492F704A5C00DE9099;
 			remoteInfo = "Pinpoint Accessibility Checker Extension (iOS)";
 		};
-		1F790EAE2E871DF700F5A582 /* PBXContainerItemProxy */ = {
+		1F6BD9562F704A5C00DE9099 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 1F790E712E871DF600F5A582 /* Project object */;
+			containerPortal = 1F6BD9192F704A5B00DE9099 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 1F790EAB2E871DF700F5A582;
+			remoteGlobalIDString = 1F6BD9532F704A5C00DE9099;
 			remoteInfo = "Pinpoint Accessibility Checker Extension (macOS)";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		1F790EC52E871DF700F5A582 /* Embed Foundation Extensions */ = {
+		1F6BD96D2F704A5C00DE9099 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				1F790EA32E871DF700F5A582 /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */,
+				1F6BD94B2F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F790ECC2E871DF700F5A582 /* Embed Foundation Extensions */ = {
+		1F6BD9742F704A5C00DE9099 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				1F790EAD2E871DF700F5A582 /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */,
+				1F6BD9552F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -94,62 +94,62 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		1F790E782E871DF600F5A582 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
-		1F790E792E871DF600F5A582 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
-		1F790E7A2E871DF600F5A582 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
-		1F790E7B2E871DF600F5A582 /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
-		1F790E7C2E871DF600F5A582 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		1F790E7D2E871DF700F5A582 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		1F790E7F2E871DF700F5A582 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
-		1F790E842E871DF700F5A582 /* Pinpoint Accessibility Checker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pinpoint Accessibility Checker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		1F790E872E871DF700F5A582 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		1F790E892E871DF700F5A582 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		1F790E8C2E871DF700F5A582 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		1F790E8F2E871DF700F5A582 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		1F790E912E871DF700F5A582 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1F790E962E871DF700F5A582 /* Pinpoint Accessibility Checker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pinpoint Accessibility Checker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		1F790E982E871DF700F5A582 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		1F790E9B2E871DF700F5A582 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		1F790E9D2E871DF700F5A582 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1F790EA22E871DF700F5A582 /* Pinpoint Accessibility Checker Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Pinpoint Accessibility Checker Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		1F790EA72E871DF700F5A582 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1F790EAC2E871DF700F5A582 /* Pinpoint Accessibility Checker Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Pinpoint Accessibility Checker Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		1F790EB12E871DF700F5A582 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1F790ED12E871DF700F5A582 /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = Resources/popup.js; sourceTree = "<group>"; };
-		1F790ED22E871DF700F5A582 /* gsap.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = gsap.min.js; path = Resources/gsap.min.js; sourceTree = "<group>"; };
-		1F790ED32E871DF700F5A582 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = Resources/background.js; sourceTree = "<group>"; };
-		1F790ED42E871DF700F5A582 /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = Resources/popup.html; sourceTree = "<group>"; };
-		1F790ED52E871DF700F5A582 /* axe-core.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "axe-core.min.js"; path = "Resources/axe-core.min.js"; sourceTree = "<group>"; };
-		1F790ED62E871DF700F5A582 /* accessibility-checker.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "accessibility-checker.js"; path = "Resources/accessibility-checker.js"; sourceTree = "<group>"; };
-		1F790ED72E871DF700F5A582 /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = icons; path = Resources/icons; sourceTree = "<group>"; };
-		1F790ED82E871DF700F5A582 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = Resources/manifest.json; sourceTree = "<group>"; };
-		1F790ED92E871DF700F5A582 /* content-script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "content-script.js"; path = "Resources/content-script.js"; sourceTree = "<group>"; };
-		1F790EDA2E871DF700F5A582 /* popup.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = popup.css; path = Resources/popup.css; sourceTree = "<group>"; };
+		1F6BD9202F704A5B00DE9099 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
+		1F6BD9212F704A5B00DE9099 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		1F6BD9222F704A5B00DE9099 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		1F6BD9232F704A5B00DE9099 /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		1F6BD9242F704A5B00DE9099 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		1F6BD9252F704A5C00DE9099 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1F6BD9272F704A5C00DE9099 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		1F6BD92C2F704A5C00DE9099 /* Pinpoint Accessibility Checker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pinpoint Accessibility Checker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F6BD92F2F704A5C00DE9099 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		1F6BD9312F704A5C00DE9099 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		1F6BD9342F704A5C00DE9099 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		1F6BD9372F704A5C00DE9099 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		1F6BD9392F704A5C00DE9099 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1F6BD93E2F704A5C00DE9099 /* Pinpoint Accessibility Checker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pinpoint Accessibility Checker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F6BD9402F704A5C00DE9099 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		1F6BD9432F704A5C00DE9099 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		1F6BD9452F704A5C00DE9099 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1F6BD94A2F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Pinpoint Accessibility Checker Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F6BD94F2F704A5C00DE9099 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1F6BD9542F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Pinpoint Accessibility Checker Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F6BD9592F704A5C00DE9099 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1F6BD9792F704A5C00DE9099 /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = Resources/popup.js; sourceTree = "<group>"; };
+		1F6BD97A2F704A5C00DE9099 /* gsap.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = gsap.min.js; path = Resources/gsap.min.js; sourceTree = "<group>"; };
+		1F6BD97B2F704A5C00DE9099 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = Resources/background.js; sourceTree = "<group>"; };
+		1F6BD97C2F704A5C00DE9099 /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = Resources/popup.html; sourceTree = "<group>"; };
+		1F6BD97D2F704A5C00DE9099 /* axe-core.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "axe-core.min.js"; path = "Resources/axe-core.min.js"; sourceTree = "<group>"; };
+		1F6BD97E2F704A5C00DE9099 /* accessibility-checker.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "accessibility-checker.js"; path = "Resources/accessibility-checker.js"; sourceTree = "<group>"; };
+		1F6BD97F2F704A5C00DE9099 /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = icons; path = Resources/icons; sourceTree = "<group>"; };
+		1F6BD9802F704A5C00DE9099 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = Resources/manifest.json; sourceTree = "<group>"; };
+		1F6BD9812F704A5C00DE9099 /* content-script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "content-script.js"; path = "Resources/content-script.js"; sourceTree = "<group>"; };
+		1F6BD9822F704A5C00DE9099 /* popup.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = popup.css; path = Resources/popup.css; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		1F790E812E871DF700F5A582 /* Frameworks */ = {
+		1F6BD9292F704A5C00DE9099 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F790E932E871DF700F5A582 /* Frameworks */ = {
+		1F6BD93B2F704A5C00DE9099 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F790E9F2E871DF700F5A582 /* Frameworks */ = {
+		1F6BD9472F704A5C00DE9099 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F790EA92E871DF700F5A582 /* Frameworks */ = {
+		1F6BD9512F704A5C00DE9099 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -159,111 +159,111 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1F790E702E871DF600F5A582 = {
+		1F6BD9182F704A5B00DE9099 = {
 			isa = PBXGroup;
 			children = (
-				1F790E752E871DF600F5A582 /* Shared (App) */,
-				1F790E7E2E871DF700F5A582 /* Shared (Extension) */,
-				1F790E862E871DF700F5A582 /* iOS (App) */,
-				1F790E972E871DF700F5A582 /* macOS (App) */,
-				1F790EA62E871DF700F5A582 /* iOS (Extension) */,
-				1F790EB02E871DF700F5A582 /* macOS (Extension) */,
-				1F790E852E871DF700F5A582 /* Products */,
+				1F6BD91D2F704A5B00DE9099 /* Shared (App) */,
+				1F6BD9262F704A5C00DE9099 /* Shared (Extension) */,
+				1F6BD92E2F704A5C00DE9099 /* iOS (App) */,
+				1F6BD93F2F704A5C00DE9099 /* macOS (App) */,
+				1F6BD94E2F704A5C00DE9099 /* iOS (Extension) */,
+				1F6BD9582F704A5C00DE9099 /* macOS (Extension) */,
+				1F6BD92D2F704A5C00DE9099 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		1F790E752E871DF600F5A582 /* Shared (App) */ = {
+		1F6BD91D2F704A5B00DE9099 /* Shared (App) */ = {
 			isa = PBXGroup;
 			children = (
-				1F790E7C2E871DF600F5A582 /* ViewController.swift */,
-				1F790E7D2E871DF700F5A582 /* Assets.xcassets */,
-				1F790E762E871DF600F5A582 /* Resources */,
+				1F6BD9242F704A5B00DE9099 /* ViewController.swift */,
+				1F6BD9252F704A5C00DE9099 /* Assets.xcassets */,
+				1F6BD91E2F704A5B00DE9099 /* Resources */,
 			);
 			path = "Shared (App)";
 			sourceTree = "<group>";
 		};
-		1F790E762E871DF600F5A582 /* Resources */ = {
+		1F6BD91E2F704A5B00DE9099 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				1F790E772E871DF600F5A582 /* Main.html */,
-				1F790E792E871DF600F5A582 /* Icon.png */,
-				1F790E7A2E871DF600F5A582 /* Style.css */,
-				1F790E7B2E871DF600F5A582 /* Script.js */,
+				1F6BD91F2F704A5B00DE9099 /* Main.html */,
+				1F6BD9212F704A5B00DE9099 /* Icon.png */,
+				1F6BD9222F704A5B00DE9099 /* Style.css */,
+				1F6BD9232F704A5B00DE9099 /* Script.js */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		1F790E7E2E871DF700F5A582 /* Shared (Extension) */ = {
+		1F6BD9262F704A5C00DE9099 /* Shared (Extension) */ = {
 			isa = PBXGroup;
 			children = (
-				1F790ED02E871DF700F5A582 /* Resources */,
-				1F790E7F2E871DF700F5A582 /* SafariWebExtensionHandler.swift */,
+				1F6BD9782F704A5C00DE9099 /* Resources */,
+				1F6BD9272F704A5C00DE9099 /* SafariWebExtensionHandler.swift */,
 			);
 			path = "Shared (Extension)";
 			sourceTree = "<group>";
 		};
-		1F790E852E871DF700F5A582 /* Products */ = {
+		1F6BD92D2F704A5C00DE9099 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1F790E842E871DF700F5A582 /* Pinpoint Accessibility Checker.app */,
-				1F790E962E871DF700F5A582 /* Pinpoint Accessibility Checker.app */,
-				1F790EA22E871DF700F5A582 /* Pinpoint Accessibility Checker Extension.appex */,
-				1F790EAC2E871DF700F5A582 /* Pinpoint Accessibility Checker Extension.appex */,
+				1F6BD92C2F704A5C00DE9099 /* Pinpoint Accessibility Checker.app */,
+				1F6BD93E2F704A5C00DE9099 /* Pinpoint Accessibility Checker.app */,
+				1F6BD94A2F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension.appex */,
+				1F6BD9542F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		1F790E862E871DF700F5A582 /* iOS (App) */ = {
+		1F6BD92E2F704A5C00DE9099 /* iOS (App) */ = {
 			isa = PBXGroup;
 			children = (
-				1F790E872E871DF700F5A582 /* AppDelegate.swift */,
-				1F790E892E871DF700F5A582 /* SceneDelegate.swift */,
-				1F790E8B2E871DF700F5A582 /* LaunchScreen.storyboard */,
-				1F790E8E2E871DF700F5A582 /* Main.storyboard */,
-				1F790E912E871DF700F5A582 /* Info.plist */,
+				1F6BD92F2F704A5C00DE9099 /* AppDelegate.swift */,
+				1F6BD9312F704A5C00DE9099 /* SceneDelegate.swift */,
+				1F6BD9332F704A5C00DE9099 /* LaunchScreen.storyboard */,
+				1F6BD9362F704A5C00DE9099 /* Main.storyboard */,
+				1F6BD9392F704A5C00DE9099 /* Info.plist */,
 			);
 			path = "iOS (App)";
 			sourceTree = "<group>";
 		};
-		1F790E972E871DF700F5A582 /* macOS (App) */ = {
+		1F6BD93F2F704A5C00DE9099 /* macOS (App) */ = {
 			isa = PBXGroup;
 			children = (
-				1F790E982E871DF700F5A582 /* AppDelegate.swift */,
-				1F790E9A2E871DF700F5A582 /* Main.storyboard */,
-				1F790E9D2E871DF700F5A582 /* Info.plist */,
+				1F6BD9402F704A5C00DE9099 /* AppDelegate.swift */,
+				1F6BD9422F704A5C00DE9099 /* Main.storyboard */,
+				1F6BD9452F704A5C00DE9099 /* Info.plist */,
 			);
 			path = "macOS (App)";
 			sourceTree = "<group>";
 		};
-		1F790EA62E871DF700F5A582 /* iOS (Extension) */ = {
+		1F6BD94E2F704A5C00DE9099 /* iOS (Extension) */ = {
 			isa = PBXGroup;
 			children = (
-				1F790EA72E871DF700F5A582 /* Info.plist */,
+				1F6BD94F2F704A5C00DE9099 /* Info.plist */,
 			);
 			path = "iOS (Extension)";
 			sourceTree = "<group>";
 		};
-		1F790EB02E871DF700F5A582 /* macOS (Extension) */ = {
+		1F6BD9582F704A5C00DE9099 /* macOS (Extension) */ = {
 			isa = PBXGroup;
 			children = (
-				1F790EB12E871DF700F5A582 /* Info.plist */,
+				1F6BD9592F704A5C00DE9099 /* Info.plist */,
 			);
 			path = "macOS (Extension)";
 			sourceTree = "<group>";
 		};
-		1F790ED02E871DF700F5A582 /* Resources */ = {
+		1F6BD9782F704A5C00DE9099 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				1F790ED12E871DF700F5A582 /* popup.js */,
-				1F790ED22E871DF700F5A582 /* gsap.min.js */,
-				1F790ED32E871DF700F5A582 /* background.js */,
-				1F790ED42E871DF700F5A582 /* popup.html */,
-				1F790ED52E871DF700F5A582 /* axe-core.min.js */,
-				1F790ED62E871DF700F5A582 /* accessibility-checker.js */,
-				1F790ED72E871DF700F5A582 /* icons */,
-				1F790ED82E871DF700F5A582 /* manifest.json */,
-				1F790ED92E871DF700F5A582 /* content-script.js */,
-				1F790EDA2E871DF700F5A582 /* popup.css */,
+				1F6BD9792F704A5C00DE9099 /* popup.js */,
+				1F6BD97A2F704A5C00DE9099 /* gsap.min.js */,
+				1F6BD97B2F704A5C00DE9099 /* background.js */,
+				1F6BD97C2F704A5C00DE9099 /* popup.html */,
+				1F6BD97D2F704A5C00DE9099 /* axe-core.min.js */,
+				1F6BD97E2F704A5C00DE9099 /* accessibility-checker.js */,
+				1F6BD97F2F704A5C00DE9099 /* icons */,
+				1F6BD9802F704A5C00DE9099 /* manifest.json */,
+				1F6BD9812F704A5C00DE9099 /* content-script.js */,
+				1F6BD9822F704A5C00DE9099 /* popup.css */,
 			);
 			name = Resources;
 			path = "Shared (Extension)";
@@ -272,55 +272,55 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1F790E832E871DF700F5A582 /* Pinpoint Accessibility Checker (iOS) */ = {
+		1F6BD92B2F704A5C00DE9099 /* Pinpoint Accessibility Checker (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1F790EC62E871DF700F5A582 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (iOS)" */;
+			buildConfigurationList = 1F6BD96E2F704A5C00DE9099 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (iOS)" */;
 			buildPhases = (
-				1F790E802E871DF700F5A582 /* Sources */,
-				1F790E812E871DF700F5A582 /* Frameworks */,
-				1F790E822E871DF700F5A582 /* Resources */,
-				1F790EC52E871DF700F5A582 /* Embed Foundation Extensions */,
+				1F6BD9282F704A5C00DE9099 /* Sources */,
+				1F6BD9292F704A5C00DE9099 /* Frameworks */,
+				1F6BD92A2F704A5C00DE9099 /* Resources */,
+				1F6BD96D2F704A5C00DE9099 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				1F790EA52E871DF700F5A582 /* PBXTargetDependency */,
+				1F6BD94D2F704A5C00DE9099 /* PBXTargetDependency */,
 			);
 			name = "Pinpoint Accessibility Checker (iOS)";
 			packageProductDependencies = (
 			);
 			productName = "Pinpoint Accessibility Checker (iOS)";
-			productReference = 1F790E842E871DF700F5A582 /* Pinpoint Accessibility Checker.app */;
+			productReference = 1F6BD92C2F704A5C00DE9099 /* Pinpoint Accessibility Checker.app */;
 			productType = "com.apple.product-type.application";
 		};
-		1F790E952E871DF700F5A582 /* Pinpoint Accessibility Checker (macOS) */ = {
+		1F6BD93D2F704A5C00DE9099 /* Pinpoint Accessibility Checker (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1F790ECD2E871DF700F5A582 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (macOS)" */;
+			buildConfigurationList = 1F6BD9752F704A5C00DE9099 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (macOS)" */;
 			buildPhases = (
-				1F790E922E871DF700F5A582 /* Sources */,
-				1F790E932E871DF700F5A582 /* Frameworks */,
-				1F790E942E871DF700F5A582 /* Resources */,
-				1F790ECC2E871DF700F5A582 /* Embed Foundation Extensions */,
+				1F6BD93A2F704A5C00DE9099 /* Sources */,
+				1F6BD93B2F704A5C00DE9099 /* Frameworks */,
+				1F6BD93C2F704A5C00DE9099 /* Resources */,
+				1F6BD9742F704A5C00DE9099 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				1F790EAF2E871DF700F5A582 /* PBXTargetDependency */,
+				1F6BD9572F704A5C00DE9099 /* PBXTargetDependency */,
 			);
 			name = "Pinpoint Accessibility Checker (macOS)";
 			packageProductDependencies = (
 			);
 			productName = "Pinpoint Accessibility Checker (macOS)";
-			productReference = 1F790E962E871DF700F5A582 /* Pinpoint Accessibility Checker.app */;
+			productReference = 1F6BD93E2F704A5C00DE9099 /* Pinpoint Accessibility Checker.app */;
 			productType = "com.apple.product-type.application";
 		};
-		1F790EA12E871DF700F5A582 /* Pinpoint Accessibility Checker Extension (iOS) */ = {
+		1F6BD9492F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1F790EC22E871DF700F5A582 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (iOS)" */;
+			buildConfigurationList = 1F6BD96A2F704A5C00DE9099 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (iOS)" */;
 			buildPhases = (
-				1F790E9E2E871DF700F5A582 /* Sources */,
-				1F790E9F2E871DF700F5A582 /* Frameworks */,
-				1F790EA02E871DF700F5A582 /* Resources */,
+				1F6BD9462F704A5C00DE9099 /* Sources */,
+				1F6BD9472F704A5C00DE9099 /* Frameworks */,
+				1F6BD9482F704A5C00DE9099 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -330,16 +330,16 @@
 			packageProductDependencies = (
 			);
 			productName = "Pinpoint Accessibility Checker Extension (iOS)";
-			productReference = 1F790EA22E871DF700F5A582 /* Pinpoint Accessibility Checker Extension.appex */;
+			productReference = 1F6BD94A2F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		1F790EAB2E871DF700F5A582 /* Pinpoint Accessibility Checker Extension (macOS) */ = {
+		1F6BD9532F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1F790EC92E871DF700F5A582 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (macOS)" */;
+			buildConfigurationList = 1F6BD9712F704A5C00DE9099 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (macOS)" */;
 			buildPhases = (
-				1F790EA82E871DF700F5A582 /* Sources */,
-				1F790EA92E871DF700F5A582 /* Frameworks */,
-				1F790EAA2E871DF700F5A582 /* Resources */,
+				1F6BD9502F704A5C00DE9099 /* Sources */,
+				1F6BD9512F704A5C00DE9099 /* Frameworks */,
+				1F6BD9522F704A5C00DE9099 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -349,199 +349,199 @@
 			packageProductDependencies = (
 			);
 			productName = "Pinpoint Accessibility Checker Extension (macOS)";
-			productReference = 1F790EAC2E871DF700F5A582 /* Pinpoint Accessibility Checker Extension.appex */;
+			productReference = 1F6BD9542F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		1F790E712E871DF600F5A582 /* Project object */ = {
+		1F6BD9192F704A5B00DE9099 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2600;
-				LastUpgradeCheck = 2600;
+				LastSwiftUpdateCheck = 2630;
+				LastUpgradeCheck = 2630;
 				TargetAttributes = {
-					1F790E832E871DF700F5A582 = {
-						CreatedOnToolsVersion = 26.0.1;
+					1F6BD92B2F704A5C00DE9099 = {
+						CreatedOnToolsVersion = 26.3;
 					};
-					1F790E952E871DF700F5A582 = {
-						CreatedOnToolsVersion = 26.0.1;
+					1F6BD93D2F704A5C00DE9099 = {
+						CreatedOnToolsVersion = 26.3;
 					};
-					1F790EA12E871DF700F5A582 = {
-						CreatedOnToolsVersion = 26.0.1;
+					1F6BD9492F704A5C00DE9099 = {
+						CreatedOnToolsVersion = 26.3;
 					};
-					1F790EAB2E871DF700F5A582 = {
-						CreatedOnToolsVersion = 26.0.1;
+					1F6BD9532F704A5C00DE9099 = {
+						CreatedOnToolsVersion = 26.3;
 					};
 				};
 			};
-			buildConfigurationList = 1F790E742E871DF600F5A582 /* Build configuration list for PBXProject "Pinpoint Accessibility Checker" */;
+			buildConfigurationList = 1F6BD91C2F704A5B00DE9099 /* Build configuration list for PBXProject "Pinpoint Accessibility Checker" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 1F790E702E871DF600F5A582;
+			mainGroup = 1F6BD9182F704A5B00DE9099;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 1F790E852E871DF700F5A582 /* Products */;
+			productRefGroup = 1F6BD92D2F704A5C00DE9099 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				1F790E832E871DF700F5A582 /* Pinpoint Accessibility Checker (iOS) */,
-				1F790E952E871DF700F5A582 /* Pinpoint Accessibility Checker (macOS) */,
-				1F790EA12E871DF700F5A582 /* Pinpoint Accessibility Checker Extension (iOS) */,
-				1F790EAB2E871DF700F5A582 /* Pinpoint Accessibility Checker Extension (macOS) */,
+				1F6BD92B2F704A5C00DE9099 /* Pinpoint Accessibility Checker (iOS) */,
+				1F6BD93D2F704A5C00DE9099 /* Pinpoint Accessibility Checker (macOS) */,
+				1F6BD9492F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension (iOS) */,
+				1F6BD9532F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension (macOS) */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		1F790E822E871DF700F5A582 /* Resources */ = {
+		1F6BD92A2F704A5C00DE9099 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F790EB42E871DF700F5A582 /* Icon.png in Resources */,
-				1F790E8D2E871DF700F5A582 /* LaunchScreen.storyboard in Resources */,
-				1F790EB22E871DF700F5A582 /* Main.html in Resources */,
-				1F790EB82E871DF700F5A582 /* Script.js in Resources */,
-				1F790EBC2E871DF700F5A582 /* Assets.xcassets in Resources */,
-				1F790E902E871DF700F5A582 /* Main.storyboard in Resources */,
-				1F790EB62E871DF700F5A582 /* Style.css in Resources */,
+				1F6BD95C2F704A5C00DE9099 /* Icon.png in Resources */,
+				1F6BD9352F704A5C00DE9099 /* LaunchScreen.storyboard in Resources */,
+				1F6BD95A2F704A5C00DE9099 /* Main.html in Resources */,
+				1F6BD9602F704A5C00DE9099 /* Script.js in Resources */,
+				1F6BD9642F704A5C00DE9099 /* Assets.xcassets in Resources */,
+				1F6BD9382F704A5C00DE9099 /* Main.storyboard in Resources */,
+				1F6BD95E2F704A5C00DE9099 /* Style.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F790E942E871DF700F5A582 /* Resources */ = {
+		1F6BD93C2F704A5C00DE9099 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F790EB52E871DF700F5A582 /* Icon.png in Resources */,
-				1F790EB72E871DF700F5A582 /* Style.css in Resources */,
-				1F790E9C2E871DF700F5A582 /* Main.storyboard in Resources */,
-				1F790EB92E871DF700F5A582 /* Script.js in Resources */,
-				1F790EBD2E871DF700F5A582 /* Assets.xcassets in Resources */,
-				1F790EB32E871DF700F5A582 /* Main.html in Resources */,
+				1F6BD95D2F704A5C00DE9099 /* Icon.png in Resources */,
+				1F6BD95F2F704A5C00DE9099 /* Style.css in Resources */,
+				1F6BD9442F704A5C00DE9099 /* Main.storyboard in Resources */,
+				1F6BD9612F704A5C00DE9099 /* Script.js in Resources */,
+				1F6BD9652F704A5C00DE9099 /* Assets.xcassets in Resources */,
+				1F6BD95B2F704A5C00DE9099 /* Main.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F790EA02E871DF700F5A582 /* Resources */ = {
+		1F6BD9482F704A5C00DE9099 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F790EEE2E871DF700F5A582 /* popup.css in Resources */,
-				1F790EE92E871DF700F5A582 /* axe-core.min.js in Resources */,
-				1F790EEA2E871DF700F5A582 /* accessibility-checker.js in Resources */,
-				1F790EE52E871DF700F5A582 /* popup.js in Resources */,
-				1F790EE82E871DF700F5A582 /* popup.html in Resources */,
-				1F790EEC2E871DF700F5A582 /* manifest.json in Resources */,
-				1F790EED2E871DF700F5A582 /* content-script.js in Resources */,
-				1F790EE72E871DF700F5A582 /* background.js in Resources */,
-				1F790EEB2E871DF700F5A582 /* icons in Resources */,
-				1F790EE62E871DF700F5A582 /* gsap.min.js in Resources */,
+				1F6BD9962F704A5C00DE9099 /* popup.css in Resources */,
+				1F6BD9912F704A5C00DE9099 /* axe-core.min.js in Resources */,
+				1F6BD9922F704A5C00DE9099 /* accessibility-checker.js in Resources */,
+				1F6BD98D2F704A5C00DE9099 /* popup.js in Resources */,
+				1F6BD9902F704A5C00DE9099 /* popup.html in Resources */,
+				1F6BD9942F704A5C00DE9099 /* manifest.json in Resources */,
+				1F6BD9952F704A5C00DE9099 /* content-script.js in Resources */,
+				1F6BD98F2F704A5C00DE9099 /* background.js in Resources */,
+				1F6BD9932F704A5C00DE9099 /* icons in Resources */,
+				1F6BD98E2F704A5C00DE9099 /* gsap.min.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F790EAA2E871DF700F5A582 /* Resources */ = {
+		1F6BD9522F704A5C00DE9099 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F790EE42E871DF700F5A582 /* popup.css in Resources */,
-				1F790EDF2E871DF700F5A582 /* axe-core.min.js in Resources */,
-				1F790EE02E871DF700F5A582 /* accessibility-checker.js in Resources */,
-				1F790EDB2E871DF700F5A582 /* popup.js in Resources */,
-				1F790EDE2E871DF700F5A582 /* popup.html in Resources */,
-				1F790EE22E871DF700F5A582 /* manifest.json in Resources */,
-				1F790EE32E871DF700F5A582 /* content-script.js in Resources */,
-				1F790EDD2E871DF700F5A582 /* background.js in Resources */,
-				1F790EE12E871DF700F5A582 /* icons in Resources */,
-				1F790EDC2E871DF700F5A582 /* gsap.min.js in Resources */,
+				1F6BD98C2F704A5C00DE9099 /* popup.css in Resources */,
+				1F6BD9872F704A5C00DE9099 /* axe-core.min.js in Resources */,
+				1F6BD9882F704A5C00DE9099 /* accessibility-checker.js in Resources */,
+				1F6BD9832F704A5C00DE9099 /* popup.js in Resources */,
+				1F6BD9862F704A5C00DE9099 /* popup.html in Resources */,
+				1F6BD98A2F704A5C00DE9099 /* manifest.json in Resources */,
+				1F6BD98B2F704A5C00DE9099 /* content-script.js in Resources */,
+				1F6BD9852F704A5C00DE9099 /* background.js in Resources */,
+				1F6BD9892F704A5C00DE9099 /* icons in Resources */,
+				1F6BD9842F704A5C00DE9099 /* gsap.min.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		1F790E802E871DF700F5A582 /* Sources */ = {
+		1F6BD9282F704A5C00DE9099 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F790EBA2E871DF700F5A582 /* ViewController.swift in Sources */,
-				1F790E882E871DF700F5A582 /* AppDelegate.swift in Sources */,
-				1F790E8A2E871DF700F5A582 /* SceneDelegate.swift in Sources */,
+				1F6BD9622F704A5C00DE9099 /* ViewController.swift in Sources */,
+				1F6BD9302F704A5C00DE9099 /* AppDelegate.swift in Sources */,
+				1F6BD9322F704A5C00DE9099 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F790E922E871DF700F5A582 /* Sources */ = {
+		1F6BD93A2F704A5C00DE9099 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F790EBB2E871DF700F5A582 /* ViewController.swift in Sources */,
-				1F790E992E871DF700F5A582 /* AppDelegate.swift in Sources */,
+				1F6BD9632F704A5C00DE9099 /* ViewController.swift in Sources */,
+				1F6BD9412F704A5C00DE9099 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F790E9E2E871DF700F5A582 /* Sources */ = {
+		1F6BD9462F704A5C00DE9099 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F790EBE2E871DF700F5A582 /* SafariWebExtensionHandler.swift in Sources */,
+				1F6BD9662F704A5C00DE9099 /* SafariWebExtensionHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1F790EA82E871DF700F5A582 /* Sources */ = {
+		1F6BD9502F704A5C00DE9099 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F790EBF2E871DF700F5A582 /* SafariWebExtensionHandler.swift in Sources */,
+				1F6BD9672F704A5C00DE9099 /* SafariWebExtensionHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		1F790EA52E871DF700F5A582 /* PBXTargetDependency */ = {
+		1F6BD94D2F704A5C00DE9099 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 1F790EA12E871DF700F5A582 /* Pinpoint Accessibility Checker Extension (iOS) */;
-			targetProxy = 1F790EA42E871DF700F5A582 /* PBXContainerItemProxy */;
+			target = 1F6BD9492F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension (iOS) */;
+			targetProxy = 1F6BD94C2F704A5C00DE9099 /* PBXContainerItemProxy */;
 		};
-		1F790EAF2E871DF700F5A582 /* PBXTargetDependency */ = {
+		1F6BD9572F704A5C00DE9099 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 1F790EAB2E871DF700F5A582 /* Pinpoint Accessibility Checker Extension (macOS) */;
-			targetProxy = 1F790EAE2E871DF700F5A582 /* PBXContainerItemProxy */;
+			target = 1F6BD9532F704A5C00DE9099 /* Pinpoint Accessibility Checker Extension (macOS) */;
+			targetProxy = 1F6BD9562F704A5C00DE9099 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		1F790E772E871DF600F5A582 /* Main.html */ = {
+		1F6BD91F2F704A5B00DE9099 /* Main.html */ = {
 			isa = PBXVariantGroup;
 			children = (
-				1F790E782E871DF600F5A582 /* Base */,
+				1F6BD9202F704A5B00DE9099 /* Base */,
 			);
 			name = Main.html;
 			sourceTree = "<group>";
 		};
-		1F790E8B2E871DF700F5A582 /* LaunchScreen.storyboard */ = {
+		1F6BD9332F704A5C00DE9099 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				1F790E8C2E871DF700F5A582 /* Base */,
+				1F6BD9342F704A5C00DE9099 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
-		1F790E8E2E871DF700F5A582 /* Main.storyboard */ = {
+		1F6BD9362F704A5C00DE9099 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				1F790E8F2E871DF700F5A582 /* Base */,
+				1F6BD9372F704A5C00DE9099 /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
-		1F790E9A2E871DF700F5A582 /* Main.storyboard */ = {
+		1F6BD9422F704A5C00DE9099 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				1F790E9B2E871DF700F5A582 /* Base */,
+				1F6BD9432F704A5C00DE9099 /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -549,7 +549,7 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		1F790EC02E871DF700F5A582 /* Debug */ = {
+		1F6BD9682F704A5C00DE9099 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -610,7 +610,7 @@
 			};
 			name = Debug;
 		};
-		1F790EC12E871DF700F5A582 /* Release */ = {
+		1F6BD9692F704A5C00DE9099 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -663,7 +663,7 @@
 			};
 			name = Release;
 		};
-		1F790EC32E871DF700F5A582 /* Debug */ = {
+		1F6BD96B2F704A5C00DE9099 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -696,7 +696,7 @@
 			};
 			name = Debug;
 		};
-		1F790EC42E871DF700F5A582 /* Release */ = {
+		1F6BD96C2F704A5C00DE9099 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -730,7 +730,7 @@
 			};
 			name = Release;
 		};
-		1F790EC72E871DF700F5A582 /* Debug */ = {
+		1F6BD96F2F704A5C00DE9099 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -770,7 +770,7 @@
 			};
 			name = Debug;
 		};
-		1F790EC82E871DF700F5A582 /* Release */ = {
+		1F6BD9702F704A5C00DE9099 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -811,7 +811,7 @@
 			};
 			name = Release;
 		};
-		1F790ECA2E871DF700F5A582 /* Debug */ = {
+		1F6BD9722F704A5C00DE9099 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -846,7 +846,7 @@
 			};
 			name = Debug;
 		};
-		1F790ECB2E871DF700F5A582 /* Release */ = {
+		1F6BD9732F704A5C00DE9099 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -881,7 +881,7 @@
 			};
 			name = Release;
 		};
-		1F790ECE2E871DF700F5A582 /* Debug */ = {
+		1F6BD9762F704A5C00DE9099 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -922,7 +922,7 @@
 			};
 			name = Debug;
 		};
-		1F790ECF2E871DF700F5A582 /* Release */ = {
+		1F6BD9772F704A5C00DE9099 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -966,52 +966,52 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1F790E742E871DF600F5A582 /* Build configuration list for PBXProject "Pinpoint Accessibility Checker" */ = {
+		1F6BD91C2F704A5B00DE9099 /* Build configuration list for PBXProject "Pinpoint Accessibility Checker" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1F790EC02E871DF700F5A582 /* Debug */,
-				1F790EC12E871DF700F5A582 /* Release */,
+				1F6BD9682F704A5C00DE9099 /* Debug */,
+				1F6BD9692F704A5C00DE9099 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1F790EC22E871DF700F5A582 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (iOS)" */ = {
+		1F6BD96A2F704A5C00DE9099 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1F790EC32E871DF700F5A582 /* Debug */,
-				1F790EC42E871DF700F5A582 /* Release */,
+				1F6BD96B2F704A5C00DE9099 /* Debug */,
+				1F6BD96C2F704A5C00DE9099 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1F790EC62E871DF700F5A582 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (iOS)" */ = {
+		1F6BD96E2F704A5C00DE9099 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1F790EC72E871DF700F5A582 /* Debug */,
-				1F790EC82E871DF700F5A582 /* Release */,
+				1F6BD96F2F704A5C00DE9099 /* Debug */,
+				1F6BD9702F704A5C00DE9099 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1F790EC92E871DF700F5A582 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (macOS)" */ = {
+		1F6BD9712F704A5C00DE9099 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker Extension (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1F790ECA2E871DF700F5A582 /* Debug */,
-				1F790ECB2E871DF700F5A582 /* Release */,
+				1F6BD9722F704A5C00DE9099 /* Debug */,
+				1F6BD9732F704A5C00DE9099 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1F790ECD2E871DF700F5A582 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (macOS)" */ = {
+		1F6BD9752F704A5C00DE9099 /* Build configuration list for PBXNativeTarget "Pinpoint Accessibility Checker (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1F790ECE2E871DF700F5A582 /* Debug */,
-				1F790ECF2E871DF700F5A582 /* Release */,
+				1F6BD9762F704A5C00DE9099 /* Debug */,
+				1F6BD9772F704A5C00DE9099 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 1F790E712E871DF600F5A582 /* Project object */;
+	rootObject = 1F6BD9192F704A5B00DE9099 /* Project object */;
 }

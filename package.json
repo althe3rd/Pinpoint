@@ -1,6 +1,6 @@
 {
   "name": "pinpoint-accessibility-checker",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Pinpoint Accessibility Checker - A bookmarklet for WCAG testing",
   "main": "accessibility-checker.js",
   "scripts": {
@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "chokidar": "^3.5.3",
-    "terser": "^5.24.0"
+    "terser": "^5.46.1"
   },
   "keywords": [
     "accessibility",

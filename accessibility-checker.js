@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.6.0', // Current version
+            version: '1.6.1', // Current version
             websiteUrl: 'https://pinpoint.heroicpixel.com/', // Main website URL
             legacyDomainUrl: 'https://althe3rd.github.io/Pinpoint/', // Legacy domain for transition
             issues: [],
@@ -651,6 +651,10 @@
                         this.buildDetailedInfo(incomplete, node),
                         incomplete.id + '-confirmed'
                     );
+                    // Mark as escalated so the score calculator can count it.
+                    // Escalated issues come from axe incomplete (not violations), so they
+                    // are invisible to the violations-based score loop without this flag.
+                    this.issues[this.issues.length - 1].escalated = true;
                     return;
                 }
 
@@ -1362,6 +1366,9 @@
                 // without CORS restrictions; it gracefully fails for cross-origin src.
                 const isTransparentBg = !bgColor || bgColor === 'transparent'
                     || bgColor === 'rgba(0, 0, 0, 0)' || bgColor.includes('rgba(0, 0, 0, 0)');
+                let overlapsUnsampledImage = false;
+
+                // Try same-origin <img> pixel sampling first (works for data: URIs etc.)
                 if (isTransparentBg) {
                     const overlappingImgs = this.findOverlappingImages(element);
                     for (const img of overlappingImgs) {
@@ -1370,8 +1377,48 @@
                             bgColor = sampled;
                             analysisMethod = 'image-pixel-sampling';
                             break;
+                        } else {
+                            // Image found but pixel sampling failed (e.g. cross-origin CORS block).
+                            overlapsUnsampledImage = true;
                         }
                     }
+                }
+
+                // Use elementsFromPoint to scan the full rendering stack at the element's
+                // center — this catches CSS background-image on ancestors AND on z-index
+                // siblings (e.g. a hero div that is adjacent in the DOM but visually behind
+                // the text via position:absolute).  Ancestor walks miss the sibling case.
+                if (!overlapsUnsampledImage) {
+                    try {
+                        const rect = element.getBoundingClientRect();
+                        if (rect.width > 0 && rect.height > 0) {
+                            const cx = rect.left + rect.width / 2;
+                            const cy = rect.top  + rect.height / 2;
+                            const stackedEls = document.elementsFromPoint(cx, cy) || [];
+                            for (const el of stackedEls) {
+                                if (el === element) continue;
+                                // Skip the checker's own UI
+                                if (el.closest && el.closest('#uw-a11y-container')) continue;
+                                const elS = window.getComputedStyle(el);
+                                const elBi = elS.backgroundImage;
+                                // Found a real background image somewhere in the stack
+                                if (elBi && elBi !== 'none' && elBi.includes('url(')) {
+                                    overlapsUnsampledImage = true;
+                                    break;
+                                }
+                                // Stop scanning deeper once we hit a fully opaque solid-color
+                                // element — it reliably covers everything behind it.
+                                const elBg = elS.backgroundColor;
+                                const isOpaqueSolid = elBg
+                                    && elBg !== 'transparent'
+                                    && elBg !== 'rgba(0, 0, 0, 0)'
+                                    && !elBg.includes('rgba(0, 0, 0, 0)')
+                                    && (!elBi || elBi === 'none')
+                                    && !/rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*0*(?:\.\d+)?\s*\)/.test(elBg);
+                                if (isOpaqueSolid) break;
+                            }
+                        }
+                    } catch (e) { /* elementsFromPoint not available, skip */ }
                 }
 
                 // Handle transparent or rgba(0,0,0,0) backgrounds by finding the effective background
@@ -1448,7 +1495,8 @@
                     background: bgColor,
                     contrast: contrast ? contrast.toFixed(2) + ':1' : 'Unable to calculate',
                     required: 'WCAG AA requires 4.5:1 for normal text, 3:1 for large text',
-                    analysisMethod: analysisMethod
+                    analysisMethod: analysisMethod,
+                    overlapsUnsampledImage: overlapsUnsampledImage
                 };
             } catch (e) {
                 console.warn('Error extracting color contrast info:', e);
@@ -2023,13 +2071,19 @@
                 const rawStops = gradientCss.match(colorPattern) || [];
                 if (rawStops.length === 0) return null;
 
-                // Parse a color token into { r, g, b } using the existing getLuminance
-                // path (hex + rgb/rgba support). We normalise rgba alpha away since
-                // the gradient itself defines the visual mix.
+                // Parse a color token into { r, g, b }, respecting alpha.
+                // Near-transparent stops (alpha < 0.15) are discarded — they are
+                // essentially invisible and should not influence contrast analysis.
+                // A common pattern is linear-gradient(rgba(R,G,B,0.9), rgba(R,G,B,0))
+                // where the transparent end is just a fade-to-image; treating it as
+                // a solid colour produces wildly wrong contrast values.
                 const parseRgb = (color) => {
-                    const m = color.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i)
-                           || color.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
-                    if (m) return { r: +m[1], g: +m[2], b: +m[3] };
+                    const m = color.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*[,/]\s*([\d.]+))?\s*\)/i);
+                    if (m) {
+                        const alpha = m[4] !== undefined ? parseFloat(m[4]) : 1;
+                        if (alpha < 0.15) return null; // skip near-transparent stops
+                        return { r: +m[1], g: +m[2], b: +m[3] };
+                    }
                     // hex
                     const hex = color.replace('#', '');
                     if (hex.length === 3) return {
@@ -2330,6 +2384,10 @@
 
                 const colorInfo = this.extractColorContrastInfo(node);
                 if (!colorInfo || !colorInfo.contrast || colorInfo.contrast === 'Unable to calculate') return false;
+
+                // If the element sits over a cross-origin image we couldn't pixel-sample,
+                // the background color is just a guess — never escalate to a hard error.
+                if (colorInfo.overlapsUnsampledImage) return false;
 
                 const contrastValue = parseFloat(colorInfo.contrast.split(':')[0]);
                 if (isNaN(contrastValue)) return false;
@@ -3290,6 +3348,20 @@
                 categoryDeductions.set(key, (categoryDeductions.get(key) || 0) + amount);
             };
 
+            // 1b) Escalated errors: issues promoted from axe incomplete → error by our own analysis.
+            // These never appear in results.violations so the loop above misses them entirely.
+            // We treat them the same as violations (full weight, per-rule dedup).
+            (this.issues || [])
+                .filter(i => i.type === 'error' && i.escalated && !dismissed.has(`${i.ruleId}-error`))
+                .forEach(issue => {
+                    const ruleId = issue.ruleId;
+                    if (violationMetaByRule.has(ruleId)) return; // already counted from violations
+                    const impact = issue.impact || 'serious';
+                    const category = getCategory(issue.tags);
+                    violationMetaByRule.set(ruleId, { impact, category });
+                });
+
+            // Accumulate all violation deductions (real + escalated) into category buckets
             violationMetaByRule.forEach(({ impact, category }) => {
                 const amount = (ruleWeights[impact] || ruleWeights.moderate);
                 addToCategory(category, amount);
@@ -7383,12 +7455,18 @@
                 
                 // Special formatting for different types
                 if (detail.type === 'colors' && typeof value === 'object') {
+                    const unsampledNote = value.overlapsUnsampledImage
+                        ? `<div style="margin-top: 0.5rem; padding: 0.4rem 0.6rem; background: #fff8e1; border-left: 3px solid #f59e0b; border-radius: 2px; font-size: 0.85em; color: #6b4c00;">
+                               <strong>Background image not sampled:</strong> The background appears to be set via a CSS <code>background-image</code> on an ancestor element (e.g. a hero banner). Browsers block cross-origin pixel sampling of such images, so the actual background color could not be determined. Manual inspection is required to verify contrast.
+                           </div>`
+                        : '';
                     value = `
                         <div style="margin: 0.5rem 0;">
                             <div><strong>Foreground:</strong> <span style="background: ${value.foreground}; color: white; padding: 2px 6px; border-radius: 2px;">${value.foreground}</span></div>
                             <div><strong>Background:</strong> <span style="background: ${value.background}; border: 1px solid #ccc; padding: 2px 6px; border-radius: 2px;">${value.background}</span></div>
                             <div><strong>Contrast Ratio:</strong> ${value.contrast}</div>
                             <div><strong>Requirement:</strong> ${value.required}</div>
+                            ${unsampledNote}
                         </div>
                     `;
                 } else if (typeof value === 'string') {

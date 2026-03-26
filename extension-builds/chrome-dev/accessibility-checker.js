@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.6.1', // Current version
+            version: '1.6.2', // Current version
             websiteUrl: 'https://pinpoint.heroicpixel.com/', // Main website URL
             legacyDomainUrl: 'https://althe3rd.github.io/Pinpoint/', // Legacy domain for transition
             issues: [],
@@ -17,6 +17,14 @@
             checkedItems: new Set(), // Track manually verified items
             isMinimized: false, // Track minimized state
             shadowRoot: null, // Shadow DOM root
+            isPickerActive: false, // Element picker mode state
+            pickerHighlightEl: null,
+            pickerTooltipEl: null,
+            pickerDoneBtn: null,
+            pickerTargetInput: null,
+            _pickerMoveHandler: null,
+            _pickerClickHandler: null,
+            _pickerKeyHandler: null,
             heightPadding: 35, // Extra pixels added to content height to avoid tiny scrollbars
             scoreAnimationPlayed: false, // Run score animation only once
             // Visibility filters for list rendering
@@ -111,19 +119,10 @@
                     this.axeLoaded = true;
                     this.runAxeChecks();
                 } else {
-                    // Fallback to CDN for bookmarklet usage (not permitted in MV3 extensions)
-                    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) {
-                        this.showError('Failed to load axe-core from extension bundle. Please try reloading the page or reinstalling the extension.');
-                    } else {
-                        this.loadAxeFromCDN();
-                    }
+                    
                 }
             }).catch(() => {
-                if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) {
-                    this.showError('Failed to load axe-core from extension bundle. Please try reloading the page or reinstalling the extension.');
-                } else {
-                    this.loadAxeFromCDN();
-                }
+                
             });
         },
 
@@ -148,20 +147,8 @@
             });
         },
 
-        // Load axe-core from CDN (bookmarklet fallback)
-        loadAxeFromCDN: function() {
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/axe-core@4.10.3/axe.min.js';
-            script.onload = () => {
-                this.axeLoaded = true;
-                this.runAxeChecks();
-            };
-            script.onerror = () => {
-                this.showError('Failed to load axe-core. Please check your internet connection and try again.');
-            };
-            document.head.appendChild(script);
-        },
         
+
         // Run axe-core accessibility checks
         runAxeChecks: function() {
             if (!window.axe) {
@@ -184,8 +171,8 @@
                 runOnly: { type: 'tag', values: tags }
             };
             
-            // Build context with excludes
-            const context = { exclude: this.getEffectiveExcludeSelectors() };
+            // Build context (with optional include scope and always-applied excludes)
+            const context = this.buildAxeContext();
 
             // Run axe-core analysis with context (excluding configured selectors)
             window.axe.run(context, axeConfig, (err, results) => {
@@ -5361,21 +5348,10 @@
                         console.log('✨ GSAP loaded successfully from extension bundle');
                         resolve(window.gsap);
                     } else {
-                        // Fallback to CDN for bookmarklet usage (not permitted in MV3 extensions)
-                        if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) {
-                            console.warn('❌ Failed to load GSAP from extension bundle, animations disabled');
-                            resolve(null);
-                        } else {
-                            this.loadGsapFromCDN().then(resolve).catch(resolve);
-                        }
+                        
                     }
                 }).catch(() => {
-                    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) {
-                        console.warn('❌ Failed to load GSAP from extension bundle, animations disabled');
-                        resolve(null);
-                    } else {
-                        this.loadGsapFromCDN().then(resolve).catch(resolve);
-                    }
+                    
                 });
             });
         },
@@ -5401,22 +5377,7 @@
             });
         },
 
-        // Load GSAP from CDN (bookmarklet fallback)
-        loadGsapFromCDN: function() {
-            return new Promise((resolve) => {
-                const script = document.createElement('script');
-                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js';
-                script.onload = () => {
-                    console.log('✨ GSAP loaded successfully from CDN');
-                    resolve(window.gsap);
-                };
-                script.onerror = () => {
-                    console.warn('❌ Failed to load GSAP, animations will be disabled');
-                    resolve(null);
-                };
-                document.head.appendChild(script);
-            });
-        },
+        
 
         // Setup initial height for smooth transitions
         setupInitialHeight: function() {
@@ -5953,6 +5914,28 @@
                 .filter(Boolean);
             // Merge in order: essentials (always), defaults, then user additions
             return [...new Set([ ...essentials, ...defaults, ...clean ])];
+        },
+
+        // Return user-configured include selectors (elements to restrict scan to)
+        getEffectiveIncludeSelectors: function() {
+            const s = this.loadSettings();
+            const user = Array.isArray(s.includeSelectors) ? s.includeSelectors
+                : (typeof s.includeSelectors === 'string' ? s.includeSelectors.split(',') : []);
+            return user.map(v => (v || '').toString().trim()).filter(Boolean);
+        },
+
+        // Build axe-core context object (handles include + exclude scoping)
+        buildAxeContext: function() {
+            const excludes = this.getEffectiveExcludeSelectors();
+            const includes = this.getEffectiveIncludeSelectors();
+            if (includes.length > 0) {
+                // axe-core requires nested arrays when both include and exclude are present
+                return {
+                    include: includes.map(sel => [sel]),
+                    exclude: excludes.map(sel => [sel])
+                };
+            }
+            return { exclude: excludes }; // flat array works when no include scope is set
         },
 
         // Check if an element should be excluded by settings
@@ -6647,8 +6630,9 @@
         },
 
         resetSettingsToDefaults: function() {
-            const defaults = { 
+            const defaults = {
                 excludeSelectors: this.getDefaultExcludeSelectors(),
+                includeSelectors: [],
                 enableBestPractices: true,
                 ...this.getDefaultWcag()
             };
@@ -6665,6 +6649,8 @@
             // Show only user-adjustable selectors in the input (strip essentials)
             const renderList = Array.isArray(settings.excludeSelectors) ? settings.excludeSelectors : this.getDefaultExcludeSelectors();
             const current = this.filterOutEssential(renderList).join(', ');
+            const includeList = Array.isArray(settings.includeSelectors) ? settings.includeSelectors : [];
+            const currentInclude = includeList.join(', ');
             const bp = settings.enableBestPractices !== false; // default true
             const wcag = { ...(this.getDefaultWcag()), wcagSpec: settings.wcagSpec || '2.1', wcagLevel: (settings.wcagLevel || 'AA').toUpperCase() };
 
@@ -6673,6 +6659,22 @@
                     <h3 id="uw-a11y-settings-heading">Settings</h3>
 
                     <p class="uw-a11y-section-divider">Scanning</p>
+
+                    <div class="uw-a11y-setting-card">
+                        <label for="uw-a11y-include-input" class="uw-a11y-setting-label">Scan Scope</label>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <input id="uw-a11y-include-input" class="uw-a11y-input" type="text"
+                                value="${this.escapeHtmlAttr(currentInclude)}"
+                                aria-describedby="uw-a11y-include-help"
+                                placeholder="e.g. #main, .content-area">
+                            <button id="uw-a11y-pick-element" class="uw-a11y-btn uw-a11y-btn-secondary"
+                                type="button" title="Click elements on the page to add their selectors"
+                                style="white-space:nowrap;flex-shrink:0;">
+                                Pick element
+                            </button>
+                        </div>
+                        <div id="uw-a11y-include-help" class="uw-a11y-helptext">Comma&#8209;separated CSS selectors. When set, only these elements are scanned. Leave empty to scan the whole page.</div>
+                    </div>
 
                     <div class="uw-a11y-setting-card">
                         <label for="uw-a11y-exclude-input" class="uw-a11y-setting-label">Exclude Selectors</label>
@@ -6751,6 +6753,8 @@
             `;
 
             const input = this.shadowRoot.getElementById('uw-a11y-exclude-input');
+            const includeInput = this.shadowRoot.getElementById('uw-a11y-include-input');
+            const pickBtn = this.shadowRoot.getElementById('uw-a11y-pick-element');
             const msg = this.shadowRoot.getElementById('uw-a11y-settings-msg');
             const actionsBar = this.shadowRoot.getElementById('uw-a11y-actions-bar');
             const saveBtn = this.shadowRoot.getElementById('uw-a11y-save-settings');
@@ -6763,6 +6767,7 @@
             // Snapshot values at render time for dirty comparison
             const snap = () => ({
                 exclude: input.value,
+                include: includeInput.value,
                 wcagSpec: wcagSpecSel.value,
                 wcagLevel: wcagLevelSel.value,
                 bp: bpInput.checked,
@@ -6773,6 +6778,7 @@
             const checkDirty = () => {
                 const now = snap();
                 const dirty = now.exclude !== initialValues.exclude
+                    || now.include !== initialValues.include
                     || now.wcagSpec !== initialValues.wcagSpec
                     || now.wcagLevel !== initialValues.wcagLevel
                     || now.bp !== initialValues.bp;
@@ -6781,9 +6787,14 @@
             };
 
             input.addEventListener('input', checkDirty);
+            includeInput.addEventListener('input', checkDirty);
             wcagSpecSel.addEventListener('change', checkDirty);
             wcagLevelSel.addEventListener('change', checkDirty);
             bpInput.addEventListener('change', checkDirty);
+
+            if (pickBtn) {
+                pickBtn.addEventListener('click', () => this.startPickerMode(includeInput));
+            }
 
             // Sound toggle — saves instantly to localStorage, no re-scan needed
             if (soundsToggle) {
@@ -6813,8 +6824,16 @@
                     msg.className = 'uw-a11y-msg err';
                     return;
                 }
+                const includeArr = parseSelectors(includeInput.value || '');
+                const badInclude = validateSelectors(includeArr);
+                if (badInclude) {
+                    msg.textContent = `Invalid scope selector: ${badInclude}`;
+                    msg.className = 'uw-a11y-msg err';
+                    return;
+                }
                 const toSave = {
                     excludeSelectors: this.filterOutEssential(arr),
+                    includeSelectors: includeArr,
                     enableBestPractices: !!(bpInput && bpInput.checked),
                     wcagSpec: wcagSpecSel ? wcagSpecSel.value : '2.1',
                     wcagLevel: wcagLevelSel ? wcagLevelSel.value : 'AA'
@@ -6831,6 +6850,7 @@
             resetBtn.addEventListener('click', () => {
                 const defaults = this.resetSettingsToDefaults();
                 input.value = this.filterOutEssential(defaults.excludeSelectors).join(', ');
+                if (includeInput) includeInput.value = '';
                 if (bpInput) bpInput.checked = !!defaults.enableBestPractices;
                 if (wcagSpecSel) wcagSpecSel.value = defaults.wcagSpec;
                 if (wcagLevelSel) wcagLevelSel.value = defaults.wcagLevel;
@@ -6850,6 +6870,273 @@
             const essentials = new Set(this.getEssentialExcludeSelectors());
             return (list || []).filter(sel => !essentials.has(sel));
         },
+
+        // ── Element Picker ─────────────────────────────────────────────────────
+
+        startPickerMode: function(inputEl) {
+            if (this.isPickerActive) return;
+            this.isPickerActive = true;
+            this.pickerTargetInput = inputEl;
+
+            // Fade the panel so the user can see the page clearly
+            const wrapper = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-wrapper');
+            if (wrapper) {
+                wrapper.dataset.pickerOrigOpacity = wrapper.style.opacity || '';
+                wrapper.style.opacity = '0.15';
+                wrapper.style.pointerEvents = 'none';
+            }
+
+            // Mark pick button as active (if still in DOM)
+            const pickBtn = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-pick-element');
+            if (pickBtn) pickBtn.classList.add('picker-active');
+
+            this.injectPickerStyles();
+
+            // Hover highlight box
+            const highlight = document.createElement('div');
+            highlight.id = 'uw-a11y-picker-highlight';
+            highlight.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(highlight);
+            this.pickerHighlightEl = highlight;
+
+            // Tag/class badge tooltip
+            const tooltip = document.createElement('div');
+            tooltip.id = 'uw-a11y-picker-tooltip';
+            tooltip.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(tooltip);
+            this.pickerTooltipEl = tooltip;
+
+            // "Done picking" button fixed at bottom-centre
+            const doneBtn = document.createElement('button');
+            doneBtn.id = 'uw-a11y-picker-done';
+            doneBtn.textContent = 'Done picking';
+            doneBtn.setAttribute('aria-label', 'Finish picking elements and return to settings');
+            document.body.appendChild(doneBtn);
+            this.pickerDoneBtn = doneBtn;
+            doneBtn.addEventListener('click', () => this.stopPickerMode());
+
+            document.body.style.cursor = 'crosshair';
+
+            this._pickerMoveHandler = (e) => this.onPickerMouseMove(e);
+            this._pickerClickHandler = (e) => this.onPickerClick(e);
+            this._pickerKeyHandler = (e) => { if (e.key === 'Escape') this.stopPickerMode(); };
+
+            document.addEventListener('mousemove', this._pickerMoveHandler);
+            document.addEventListener('click', this._pickerClickHandler, true);
+            document.addEventListener('keydown', this._pickerKeyHandler, true);
+        },
+
+        stopPickerMode: function() {
+            if (!this.isPickerActive) return;
+            this.isPickerActive = false;
+
+            // Restore panel
+            const wrapper = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-wrapper');
+            if (wrapper) {
+                wrapper.style.opacity = wrapper.dataset.pickerOrigOpacity || '';
+                wrapper.style.pointerEvents = '';
+                delete wrapper.dataset.pickerOrigOpacity;
+            }
+
+            const pickBtn = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-pick-element');
+            if (pickBtn) pickBtn.classList.remove('picker-active');
+
+            if (this.pickerHighlightEl) { this.pickerHighlightEl.remove(); this.pickerHighlightEl = null; }
+            if (this.pickerTooltipEl) { this.pickerTooltipEl.remove(); this.pickerTooltipEl = null; }
+            if (this.pickerDoneBtn) { this.pickerDoneBtn.remove(); this.pickerDoneBtn = null; }
+
+            const st = document.getElementById('uw-a11y-picker-styles');
+            if (st) st.remove();
+
+            if (this._pickerMoveHandler) document.removeEventListener('mousemove', this._pickerMoveHandler);
+            if (this._pickerClickHandler) document.removeEventListener('click', this._pickerClickHandler, true);
+            if (this._pickerKeyHandler) document.removeEventListener('keydown', this._pickerKeyHandler, true);
+            this._pickerMoveHandler = null;
+            this._pickerClickHandler = null;
+            this._pickerKeyHandler = null;
+
+            document.body.style.cursor = '';
+            this.pickerTargetInput = null;
+        },
+
+        onPickerMouseMove: function(e) {
+            const el = this.getPickerTargetAt(e.clientX, e.clientY);
+            if (!el) {
+                if (this.pickerHighlightEl) this.pickerHighlightEl.style.display = 'none';
+                if (this.pickerTooltipEl) this.pickerTooltipEl.style.display = 'none';
+                return;
+            }
+            const rect = el.getBoundingClientRect();
+            const h = this.pickerHighlightEl;
+            if (h) {
+                h.style.display = 'block';
+                h.style.left   = (rect.left + window.scrollX) + 'px';
+                h.style.top    = (rect.top  + window.scrollY) + 'px';
+                h.style.width  = rect.width  + 'px';
+                h.style.height = rect.height + 'px';
+            }
+            const t = this.pickerTooltipEl;
+            if (t) {
+                t.style.display = 'block';
+                t.textContent = this.getPickerBadgeText(el);
+                const badgeTop = rect.top + window.scrollY - 28;
+                t.style.left = (rect.left + window.scrollX) + 'px';
+                t.style.top  = (badgeTop > 0 ? badgeTop : rect.bottom + window.scrollY + 4) + 'px';
+            }
+        },
+
+        getPickerTargetAt: function(x, y) {
+            const h = this.pickerHighlightEl;
+            const t = this.pickerTooltipEl;
+            const prevH = h ? h.style.display : null;
+            const prevT = t ? t.style.display : null;
+            if (h) h.style.display = 'none';
+            if (t) t.style.display = 'none';
+
+            let el = document.elementFromPoint(x, y);
+
+            if (h && prevH !== null) h.style.display = prevH;
+            if (t && prevT !== null) t.style.display = prevT;
+
+            if (!el || el === document.documentElement || el === document.body) return null;
+
+            // Skip the checker's own chrome
+            const forbidden = new Set(['uw-a11y-picker-done', 'uw-a11y-picker-highlight', 'uw-a11y-picker-tooltip', 'uw-a11y-container']);
+            if (el.id && forbidden.has(el.id)) return null;
+
+            return el;
+        },
+
+        onPickerClick: function(e) {
+            const el = this.getPickerTargetAt(e.clientX, e.clientY);
+            if (!el) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const sel = this.generateSelectorForElement(el);
+            if (!sel) return;
+
+            const input = this.pickerTargetInput;
+            if (input) {
+                const existing = input.value.trim();
+                input.value = existing ? existing + ', ' + sel : sel;
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+
+            // Brief green flash, then exit picker mode
+            if (this.pickerHighlightEl) {
+                this.pickerHighlightEl.classList.add('uw-a11y-picker-selected');
+            }
+            setTimeout(() => this.stopPickerMode(), 350);
+        },
+
+        generateSelectorForElement: function(el) {
+            if (!el || !el.tagName) return null;
+            const tag = el.tagName.toLowerCase();
+
+            // 1. Prefer ID (skip uw-a11y- internal IDs)
+            if (el.id && !el.id.startsWith('uw-a11y-')) {
+                return '#' + CSS.escape(el.id);
+            }
+
+            // 2. tag + significant classes (skip state/utility classes)
+            const IGNORE = /^(active|hover|focus|selected|open|visible|hidden|show|fade|is-|has-|js-|uw-a11y-)/;
+            const classes = Array.from(el.classList).filter(c => !IGNORE.test(c)).slice(0, 2);
+            if (classes.length > 0) {
+                return tag + '.' + classes.map(c => CSS.escape(c)).join('.');
+            }
+
+            // 3. Landmark/semantic tags that tend to be unique
+            if (['main', 'header', 'footer', 'nav', 'aside', 'article', 'form'].includes(tag)) {
+                return tag;
+            }
+
+            // 4. tag + aria-label
+            const ariaLabel = el.getAttribute('aria-label');
+            if (ariaLabel) {
+                return `${tag}[aria-label="${ariaLabel.replace(/"/g, '\\"')}"]`;
+            }
+
+            // 5. nth-of-type fallback (one level only)
+            const parent = el.parentElement;
+            if (parent) {
+                const siblings = Array.from(parent.children).filter(c => c.tagName === el.tagName);
+                if (siblings.length === 1) return tag;
+                const idx = siblings.indexOf(el) + 1;
+                const parentSel = parent.id ? '#' + CSS.escape(parent.id) : parent.tagName.toLowerCase();
+                return `${parentSel} > ${tag}:nth-of-type(${idx})`;
+            }
+
+            return tag;
+        },
+
+        getPickerBadgeText: function(el) {
+            const tag = el.tagName.toLowerCase();
+            const id = el.id ? '#' + el.id : '';
+            const cls = el.classList.length > 0 ? '.' + Array.from(el.classList).slice(0, 2).join('.') : '';
+            return tag + id + cls;
+        },
+
+        injectPickerStyles: function() {
+            if (document.getElementById('uw-a11y-picker-styles')) return;
+            const style = document.createElement('style');
+            style.id = 'uw-a11y-picker-styles';
+            style.textContent = `
+                #uw-a11y-picker-highlight {
+                    position: absolute;
+                    pointer-events: none;
+                    outline: 2px solid #0d6efd;
+                    outline-offset: 1px;
+                    background: rgba(13, 110, 253, 0.08);
+                    z-index: 999998;
+                    border-radius: 2px;
+                    display: none;
+                }
+                #uw-a11y-picker-highlight.uw-a11y-picker-selected {
+                    background: rgba(34, 160, 107, 0.2);
+                    outline-color: #22a06b;
+                }
+                #uw-a11y-picker-tooltip {
+                    position: absolute;
+                    pointer-events: none;
+                    background: #212529;
+                    color: #fff;
+                    font: 12px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+                    padding: 3px 8px;
+                    border-radius: 4px;
+                    z-index: 999999;
+                    white-space: nowrap;
+                    display: none;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                }
+                #uw-a11y-picker-done {
+                    position: fixed;
+                    bottom: 24px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    z-index: 999999;
+                    background: #0d6efd;
+                    color: #fff;
+                    border: none;
+                    border-radius: 24px;
+                    padding: 10px 24px;
+                    font: 600 15px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+                    cursor: pointer;
+                    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+                }
+                #uw-a11y-picker-done:focus {
+                    outline: 3px solid #fff;
+                    outline-offset: 2px;
+                }
+                #uw-a11y-picker-done:hover {
+                    background: #0b5ed7;
+                }
+            `;
+            document.head.appendChild(style);
+        },
+
+        // ── End Element Picker ─────────────────────────────────────────────────
 
         // Escape for attribute values
         escapeHtmlAttr: function(str) {
@@ -7180,7 +7467,14 @@
                 <div id="uw-a11y-announcements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
                 
                 ${scoreData ? this.renderScoreDial(scoreData) : ''}
-                
+
+                ${this.getEffectiveIncludeSelectors().length > 0 ? `
+                <div role="status" style="background:rgba(13,110,253,0.07);border:1px solid rgba(13,110,253,0.25);border-radius:8px;padding:8px 12px;font-size:12px;color:#0d6efd;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    <span><strong>Partial scan</strong> — scoped to: <code style="font-size:11px;">${this.escapeHtmlAttr(this.getEffectiveIncludeSelectors().join(', '))}</code></span>
+                    <a href="#" onclick="window.uwAccessibilityChecker.showView('settings');return false;" style="margin-left:auto;font-size:11px;color:inherit;text-decoration:underline;">Edit scope</a>
+                </div>` : ''}
+
                 <!-- Accessible summary section -->
                 <div role="region" aria-labelledby="uw-a11y-summary-heading">
                     <h3 id="uw-a11y-summary-heading" class="sr-only">Accessibility Test Results Summary</h3>
@@ -8007,6 +8301,9 @@
 
 
         remove: function() {
+            // Clean up element picker if active
+            this.stopPickerMode();
+
             // Clean up tab order visualization
             this.hideTabOrderVisualization();
             

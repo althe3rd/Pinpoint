@@ -64,6 +64,11 @@ function validateExtensionFiles(extensionDir) {
     return true;
 }
 
+function stripBookmarkletOnlyBlocks(content) {
+    // Remove blocks marked as bookmarklet-only (CDN fallbacks not permitted in MV3 extensions)
+    return content.replace(/\/\* @bookmarklet-only-start \*\/[\s\S]*?\/\* @bookmarklet-only-end \*\//g, '');
+}
+
 function syncAccessibilityCheckerSource() {
     try {
         const sourcePath = path.resolve('accessibility-checker.js');
@@ -74,9 +79,12 @@ function syncAccessibilityCheckerSource() {
             throw new Error('Source file accessibility-checker.js not found at project root');
         }
 
-        fs.copyFileSync(sourcePath, chromeTarget);
-        fs.copyFileSync(sourcePath, firefoxTarget);
-        log('🔁 Synchronized accessibility-checker.js to extension/chrome/ and extension/firefox/', 'blue');
+        const sourceContent = fs.readFileSync(sourcePath, 'utf8');
+        const extensionContent = stripBookmarkletOnlyBlocks(sourceContent);
+
+        fs.writeFileSync(chromeTarget, extensionContent);
+        fs.writeFileSync(firefoxTarget, extensionContent);
+        log('🔁 Synchronized accessibility-checker.js to extension/chrome/ and extension/firefox/ (CDN blocks stripped for MV3)', 'blue');
     } catch (error) {
         log(`❌ Error syncing accessibility-checker.js to extensions: ${error.message}`, 'red');
         throw error;

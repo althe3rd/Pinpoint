@@ -25,6 +25,7 @@
             _pickerMoveHandler: null,
             _pickerClickHandler: null,
             _pickerKeyHandler: null,
+            _pickerScopeSeq: 0, // Counter for unique data-pinpoint-scope values
             heightPadding: 35, // Extra pixels added to content height to avoid tiny scrollbars
             scoreAnimationPlayed: false, // Run score animation only once
             // Visibility filters for list rendering
@@ -84,10 +85,10 @@
                 <div id="uw-a11y-panel">
                     <div id="uw-a11y-header">
                         <div class="uw-a11y-title-container">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo" viewBox="0 0 404 404" fill="none"><g filter="url(#a)"><path fill="url(#b)" fill-rule="evenodd" d="M201 349c87.261 0 158-70.739 158-158S288.261 33 201 33 43 103.739 43 191s70.739 158 158 158Zm0 24c100.516 0 182-81.484 182-182S301.516 9 201 9 19 90.484 19 191s81.484 182 182 182Z" clip-rule="evenodd"/></g><g filter="url(#c)"><path fill="url(#d)" fill-rule="evenodd" d="M200.5 302c61.58 0 111.5-49.92 111.5-111.5S262.08 79 200.5 79 89 128.92 89 190.5 138.92 302 200.5 302Zm0 24c74.835 0 135.5-60.665 135.5-135.5C336 115.665 275.335 55 200.5 55 125.665 55 65 115.665 65 190.5 65 265.335 125.665 326 200.5 326Z" clip-rule="evenodd"/></g><defs><linearGradient id="b" x1="78.771" x2="324.572" y1="51.982" y2="313.9" gradientUnits="userSpaceOnUse"><stop stop-color="#7435CD"/><stop offset="1" stop-color="#33BFF1"/></linearGradient><linearGradient id="d" x1="109.5" x2="292.5" y1="87" y2="282" gradientUnits="userSpaceOnUse"><stop stop-color="#9A35CD"/><stop offset="1" stop-color="#33D1F1"/></linearGradient><filter id="a" width="403.2" height="403.2" x=".4" y=".4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.401609 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter><filter id="c" width="310.2" height="310.2" x="46.4" y="46.4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.670614 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter></defs></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo" viewBox="0 0 404 404" fill="none" aria-hidden="true"><g filter="url(#a)"><path fill="url(#b)" fill-rule="evenodd" d="M201 349c87.261 0 158-70.739 158-158S288.261 33 201 33 43 103.739 43 191s70.739 158 158 158Zm0 24c100.516 0 182-81.484 182-182S301.516 9 201 9 19 90.484 19 191s81.484 182 182 182Z" clip-rule="evenodd"/></g><g filter="url(#c)"><path fill="url(#d)" fill-rule="evenodd" d="M200.5 302c61.58 0 111.5-49.92 111.5-111.5S262.08 79 200.5 79 89 128.92 89 190.5 138.92 302 200.5 302Zm0 24c74.835 0 135.5-60.665 135.5-135.5C336 115.665 275.335 55 200.5 55 125.665 55 65 115.665 65 190.5 65 265.335 125.665 326 200.5 326Z" clip-rule="evenodd"/></g><defs><linearGradient id="b" x1="78.771" x2="324.572" y1="51.982" y2="313.9" gradientUnits="userSpaceOnUse"><stop stop-color="#7435CD"/><stop offset="1" stop-color="#33BFF1"/></linearGradient><linearGradient id="d" x1="109.5" x2="292.5" y1="87" y2="282" gradientUnits="userSpaceOnUse"><stop stop-color="#9A35CD"/><stop offset="1" stop-color="#33D1F1"/></linearGradient><filter id="a" width="403.2" height="403.2" x=".4" y=".4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.401609 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter><filter id="c" width="310.2" height="310.2" x="46.4" y="46.4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.670614 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter></defs></svg>
                             <h2 id="uw-a11y-title">Pinpoint Accessibility Checker</h2>
                         </div>
-                        <button id="uw-a11y-close">✕</button> 
+                        <button id="uw-a11y-close" aria-label="Close">✕</button>
                     </div>
                     <div id="uw-a11y-content">
                         <div style="text-align: center; padding: 2rem;">
@@ -197,6 +198,13 @@
 
         // Additional best-practices checks beyond axe rules
         runBestPracticeChecks: function() {
+            // Respect include-scope: query only within scoped roots when set
+            const includeSels = this.getEffectiveIncludeSelectors();
+            const scopedRoots = includeSels.length > 0
+                ? includeSels.flatMap(sel => { try { return Array.from(document.querySelectorAll(sel)); } catch(_) { return []; } })
+                : [document];
+            const scopedQueryAll = (sel) => scopedRoots.flatMap(root => { try { return Array.from(root.querySelectorAll(sel)); } catch(_) { return []; } });
+
             // Helper: compute an approximate accessible name for links/buttons
             const getAccessibleName = (el) => {
                 if (!el) return '';
@@ -257,7 +265,7 @@
                 'click here', 'here', 'learn more', 'read more', 'more', 'details',
                 'this', 'this link', 'continue', 'link', 'info'
             ];
-            const anchors = Array.from(document.querySelectorAll('a[href]'));
+            const anchors = scopedQueryAll('a[href]');
             anchors.forEach(a => {
                 if (!isVisible(a)) return;
                 const name = getAccessibleName(a).toLowerCase();
@@ -354,7 +362,7 @@
             });
 
             // 4) Inputs using placeholder as the primary label (lack persistent label)
-            const formControls = Array.from(document.querySelectorAll('input, textarea, select'))
+            const formControls = scopedQueryAll('input, textarea, select')
                 .filter(el => {
                     const type = (el.getAttribute('type') || '').toLowerCase();
                     if (type === 'hidden') return false;
@@ -398,7 +406,7 @@
 
             // 5) Generic/unclear button text
             const buttonSelectors = 'button, input[type="button"], input[type="submit"], input[type="reset"], a[role="button"]';
-            const buttons = Array.from(document.querySelectorAll(buttonSelectors));
+            const buttons = scopedQueryAll(buttonSelectors);
             const genericButtonPhrases = [
                 'submit','go','more','learn more','read more','click here','ok','yes','no','continue','next','previous','prev','send'
             ];
@@ -423,7 +431,7 @@
             });
 
             // 6) Autoplaying media recommendations
-            const autoplayMedia = Array.from(document.querySelectorAll('video[autoplay], audio[autoplay]'));
+            const autoplayMedia = scopedQueryAll('video[autoplay], audio[autoplay]');
             autoplayMedia.forEach(m => {
                 if (!isVisible(m)) return;
                 const hasControls = m.hasAttribute('controls');
@@ -449,7 +457,7 @@
 
             // 7) Infinite or marquee-style animations
             // Simple tag checks first
-            const marqueeLike = Array.from(document.querySelectorAll('marquee, blink'));
+            const marqueeLike = scopedQueryAll('marquee, blink');
             marqueeLike.forEach(el => {
                 if (!isVisible(el)) return;
                 this.addIssue(
@@ -467,7 +475,7 @@
             });
             // Computed-style animation scan (limited for performance)
             try {
-                const allEls = Array.from(document.querySelectorAll('*'));
+                const allEls = scopedQueryAll('*');
                 if (allEls.length <= 2500) {
                     allEls.forEach(el => {
                         if (!isVisible(el)) return;
@@ -574,10 +582,13 @@
         // Process axe-core results into our format
         processAxeResults: function(results) {
             this.issues = [];
-            
+
             // Load previously checked items for this session
             this.loadCheckedItems();
-            
+
+            // Build scope filter — checks if an element is within the include selectors
+            const isInScope = this.buildScopeFilter();
+
             // Process violations (errors)
             results.violations.forEach(violation => {
                 violation.nodes.forEach(node => {
@@ -586,9 +597,14 @@
                         return;
                     }
 
+                    // Skip if outside the user's scan scope
+                    if (!isInScope(this.getElementFromNode(node))) {
+                        return;
+                    }
+
                     // Check if this is a contrast violation that can be auto-resolved
                     const shouldSkipViolation = this.shouldSkipContrastViolation(violation, node);
-                    
+
                     if (shouldSkipViolation) {
                         // Skip entirely - no need to show resolved contrast violations to user
                         return;
@@ -614,6 +630,11 @@
             incomplete.nodes.forEach((node, nodeIndex) => {
                 // Skip if this node is part of our accessibility checker UI
                 if (this.isOwnUIElement(node)) {
+                    return;
+                }
+
+                // Skip if outside the user's scan scope
+                if (!isInScope(this.getElementFromNode(node))) {
                     return;
                 }
 
@@ -665,17 +686,22 @@
             
             // Store the original results for score recalculation
             this.originalAxeResults = results;
-            
-            // Create filtered results for accurate scoring (excluding our own UI elements)
+
+            // Create filtered results for accurate scoring:
+            // exclude own UI elements AND apply the include-scope filter
             const filteredResults = {
                 ...results,
                 violations: results.violations.map(violation => ({
                     ...violation,
-                    nodes: violation.nodes.filter(node => !this.isOwnUIElement(node))
+                    nodes: violation.nodes.filter(node =>
+                        !this.isOwnUIElement(node) && isInScope(this.getElementFromNode(node))
+                    )
                 })).filter(violation => violation.nodes.length > 0),
                 incomplete: results.incomplete.map(incomplete => ({
                     ...incomplete,
-                    nodes: incomplete.nodes.filter(node => !this.isOwnUIElement(node))
+                    nodes: incomplete.nodes.filter(node =>
+                        !this.isOwnUIElement(node) && isInScope(this.getElementFromNode(node))
+                    )
                 })).filter(incomplete => incomplete.nodes.length > 0)
             };
             
@@ -3539,7 +3565,7 @@
                         </ul>
                     </nav>
                 </div>
-                <div id="uw-a11y-panel" tabindex="-1" role="dialog" aria-labelledby="uw-a11y-title">
+                <div id="uw-a11y-panel" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="uw-a11y-title">
                     <div class="accentcolors">
                         <div class="color1"></div>
                         <div class="color2"></div>
@@ -3547,7 +3573,7 @@
                     </div>
                     <div id="uw-a11y-header">
                         <div class="uw-a11y-title-container">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo" viewBox="0 0 404 404" fill="none"><g filter="url(#a)"><path fill="url(#b)" fill-rule="evenodd" d="M201 349c87.261 0 158-70.739 158-158S288.261 33 201 33 43 103.739 43 191s70.739 158 158 158Zm0 24c100.516 0 182-81.484 182-182S301.516 9 201 9 19 90.484 19 191s81.484 182 182 182Z" clip-rule="evenodd"/></g><g filter="url(#c)"><path fill="url(#d)" fill-rule="evenodd" d="M200.5 302c61.58 0 111.5-49.92 111.5-111.5S262.08 79 200.5 79 89 128.92 89 190.5 138.92 302 200.5 302Zm0 24c74.835 0 135.5-60.665 135.5-135.5C336 115.665 275.335 55 200.5 55 125.665 55 65 115.665 65 190.5 65 265.335 125.665 326 200.5 326Z" clip-rule="evenodd"/></g><defs><linearGradient id="b" x1="78.771" x2="324.572" y1="51.982" y2="313.9" gradientUnits="userSpaceOnUse"><stop stop-color="#7435CD"/><stop offset="1" stop-color="#33BFF1"/></linearGradient><linearGradient id="d" x1="109.5" x2="292.5" y1="87" y2="282" gradientUnits="userSpaceOnUse"><stop stop-color="#9A35CD"/><stop offset="1" stop-color="#33D1F1"/></linearGradient><filter id="a" width="403.2" height="403.2" x=".4" y=".4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.401609 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter><filter id="c" width="310.2" height="310.2" x="46.4" y="46.4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.670614 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter></defs></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo" viewBox="0 0 404 404" fill="none" aria-hidden="true"><g filter="url(#a)"><path fill="url(#b)" fill-rule="evenodd" d="M201 349c87.261 0 158-70.739 158-158S288.261 33 201 33 43 103.739 43 191s70.739 158 158 158Zm0 24c100.516 0 182-81.484 182-182S301.516 9 201 9 19 90.484 19 191s81.484 182 182 182Z" clip-rule="evenodd"/></g><g filter="url(#c)"><path fill="url(#d)" fill-rule="evenodd" d="M200.5 302c61.58 0 111.5-49.92 111.5-111.5S262.08 79 200.5 79 89 128.92 89 190.5 138.92 302 200.5 302Zm0 24c74.835 0 135.5-60.665 135.5-135.5C336 115.665 275.335 55 200.5 55 125.665 55 65 115.665 65 190.5 65 265.335 125.665 326 200.5 326Z" clip-rule="evenodd"/></g><defs><linearGradient id="b" x1="78.771" x2="324.572" y1="51.982" y2="313.9" gradientUnits="userSpaceOnUse"><stop stop-color="#7435CD"/><stop offset="1" stop-color="#33BFF1"/></linearGradient><linearGradient id="d" x1="109.5" x2="292.5" y1="87" y2="282" gradientUnits="userSpaceOnUse"><stop stop-color="#9A35CD"/><stop offset="1" stop-color="#33D1F1"/></linearGradient><filter id="a" width="403.2" height="403.2" x=".4" y=".4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.401609 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter><filter id="c" width="310.2" height="310.2" x="46.4" y="46.4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.670614 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter></defs></svg>
                             <h2 id="uw-a11y-title">Pinpoint Accessibility Checker</h2>
                         </div>
                         <div class="uw-a11y-header-buttons">
@@ -3559,8 +3585,8 @@
                         <div id="uw-a11y-view-results" class="uw-a11y-view">
                             <div id="uw-a11y-summary"></div>
                             <p class="if-issues">
-                                <div class="mouse-icon"></div>
-                                <small>Select any item below to highlight the element on the page.</small>
+                                <span class="mouse-icon"></span>
+                                <small>Select any issue to highlight the element on the page. Press <kbd>Escape</kbd> to return here from a highlighted element.</small>
                             </p>
                             <div id="uw-a11y-results"></div>
                         </div>
@@ -3817,7 +3843,7 @@
                 .uw-a11y-view[hidden] { display: none; }
 
                 /* Settings styles */
-                .uw-a11y-settings { margin-bottom: 3rem; }
+                .uw-a11y-settings { padding-bottom: 0.5rem; }
                 .uw-a11y-form-row { margin: .75rem 0; }
                 .uw-a11y-input { width: 80%; padding: 8px 14px; border-radius: 6px; border: 1px solid #cbd3da; font-size: 14px; border-radius: 50rem; }
                 .uw-a11y-helptext { font-size: 12px; color: #555; margin-top: 4px; }
@@ -3904,7 +3930,7 @@
                     font-weight: 700;
                     text-transform: uppercase;
                     letter-spacing: 0.08em;
-                    color: #888;
+                    color: #595959;
                     margin: 1.25rem 0 0.5rem;
                     padding-bottom: 7px;
                     border-bottom: 1px solid rgba(0,0,0,0.08);
@@ -3961,12 +3987,20 @@
                     display: flex;
                     align-items: center;
                     gap: 8px;
-                    margin-top: 0.75rem;
-                    padding: 12px 14px;
-                    background: rgba(13,110,253,0.05);
-                    border: 1px solid rgba(13,110,253,0.18);
-                    border-radius: 12px;
-                    animation: uw-a11y-fadein 0.18s ease;
+                    position: sticky;
+                    bottom: -20px;
+                    z-index: 10;
+                    margin: 0 -20px -20px -20px;
+                    padding: 12px 20px;
+                    background: rgba(240,246,255,0.97);
+                    border-top: 1px solid rgba(13,110,253,0.22);
+                    box-shadow: 0 -2px 8px rgba(13,110,253,0.08);
+                    border-radius: 0 0 14px 14px;
+                    animation: uw-a11y-slideup 0.18s ease;
+                }
+                @keyframes uw-a11y-slideup {
+                    from { opacity: 0; transform: translateY(6px); }
+                    to   { opacity: 1; transform: translateY(0); }
                 }
                 .uw-a11y-actions-bar[hidden] { display: none; }
                 .uw-a11y-actions-bar .uw-a11y-btn {
@@ -4535,7 +4569,7 @@
                     background: none;
                     border: 1px solid rgba(0,0,0,0.18);
                     border-radius: 5px;
-                    color: #888;
+                    color: #595959;
                     font-size: 11px;
                     font-family: inherit;
                     padding: 2px 8px;
@@ -4562,7 +4596,7 @@
                 /* Dismissed banner above issue list */
                 #uw-a11y-panel .uw-a11y-dismissed-banner {
                     font-size: 12px;
-                    color: #6b7280;
+                    color: #545b64;
                     background: #f9fafb;
                     border: 1px solid #e5e7eb;
                     border-radius: 8px;
@@ -4786,8 +4820,11 @@
                     background: #0056b3;
                     transform: scale(1.1);
                     color: #fff;
-                    outline: none;
                     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                }
+                #uw-a11y-panel .uw-a11y-score-info:focus-visible {
+                    outline: 2px solid #005a87;
+                    outline-offset: 2px;
                 }
                 #uw-a11y-panel .uw-a11y-details {
                     margin-top: 1rem;
@@ -4931,7 +4968,9 @@
             font-size: 12px;
             color: #e83e8c;
             font-weight: 600;
-            white-space: nowrap;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
         
         #uw-a11y-panel .how-to-fix code:not(:last-child) {
@@ -5924,18 +5963,41 @@
             return user.map(v => (v || '').toString().trim()).filter(Boolean);
         },
 
-        // Build axe-core context object (handles include + exclude scoping)
+        // Build axe-core context object (excludes only; include-scope is applied
+        // in processAxeResults by checking element containment, which is more reliable
+        // than axe-core's include context which can be silently ignored for document-level rules)
         buildAxeContext: function() {
-            const excludes = this.getEffectiveExcludeSelectors();
+            return { exclude: this.getEffectiveExcludeSelectors() };
+        },
+
+        // Human-readable label for the scope banner — translates data-pinpoint-scope
+        // attribute selectors back into tag+id+class descriptions.
+        getScopeDisplayLabel: function() {
+            return this.getEffectiveIncludeSelectors().map(sel => {
+                const attrMatch = sel.match(/^\[data-pinpoint-scope="([^"]+)"\]$/);
+                if (attrMatch) {
+                    try {
+                        const el = document.querySelector(sel);
+                        if (el) return this.getPickerBadgeText(el);
+                    } catch(_) {}
+                }
+                return sel;
+            }).join(', ');
+        },
+
+        // Returns a function that tests whether a DOM element is within the current scan scope.
+        // If no include selectors are set, every element is in scope.
+        buildScopeFilter: function() {
             const includes = this.getEffectiveIncludeSelectors();
-            if (includes.length > 0) {
-                // axe-core requires nested arrays when both include and exclude are present
-                return {
-                    include: includes.map(sel => [sel]),
-                    exclude: excludes.map(sel => [sel])
-                };
-            }
-            return { exclude: excludes }; // flat array works when no include scope is set
+            if (includes.length === 0) return () => true;
+            const roots = includes.flatMap(sel => {
+                try { return Array.from(document.querySelectorAll(sel)); } catch(_) { return []; }
+            });
+            if (roots.length === 0) return () => true; // selector matched nothing — don't hide everything
+            return (el) => {
+                if (!el) return true; // unknown element — include conservatively
+                return roots.some(root => root === el || root.contains(el));
+            };
         },
 
         // Check if an element should be excluded by settings
@@ -6663,10 +6725,19 @@
                     <div class="uw-a11y-setting-card">
                         <label for="uw-a11y-include-input" class="uw-a11y-setting-label">Scan Scope</label>
                         <div style="display:flex;gap:8px;align-items:center;">
-                            <input id="uw-a11y-include-input" class="uw-a11y-input" type="text"
-                                value="${this.escapeHtmlAttr(currentInclude)}"
-                                aria-describedby="uw-a11y-include-help"
-                                placeholder="e.g. #main, .content-area">
+                            <div style="position:relative;flex:1;min-width:0;">
+                                <input id="uw-a11y-include-input" class="uw-a11y-input" type="text"
+                                    value="${this.escapeHtmlAttr(currentInclude)}"
+                                    aria-describedby="uw-a11y-include-help"
+                                    placeholder="e.g. #main, .content-area"
+                                    style="width:100%;padding-right:${currentInclude ? '28px' : ''};">
+                                <button id="uw-a11y-clear-scope" type="button"
+                                    aria-label="Clear scan scope"
+                                    title="Clear scan scope"
+                                    style="display:${currentInclude ? 'flex' : 'none'};position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;padding:2px;cursor:pointer;color:#888;align-items:center;justify-content:center;border-radius:3px;line-height:1;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                </button>
+                            </div>
                             <button id="uw-a11y-pick-element" class="uw-a11y-btn uw-a11y-btn-secondary"
                                 type="button" title="Click elements on the page to add their selectors"
                                 style="white-space:nowrap;flex-shrink:0;">
@@ -6715,16 +6786,6 @@
                         </label>
                     </div>
 
-                    <!-- Appears only when scan settings have been changed -->
-                    <div id="uw-a11y-actions-bar" class="uw-a11y-actions-bar" hidden>
-                        <button id="uw-a11y-save-settings" class="uw-a11y-btn primary">Save and Re‑scan</button>
-                        <button id="uw-a11y-reset-settings" class="uw-a11y-btn" title="Reset to defaults">
-                            <svg class="uw-a11y-reset-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 5V1L7 6l5 5V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
-                            Reset
-                        </button>
-                        <div id="uw-a11y-settings-msg" class="uw-a11y-msg" aria-live="polite"></div>
-                    </div>
-
                     <p class="uw-a11y-section-divider">Interface</p>
 
                     <div class="uw-a11y-pref-row">
@@ -6750,11 +6811,21 @@
                         </div>
                     </div>
                 </div>
+                <!-- Docked footer: appears only when scan settings have been changed -->
+                <div id="uw-a11y-actions-bar" class="uw-a11y-actions-bar" hidden>
+                    <button id="uw-a11y-save-settings" class="uw-a11y-btn primary">Save and Re‑scan</button>
+                    <button id="uw-a11y-reset-settings" class="uw-a11y-btn" title="Reset to defaults">
+                        <svg class="uw-a11y-reset-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 5V1L7 6l5 5V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+                        Reset
+                    </button>
+                    <div id="uw-a11y-settings-msg" class="uw-a11y-msg" aria-live="polite"></div>
+                </div>
             `;
 
             const input = this.shadowRoot.getElementById('uw-a11y-exclude-input');
             const includeInput = this.shadowRoot.getElementById('uw-a11y-include-input');
             const pickBtn = this.shadowRoot.getElementById('uw-a11y-pick-element');
+            const clearScopeBtn = this.shadowRoot.getElementById('uw-a11y-clear-scope');
             const msg = this.shadowRoot.getElementById('uw-a11y-settings-msg');
             const actionsBar = this.shadowRoot.getElementById('uw-a11y-actions-bar');
             const saveBtn = this.shadowRoot.getElementById('uw-a11y-save-settings');
@@ -6796,6 +6867,30 @@
                 pickBtn.addEventListener('click', () => this.startPickerMode(includeInput));
             }
 
+            // Show/hide the X button as the include input changes; update padding so text doesn't overlap it
+            const updateClearBtn = () => {
+                const hasValue = includeInput.value.trim().length > 0;
+                if (clearScopeBtn) {
+                    clearScopeBtn.style.display = hasValue ? 'flex' : 'none';
+                }
+                includeInput.style.paddingRight = hasValue ? '28px' : '';
+            };
+            includeInput.addEventListener('input', updateClearBtn);
+
+            if (clearScopeBtn) {
+                clearScopeBtn.addEventListener('click', () => {
+                    includeInput.value = '';
+                    // Remove any picker-injected data-pinpoint-scope attributes
+                    document.querySelectorAll('[data-pinpoint-scope]').forEach(el => {
+                        el.removeAttribute('data-pinpoint-scope');
+                    });
+                    updateClearBtn();
+                    checkDirty();
+                    this.playSound('ui');
+                    includeInput.focus();
+                });
+            }
+
             // Sound toggle — saves instantly to localStorage, no re-scan needed
             if (soundsToggle) {
                 soundsToggle.addEventListener('change', () => {
@@ -6824,7 +6919,7 @@
                     msg.className = 'uw-a11y-msg err';
                     return;
                 }
-                const includeArr = parseSelectors(includeInput.value || '');
+                const includeArr = [...new Set(parseSelectors(includeInput.value || ''))];
                 const badInclude = validateSelectors(includeArr);
                 if (badInclude) {
                     msg.textContent = `Invalid scope selector: ${badInclude}`;
@@ -6916,6 +7011,7 @@
             doneBtn.addEventListener('click', () => this.stopPickerMode());
 
             document.body.style.cursor = 'crosshair';
+            this.playSound('ui');
 
             this._pickerMoveHandler = (e) => this.onPickerMouseMove(e);
             this._pickerClickHandler = (e) => this.onPickerClick(e);
@@ -6956,6 +7052,7 @@
             this._pickerKeyHandler = null;
 
             document.body.style.cursor = '';
+            this.playSound('ui');
             this.pickerTargetInput = null;
         },
 
@@ -7014,8 +7111,13 @@
             e.preventDefault();
             e.stopPropagation();
 
-            const sel = this.generateSelectorForElement(el);
-            if (!sel) return;
+            // Stamp a unique attribute onto this exact element so the selector
+            // can never accidentally match anything else on the page, regardless
+            // of shared classes or tag names.
+            this._pickerScopeSeq++;
+            const scopeId = 'pp-' + this._pickerScopeSeq;
+            el.setAttribute('data-pinpoint-scope', scopeId);
+            const sel = `[data-pinpoint-scope="${scopeId}"]`;
 
             const input = this.pickerTargetInput;
             if (input) {
@@ -7023,6 +7125,8 @@
                 input.value = existing ? existing + ', ' + sel : sel;
                 input.dispatchEvent(new Event('input', { bubbles: true }));
             }
+
+            this.playSound('verify');
 
             // Brief green flash, then exit picker mode
             if (this.pickerHighlightEl) {
@@ -7035,36 +7139,47 @@
             if (!el || !el.tagName) return null;
             const tag = el.tagName.toLowerCase();
 
+            // Helper: returns true if the selector uniquely matches exactly this element
+            const isUnique = (sel) => {
+                try {
+                    const matches = document.querySelectorAll(sel);
+                    return matches.length === 1 && matches[0] === el;
+                } catch(_) { return false; }
+            };
+
             // 1. Prefer ID (skip uw-a11y- internal IDs)
             if (el.id && !el.id.startsWith('uw-a11y-')) {
                 return '#' + CSS.escape(el.id);
             }
 
-            // 2. tag + significant classes (skip state/utility classes)
+            // 2. tag + significant classes — only if the combination is unique on the page
             const IGNORE = /^(active|hover|focus|selected|open|visible|hidden|show|fade|is-|has-|js-|uw-a11y-)/;
             const classes = Array.from(el.classList).filter(c => !IGNORE.test(c)).slice(0, 2);
             if (classes.length > 0) {
-                return tag + '.' + classes.map(c => CSS.escape(c)).join('.');
+                const candidate = tag + '.' + classes.map(c => CSS.escape(c)).join('.');
+                if (isUnique(candidate)) return candidate;
             }
 
-            // 3. Landmark/semantic tags that tend to be unique
+            // 3. Landmark/semantic tags — only if unique
             if (['main', 'header', 'footer', 'nav', 'aside', 'article', 'form'].includes(tag)) {
-                return tag;
+                if (isUnique(tag)) return tag;
             }
 
             // 4. tag + aria-label
             const ariaLabel = el.getAttribute('aria-label');
             if (ariaLabel) {
-                return `${tag}[aria-label="${ariaLabel.replace(/"/g, '\\"')}"]`;
+                const candidate = `${tag}[aria-label="${ariaLabel.replace(/"/g, '\\"')}"]`;
+                if (isUnique(candidate)) return candidate;
             }
 
-            // 5. nth-of-type fallback (one level only)
+            // 5. nth-of-type within parent (always unique for a specific position)
             const parent = el.parentElement;
             if (parent) {
                 const siblings = Array.from(parent.children).filter(c => c.tagName === el.tagName);
-                if (siblings.length === 1) return tag;
                 const idx = siblings.indexOf(el) + 1;
-                const parentSel = parent.id ? '#' + CSS.escape(parent.id) : parent.tagName.toLowerCase();
+                const parentSel = parent.id
+                    ? '#' + CSS.escape(parent.id)
+                    : (parent.tagName.toLowerCase() === 'body' ? 'body' : parent.tagName.toLowerCase());
                 return `${parentSel} > ${tag}:nth-of-type(${idx})`;
             }
 
@@ -7465,13 +7580,15 @@
             summary.innerHTML = `
                 <!-- ARIA live region for screen reader announcements -->
                 <div id="uw-a11y-announcements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+                <!-- ARIA live region for highlight navigation instructions (assertive so it reads immediately after the element announcement) -->
+                <div id="uw-a11y-nav-hint" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
                 
                 ${scoreData ? this.renderScoreDial(scoreData) : ''}
 
                 ${this.getEffectiveIncludeSelectors().length > 0 ? `
                 <div role="status" style="background:rgba(13,110,253,0.07);border:1px solid rgba(13,110,253,0.25);border-radius:8px;padding:8px 12px;font-size:12px;color:#0d6efd;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                    <span><strong>Partial scan</strong> — scoped to: <code style="font-size:11px;">${this.escapeHtmlAttr(this.getEffectiveIncludeSelectors().join(', '))}</code></span>
+                    <span><strong>Partial scan</strong> — scoped to: <code style="font-size:11px;">${this.escapeHtmlAttr(this.getScopeDisplayLabel())}</code></span>
                     <a href="#" onclick="window.uwAccessibilityChecker.showView('settings');return false;" style="margin-left:auto;font-size:11px;color:inherit;text-decoration:underline;">Edit scope</a>
                 </div>` : ''}
 
@@ -7895,7 +8012,34 @@
                 try { el.focus({ preventScroll: true }); } catch (_) { /* ignore */ }
                 // Scroll into center for visibility
                 try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) { /* ignore */ }
-                
+
+                // ── Screen reader navigation: Escape returns focus to the issue card ──
+                // Remove any previous handler before setting a new one
+                if (this._highlightEscHandler) {
+                    document.removeEventListener('keydown', this._highlightEscHandler, true);
+                    this._highlightEscHandler = null;
+                }
+                this._highlightRuleId = ruleId;
+                this._highlightEscHandler = (e) => {
+                    if (e.key === 'Escape') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.returnFocusToPanel(this._highlightRuleId);
+                    }
+                };
+                document.addEventListener('keydown', this._highlightEscHandler, true);
+
+                // Announce navigation instructions after a short delay so the screen
+                // reader finishes announcing the newly-focused element first.
+                setTimeout(() => {
+                    const navHint = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-nav-hint');
+                    if (navHint) {
+                        navHint.textContent = 'Element highlighted on page. Press Escape to return to the Pinpoint results list.';
+                        // Clear after a moment so repeated highlights re-trigger the announcement
+                        setTimeout(() => { navHint.textContent = ''; }, 4000);
+                    }
+                }, 700);
+
                 // Cleanup highlight and temporary tabindex after a delay
                 setTimeout(() => {
                     if (el && el.classList) el.classList.remove('uw-a11y-highlight');
@@ -7906,6 +8050,44 @@
                     // Re-hide previously hidden ancestors
                     try { if (typeof cleanupReveal === 'function') cleanupReveal(); } catch (_) { /* ignore */ }
                 }, 3000);
+            }
+        },
+
+        // Return keyboard focus to the issue card in the panel after inspecting a highlighted element.
+        // Called when the user presses Escape while focus is anywhere on the page.
+        returnFocusToPanel: function(ruleId) {
+            // Remove highlight from any highlighted elements
+            document.querySelectorAll('.uw-a11y-highlight').forEach(highlighted => {
+                highlighted.classList.remove('uw-a11y-highlight');
+                if (highlighted.hasAttribute('data-uw-a11y-temp-tabindex')) {
+                    highlighted.removeAttribute('tabindex');
+                    highlighted.removeAttribute('data-uw-a11y-temp-tabindex');
+                }
+            });
+
+            // Remove the Escape key handler
+            if (this._highlightEscHandler) {
+                document.removeEventListener('keydown', this._highlightEscHandler, true);
+                this._highlightEscHandler = null;
+            }
+            this._highlightRuleId = null;
+
+            // Return focus to the issue card that was activated
+            const issueCard = ruleId && this.shadowRoot && this.shadowRoot.getElementById('issue-' + this.sanitizeHtmlId(ruleId));
+            if (issueCard) {
+                issueCard.focus();
+                issueCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                // Fall back to the panel itself
+                const panel = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-panel');
+                if (panel) panel.focus();
+            }
+
+            // Announce the return so screen readers confirm the navigation
+            const navHint = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-nav-hint');
+            if (navHint) {
+                navHint.textContent = 'Returned to Pinpoint results list.';
+                setTimeout(() => { navHint.textContent = ''; }, 3000);
             }
         },
 
@@ -8304,6 +8486,11 @@
             // Clean up element picker if active
             this.stopPickerMode();
 
+            // Remove any data-pinpoint-scope attributes injected by the picker
+            document.querySelectorAll('[data-pinpoint-scope]').forEach(el => {
+                el.removeAttribute('data-pinpoint-scope');
+            });
+
             // Clean up tab order visualization
             this.hideTabOrderVisualization();
             
@@ -8328,6 +8515,13 @@
             this.cleanupTabOrderEventHandlers();
             this.cleanupFocusIndicatorsEventHandlers();
             this.cleanupLandmarkStructureEventHandlers();
+
+            // Clean up highlight Escape handler if active
+            if (this._highlightEscHandler) {
+                document.removeEventListener('keydown', this._highlightEscHandler, true);
+                this._highlightEscHandler = null;
+            }
+            this._highlightRuleId = null;
             
             // Clean up resize handler
             if (this.resizeHandler) {

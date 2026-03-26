@@ -85,10 +85,10 @@
                 <div id="uw-a11y-panel">
                     <div id="uw-a11y-header">
                         <div class="uw-a11y-title-container">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo" viewBox="0 0 404 404" fill="none"><g filter="url(#a)"><path fill="url(#b)" fill-rule="evenodd" d="M201 349c87.261 0 158-70.739 158-158S288.261 33 201 33 43 103.739 43 191s70.739 158 158 158Zm0 24c100.516 0 182-81.484 182-182S301.516 9 201 9 19 90.484 19 191s81.484 182 182 182Z" clip-rule="evenodd"/></g><g filter="url(#c)"><path fill="url(#d)" fill-rule="evenodd" d="M200.5 302c61.58 0 111.5-49.92 111.5-111.5S262.08 79 200.5 79 89 128.92 89 190.5 138.92 302 200.5 302Zm0 24c74.835 0 135.5-60.665 135.5-135.5C336 115.665 275.335 55 200.5 55 125.665 55 65 115.665 65 190.5 65 265.335 125.665 326 200.5 326Z" clip-rule="evenodd"/></g><defs><linearGradient id="b" x1="78.771" x2="324.572" y1="51.982" y2="313.9" gradientUnits="userSpaceOnUse"><stop stop-color="#7435CD"/><stop offset="1" stop-color="#33BFF1"/></linearGradient><linearGradient id="d" x1="109.5" x2="292.5" y1="87" y2="282" gradientUnits="userSpaceOnUse"><stop stop-color="#9A35CD"/><stop offset="1" stop-color="#33D1F1"/></linearGradient><filter id="a" width="403.2" height="403.2" x=".4" y=".4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.401609 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter><filter id="c" width="310.2" height="310.2" x="46.4" y="46.4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.670614 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter></defs></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo" viewBox="0 0 404 404" fill="none" aria-hidden="true"><g filter="url(#a)"><path fill="url(#b)" fill-rule="evenodd" d="M201 349c87.261 0 158-70.739 158-158S288.261 33 201 33 43 103.739 43 191s70.739 158 158 158Zm0 24c100.516 0 182-81.484 182-182S301.516 9 201 9 19 90.484 19 191s81.484 182 182 182Z" clip-rule="evenodd"/></g><g filter="url(#c)"><path fill="url(#d)" fill-rule="evenodd" d="M200.5 302c61.58 0 111.5-49.92 111.5-111.5S262.08 79 200.5 79 89 128.92 89 190.5 138.92 302 200.5 302Zm0 24c74.835 0 135.5-60.665 135.5-135.5C336 115.665 275.335 55 200.5 55 125.665 55 65 115.665 65 190.5 65 265.335 125.665 326 200.5 326Z" clip-rule="evenodd"/></g><defs><linearGradient id="b" x1="78.771" x2="324.572" y1="51.982" y2="313.9" gradientUnits="userSpaceOnUse"><stop stop-color="#7435CD"/><stop offset="1" stop-color="#33BFF1"/></linearGradient><linearGradient id="d" x1="109.5" x2="292.5" y1="87" y2="282" gradientUnits="userSpaceOnUse"><stop stop-color="#9A35CD"/><stop offset="1" stop-color="#33D1F1"/></linearGradient><filter id="a" width="403.2" height="403.2" x=".4" y=".4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.401609 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter><filter id="c" width="310.2" height="310.2" x="46.4" y="46.4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.670614 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter></defs></svg>
                             <h2 id="uw-a11y-title">Pinpoint Accessibility Checker</h2>
                         </div>
-                        <button id="uw-a11y-close">✕</button> 
+                        <button id="uw-a11y-close" aria-label="Close">✕</button>
                     </div>
                     <div id="uw-a11y-content">
                         <div style="text-align: center; padding: 2rem;">
@@ -3591,7 +3591,7 @@
                         </ul>
                     </nav>
                 </div>
-                <div id="uw-a11y-panel" tabindex="-1" role="dialog" aria-labelledby="uw-a11y-title">
+                <div id="uw-a11y-panel" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="uw-a11y-title">
                     <div class="accentcolors">
                         <div class="color1"></div>
                         <div class="color2"></div>
@@ -3599,7 +3599,7 @@
                     </div>
                     <div id="uw-a11y-header">
                         <div class="uw-a11y-title-container">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo" viewBox="0 0 404 404" fill="none"><g filter="url(#a)"><path fill="url(#b)" fill-rule="evenodd" d="M201 349c87.261 0 158-70.739 158-158S288.261 33 201 33 43 103.739 43 191s70.739 158 158 158Zm0 24c100.516 0 182-81.484 182-182S301.516 9 201 9 19 90.484 19 191s81.484 182 182 182Z" clip-rule="evenodd"/></g><g filter="url(#c)"><path fill="url(#d)" fill-rule="evenodd" d="M200.5 302c61.58 0 111.5-49.92 111.5-111.5S262.08 79 200.5 79 89 128.92 89 190.5 138.92 302 200.5 302Zm0 24c74.835 0 135.5-60.665 135.5-135.5C336 115.665 275.335 55 200.5 55 125.665 55 65 115.665 65 190.5 65 265.335 125.665 326 200.5 326Z" clip-rule="evenodd"/></g><defs><linearGradient id="b" x1="78.771" x2="324.572" y1="51.982" y2="313.9" gradientUnits="userSpaceOnUse"><stop stop-color="#7435CD"/><stop offset="1" stop-color="#33BFF1"/></linearGradient><linearGradient id="d" x1="109.5" x2="292.5" y1="87" y2="282" gradientUnits="userSpaceOnUse"><stop stop-color="#9A35CD"/><stop offset="1" stop-color="#33D1F1"/></linearGradient><filter id="a" width="403.2" height="403.2" x=".4" y=".4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.401609 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter><filter id="c" width="310.2" height="310.2" x="46.4" y="46.4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.670614 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter></defs></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="uw-a11y-logo" viewBox="0 0 404 404" fill="none" aria-hidden="true"><g filter="url(#a)"><path fill="url(#b)" fill-rule="evenodd" d="M201 349c87.261 0 158-70.739 158-158S288.261 33 201 33 43 103.739 43 191s70.739 158 158 158Zm0 24c100.516 0 182-81.484 182-182S301.516 9 201 9 19 90.484 19 191s81.484 182 182 182Z" clip-rule="evenodd"/></g><g filter="url(#c)"><path fill="url(#d)" fill-rule="evenodd" d="M200.5 302c61.58 0 111.5-49.92 111.5-111.5S262.08 79 200.5 79 89 128.92 89 190.5 138.92 302 200.5 302Zm0 24c74.835 0 135.5-60.665 135.5-135.5C336 115.665 275.335 55 200.5 55 125.665 55 65 115.665 65 190.5 65 265.335 125.665 326 200.5 326Z" clip-rule="evenodd"/></g><defs><linearGradient id="b" x1="78.771" x2="324.572" y1="51.982" y2="313.9" gradientUnits="userSpaceOnUse"><stop stop-color="#7435CD"/><stop offset="1" stop-color="#33BFF1"/></linearGradient><linearGradient id="d" x1="109.5" x2="292.5" y1="87" y2="282" gradientUnits="userSpaceOnUse"><stop stop-color="#9A35CD"/><stop offset="1" stop-color="#33D1F1"/></linearGradient><filter id="a" width="403.2" height="403.2" x=".4" y=".4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.401609 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter><filter id="c" width="310.2" height="310.2" x="46.4" y="46.4" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dx="1" dy="11"/><feGaussianBlur stdDeviation="9.8"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix values="0 0 0 0 0.0788033 0 0 0 0 0.670614 0 0 0 0 0.885817 0 0 0 0.17 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_21_18"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_21_18" result="shape"/></filter></defs></svg>
                             <h2 id="uw-a11y-title">Pinpoint Accessibility Checker</h2>
                         </div>
                         <div class="uw-a11y-header-buttons">
@@ -3611,8 +3611,8 @@
                         <div id="uw-a11y-view-results" class="uw-a11y-view">
                             <div id="uw-a11y-summary"></div>
                             <p class="if-issues">
-                                <div class="mouse-icon"></div>
-                                <small>Select any item below to highlight the element on the page.</small>
+                                <span class="mouse-icon"></span>
+                                <small>Select any issue to highlight the element on the page. Press <kbd>Escape</kbd> to return here from a highlighted element.</small>
                             </p>
                             <div id="uw-a11y-results"></div>
                         </div>
@@ -3956,7 +3956,7 @@
                     font-weight: 700;
                     text-transform: uppercase;
                     letter-spacing: 0.08em;
-                    color: #888;
+                    color: #595959;
                     margin: 1.25rem 0 0.5rem;
                     padding-bottom: 7px;
                     border-bottom: 1px solid rgba(0,0,0,0.08);
@@ -4595,7 +4595,7 @@
                     background: none;
                     border: 1px solid rgba(0,0,0,0.18);
                     border-radius: 5px;
-                    color: #888;
+                    color: #595959;
                     font-size: 11px;
                     font-family: inherit;
                     padding: 2px 8px;
@@ -4622,7 +4622,7 @@
                 /* Dismissed banner above issue list */
                 #uw-a11y-panel .uw-a11y-dismissed-banner {
                     font-size: 12px;
-                    color: #6b7280;
+                    color: #545b64;
                     background: #f9fafb;
                     border: 1px solid #e5e7eb;
                     border-radius: 8px;
@@ -4846,8 +4846,11 @@
                     background: #0056b3;
                     transform: scale(1.1);
                     color: #fff;
-                    outline: none;
                     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                }
+                #uw-a11y-panel .uw-a11y-score-info:focus-visible {
+                    outline: 2px solid #005a87;
+                    outline-offset: 2px;
                 }
                 #uw-a11y-panel .uw-a11y-details {
                     margin-top: 1rem;
@@ -4991,7 +4994,9 @@
             font-size: 12px;
             color: #e83e8c;
             font-weight: 600;
-            white-space: nowrap;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
         
         #uw-a11y-panel .how-to-fix code:not(:last-child) {
@@ -7632,6 +7637,8 @@
             summary.innerHTML = `
                 <!-- ARIA live region for screen reader announcements -->
                 <div id="uw-a11y-announcements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+                <!-- ARIA live region for highlight navigation instructions (assertive so it reads immediately after the element announcement) -->
+                <div id="uw-a11y-nav-hint" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
                 
                 ${scoreData ? this.renderScoreDial(scoreData) : ''}
 
@@ -8062,7 +8069,34 @@
                 try { el.focus({ preventScroll: true }); } catch (_) { /* ignore */ }
                 // Scroll into center for visibility
                 try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) { /* ignore */ }
-                
+
+                // ── Screen reader navigation: Escape returns focus to the issue card ──
+                // Remove any previous handler before setting a new one
+                if (this._highlightEscHandler) {
+                    document.removeEventListener('keydown', this._highlightEscHandler, true);
+                    this._highlightEscHandler = null;
+                }
+                this._highlightRuleId = ruleId;
+                this._highlightEscHandler = (e) => {
+                    if (e.key === 'Escape') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.returnFocusToPanel(this._highlightRuleId);
+                    }
+                };
+                document.addEventListener('keydown', this._highlightEscHandler, true);
+
+                // Announce navigation instructions after a short delay so the screen
+                // reader finishes announcing the newly-focused element first.
+                setTimeout(() => {
+                    const navHint = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-nav-hint');
+                    if (navHint) {
+                        navHint.textContent = 'Element highlighted on page. Press Escape to return to the Pinpoint results list.';
+                        // Clear after a moment so repeated highlights re-trigger the announcement
+                        setTimeout(() => { navHint.textContent = ''; }, 4000);
+                    }
+                }, 700);
+
                 // Cleanup highlight and temporary tabindex after a delay
                 setTimeout(() => {
                     if (el && el.classList) el.classList.remove('uw-a11y-highlight');
@@ -8073,6 +8107,44 @@
                     // Re-hide previously hidden ancestors
                     try { if (typeof cleanupReveal === 'function') cleanupReveal(); } catch (_) { /* ignore */ }
                 }, 3000);
+            }
+        },
+
+        // Return keyboard focus to the issue card in the panel after inspecting a highlighted element.
+        // Called when the user presses Escape while focus is anywhere on the page.
+        returnFocusToPanel: function(ruleId) {
+            // Remove highlight from any highlighted elements
+            document.querySelectorAll('.uw-a11y-highlight').forEach(highlighted => {
+                highlighted.classList.remove('uw-a11y-highlight');
+                if (highlighted.hasAttribute('data-uw-a11y-temp-tabindex')) {
+                    highlighted.removeAttribute('tabindex');
+                    highlighted.removeAttribute('data-uw-a11y-temp-tabindex');
+                }
+            });
+
+            // Remove the Escape key handler
+            if (this._highlightEscHandler) {
+                document.removeEventListener('keydown', this._highlightEscHandler, true);
+                this._highlightEscHandler = null;
+            }
+            this._highlightRuleId = null;
+
+            // Return focus to the issue card that was activated
+            const issueCard = ruleId && this.shadowRoot && this.shadowRoot.getElementById('issue-' + this.sanitizeHtmlId(ruleId));
+            if (issueCard) {
+                issueCard.focus();
+                issueCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                // Fall back to the panel itself
+                const panel = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-panel');
+                if (panel) panel.focus();
+            }
+
+            // Announce the return so screen readers confirm the navigation
+            const navHint = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-nav-hint');
+            if (navHint) {
+                navHint.textContent = 'Returned to Pinpoint results list.';
+                setTimeout(() => { navHint.textContent = ''; }, 3000);
             }
         },
 
@@ -8500,6 +8572,13 @@
             this.cleanupTabOrderEventHandlers();
             this.cleanupFocusIndicatorsEventHandlers();
             this.cleanupLandmarkStructureEventHandlers();
+
+            // Clean up highlight Escape handler if active
+            if (this._highlightEscHandler) {
+                document.removeEventListener('keydown', this._highlightEscHandler, true);
+                this._highlightEscHandler = null;
+            }
+            this._highlightRuleId = null;
             
             // Clean up resize handler
             if (this.resizeHandler) {

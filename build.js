@@ -86,62 +86,51 @@ function updateIndexHtml(minifiedCode) {
         .replace(/\$/g, '\\$');  // Escape dollar signs (for template literals)
     
     console.log(`🔍 Escaped code length: ${escapedCode.length}`);
-    
-    // Find and replace the bookmarkletCode variable (more robust pattern)
-    const bookmarkletCodeRegex = /const bookmarkletCode = `[^`]*(?:`[^`]*`[^`]*)*`;/;
+
     const newBookmarkletCode = `const bookmarkletCode = \`${escapedCode}\`;`;
-    
     console.log(`🔍 Replacement code length: ${newBookmarkletCode.length}`);
-    
-    // Check if we can find the pattern
-    const match = indexContent.match(bookmarkletCodeRegex);
-    if (match) {
-        console.log(`🔍 Found existing bookmarkletCode of length: ${match[0].length}`);
-        const originalLength = indexContent.length;
-        indexContent = indexContent.replace(bookmarkletCodeRegex, newBookmarkletCode);
-        const newLength = indexContent.length;
-        console.log(`🔍 HTML file length change: ${originalLength} → ${newLength}`);
-        
-        fs.writeFileSync(indexPath, indexContent, 'utf8');
-    } else {
-        // Fallback: try a simpler but more aggressive approach
-        console.log('⚠️ Standard pattern failed, trying fallback approach...');
-        const startMarker = 'const bookmarkletCode = `';
-        const endMarker = '`;';
-        
-        const startIndex = indexContent.indexOf(startMarker);
-        if (startIndex === -1) {
-            throw new Error('Could not find bookmarkletCode variable start in index.html');
-        }
-        
-        // Find the matching closing backtick and semicolon
-        let endIndex = -1;
-        let backtickCount = 0;
-        let searchIndex = startIndex + startMarker.length;
-        
-        while (searchIndex < indexContent.length) {
-            const char = indexContent[searchIndex];
-            if (char === '`') {
-                backtickCount++;
-                if (indexContent.substring(searchIndex, searchIndex + endMarker.length) === endMarker) {
-                    endIndex = searchIndex + endMarker.length;
-                    break;
-                }
-            }
-            searchIndex++;
-        }
-        
-        if (endIndex === -1) {
-            throw new Error('Could not find bookmarkletCode variable end in index.html');
-        }
-        
-        const beforeCode = indexContent.substring(0, startIndex);
-        const afterCode = indexContent.substring(endIndex);
-        indexContent = beforeCode + newBookmarkletCode + afterCode;
-        
-        console.log(`🔍 Fallback replacement successful`);
-        fs.writeFileSync(indexPath, indexContent, 'utf8');
+
+    // Find the bookmarkletCode declaration and locate its end while respecting
+    // backslash escape sequences (so escaped backticks \` inside the template
+    // literal don't get misread as a closing delimiter).
+    const startMarker = 'const bookmarkletCode = `';
+    const startIndex = indexContent.indexOf(startMarker);
+    if (startIndex === -1) {
+        throw new Error('Could not find bookmarkletCode variable start in index.html');
     }
+
+    let i = startIndex + startMarker.length;
+    let endIndex = -1;
+    while (i < indexContent.length) {
+        const ch = indexContent[i];
+        if (ch === '\\') {
+            // Skip the next character entirely (handles \`, \\, \$, etc.)
+            i += 2;
+            continue;
+        }
+        if (ch === '`') {
+            // Found the unescaped closing backtick; expect `;` after it
+            if (indexContent[i + 1] === ';') {
+                endIndex = i + 2;
+            } else {
+                endIndex = i + 1;
+            }
+            break;
+        }
+        i++;
+    }
+
+    if (endIndex === -1) {
+        throw new Error('Could not find bookmarkletCode variable end in index.html');
+    }
+
+    const beforeCode = indexContent.substring(0, startIndex);
+    const afterCode = indexContent.substring(endIndex);
+    const originalLength = indexContent.length;
+    indexContent = beforeCode + newBookmarkletCode + afterCode;
+    console.log(`🔍 HTML file length change: ${originalLength} → ${indexContent.length}`);
+
+    fs.writeFileSync(indexPath, indexContent, 'utf8');
 }
 
 function updateTestPage(minifiedCode) {
@@ -165,16 +154,35 @@ function updateTestPage(minifiedCode) {
         .replace(/`/g, '\\`')    // Escape backticks
         .replace(/\$/g, '\\$');  // Escape dollar signs (for template literals)
     
-    // Find and replace the testBookmarkletCode variable
-    const testBookmarkletCodeRegex = /const testBookmarkletCode = `[^`]*(?:`[^`]*`[^`]*)*`;/;
     const newTestBookmarkletCode = `const testBookmarkletCode = \`${escapedCode}\`;`;
-    
-    // Check if we can find the pattern
-    const match = testPageContent.match(testBookmarkletCodeRegex);
-    if (match) {
-        console.log(`🔍 Found existing testBookmarkletCode in test page`);
-        testPageContent = testPageContent.replace(testBookmarkletCodeRegex, newTestBookmarkletCode);
+
+    // Locate the existing testBookmarkletCode declaration, walking the string
+    // while respecting backslash escape sequences (so \` and \\ inside the
+    // template literal are not misread as a closing delimiter).
+    const startMarker = 'const testBookmarkletCode = `';
+    const startIndex = testPageContent.indexOf(startMarker);
+
+    if (startIndex !== -1) {
+        let i = startIndex + startMarker.length;
+        let endIndex = -1;
+        while (i < testPageContent.length) {
+            const ch = testPageContent[i];
+            if (ch === '\\') { i += 2; continue; }
+            if (ch === '`') {
+                endIndex = (testPageContent[i + 1] === ';') ? i + 2 : i + 1;
+                break;
+            }
+            i++;
+        }
+        if (endIndex === -1) {
+            console.log('⚠️ Could not find end of testBookmarkletCode declaration');
+            return;
+        }
+        const before = testPageContent.substring(0, startIndex);
+        const after = testPageContent.substring(endIndex);
+        testPageContent = before + newTestBookmarkletCode + after;
         fs.writeFileSync(testPagePath, testPageContent, 'utf8');
+        console.log(`🔍 Updated testBookmarkletCode in test page`);
     } else {
         // Fallback: try to find the placeholder
         const placeholderPattern = 'PLACEHOLDER_FOR_BOOKMARKLET_CODE';

@@ -1,7 +1,7 @@
 {
   "name": "pinpoint-accessibility-checker",
-  "version": "1.6.2",
-  "description": "Pinpoint Accessibility Checker - A bookmarklet for WCAG testing",
+  "version": "1.6.3",
+  "description": "Pinpoint Accessibility Checker - Digital accessibility testing powered by axe-core. Get detailed reports with actionable recommendations.",
   "main": "accessibility-checker.js",
   "scripts": {
     "build": "node build.js",

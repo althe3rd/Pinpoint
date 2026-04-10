@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.6.2', // Current version
+            version: '1.6.3', // Current version
             websiteUrl: 'https://pinpoint.heroicpixel.com/', // Main website URL
             legacyDomainUrl: 'https://althe3rd.github.io/Pinpoint/', // Legacy domain for transition
             issues: [],
@@ -4299,7 +4299,7 @@
                 }
 
                 .violationtype {
-                    margin-bottom: 0.75rem;
+                    margin-bottom: 0.25rem;
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
@@ -8469,7 +8469,7 @@
 
         // Return the gradient stop colors for a given score band.
         getScoreColors: function(score) {
-            if (score >= 90) return { start: '#1e7e34', end: '#40d969' };
+            if (score >= 90) return { start: '#1e7e34', end: '#84d940' };
             if (score >= 70) return { start: '#e6a800', end: '#ffd96a' };
             if (score >= 50) return { start: '#dc6002', end: '#ff9a56' };
             return { start: '#a71e2a', end: '#ee6674' };

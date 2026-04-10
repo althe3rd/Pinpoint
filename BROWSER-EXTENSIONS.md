@@ -27,7 +27,7 @@ This document explains how to use and develop the Pinpoint Accessibility Checker
 4. **Context Menu**: Right-click on any page and select "Check accessibility with Pinpoint"
 
 ### Features
-- **Comprehensive Analysis**: WCAG 2.1 AA compliance testing using axe-core
+- **Comprehensive Analysis**: Accessibility testing using axe-core
 - **Accessibility Score**: Get a 0-100 score for any webpage
 - **Detailed Reports**: Technical information including CSS selectors, line numbers, and color contrast data
 - **Actionable Recommendations**: Specific guidance on how to fix each issue

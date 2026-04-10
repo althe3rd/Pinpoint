@@ -7,7 +7,7 @@ A bookmarklet-based accessibility testing tool powered by axe-core that provides
 - **Accessibility Score**: 0-100 rating with color-coded visual indicator
 - **Detailed Analysis**: Technical information including HTML source, line numbers, and CSS selectors
 - **Click-to-Highlight**: Click any issue to highlight the problematic element
-- **WCAG 2.1 AA Compliance**: Industry-standard testing using axe-core
+- **WCAG 2.1 AA Testing**: Industry-standard testing using axe-core
 - **Enhanced UI**: Professional sidebar with expandable details
 
 ## Development Setup

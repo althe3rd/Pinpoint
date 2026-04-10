@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.6.2', // Current version
+            version: '1.6.3', // Current version
             websiteUrl: 'https://pinpoint.heroicpixel.com/', // Main website URL
             legacyDomainUrl: 'https://althe3rd.github.io/Pinpoint/', // Legacy domain for transition
             issues: [],
@@ -3692,15 +3692,7 @@
                         </div>
 
                         <div id="uw-a11y-view-help" class="uw-a11y-view" hidden>
-                            <div class="uw-a11y-help">
-                                <h3>Help</h3>
-                                <ul>
-                                    <li>Click a result to highlight it on the page.</li>
-                                    <li>Use the eye icons to filter categories.</li>
-                                    <li>Open “Learn more” links for WCAG details.</li>
-                                </ul>
-                                <p>Need more? Visit the <a href="https://github.com/althe3rd/Pinpoint#readme" target="_blank" rel="noopener noreferrer">documentation</a>.</p>
-                            </div>
+                            <div class="uw-a11y-help"></div>
                         </div>
                     </div>
                 </div>
@@ -3716,7 +3708,8 @@
             this.initDrag();
             this.initNavigation();
             this.renderSettings();
-            
+            this.renderHelp();
+
             // Load GSAP and animate panel
             this.loadGSAP().then(() => {
                 this.setupInitialHeight();
@@ -3921,6 +3914,145 @@
                 @media (prefers-reduced-motion: reduce) {
                     .uw-a11y-toggle-slider,
                     .uw-a11y-toggle-slider::before { transition: none; }
+                }
+
+                /* ── Help view ── */
+                .uw-a11y-help h3 { margin: 0 0 1rem; font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
+                .uw-a11y-help-search-wrap {
+                    position: relative;
+                    margin-bottom: 14px;
+                }
+                .uw-a11y-help-search-wrap svg {
+                    position: absolute;
+                    left: 11px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #888;
+                    pointer-events: none;
+                }
+                .uw-a11y-help-search {
+                    width: 100%;
+                    box-sizing: border-box;
+                    background: white;
+                    border: 1px solid rgba(0,0,0,0.13);
+                    padding: 9px 13px 9px 34px;
+                    border-radius: 8px;
+                    font-size: 13px;
+                    font-family: inherit;
+                    color: #111;
+                    transition: border-color 0.15s, box-shadow 0.15s;
+                    appearance: none;
+                }
+                .uw-a11y-help-search:focus {
+                    outline: none;
+                    border-color: #007cba;
+                    box-shadow: 0 0 0 3px rgba(0,124,186,0.14);
+                }
+                .uw-a11y-help-level-note {
+                    font-size: 11px;
+                    color: #595959;
+                    margin: 0.6rem 0 0;
+                    padding: 8px 12px;
+                    background: rgba(0,124,186,0.06);
+                    border-left: 3px solid rgba(0,124,186,0.55);
+                    border-radius: 4px;
+                }
+                .uw-a11y-help-level-note strong { color: #1a1a1a; }
+                .uw-a11y-help-category {
+                    font-size: 10px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.08em;
+                    color: #595959;
+                    margin: 1.1rem 0 0.4rem;
+                    padding-bottom: 6px;
+                    border-bottom: 1px solid rgba(0,0,0,0.08);
+                }
+                .uw-a11y-help-topic {
+                    background: rgba(255,255,255,0.78);
+                    border: 1px solid rgba(0,0,0,0.07);
+                    border-radius: 10px;
+                    margin: 0.4rem 0;
+                    overflow: hidden;
+                    transition: border-color 0.15s;
+                }
+                .uw-a11y-help-topic:hover { border-color: rgba(0,0,0,0.15); }
+                .uw-a11y-help-topic-head {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 10px 14px;
+                    cursor: pointer;
+                    user-select: none;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #222;
+                    background: none;
+                    border: none;
+                    width: 100%;
+                    text-align: left;
+                    font-family: inherit;
+                }
+                .uw-a11y-help-topic-head:focus-visible {
+                    outline: 2px solid #007cba;
+                    outline-offset: -2px;
+                    border-radius: 10px;
+                }
+                .uw-a11y-help-topic-head::before {
+                    content: '';
+                    display: inline-block;
+                    width: 6px; height: 6px;
+                    border-right: 2px solid #888;
+                    border-bottom: 2px solid #888;
+                    transform: rotate(-45deg);
+                    flex-shrink: 0;
+                    transition: transform 0.15s;
+                    margin-left: 2px;
+                }
+                .uw-a11y-help-topic.open .uw-a11y-help-topic-head::before {
+                    transform: rotate(45deg);
+                }
+                .uw-a11y-help-topic-head .uw-a11y-help-tag {
+                    margin-left: auto;
+                    font-size: 10px;
+                    font-weight: 600;
+                    padding: 2px 7px;
+                    border-radius: 4px;
+                    background: #eee;
+                    color: #666;
+                    text-transform: uppercase;
+                    letter-spacing: 0.04em;
+                    flex-shrink: 0;
+                }
+                .uw-a11y-help-topic-body {
+                    display: none;
+                    padding: 0 14px 12px 28px;
+                    font-size: 13px;
+                    line-height: 1.55;
+                    color: #333;
+                }
+                .uw-a11y-help-topic.open .uw-a11y-help-topic-body { display: block; }
+                .uw-a11y-help-topic-body p { margin: 0 0 8px; }
+                .uw-a11y-help-topic-body ul { margin: 4px 0 8px; padding-left: 18px; }
+                .uw-a11y-help-topic-body li { margin: 3px 0; }
+                .uw-a11y-help-topic-body code {
+                    background: rgba(0,0,0,0.06);
+                    padding: 1px 5px;
+                    border-radius: 3px;
+                    font-size: 12px;
+                }
+                .uw-a11y-help-topic-body strong { font-weight: 650; }
+                .uw-a11y-help-empty {
+                    text-align: center;
+                    padding: 2rem 1rem;
+                    color: #888;
+                    font-size: 13px;
+                }
+                mark.uw-a11y-help-hl {
+                    background: #fff3cd;
+                    color: inherit;
+                    border-radius: 2px;
+                    padding: 0 1px;
                 }
 
                 /* ── Settings card layout ── */
@@ -4141,7 +4273,7 @@
                 }
 
                 .violationtype {
-                    margin-bottom: 0.75rem;
+                    margin-bottom: 0.25rem;
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
@@ -4766,13 +4898,33 @@
                     width: 120px;
                     height: 120px;
                     border-radius: 50%;
-                    background: conic-gradient(from 0deg, #28a745 0deg 0deg, #e9ecef 0deg 360deg);
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     position: relative;
                 }
+                #uw-a11y-panel .uw-a11y-score-svg {
+                    position: absolute;
+                    inset: 0;
+                    width: 100%;
+                    height: 100%;
+                    transform: rotate(-90deg);
+                    pointer-events: none;
+                }
+                #uw-a11y-panel .uw-a11y-score-track {
+                    fill: none;
+                    stroke: #e9ecef;
+                    stroke-width: 14;
+                }
+                #uw-a11y-panel .uw-a11y-score-progress {
+                    fill: none;
+                    stroke-width: 14;
+                    stroke-linecap: round;
+                    transition: stroke 0.3s ease;
+                }
                 #uw-a11y-panel .uw-a11y-score-inner {
+                    position: relative;
+                    z-index: 1;
                     width: 92px;
                     height: 92px;
                     background: white;
@@ -6720,38 +6872,7 @@
                 <div class="uw-a11y-settings" role="region" aria-labelledby="uw-a11y-settings-heading">
                     <h3 id="uw-a11y-settings-heading">Settings</h3>
 
-                    <p class="uw-a11y-section-divider">Scanning</p>
-
-                    <div class="uw-a11y-setting-card">
-                        <label for="uw-a11y-include-input" class="uw-a11y-setting-label">Scan Scope</label>
-                        <div style="display:flex;gap:8px;align-items:center;">
-                            <div style="position:relative;flex:1;min-width:0;">
-                                <input id="uw-a11y-include-input" class="uw-a11y-input" type="text"
-                                    value="${this.escapeHtmlAttr(currentInclude)}"
-                                    aria-describedby="uw-a11y-include-help"
-                                    placeholder="e.g. #main, .content-area"
-                                    style="width:100%;padding-right:${currentInclude ? '28px' : ''};">
-                                <button id="uw-a11y-clear-scope" type="button"
-                                    aria-label="Clear scan scope"
-                                    title="Clear scan scope"
-                                    style="display:${currentInclude ? 'flex' : 'none'};position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;padding:2px;cursor:pointer;color:#888;align-items:center;justify-content:center;border-radius:3px;line-height:1;">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                                </button>
-                            </div>
-                            <button id="uw-a11y-pick-element" class="uw-a11y-btn uw-a11y-btn-secondary"
-                                type="button" title="Click elements on the page to add their selectors"
-                                style="white-space:nowrap;flex-shrink:0;">
-                                Pick element
-                            </button>
-                        </div>
-                        <div id="uw-a11y-include-help" class="uw-a11y-helptext">Comma&#8209;separated CSS selectors. When set, only these elements are scanned. Leave empty to scan the whole page.</div>
-                    </div>
-
-                    <div class="uw-a11y-setting-card">
-                        <label for="uw-a11y-exclude-input" class="uw-a11y-setting-label">Exclude Selectors</label>
-                        <input id="uw-a11y-exclude-input" class="uw-a11y-input" type="text" value="${this.escapeHtmlAttr(current)}" aria-describedby="uw-a11y-exclude-help" placeholder="e.g. .my-widget, #sidebar">
-                        <div id="uw-a11y-exclude-help" class="uw-a11y-helptext">Comma‑separated CSS selectors skipped during scanning. Essential internal UI is always excluded.</div>
-                    </div>
+                    <p class="uw-a11y-section-divider">Accessibility</p>
 
                     <div class="uw-a11y-setting-card">
                         <div class="uw-a11y-settings-2col">
@@ -6784,6 +6905,71 @@
                             <input id="uw-a11y-bp-input" type="checkbox" ${bp ? 'checked' : ''}>
                             <span class="uw-a11y-toggle-slider"></span>
                         </label>
+                    </div>
+
+                    <p class="uw-a11y-section-divider">Scanning</p>
+
+                    <div class="uw-a11y-setting-card">
+                        <label for="uw-a11y-include-input" class="uw-a11y-setting-label">Scan Scope</label>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <div style="position:relative;flex:1;min-width:0;">
+                                <input id="uw-a11y-include-input" class="uw-a11y-input" type="text"
+                                    value="${this.escapeHtmlAttr(currentInclude)}"
+                                    aria-describedby="uw-a11y-include-help"
+                                    placeholder="e.g. #main, .content-area"
+                                    style="width:100%;padding-right:${currentInclude ? '28px' : ''};">
+                                <button id="uw-a11y-clear-scope" type="button"
+                                    aria-label="Clear scan scope"
+                                    title="Clear scan scope"
+                                    style="display:${currentInclude ? 'flex' : 'none'};position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;padding:2px;cursor:pointer;color:#888;align-items:center;justify-content:center;border-radius:3px;line-height:1;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                </button>
+                            </div>
+                            <button id="uw-a11y-pick-element" class="uw-a11y-btn uw-a11y-btn-secondary"
+                                type="button" title="Click elements on the page to add their selectors"
+                                style="white-space:nowrap;flex-shrink:0;">
+                                Pick element
+                            </button>
+                        </div>
+                        <div id="uw-a11y-include-help" class="uw-a11y-helptext">Comma&#8209;separated CSS selectors. When set, only these elements are scanned. Leave empty to scan the whole page.</div>
+                    </div>
+
+                    <div class="uw-a11y-setting-card">
+                        <label for="uw-a11y-exclude-input" class="uw-a11y-setting-label">Exclude Selectors</label>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <div style="position:relative;flex:1;min-width:0;">
+                                <input id="uw-a11y-exclude-input" class="uw-a11y-input" type="text"
+                                    value="${this.escapeHtmlAttr(current)}"
+                                    aria-describedby="uw-a11y-exclude-help"
+                                    placeholder="e.g. .my-widget, #sidebar"
+                                    style="width:100%;padding-right:${current ? '28px' : ''};">
+                                <button id="uw-a11y-clear-exclude" type="button"
+                                    aria-label="Clear exclude selectors"
+                                    title="Clear exclude selectors"
+                                    style="display:${current ? 'flex' : 'none'};position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;padding:2px;cursor:pointer;color:#888;align-items:center;justify-content:center;border-radius:3px;line-height:1;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                </button>
+                            </div>
+                            <button id="uw-a11y-pick-exclude-element" class="uw-a11y-btn uw-a11y-btn-secondary"
+                                type="button" title="Click elements on the page to exclude them from scanning"
+                                style="white-space:nowrap;flex-shrink:0;">
+                                Pick element
+                            </button>
+                        </div>
+                        <div style="margin-top:8px;">
+                            <label for="uw-a11y-platform-preset" class="uw-a11y-setting-label" style="margin-bottom:4px;">Platform Preset</label>
+                            <select id="uw-a11y-platform-preset" class="uw-a11y-input" aria-describedby="uw-a11y-exclude-help">
+                                <option value="">Add CMS exclusions...</option>
+                                <option value="wordpress">WordPress</option>
+                                <option value="drupal">Drupal</option>
+                                <option value="squarespace">Squarespace</option>
+                                <option value="wix">Wix</option>
+                                <option value="shopify">Shopify</option>
+                                <option value="joomla">Joomla</option>
+                                <option value="webflow">Webflow</option>
+                            </select>
+                        </div>
+                        <div id="uw-a11y-exclude-help" class="uw-a11y-helptext">Comma‑separated CSS selectors skipped during scanning. Essential internal UI is always excluded.</div>
                     </div>
 
                     <p class="uw-a11y-section-divider">Interface</p>
@@ -6834,6 +7020,9 @@
             const wcagSpecSel = this.shadowRoot.getElementById('uw-a11y-wcag-spec');
             const wcagLevelSel = this.shadowRoot.getElementById('uw-a11y-wcag-level');
             const soundsToggle = this.shadowRoot.getElementById('uw-a11y-sounds-toggle');
+            const pickExcludeBtn = this.shadowRoot.getElementById('uw-a11y-pick-exclude-element');
+            const clearExcludeBtn = this.shadowRoot.getElementById('uw-a11y-clear-exclude');
+            const platformPreset = this.shadowRoot.getElementById('uw-a11y-platform-preset');
 
             // Snapshot values at render time for dirty comparison
             const snap = () => ({
@@ -6891,6 +7080,60 @@
                 });
             }
 
+            // ── Exclude selectors: Pick element, Clear, and Platform Preset ──
+
+            if (pickExcludeBtn) {
+                pickExcludeBtn.addEventListener('click', () => this.startPickerMode(input));
+            }
+
+            // Show/hide the X button as the exclude input changes
+            const updateClearExcludeBtn = () => {
+                const hasValue = input.value.trim().length > 0;
+                if (clearExcludeBtn) {
+                    clearExcludeBtn.style.display = hasValue ? 'flex' : 'none';
+                }
+                input.style.paddingRight = hasValue ? '28px' : '';
+            };
+            input.addEventListener('input', updateClearExcludeBtn);
+
+            if (clearExcludeBtn) {
+                clearExcludeBtn.addEventListener('click', () => {
+                    input.value = '';
+                    updateClearExcludeBtn();
+                    checkDirty();
+                    this.playSound('ui');
+                    input.focus();
+                });
+            }
+
+            // Platform preset dropdown — appends CMS-specific exclude selectors
+            const platformPresets = {
+                wordpress: '#wpadminbar, #adminmenuwrap, #adminmenuback, #adminmenumain, #wpfooter',
+                drupal: '#toolbar-administration, .toolbar-bar, .toolbar-tray',
+                squarespace: '.sqs-announcement-bar-dropzone, .sqs-cookie-banner-v2',
+                wix: '#WIX_ADS, #SITE_HEADER, .wixAds',
+                shopify: '.shopify-section--announcement-bar, #preview-bar-iframe, #admin-bar-iframe',
+                joomla: '#atum-sidebar, .atum-contract, #subhead-container',
+                webflow: '.w-webflow-badge'
+            };
+
+            if (platformPreset) {
+                platformPreset.addEventListener('change', () => {
+                    const selectors = platformPresets[platformPreset.value];
+                    if (!selectors) return;
+                    const existing = input.value.trim();
+                    // Merge without duplicating selectors already present
+                    const existingSet = new Set(existing.split(',').map(s => s.trim()).filter(Boolean));
+                    const newSelectors = selectors.split(',').map(s => s.trim()).filter(s => s && !existingSet.has(s));
+                    if (newSelectors.length > 0) {
+                        input.value = existing ? existing + ', ' + newSelectors.join(', ') : newSelectors.join(', ');
+                    }
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    platformPreset.value = '';
+                    this.playSound('ui');
+                });
+            }
+
             // Sound toggle — saves instantly to localStorage, no re-scan needed
             if (soundsToggle) {
                 soundsToggle.addEventListener('change', () => {
@@ -6938,6 +7181,8 @@
                 initialValues = snap();
                 actionsBar.hidden = true;
                 this.scoreAnimationPlayed = false;
+                // Refresh the help section so its WCAG filter reflects the new level
+                this.renderHelp();
                 this.runAxeChecks();
                 this.showView('results');
             });
@@ -6949,10 +7194,14 @@
                 if (bpInput) bpInput.checked = !!defaults.enableBestPractices;
                 if (wcagSpecSel) wcagSpecSel.value = defaults.wcagSpec;
                 if (wcagLevelSel) wcagLevelSel.value = defaults.wcagLevel;
+                updateClearBtn();
+                updateClearExcludeBtn();
                 // Update snapshot to match restored defaults → hides bar
                 initialValues = snap();
                 actionsBar.hidden = true;
                 if (msg) { msg.textContent = 'Reset to defaults.'; msg.className = 'uw-a11y-msg ok'; }
+                // Refresh help so its WCAG filter follows the reset level
+                this.renderHelp();
             });
 
             // Populate dismissed count immediately
@@ -6964,6 +7213,455 @@
         filterOutEssential: function(list) {
             const essentials = new Set(this.getEssentialExcludeSelectors());
             return (list || []).filter(sel => !essentials.has(sel));
+        },
+
+        // ── Help System ────────────────────────────────────────────────────────
+
+        getHelpTopics: function() {
+            return [
+                // ─── Using Pinpoint ───
+                { id: 'help-getting-started', cat: 'tool', title: 'Getting Started',
+                  keys: 'getting started run scan check begin how to use quick start',
+                  body: '<p>Click the Pinpoint icon in your browser toolbar to launch the checker on any page. It automatically runs an accessibility scan and displays results organized by severity.</p><ul><li><strong>Errors</strong> — WCAG violations that must be fixed.</li><li><strong>Warnings</strong> — Issues that need manual review.</li><li><strong>Best Practices</strong> — Suggestions beyond the WCAG spec.</li></ul><p>Click any result to highlight the offending element on the page and see a recommended fix.</p>' },
+                { id: 'help-results', cat: 'tool', title: 'Understanding Results',
+                  keys: 'results issues errors warnings best practices score impact severity count badge',
+                  body: '<p>Results are grouped by rule. Each group shows how many instances were found and the impact level: <strong>critical</strong>, <strong>serious</strong>, <strong>moderate</strong>, or <strong>minor</strong>.</p><ul><li>Click a group to expand it and see every affected element.</li><li>Click an individual instance to scroll to and highlight the element on the page.</li><li>Use the <strong>eye icons</strong> in the category headers to show or hide entire categories (errors, warnings, best practices).</li></ul><p>The accessibility score at the top gives a quick overall picture. A higher score means fewer issues relative to total elements checked.</p>' },
+                { id: 'help-inspector', cat: 'tool', title: 'Inspector',
+                  keys: 'inspector inspect element details dom node attributes accessibility tree',
+                  body: '<p>The Inspector view lets you examine individual elements and their accessibility properties. Click any element on the page while the Inspector is active to see:</p><ul><li>The element\'s accessible name and role</li><li>ARIA attributes and states</li><li>Color contrast information</li><li>Relevant WCAG criteria</li></ul>' },
+                { id: 'help-scan-scope', cat: 'tool', title: 'Scan Scope',
+                  keys: 'scan scope include selector limit area section pick element scope restrict',
+                  body: '<p>By default, Pinpoint scans the entire page. Use <strong>Scan Scope</strong> in Settings to limit the scan to specific areas.</p><ul><li>Enter one or more CSS selectors (comma-separated), e.g. <code>#main, .content-area</code>.</li><li>Or click <strong>Pick element</strong> to visually click an element on the page — its selector is added automatically.</li></ul><p>This is useful when you only want to audit a particular component or section without noise from the rest of the page.</p>' },
+                { id: 'help-exclude', cat: 'tool', title: 'Exclude Selectors',
+                  keys: 'exclude selector ignore skip hide admin bar toolbar cms platform preset wordpress drupal',
+                  body: '<p>Exclude Selectors let you skip parts of the page during scanning. This is especially useful for CMS admin bars and toolbars you don\'t control.</p><ul><li>Enter CSS selectors in the Exclude field, e.g. <code>#wpadminbar, .admin-toolbar</code>.</li><li>Use <strong>Pick element</strong> to visually select elements to exclude.</li><li>Use the <strong>Platform Preset</strong> dropdown to auto-populate exclusions for popular platforms like WordPress, Drupal, Squarespace, Shopify, Wix, Joomla, or Webflow.</li></ul><p>Pinpoint always excludes its own UI elements automatically.</p>' },
+                { id: 'help-pick-element', cat: 'tool', title: 'Pick Element',
+                  keys: 'pick element picker click visual select cursor crosshair',
+                  body: '<p>The Pick Element feature lets you visually click elements on the page instead of writing CSS selectors by hand.</p><ul><li>Click <strong>Pick element</strong> next to either the Scan Scope or Exclude Selectors field.</li><li>The settings panel fades and your cursor becomes a crosshair.</li><li>Hover over elements to see them highlighted with a tooltip showing their tag and class.</li><li>Click an element to add its selector to the field.</li><li>Press <strong>Escape</strong> or click <strong>Done picking</strong> to exit picker mode.</li></ul>' },
+                { id: 'help-wcag-settings', cat: 'tool', title: 'WCAG Version & Level',
+                  keys: 'wcag version level conformance 2.0 2.1 2.2 A AA AAA settings standard',
+                  body: '<p>In Settings under Accessibility, you can choose which WCAG version and conformance level to test against.</p><ul><li><strong>WCAG 2.0 / 2.1 / 2.2</strong> — newer versions add additional success criteria. 2.1 is the most widely adopted standard.</li><li><strong>Level A</strong> — minimum accessibility requirements.</li><li><strong>Level AA</strong> — the recommended target for most sites (and the legal standard in many jurisdictions).</li><li><strong>Level AAA</strong> — highest standard; enables enhanced contrast ratio rules (7:1 for normal text).</li></ul><p>Default is WCAG 2.1 AA.</p>' },
+                { id: 'help-false-positives', cat: 'tool', title: 'Dismissing False Positives',
+                  keys: 'false positive dismiss hide restore issue wrong incorrect noise',
+                  body: '<p>If a reported issue is a false positive (the tool flagged it but it\'s actually fine), you can dismiss it:</p><ul><li>Expand the issue and click the <strong>Dismiss</strong> button.</li><li>Dismissed issues are hidden from results and remembered across sessions for the current site.</li><li>To restore dismissed issues, go to <strong>Settings → Results → Restore all dismissed</strong>.</li></ul>' },
+                { id: 'help-manual-verify', cat: 'tool', title: 'Manual Verification',
+                  keys: 'manual verify check mark verified instance checkbox confirm',
+                  body: '<p>Some issues need human judgment. After reviewing an issue, you can mark all its instances as manually verified using the checkbox at the bottom of the expanded issue group. Verified rules are visually distinguished so you can track your audit progress.</p>' },
+                { id: 'help-keyboard', cat: 'tool', title: 'Keyboard Shortcuts',
+                  keys: 'keyboard shortcut hotkey key binding ctrl shift command',
+                  body: '<p>Pinpoint supports keyboard shortcuts for efficient use:</p><ul><li><strong>Ctrl+Shift+A</strong> (or <strong>Cmd+Shift+A</strong> on Mac) — Launch or toggle Pinpoint.</li><li><strong>Escape</strong> — Close the panel or exit Pick Element mode.</li><li><strong>Tab / Shift+Tab</strong> — Navigate through results and controls.</li></ul>' },
+
+                // ─── WCAG Reference ───
+                { id: 'wcag-1.1.1', cat: 'wcag', title: '1.1.1 Non-text Content (A)',
+                  keys: 'image alt text alternative non-text img decorative svg icon',
+                  body: '<p>All non-text content (images, icons, charts) must have a text alternative that serves the same purpose.</p><ul><li>Add descriptive <code>alt</code> text to <code>&lt;img&gt;</code> elements.</li><li>Mark purely decorative images with <code>alt=""</code> or <code>role="presentation"</code>.</li><li>SVG icons should use <code>aria-label</code> or a visually hidden text label.</li><li>Complex images (charts, diagrams) need longer descriptions nearby.</li></ul>' },
+                { id: 'wcag-1.2.1', cat: 'wcag', title: '1.2.1 Audio-only and Video-only Prerecorded (A)',
+                  keys: 'audio video only prerecorded transcript alternative media podcast silent',
+                  body: '<p>Provide an alternative for prerecorded audio-only and video-only content.</p><ul><li><strong>Audio-only</strong> (e.g. a podcast): provide a text transcript that includes all spoken words and important non-speech sounds.</li><li><strong>Video-only</strong> (e.g. a silent animation): provide either a text description or an audio track describing what is happening.</li></ul>' },
+                { id: 'wcag-1.2.2', cat: 'wcag', title: '1.2.2 Captions Prerecorded (A)',
+                  keys: 'captions subtitle prerecorded video media synchronized closed cc deaf',
+                  body: '<p>Captions must be provided for all prerecorded audio in synchronized media (video with sound).</p><ul><li>Use real captions, not auto-generated transcripts that haven\'t been corrected.</li><li>Captions must include speaker identification and important non-speech sounds (laughter, music, applause).</li><li>Use <code>&lt;track kind="captions"&gt;</code> on <code>&lt;video&gt;</code> elements, or a player that supports caption files (WebVTT, SRT).</li></ul>' },
+                { id: 'wcag-1.2.3', cat: 'wcag', title: '1.2.3 Audio Description or Media Alternative Prerecorded (A)',
+                  keys: 'audio description media alternative transcript prerecorded video described',
+                  body: '<p>For prerecorded video with sound, provide either an audio description of the visual content or a full text alternative (transcript) that describes both audio and video.</p><ul><li>An <strong>audio description</strong> is a separate narration track describing important visual information (actions, scene changes, on-screen text).</li><li>A <strong>media alternative</strong> is a text document containing all dialogue plus descriptions of visuals.</li></ul>' },
+                { id: 'wcag-1.2.4', cat: 'wcag', title: '1.2.4 Captions Live (AA)',
+                  keys: 'captions live synchronized media broadcast streaming realtime webinar',
+                  body: '<p>Captions must be provided for all <strong>live</strong> audio content in synchronized media — webinars, livestreams, broadcasts, virtual events. Live captions can come from a stenographer/CART service or a high-quality speech-to-text engine, but accuracy matters.</p>' },
+                { id: 'wcag-1.2.5', cat: 'wcag', title: '1.2.5 Audio Description Prerecorded (AA)',
+                  keys: 'audio description prerecorded video described narration visual',
+                  body: '<p>Audio description must be provided for all prerecorded video content. Unlike 1.2.3, the text-alternative option is not enough at AA — the video itself must include narrated descriptions of important visual information during pauses in dialogue.</p>' },
+                { id: 'wcag-1.2.6', cat: 'wcag', title: '1.2.6 Sign Language Prerecorded (AAA)',
+                  keys: 'sign language prerecorded video deaf interpreter ASL BSL',
+                  body: '<p>Sign-language interpretation is provided for all prerecorded audio in synchronized media. This benefits users who are deaf and use sign language as their primary language, since written captions may not be as fluent for them.</p>' },
+                { id: 'wcag-1.2.7', cat: 'wcag', title: '1.2.7 Extended Audio Description Prerecorded (AAA)',
+                  keys: 'extended audio description prerecorded video pause narration',
+                  body: '<p>When pauses in foreground audio are insufficient to allow audio descriptions to convey the sense of the video, provide an extended version where the video pauses to make room for additional description. Used when standard audio description (1.2.5) cannot fit all needed information.</p>' },
+                { id: 'wcag-1.2.8', cat: 'wcag', title: '1.2.8 Media Alternative Prerecorded (AAA)',
+                  keys: 'media alternative prerecorded transcript text full document',
+                  body: '<p>An alternative for time-based media is provided for all prerecorded synchronized media and prerecorded video-only content. This is a full text document that captures all spoken dialogue plus descriptions of all important visual information — equivalent to a screenplay with stage directions.</p>' },
+                { id: 'wcag-1.2.9', cat: 'wcag', title: '1.2.9 Audio-only Live (AAA)',
+                  keys: 'audio only live transcript realtime broadcast radio podcast',
+                  body: '<p>An alternative is provided for live audio-only content that presents equivalent information — typically a real-time text transcript via CART or live captioning service.</p>' },
+                { id: 'wcag-1.3.1', cat: 'wcag', title: '1.3.1 Info and Relationships (A)',
+                  keys: 'structure semantic heading list table form label relationship programmatic',
+                  body: '<p>Information, structure, and relationships conveyed visually must also be available programmatically.</p><ul><li>Use proper heading hierarchy (<code>h1</code>–<code>h6</code>) — don\'t skip levels.</li><li>Use <code>&lt;ul&gt;</code>/<code>&lt;ol&gt;</code> for lists, <code>&lt;table&gt;</code> for tabular data.</li><li>Associate form inputs with <code>&lt;label&gt;</code> elements.</li><li>Use landmark elements (<code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;aside&gt;</code>) for page structure.</li></ul>' },
+                { id: 'wcag-1.3.5', cat: 'wcag', title: '1.3.5 Identify Input Purpose (AA)',
+                  keys: 'autocomplete input purpose identify name email phone address autofill',
+                  body: '<p>Form inputs that collect personal information must identify their purpose using the <code>autocomplete</code> attribute so browsers and assistive technologies can auto-fill them.</p><ul><li>Use values like <code>autocomplete="name"</code>, <code>autocomplete="email"</code>, <code>autocomplete="tel"</code>.</li><li>This helps users with cognitive disabilities and motor impairments.</li></ul>' },
+                { id: 'wcag-1.4.1', cat: 'wcag', title: '1.4.1 Use of Color (A)',
+                  keys: 'color alone information meaning distinguish visual indicator',
+                  body: '<p>Color must not be the only way to convey information. Always provide an additional visual cue.</p><ul><li>Error states: add an icon or text label, not just red color.</li><li>Required fields: use an asterisk or text, not just color.</li><li>Links within text: underline them or add another non-color indicator.</li><li>Charts/graphs: use patterns, labels, or textures in addition to color.</li></ul>' },
+                { id: 'wcag-1.4.3', cat: 'wcag', title: '1.4.3 Contrast Minimum (AA)',
+                  keys: 'contrast ratio color text background minimum 4.5 3 readability',
+                  body: '<p>Text must have sufficient contrast against its background to be readable.</p><ul><li><strong>Normal text</strong> (under 18px or under 14px bold): minimum <strong>4.5:1</strong> ratio.</li><li><strong>Large text</strong> (18px+ or 14px+ bold): minimum <strong>3:1</strong> ratio.</li><li>Logos and purely decorative text are exempt.</li></ul><p>Use a contrast checker to test your color combinations. If you enable Level AAA, the thresholds become 7:1 and 4.5:1.</p>' },
+                { id: 'wcag-1.4.4', cat: 'wcag', title: '1.4.4 Resize Text (AA)',
+                  keys: 'resize text zoom 200% magnify font size scale reflow',
+                  body: '<p>Text must be resizable up to 200% without loss of content or functionality. Avoid fixed pixel sizes for text — use relative units like <code>rem</code> or <code>em</code>. Ensure layouts don\'t break or hide content when the user zooms their browser to 200%.</p>' },
+                { id: 'wcag-1.4.11', cat: 'wcag', title: '1.4.11 Non-text Contrast (AA)',
+                  keys: 'non-text contrast UI component graphic boundary border icon focus indicator 3:1',
+                  body: '<p>UI components (buttons, form fields, icons) and meaningful graphics must have at least a <strong>3:1</strong> contrast ratio against adjacent colors.</p><ul><li>Button borders or backgrounds must be distinguishable.</li><li>Form input outlines need sufficient contrast.</li><li>Custom focus indicators must meet the ratio.</li><li>Icons conveying meaning need adequate contrast.</li></ul>' },
+                { id: 'wcag-2.1.1', cat: 'wcag', title: '2.1.1 Keyboard (A)',
+                  keys: 'keyboard accessible tab focus navigate operable enter space click trap',
+                  body: '<p>All functionality must be operable through a keyboard interface.</p><ul><li>Every interactive element must be reachable with <strong>Tab</strong>.</li><li>Buttons and links must activate with <strong>Enter</strong> (and <strong>Space</strong> for buttons).</li><li>Custom widgets need appropriate keyboard handlers.</li><li>Avoid keyboard traps — the user must always be able to Tab away from a component.</li></ul>' },
+                { id: 'wcag-2.4.1', cat: 'wcag', title: '2.4.1 Bypass Blocks (A)',
+                  keys: 'skip link bypass navigation block repeat header landmark main content',
+                  body: '<p>Provide a way for keyboard users to skip repetitive navigation and go straight to main content.</p><ul><li>Add a <strong>Skip to main content</strong> link as the first focusable element.</li><li>Use landmark elements (<code>&lt;main&gt;</code>, <code>&lt;nav&gt;</code>) so screen reader users can jump between sections.</li><li>Use proper heading structure for easy navigation.</li></ul>' },
+                { id: 'wcag-2.4.2', cat: 'wcag', title: '2.4.2 Page Titled (A)',
+                  keys: 'page title head document title tag descriptive',
+                  body: '<p>Every page must have a descriptive <code>&lt;title&gt;</code> that identifies its topic or purpose. For SPAs, update the title when the view changes. Titles should be unique across the site and describe the specific page, e.g. "Contact Us — Acme Corp" rather than just "Acme Corp".</p>' },
+                { id: 'wcag-2.4.3', cat: 'wcag', title: '2.4.3 Focus Order (A)',
+                  keys: 'focus order tab sequence logical navigation DOM order tabindex',
+                  body: '<p>The focus order when tabbing through a page must be logical and meaningful. It should generally follow the visual reading order (left to right, top to bottom).</p><ul><li>Avoid positive <code>tabindex</code> values — they override natural order.</li><li>Make sure modals trap focus properly and return focus when closed.</li><li>Dynamically inserted content should receive focus or be announced.</li></ul>' },
+                { id: 'wcag-2.4.4', cat: 'wcag', title: '2.4.4 Link Purpose (A)',
+                  keys: 'link purpose text click here read more learn more anchor descriptive meaningful',
+                  body: '<p>The purpose of each link should be clear from its text alone (or its surrounding context).</p><ul><li>Avoid generic text like "click here" or "read more".</li><li>If the link text is an image, the <code>alt</code> text serves as the link text.</li><li>Use <code>aria-label</code> or <code>aria-describedby</code> when visual context makes the link clear but the text alone doesn\'t.</li></ul>' },
+                { id: 'wcag-2.4.6', cat: 'wcag', title: '2.4.6 Headings and Labels (AA)',
+                  keys: 'heading label descriptive purpose form field h1 h2 h3 h4 h5 h6',
+                  body: '<p>Headings and labels must describe the topic or purpose of the content they introduce.</p><ul><li>Headings should summarize the section they precede.</li><li>Form labels should clearly describe the expected input.</li><li>Don\'t use headings solely for visual styling — use CSS instead.</li></ul>' },
+                { id: 'wcag-2.4.7', cat: 'wcag', title: '2.4.7 Focus Visible (AA)',
+                  keys: 'focus visible indicator outline ring highlight keyboard tab style',
+                  body: '<p>Keyboard users must be able to see which element is currently focused.</p><ul><li>Don\'t remove the browser\'s default focus outline with <code>outline: none</code> unless you replace it with an equally visible custom indicator.</li><li>Custom focus styles should have sufficient contrast (3:1 against adjacent colors per WCAG 2.4.11).</li><li>Test by tabbing through your page — if you lose track of where focus is, the indicator is insufficient.</li></ul>' },
+                { id: 'wcag-2.5.3', cat: 'wcag', title: '2.5.3 Label in Name (A)',
+                  keys: 'label name accessible visible speech voice control match',
+                  body: '<p>When a component has a visible text label, its accessible name must contain that text. This ensures voice-control users can activate components by saying what they see.</p><ul><li>Don\'t use an <code>aria-label</code> that contradicts the visible text.</li><li>The accessible name should start with or match the visible label.</li></ul>' },
+                { id: 'wcag-3.1.1', cat: 'wcag', title: '3.1.1 Language of Page (A)',
+                  keys: 'language lang html attribute page document locale',
+                  body: '<p>The default language of the page must be identified in the HTML. Add a <code>lang</code> attribute to the <code>&lt;html&gt;</code> element, e.g. <code>&lt;html lang="en"&gt;</code>. This enables screen readers to use the correct pronunciation rules. For multilingual content, use <code>lang</code> attributes on specific elements in other languages.</p>' },
+                { id: 'wcag-3.3.1', cat: 'wcag', title: '3.3.1 Error Identification (A)',
+                  keys: 'error identification form validation message input mistake describe',
+                  body: '<p>When an input error is detected, the item in error must be identified and described in text.</p><ul><li>Show error messages near the field, not only at the top of the form.</li><li>Use <code>aria-describedby</code> to associate error text with the input.</li><li>Don\'t rely solely on color to indicate errors (see 1.4.1).</li><li>Mark invalid fields with <code>aria-invalid="true"</code>.</li></ul>' },
+                { id: 'wcag-3.3.2', cat: 'wcag', title: '3.3.2 Labels or Instructions (A)',
+                  keys: 'label instruction form input field hint placeholder guidance required',
+                  body: '<p>Labels or instructions must be provided when content requires user input.</p><ul><li>Every form field needs a visible <code>&lt;label&gt;</code>.</li><li>Mark required fields clearly (not just with color).</li><li>Provide format hints for specific inputs (e.g. "MM/DD/YYYY").</li><li>Don\'t use <code>placeholder</code> as a substitute for labels — it disappears when the user starts typing.</li></ul>' },
+                { id: 'wcag-4.1.1', cat: 'wcag', title: '4.1.1 Parsing (A)',
+                  keys: 'parsing html valid duplicate id attribute markup nesting',
+                  body: '<p>HTML must be well-formed so assistive technologies can parse it correctly.</p><ul><li>No duplicate <code>id</code> attributes on the same page.</li><li>Elements must be properly nested and closed.</li><li>Use a validator to check for markup errors.</li></ul><p><em>Note: WCAG 2.2 considers this criterion "always satisfied" for HTML, but valid markup is still best practice.</em></p>' },
+                { id: 'wcag-4.1.2', cat: 'wcag', title: '4.1.2 Name, Role, Value (A)',
+                  keys: 'name role value aria custom widget component accessible button link state',
+                  body: '<p>All user-interface components must have an accessible name, an appropriate role, and expose their current state.</p><ul><li>Native HTML elements (<code>&lt;button&gt;</code>, <code>&lt;a&gt;</code>, <code>&lt;input&gt;</code>) get this automatically.</li><li>Custom components need ARIA: <code>role</code>, <code>aria-label</code>, <code>aria-expanded</code>, <code>aria-checked</code>, etc.</li><li>Test with a screen reader to verify custom widgets announce correctly.</li></ul>' },
+                { id: 'wcag-4.1.3', cat: 'wcag', title: '4.1.3 Status Messages (AA)',
+                  keys: 'status message live region aria-live polite assertive notification toast alert',
+                  body: '<p>Status messages (success confirmations, error counts, loading states) must be programmatically communicated to assistive technologies without receiving focus.</p><ul><li>Use <code>role="status"</code> or <code>aria-live="polite"</code> for non-urgent messages.</li><li>Use <code>role="alert"</code> or <code>aria-live="assertive"</code> for urgent notifications.</li><li>Avoid moving focus just to announce a status change.</li></ul>' },
+
+                // ─── AAA-level criteria ───
+                { id: 'wcag-1.4.6', cat: 'wcag', title: '1.4.6 Contrast Enhanced (AAA)',
+                  keys: 'contrast enhanced 7:1 4.5 ratio AAA color text background readability',
+                  body: '<p>Stricter contrast requirements than 1.4.3. Aim for the highest readability for users with low vision.</p><ul><li><strong>Normal text</strong>: minimum <strong>7:1</strong> ratio.</li><li><strong>Large text</strong> (18px+ or 14px+ bold): minimum <strong>4.5:1</strong> ratio.</li><li>Logos and incidental text are exempt.</li></ul><p>This is one of the most commonly required AAA criteria — design systems targeting AAA should bake these ratios into color tokens.</p>' },
+                { id: 'wcag-1.4.8', cat: 'wcag', title: '1.4.8 Visual Presentation (AAA)',
+                  keys: 'visual presentation line spacing paragraph width column justify foreground background',
+                  body: '<p>For blocks of text, users must be able to control visual presentation:</p><ul><li>Foreground and background colors can be selected by the user.</li><li>Text width is no more than <strong>80 characters</strong> (or 40 for CJK).</li><li>Text is not justified (no flush left and right).</li><li>Line spacing is at least <strong>1.5×</strong> within paragraphs.</li><li>Paragraph spacing is at least <strong>1.5×</strong> the line spacing.</li><li>Text can be resized to 200% without horizontal scrolling.</li></ul>' },
+                { id: 'wcag-1.4.9', cat: 'wcag', title: '1.4.9 Images of Text No Exception (AAA)',
+                  keys: 'image text no exception bitmap raster graphic essential decoration',
+                  body: '<p>Images of text must not be used except when essential (like logos or when a particular presentation is required, e.g. a screenshot of code). Always use real text styled with CSS instead of rendering text into images.</p>' },
+                { id: 'wcag-2.1.3', cat: 'wcag', title: '2.1.3 Keyboard No Exception (AAA)',
+                  keys: 'keyboard no exception accessible interface drawing path stroke timing',
+                  body: '<p>Stricter version of 2.1.1. <strong>All</strong> functionality must be operable via keyboard, with no exceptions for path-dependent input. Drawing apps, signature pads, and other free-form input components must provide keyboard alternatives.</p>' },
+                { id: 'wcag-2.2.3', cat: 'wcag', title: '2.2.3 No Timing (AAA)',
+                  keys: 'timing time limit deadline session expire essential',
+                  body: '<p>Time limits are not an essential part of the activity. Avoid timed quizzes, session timeouts, or auto-advancing carousels unless the time limit is essential (e.g. an auction or live event). When time limits are required, allow users to extend or disable them.</p>' },
+                { id: 'wcag-2.3.2', cat: 'wcag', title: '2.3.2 Three Flashes (AAA)',
+                  keys: 'flash flashing seizure photosensitive epilepsy three blink animation',
+                  body: '<p>Stricter than 2.3.1: web pages must not contain anything that flashes more than three times in any one-second period — full stop, regardless of the flash area. Avoid flashing animations, strobing video, and rapidly-changing visual effects entirely.</p>' },
+                { id: 'wcag-2.4.8', cat: 'wcag', title: '2.4.8 Location (AAA)',
+                  keys: 'location breadcrumb navigation orient site map current page sitemap',
+                  body: '<p>Information about the user\'s location within a set of pages is available.</p><ul><li>Provide breadcrumbs showing the path through the site hierarchy.</li><li>Highlight the current page in the navigation.</li><li>Use a sitemap or page-locator widget for complex sites.</li></ul>' },
+                { id: 'wcag-2.4.9', cat: 'wcag', title: '2.4.9 Link Purpose Link Only (AAA)',
+                  keys: 'link purpose link only context isolation descriptive text alone',
+                  body: '<p>Stricter than 2.4.4: each link\'s purpose must be identifiable from the <strong>link text alone</strong>, without relying on surrounding context. This means no "click here" or "more info" — every link must stand on its own (or use <code>aria-label</code> to provide standalone text).</p>' },
+                { id: 'wcag-2.4.10', cat: 'wcag', title: '2.4.10 Section Headings (AAA)',
+                  keys: 'section heading organize content structure outline navigate',
+                  body: '<p>Use section headings to organize content. Long-form content (articles, documentation) should be broken up with descriptive headings so users — especially screen reader users — can scan and navigate by heading.</p>' },
+                { id: 'wcag-3.1.5', cat: 'wcag', title: '3.1.5 Reading Level (AAA)',
+                  keys: 'reading level plain language jargon literacy education complex simple',
+                  body: '<p>When text requires reading ability beyond a lower secondary education level (about age 14), provide supplemental content or a simpler version. Use plain language tools and readability calculators (Flesch-Kincaid, etc.) to assess complexity. This benefits users with cognitive disabilities, non-native speakers, and everyone in a hurry.</p>' },
+                { id: 'wcag-3.2.5', cat: 'wcag', title: '3.2.5 Change on Request (AAA)',
+                  keys: 'change request context user initiate confirm submit form auto',
+                  body: '<p>Changes of context (new windows, form submissions, navigation) happen only at the user\'s request — never automatically. Avoid auto-submitting forms when a value changes, auto-navigating after a delay, or popping new windows without user action.</p>' },
+                { id: 'wcag-3.3.6', cat: 'wcag', title: '3.3.6 Error Prevention All (AAA)',
+                  keys: 'error prevention all reverse review confirm submit form data',
+                  body: '<p>Stricter than 3.3.4: for <strong>any</strong> form that requires user input, provide at least one of:</p><ul><li><strong>Reversible</strong> — submissions can be undone.</li><li><strong>Checked</strong> — input is validated and the user can correct errors.</li><li><strong>Confirmed</strong> — user can review, confirm, and correct before submitting.</li></ul>' },
+
+                // ─── Remaining 1.3 / 1.4 criteria ───
+                { id: 'wcag-1.3.2', cat: 'wcag', title: '1.3.2 Meaningful Sequence (A)',
+                  keys: 'meaningful sequence reading order DOM source CSS visual logical',
+                  body: '<p>When the sequence in which content is presented affects its meaning, the correct reading order must be programmatically determinable. The DOM order should match the visual reading order so screen readers and reflowed layouts present content correctly. Avoid using CSS positioning to reorder content in ways the underlying markup doesn\'t reflect.</p>' },
+                { id: 'wcag-1.3.3', cat: 'wcag', title: '1.3.3 Sensory Characteristics (A)',
+                  keys: 'sensory shape size location sound visual instruction reference',
+                  body: '<p>Instructions must not rely solely on sensory characteristics like shape, color, size, visual location, orientation, or sound.</p><ul><li>Bad: "Click the round button on the right."</li><li>Good: "Click the round Submit button on the right."</li><li>Provide text labels alongside any shape/color/position-based references.</li></ul>' },
+                { id: 'wcag-1.3.4', cat: 'wcag', title: '1.3.4 Orientation (AA)',
+                  keys: 'orientation portrait landscape rotate device lock essential',
+                  body: '<p>Content must not be locked to a single display orientation (portrait or landscape) unless a specific orientation is essential. Users mounting devices in fixed positions (wheelchairs, beds) need both orientations to work.</p>' },
+                { id: 'wcag-1.3.6', cat: 'wcag', title: '1.3.6 Identify Purpose (AAA)',
+                  keys: 'identify purpose icon symbol UI component metadata personalization',
+                  body: '<p>The purpose of UI components, icons, and regions must be programmatically determinable. This supports personalization tools (e.g. symbol overlays for users with cognitive disabilities) that swap unfamiliar icons for known ones. Use ARIA landmarks, roles, and microdata so assistive tech can recognize purpose.</p>' },
+                { id: 'wcag-1.4.2', cat: 'wcag', title: '1.4.2 Audio Control (A)',
+                  keys: 'audio control autoplay pause stop mute volume background sound',
+                  body: '<p>If audio plays automatically for more than 3 seconds, provide a mechanism to pause, stop, or independently control its volume. Auto-playing audio interferes with screen readers and is disruptive — the safest practice is to never autoplay audio at all.</p>' },
+                { id: 'wcag-1.4.5', cat: 'wcag', title: '1.4.5 Images of Text (AA)',
+                  keys: 'images of text bitmap graphic logo essential customizable real',
+                  body: '<p>Use real text styled with CSS rather than images of text, except when a particular presentation is essential (logos, brand assets) or when the user can customize the image. Real text scales, reflows, can be translated, and respects user font settings.</p>' },
+                { id: 'wcag-1.4.7', cat: 'wcag', title: '1.4.7 Low or No Background Audio (AAA)',
+                  keys: 'background audio noise speech foreground 20 decibel quiet',
+                  body: '<p>For prerecorded audio-only content with primarily speech, background sounds must be at least <strong>20 dB</strong> lower than the foreground speech (or absent). This helps users with hearing loss separate speech from ambient noise.</p>' },
+                { id: 'wcag-1.4.10', cat: 'wcag', title: '1.4.10 Reflow (AA)',
+                  keys: 'reflow responsive 320 viewport zoom mobile horizontal scroll one column',
+                  body: '<p>Content must reflow into a single column at <strong>320 CSS pixels</strong> wide without requiring two-dimensional scrolling — except for content that genuinely needs 2D layout (maps, data tables, complex diagrams).</p><ul><li>Use responsive design with relative units and media queries.</li><li>Test by zooming to 400% in a 1280px viewport (which collapses content to ~320px wide).</li></ul>' },
+                { id: 'wcag-1.4.12', cat: 'wcag', title: '1.4.12 Text Spacing (AA)',
+                  keys: 'text spacing line height letter word paragraph override user style',
+                  body: '<p>No loss of content or functionality when users override text spacing to:</p><ul><li>Line height at least <strong>1.5×</strong> font size</li><li>Paragraph spacing at least <strong>2×</strong> font size</li><li>Letter spacing at least <strong>0.12×</strong> font size</li><li>Word spacing at least <strong>0.16×</strong> font size</li></ul><p>Avoid fixed-height containers and <code>overflow: hidden</code> on text blocks.</p>' },
+                { id: 'wcag-1.4.13', cat: 'wcag', title: '1.4.13 Content on Hover or Focus (AA)',
+                  keys: 'hover focus tooltip popover dismissable hoverable persistent',
+                  body: '<p>Content that appears on hover or focus (tooltips, popovers, custom menus) must be:</p><ul><li><strong>Dismissable</strong> — can be dismissed without moving pointer or focus (e.g. Escape key).</li><li><strong>Hoverable</strong> — the user can move the pointer onto the new content without it disappearing.</li><li><strong>Persistent</strong> — stays visible until dismissed, focus moves, or the trigger goes away.</li></ul>' },
+
+                // ─── Remaining 2.1 criteria ───
+                { id: 'wcag-2.1.2', cat: 'wcag', title: '2.1.2 No Keyboard Trap (A)',
+                  keys: 'keyboard trap focus stuck escape exit navigate away modal',
+                  body: '<p>If keyboard focus can be moved to a component, it must be possible to move focus away using only the keyboard. Common offenders are embedded plugins, custom widgets, and modals that don\'t handle Escape. The user should never get "stuck" inside a component.</p>' },
+                { id: 'wcag-2.1.4', cat: 'wcag', title: '2.1.4 Character Key Shortcuts (A)',
+                  keys: 'character key shortcut single letter remap disable hotkey speech',
+                  body: '<p>If single-character keyboard shortcuts exist (e.g. press <kbd>j</kbd> to jump), users must be able to turn them off, remap them, or have them only fire when a specific element has focus. Single-key shortcuts can be triggered accidentally by speech-input users.</p>' },
+
+                // ─── Remaining 2.2 criteria ───
+                { id: 'wcag-2.2.1', cat: 'wcag', title: '2.2.1 Timing Adjustable (A)',
+                  keys: 'time limit adjust extend disable session timeout countdown',
+                  body: '<p>For each time limit set by the content, the user must be able to turn it off, adjust it, or extend it (at least 10× the default), unless the time limit is essential. Examples: session timeouts, timed quizzes, auto-rotating carousels.</p>' },
+                { id: 'wcag-2.2.2', cat: 'wcag', title: '2.2.2 Pause, Stop, Hide (A)',
+                  keys: 'pause stop hide moving blinking scrolling animation carousel auto',
+                  body: '<p>For moving, blinking, scrolling, or auto-updating content that starts automatically, lasts more than 5 seconds, and is shown alongside other content, provide a way to pause, stop, or hide it.</p><ul><li>Carousels and auto-rotating banners need pause controls.</li><li>Animated GIFs and video previews need controls.</li><li>Live tickers and feeds need a pause option.</li></ul>' },
+                { id: 'wcag-2.2.4', cat: 'wcag', title: '2.2.4 Interruptions (AAA)',
+                  keys: 'interruptions postpone suppress notifications alerts emergency',
+                  body: '<p>Interruptions (notifications, alerts, updates) can be postponed or suppressed by the user, except for emergencies. This helps users with cognitive disabilities or anyone trying to focus.</p>' },
+                { id: 'wcag-2.2.5', cat: 'wcag', title: '2.2.5 Re-authenticating (AAA)',
+                  keys: 're-authenticate session expire data preserve continue login',
+                  body: '<p>When an authenticated session expires, the user can continue without losing data after re-authenticating. Save form data and restore it after login so users don\'t have to start over.</p>' },
+                { id: 'wcag-2.2.6', cat: 'wcag', title: '2.2.6 Timeouts (AAA)',
+                  keys: 'timeout warn inactivity data loss session preserve hours',
+                  body: '<p>Warn users about the duration of any user inactivity that could cause data loss, unless the data is preserved for more than 20 hours when the user does not take any actions.</p>' },
+
+                // ─── Remaining 2.3 criteria ───
+                { id: 'wcag-2.3.1', cat: 'wcag', title: '2.3.1 Three Flashes or Below Threshold (A)',
+                  keys: 'flash three flashing seizure threshold photosensitive epilepsy',
+                  body: '<p>Web pages must not contain anything that flashes more than three times in any one-second period, or the flash must be below the general flash and red flash thresholds. Flashing content can trigger photosensitive seizures. The safest practice: avoid flashing entirely.</p>' },
+                { id: 'wcag-2.3.3', cat: 'wcag', title: '2.3.3 Animation from Interactions (AAA)',
+                  keys: 'animation interaction motion reduce vestibular parallax disable',
+                  body: '<p>Motion animation triggered by interaction (parallax scrolling, transition effects, page slide-ins) can be disabled, unless the animation is essential. Honor the <code>prefers-reduced-motion</code> media query so users with vestibular disorders can opt out.</p><pre><code>@media (prefers-reduced-motion: reduce) { /* disable transforms */ }</code></pre>' },
+
+                // ─── Remaining 2.4 criteria (incl. WCAG 2.2) ───
+                { id: 'wcag-2.4.5', cat: 'wcag', title: '2.4.5 Multiple Ways (AA)',
+                  keys: 'multiple ways navigate find page search sitemap menu links discovery',
+                  body: '<p>More than one way must be available to locate a page within a set of pages, except when the page is the result of a process step. Provide at least two of: site navigation, site search, sitemap, table of contents, link list, or related-links.</p>' },
+                { id: 'wcag-2.4.11', cat: 'wcag', title: '2.4.11 Focus Not Obscured Minimum (AA)',
+                  keys: 'focus not obscured minimum sticky header cookie banner overlay hidden',
+                  body: '<p>When a UI component receives keyboard focus, the focus indicator must not be <strong>entirely</strong> hidden by author-created content (sticky headers, cookie banners, floating action buttons). Test by tabbing through the page with sticky elements present. <em>(WCAG 2.2)</em></p>' },
+                { id: 'wcag-2.4.12', cat: 'wcag', title: '2.4.12 Focus Not Obscured Enhanced (AAA)',
+                  keys: 'focus not obscured enhanced fully visible sticky overlay hidden',
+                  body: '<p>Stricter than 2.4.11: the focused component must not be obscured by author-created content at all — not even partially. <em>(WCAG 2.2)</em></p>' },
+                { id: 'wcag-2.4.13', cat: 'wcag', title: '2.4.13 Focus Appearance (AAA)',
+                  keys: 'focus appearance indicator size contrast outline ring perimeter',
+                  body: '<p>Focus indicators must meet minimum size and contrast requirements:</p><ul><li>Area at least equal to a 2 CSS-pixel solid outline of the perimeter of the unfocused component.</li><li>Contrast ratio of at least <strong>3:1</strong> between focused and unfocused states.</li></ul><p><em>(WCAG 2.2)</em></p>' },
+
+                // ─── Remaining 2.5 criteria (incl. WCAG 2.2) ───
+                { id: 'wcag-2.5.1', cat: 'wcag', title: '2.5.1 Pointer Gestures (A)',
+                  keys: 'pointer gestures multipoint path swipe pinch drag single tap alternative',
+                  body: '<p>All functionality that uses multipoint or path-based gestures (pinch-to-zoom, swipe, drag) must also be operable with a single pointer without a path-based gesture, unless the gesture is essential.</p><ul><li>Provide buttons for zoom in/out alongside pinch gestures.</li><li>Provide arrow buttons alongside swipe carousels.</li></ul>' },
+                { id: 'wcag-2.5.2', cat: 'wcag', title: '2.5.2 Pointer Cancellation (A)',
+                  keys: 'pointer cancellation down up event abort undo click release',
+                  body: '<p>For functionality operated by a single pointer, at least one of the following must be true:</p><ul><li>The down-event is not used to execute any part of the function.</li><li>Completion is on the up-event, and an abort/undo mechanism is available.</li><li>The up-event reverses the down-event.</li><li>Completing the function on the down-event is essential.</li></ul><p>This means: don\'t fire actions on <code>mousedown</code>/<code>pointerdown</code> — wait for <code>click</code>.</p>' },
+                { id: 'wcag-2.5.4', cat: 'wcag', title: '2.5.4 Motion Actuation (A)',
+                  keys: 'motion actuation shake tilt device sensor accelerometer alternative disable',
+                  body: '<p>Functions triggered by device motion (shake to undo, tilt to scroll) must also be operable through standard UI controls, and the motion-triggered behavior must be disable-able to prevent accidental actuation. Users with tremors or fixed-mount devices need this.</p>' },
+                { id: 'wcag-2.5.5', cat: 'wcag', title: '2.5.5 Target Size Enhanced (AAA)',
+                  keys: 'target size enhanced 44 pixels touch tap area button click large',
+                  body: '<p>The size of the target for pointer inputs must be at least <strong>44×44 CSS pixels</strong>, with limited exceptions (inline links in text, equivalent target available, user-agent default styling, essential).</p>' },
+                { id: 'wcag-2.5.6', cat: 'wcag', title: '2.5.6 Concurrent Input Mechanisms (AAA)',
+                  keys: 'concurrent input mechanism keyboard mouse touch switch restrict',
+                  body: '<p>Don\'t restrict use of input modalities available on the platform. Users may switch between keyboard, mouse, touch, voice, and assistive devices freely, sometimes mid-task. Don\'t lock the page into a single input method.</p>' },
+                { id: 'wcag-2.5.7', cat: 'wcag', title: '2.5.7 Dragging Movements (AA)',
+                  keys: 'dragging movement single pointer alternative drag drop reorder slider',
+                  body: '<p>All functionality that uses a dragging movement must be achievable with a single pointer without dragging, unless dragging is essential. For example, drag-and-drop reorder lists should also offer up/down arrow buttons, and sliders should be operable by clicking on the track. <em>(WCAG 2.2)</em></p>' },
+                { id: 'wcag-2.5.8', cat: 'wcag', title: '2.5.8 Target Size Minimum (AA)',
+                  keys: 'target size minimum 24 pixels touch tap button click spacing',
+                  body: '<p>Pointer input targets must be at least <strong>24×24 CSS pixels</strong>, except when:</p><ul><li>Spacing — the target has at least a 24px-diameter circle of clearance to other targets.</li><li>The target is in a sentence or block of text.</li><li>An equivalent control of the right size exists.</li><li>The target is determined by the user agent.</li><li>The size is essential.</li></ul><p><em>(WCAG 2.2)</em></p>' },
+
+                // ─── Remaining 3.1 criteria ───
+                { id: 'wcag-3.1.2', cat: 'wcag', title: '3.1.2 Language of Parts (AA)',
+                  keys: 'language parts lang attribute span foreign multilingual quotation',
+                  body: '<p>The language of any passage or phrase that differs from the surrounding text must be programmatically identified. Use the <code>lang</code> attribute on elements containing foreign-language content, e.g. <code>&lt;span lang="fr"&gt;c\'est la vie&lt;/span&gt;</code>. Proper names, technical terms, and indeterminate words are exempt.</p>' },
+                { id: 'wcag-3.1.3', cat: 'wcag', title: '3.1.3 Unusual Words (AAA)',
+                  keys: 'unusual words jargon idiom definition glossary technical specialized',
+                  body: '<p>Provide a mechanism for identifying specific definitions of words or phrases used in an unusual or restricted way, including idioms and jargon. Link unfamiliar terms to a glossary, use <code>&lt;dfn&gt;</code>, or provide inline definitions.</p>' },
+                { id: 'wcag-3.1.4', cat: 'wcag', title: '3.1.4 Abbreviations (AAA)',
+                  keys: 'abbreviation acronym expansion title abbr definition',
+                  body: '<p>Provide a mechanism for identifying the expanded form or meaning of abbreviations. Use the <code>&lt;abbr title="..."&gt;</code> element, expand on first use ("World Health Organization (WHO)"), or link to a glossary.</p>' },
+                { id: 'wcag-3.1.6', cat: 'wcag', title: '3.1.6 Pronunciation (AAA)',
+                  keys: 'pronunciation phonetic ruby furigana ambiguous homograph',
+                  body: '<p>A mechanism is available for identifying specific pronunciation of words where meaning is ambiguous without it. Particularly relevant for languages like Japanese (ruby/furigana) and for proper names with non-obvious pronunciation.</p>' },
+
+                // ─── Remaining 3.2 criteria (incl. WCAG 2.2) ───
+                { id: 'wcag-3.2.1', cat: 'wcag', title: '3.2.1 On Focus (A)',
+                  keys: 'on focus context change automatic surprise unexpected',
+                  body: '<p>Receiving focus must not trigger a change of context. Focus alone should never submit a form, navigate to a new page, open a new window, or significantly rearrange content. Wait for explicit user action like a click or Enter press.</p>' },
+                { id: 'wcag-3.2.2', cat: 'wcag', title: '3.2.2 On Input (A)',
+                  keys: 'on input change context select dropdown auto submit warn',
+                  body: '<p>Changing the value of a form control must not automatically cause a change of context unless the user has been advised in advance. Common violation: a country dropdown that auto-submits the form when you change the selection. Provide a Submit button instead.</p>' },
+                { id: 'wcag-3.2.3', cat: 'wcag', title: '3.2.3 Consistent Navigation (AA)',
+                  keys: 'consistent navigation order menu repeat layout same pages',
+                  body: '<p>Navigation mechanisms repeated across multiple pages must appear in the same relative order each time, unless the user changes them. Don\'t shuffle menu items or move the search box around.</p>' },
+                { id: 'wcag-3.2.4', cat: 'wcag', title: '3.2.4 Consistent Identification (AA)',
+                  keys: 'consistent identification label icon component same function',
+                  body: '<p>Components with the same functionality must be identified consistently across pages. The "Search" button should always be labeled "Search", not "Find" on one page and "Go" on another. Same icons should mean the same thing site-wide.</p>' },
+                { id: 'wcag-3.2.6', cat: 'wcag', title: '3.2.6 Consistent Help (A)',
+                  keys: 'consistent help contact support chat phone same location order',
+                  body: '<p>If a page contains help mechanisms (contact info, help links, chat, FAQ), they must appear in the same relative order across pages where they exist. Don\'t move the contact link from the footer to the header from one page to another. <em>(WCAG 2.2)</em></p>' },
+
+                // ─── Remaining 3.3 criteria (incl. WCAG 2.2) ───
+                { id: 'wcag-3.3.3', cat: 'wcag', title: '3.3.3 Error Suggestion (AA)',
+                  keys: 'error suggestion correction fix recommend hint validation',
+                  body: '<p>When an input error is detected and suggestions for correction are known, provide them to the user — unless doing so would jeopardize security or the purpose of the content. Examples: "Did you mean user@example.com?", "Password must contain at least one number".</p>' },
+                { id: 'wcag-3.3.4', cat: 'wcag', title: '3.3.4 Error Prevention Legal Financial Data (AA)',
+                  keys: 'error prevention legal financial data reversible checked confirmed',
+                  body: '<p>For pages that cause legal commitments, financial transactions, modify or delete user data, or submit test responses, at least one of the following must be true:</p><ul><li><strong>Reversible</strong> — submissions can be undone.</li><li><strong>Checked</strong> — input is validated and the user can correct mistakes.</li><li><strong>Confirmed</strong> — user can review, confirm, and correct before submitting.</li></ul>' },
+                { id: 'wcag-3.3.5', cat: 'wcag', title: '3.3.5 Help (AAA)',
+                  keys: 'help context sensitive instruction documentation tooltip guidance',
+                  body: '<p>Context-sensitive help is available for forms requiring user input. Provide tooltips, inline hints, examples, or links to relevant help content near the field where the user might need it.</p>' },
+                { id: 'wcag-3.3.7', cat: 'wcag', title: '3.3.7 Redundant Entry (A)',
+                  keys: 'redundant entry repeat information autofill remember session step',
+                  body: '<p>Information previously entered by the user in the same process must be either auto-populated or available for the user to select, rather than requiring re-entry. Don\'t make users type their address twice in a checkout flow. Exceptions: re-entering for security (password confirmation), or when previously-entered information is no longer valid. <em>(WCAG 2.2)</em></p>' },
+                { id: 'wcag-3.3.8', cat: 'wcag', title: '3.3.8 Accessible Authentication Minimum (AA)',
+                  keys: 'accessible authentication minimum cognitive function test password recall puzzle',
+                  body: '<p>Authentication processes must not rely on a cognitive function test (remembering a password, solving a puzzle, recognizing characters), unless an alternative is available or the test is for object recognition or non-text content the user provided.</p><ul><li>Allow paste into password fields.</li><li>Support password managers and WebAuthn/passkeys.</li><li>Don\'t require users to re-type confirmation codes manually — link/auto-fill them.</li></ul><p><em>(WCAG 2.2)</em></p>' },
+                { id: 'wcag-3.3.9', cat: 'wcag', title: '3.3.9 Accessible Authentication Enhanced (AAA)',
+                  keys: 'accessible authentication enhanced cognitive object recognition image puzzle',
+                  body: '<p>Stricter than 3.3.8: even object-recognition and user-provided-content cognitive function tests are not allowed. The only acceptable authentication is one that does not rely on cognitive function tests at all (e.g. passkeys, biometrics, magic links). <em>(WCAG 2.2)</em></p>' },
+            ];
+        },
+
+        renderHelp: function() {
+            const wrap = this.shadowRoot.getElementById('uw-a11y-view-help');
+            if (!wrap) return;
+            const container = wrap.querySelector('.uw-a11y-help');
+            if (!container) return;
+
+            // Filter WCAG topics by the user's selected conformance level so the
+            // reference matches what Pinpoint is actually testing against.
+            const userLevel = String((this.loadSettings && this.loadSettings().wcagLevel) || 'AA').toUpperCase();
+            const allowedLevels = userLevel === 'A'
+                ? ['A']
+                : (userLevel === 'AAA' ? ['A', 'AA', 'AAA'] : ['A', 'AA']);
+            const topics = this.getHelpTopics().filter(t => {
+                if (t.cat !== 'wcag') return true;
+                const m = t.title.match(/\(([A]+)\)/);
+                return m ? allowedLevels.indexOf(m[1]) !== -1 : true;
+            });
+            // Sort WCAG entries numerically by criterion (1.1.1, 1.3.1, …) so they
+            // appear in spec order regardless of which level was added when.
+            // Tool topics keep their authored order at the top.
+            const wcagNumKey = (title) => {
+                const m = title.match(/^(\d+)\.(\d+)\.(\d+)/);
+                return m ? (parseInt(m[1],10)*10000 + parseInt(m[2],10)*100 + parseInt(m[3],10)) : 999999;
+            };
+            topics.sort((a, b) => {
+                if (a.cat !== b.cat) return a.cat === 'tool' ? -1 : 1;
+                if (a.cat === 'wcag') return wcagNumKey(a.title) - wcagNumKey(b.title);
+                return 0;
+            });
+
+            container.innerHTML = `
+                <h3>Help</h3>
+                <div class="uw-a11y-help-search-wrap">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input id="uw-a11y-help-search" class="uw-a11y-help-search" type="search" placeholder="Search help topics and WCAG criteria..." aria-label="Search help">
+                </div>
+                <p class="uw-a11y-help-level-note">Showing WCAG criteria for your selected level: <strong>${userLevel}</strong>. Change this in Settings &rarr; Accessibility.</p>
+                <div id="uw-a11y-help-results"></div>
+            `;
+
+            const searchInput = this.shadowRoot.getElementById('uw-a11y-help-search');
+            const resultsDiv = this.shadowRoot.getElementById('uw-a11y-help-results');
+
+            const escHtml = (s) => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+            const highlightText = (html, terms) => {
+                if (!terms.length) return html;
+                // Only highlight inside text nodes, not inside tags
+                const escRe = function(s) { return s.replace(/[-.*+?^$|(){}[\]\\]/g, '\\$&'); };
+                const re = new RegExp('(' + terms.map(escRe).join('|') + ')', 'gi');
+                return html.replace(/>([^<]+)</g, (full, text) => {
+                    return '>' + text.replace(re, '<mark class="uw-a11y-help-hl">$1</mark>') + '<';
+                });
+            };
+
+            const renderTopics = (query) => {
+                const q = (query || '').trim().toLowerCase();
+                const terms = q.split(/\s+/).filter(Boolean);
+
+                let filtered = topics;
+                if (terms.length > 0) {
+                    filtered = topics.filter(t => {
+                        const haystack = (t.title + ' ' + t.keys + ' ' + t.body.replace(/<[^>]+>/g, '')).toLowerCase();
+                        return terms.every(term => haystack.includes(term));
+                    });
+                }
+
+                const toolTopics = filtered.filter(t => t.cat === 'tool');
+                const wcagTopics = filtered.filter(t => t.cat === 'wcag');
+
+                if (filtered.length === 0) {
+                    resultsDiv.innerHTML = '<div class="uw-a11y-help-empty">No topics match your search.</div>';
+                    return;
+                }
+
+                let html = '';
+                if (toolTopics.length > 0) {
+                    html += '<p class="uw-a11y-help-category">Using Pinpoint</p>';
+                    html += toolTopics.map(t => {
+                        const body = terms.length > 0 ? highlightText(t.body, terms) : t.body;
+                        const title = terms.length > 0 ? highlightText('>' + escHtml(t.title) + '<', terms).slice(1, -1) : escHtml(t.title);
+                        return '<div class="uw-a11y-help-topic" data-id="' + t.id + '">' +
+                            '<button class="uw-a11y-help-topic-head" aria-expanded="false">' + title + '</button>' +
+                            '<div class="uw-a11y-help-topic-body" role="region">' + body + '</div></div>';
+                    }).join('');
+                }
+                if (wcagTopics.length > 0) {
+                    html += '<p class="uw-a11y-help-category">WCAG Reference</p>';
+                    html += wcagTopics.map(t => {
+                        const body = terms.length > 0 ? highlightText(t.body, terms) : t.body;
+                        const title = terms.length > 0 ? highlightText('>' + escHtml(t.title) + '<', terms).slice(1, -1) : escHtml(t.title);
+                        const level = t.title.match(/\(([A]+)\)/);
+                        const tag = level ? '<span class="uw-a11y-help-tag">Level ' + escHtml(level[1]) + '</span>' : '';
+                        return '<div class="uw-a11y-help-topic" data-id="' + t.id + '">' +
+                            '<button class="uw-a11y-help-topic-head" aria-expanded="false">' + title + tag + '</button>' +
+                            '<div class="uw-a11y-help-topic-body" role="region">' + body + '</div></div>';
+                    }).join('');
+                }
+
+                resultsDiv.innerHTML = html;
+
+                // If searching with results, auto-expand all matches
+                if (terms.length > 0) {
+                    resultsDiv.querySelectorAll('.uw-a11y-help-topic').forEach(el => {
+                        el.classList.add('open');
+                        el.querySelector('.uw-a11y-help-topic-head').setAttribute('aria-expanded', 'true');
+                    });
+                }
+            };
+
+            // Toggle expand/collapse
+            resultsDiv.addEventListener('click', (e) => {
+                const head = e.target.closest('.uw-a11y-help-topic-head');
+                if (!head) return;
+                const topic = head.closest('.uw-a11y-help-topic');
+                const isOpen = topic.classList.toggle('open');
+                head.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            });
+
+            let debounceTimer;
+            searchInput.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => renderTopics(searchInput.value), 120);
+            });
+
+            renderTopics('');
         },
 
         // ── Element Picker ─────────────────────────────────────────────────────
@@ -6981,9 +7679,11 @@
                 wrapper.style.pointerEvents = 'none';
             }
 
-            // Mark pick button as active (if still in DOM)
+            // Mark the relevant pick button as active (if still in DOM)
             const pickBtn = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-pick-element');
+            const pickExcBtn = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-pick-exclude-element');
             if (pickBtn) pickBtn.classList.add('picker-active');
+            if (pickExcBtn) pickExcBtn.classList.add('picker-active');
 
             this.injectPickerStyles();
 
@@ -7035,7 +7735,9 @@
             }
 
             const pickBtn = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-pick-element');
+            const pickExcBtn = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-pick-exclude-element');
             if (pickBtn) pickBtn.classList.remove('picker-active');
+            if (pickExcBtn) pickExcBtn.classList.remove('picker-active');
 
             if (this.pickerHighlightEl) { this.pickerHighlightEl.remove(); this.pickerHighlightEl = null; }
             if (this.pickerTooltipEl) { this.pickerTooltipEl.remove(); this.pickerTooltipEl = null; }
@@ -7704,24 +8406,34 @@
         
         // Render the accessibility score dial
         // Helper function to create gradient with multiple stops
-        createScoreGradient: function(score, percentage) {
-            let gradientStops;
-            
-            if (score >= 90) {
-                // Dark green to light green for excellent scores
-                gradientStops = `#1e7e34 0deg, #28a745 ${percentage * 0.3}deg, #34ce57 ${percentage * 0.6}deg, #40d969 ${percentage}deg`;
-            } else if (score >= 70) {
-                // Dark yellow/amber to light yellow
-                gradientStops = `#e6a800 0deg, #ffc107 ${percentage * 0.3}deg, #ffce3a ${percentage * 0.6}deg, #ffd96a ${percentage}deg`;
-            } else if (score >= 50) {
-                // Dark orange to light orange
-                gradientStops = `#dc6002 0deg, #fd7e14 ${percentage * 0.3}deg, #ff8c42 ${percentage * 0.6}deg, #ff9a56 ${percentage}deg`;
-            } else {
-                // Dark red to light red
-                gradientStops = `#a71e2a 0deg, #dc3545 ${percentage * 0.3}deg, #e55666 ${percentage * 0.6}deg, #ee6674 ${percentage}deg`;
+        // Score ring geometry — must match the cx/cy/r in the rendered SVG
+        scoreRingRadius: 53,
+        scoreRingCircumference: function() { return 2 * Math.PI * this.scoreRingRadius; },
+
+        // Return the gradient stop colors for a given score band.
+        getScoreColors: function(score) {
+            if (score >= 90) return { start: '#1e7e34', end: '#84d940' };
+            if (score >= 70) return { start: '#e6a800', end: '#ffd96a' };
+            if (score >= 50) return { start: '#dc6002', end: '#ff9a56' };
+            return { start: '#a71e2a', end: '#ee6674' };
+        },
+
+        // Apply the score ring visuals (color + fill amount) to a score-circle element.
+        // `percent01` is 0..1 (animatable). Falls back to score/100 when omitted.
+        applyScoreVisual: function(scoreCircleEl, score, percent01) {
+            if (!scoreCircleEl) return;
+            const p = (percent01 == null) ? Math.max(0, Math.min(1, score / 100)) : Math.max(0, Math.min(1, percent01));
+            const circumference = this.scoreRingCircumference();
+            const progress = scoreCircleEl.querySelector('.uw-a11y-score-progress');
+            const gradStart = scoreCircleEl.querySelector('.uw-a11y-score-grad-start');
+            const gradEnd = scoreCircleEl.querySelector('.uw-a11y-score-grad-end');
+            const colors = this.getScoreColors(score);
+            if (progress) {
+                progress.setAttribute('stroke-dasharray', String(circumference));
+                progress.setAttribute('stroke-dashoffset', String(circumference * (1 - p)));
             }
-            
-            return `conic-gradient(from 0deg, ${gradientStops}, #e9ecef ${percentage}deg 360deg)`;
+            if (gradStart) gradStart.setAttribute('stop-color', colors.start);
+            if (gradEnd) gradEnd.setAttribute('stop-color', colors.end);
         },
 
         // Return a consistent SVG icon for a given issue type
@@ -7743,27 +8455,38 @@
 
         renderScoreDial: function(scoreData) {
             const score = scoreData.score;
-            const percentage = (score / 100) * 360; // Convert to degrees
-            const gradient = this.createScoreGradient(score, percentage);
-            
+            const colors = this.getScoreColors(score);
+            const circumference = this.scoreRingCircumference();
+            const r = this.scoreRingRadius;
+
             // Generate accessibility rating text
-            const ratingText = score >= 97 ? 'Excellent' : 
-                              score >= 90 ? 'Very Good - just a few issues to address' : 
-                              score >= 70 ? 'Fair accessibility with room for improvement' : 
-                              score >= 50 ? 'Several issues to address' : 
+            const ratingText = score >= 97 ? 'Excellent' :
+                              score >= 90 ? 'Very Good - just a few issues to address' :
+                              score >= 70 ? 'Fair accessibility with room for improvement' :
+                              score >= 50 ? 'Several issues to address' :
                               'Immediate attention needed';
-            
+
             return `
                 <div class="uw-a11y-score-container" role="region" aria-labelledby="uw-a11y-score-heading">
                     <h3 id="uw-a11y-score-heading" class="sr-only">Accessibility Score</h3>
-                    
+
                     <!-- Screen reader accessible score announcement -->
                     <div class="sr-only">
                         Accessibility score: ${score} out of 100. Rating: ${ratingText}
                     </div>
-                    
+
                     <div class="uw-a11y-score-dial" role="img" aria-label="Accessibility score ${score} out of 100, rated as ${ratingText}">
-                        <div class="uw-a11y-score-circle" style="background: ${this.createScoreGradient(0, 0)};">
+                        <div class="uw-a11y-score-circle">
+                            <svg class="uw-a11y-score-svg" viewBox="0 0 120 120" aria-hidden="true">
+                                <defs>
+                                    <linearGradient id="uw-a11y-score-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop class="uw-a11y-score-grad-start" offset="0%" stop-color="${colors.start}"/>
+                                        <stop class="uw-a11y-score-grad-end" offset="100%" stop-color="${colors.end}"/>
+                                    </linearGradient>
+                                </defs>
+                                <circle class="uw-a11y-score-track" cx="60" cy="60" r="${r}"/>
+                                <circle class="uw-a11y-score-progress" cx="60" cy="60" r="${r}" stroke="url(#uw-a11y-score-grad)" stroke-dasharray="${circumference}" stroke-dashoffset="${circumference}"/>
+                            </svg>
                             <div class="uw-a11y-score-inner">
                                 <div class="uw-a11y-score-number" aria-hidden="true">0</div>
                                 <div class="uw-a11y-score-label" aria-hidden="true">Score</div>
@@ -7804,7 +8527,7 @@
 
                 // Reset start state
                 scoreNumber.textContent = '0';
-                scoreCircle.style.background = this.createScoreGradient(0, 0);
+                this.applyScoreVisual(scoreCircle, finalScore, 0);
 
                 // Kill prior animation if any
                 if (this._scoreTween && window.gsap) {
@@ -7822,19 +8545,18 @@
                     scoreDial.setAttribute('aria-label', `Accessibility score ${current} out of 100, rated as ${ratingText}`);
                 };
 
-                const endDeg = (finalScore / 100) * 360;
                 if (window.gsap) {
-                    const state = { n: 0, deg: 0 };
+                    const state = { n: 0, p: 0 };
                     this._scoreTween = window.gsap.to(state, {
                         n: finalScore,
-                        deg: endDeg,
+                        p: finalScore / 100,
                         duration: 1.2,
                         ease: 'power2.out',
                         onUpdate: () => {
                             const currentScore = Math.round(state.n);
                             scoreNumber.textContent = String(currentScore);
-                            // Use currentScore for color banding and state.deg for fill
-                            scoreCircle.style.background = this.createScoreGradient(currentScore, state.deg);
+                            // Use currentScore for color banding and state.p for ring fill
+                            this.applyScoreVisual(scoreCircle, currentScore, state.p);
                             updateAria(state.n);
                         }
                     });
@@ -7845,9 +8567,9 @@
                     const step = (t) => {
                         const p = Math.min(1, (t - start) / dur);
                         const val = Math.round(finalScore * p);
-                        const deg = endDeg * p;
+                        const fillP = (finalScore / 100) * p;
                         scoreNumber.textContent = String(val);
-                        scoreCircle.style.background = this.createScoreGradient(val, deg);
+                        this.applyScoreVisual(scoreCircle, val, fillP);
                         updateAria(val);
                         if (p < 1) requestAnimationFrame(step);
                     };
@@ -8227,12 +8949,7 @@
             
             if (scoreNumber && scoreCircle) {
                 scoreNumber.textContent = newScore.score;
-                
-                // Update gradient based on score
-                const score = newScore.score;
-                const percentage = (score / 100) * 360;
-                const gradient = this.createScoreGradient(score, percentage);
-                scoreCircle.style.background = gradient;
+                this.applyScoreVisual(scoreCircle, newScore.score);
             }
             
             // Update the counts

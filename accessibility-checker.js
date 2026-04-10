@@ -4924,13 +4924,33 @@
                     width: 120px;
                     height: 120px;
                     border-radius: 50%;
-                    background: conic-gradient(from 0deg, #28a745 0deg 0deg, #e9ecef 0deg 360deg);
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     position: relative;
                 }
+                #uw-a11y-panel .uw-a11y-score-svg {
+                    position: absolute;
+                    inset: 0;
+                    width: 100%;
+                    height: 100%;
+                    transform: rotate(-90deg);
+                    pointer-events: none;
+                }
+                #uw-a11y-panel .uw-a11y-score-track {
+                    fill: none;
+                    stroke: #e9ecef;
+                    stroke-width: 14;
+                }
+                #uw-a11y-panel .uw-a11y-score-progress {
+                    fill: none;
+                    stroke-width: 14;
+                    stroke-linecap: round;
+                    transition: stroke 0.3s ease;
+                }
                 #uw-a11y-panel .uw-a11y-score-inner {
+                    position: relative;
+                    z-index: 1;
                     width: 92px;
                     height: 92px;
                     background: white;
@@ -8443,24 +8463,34 @@
         
         // Render the accessibility score dial
         // Helper function to create gradient with multiple stops
-        createScoreGradient: function(score, percentage) {
-            let gradientStops;
-            
-            if (score >= 90) {
-                // Dark green to light green for excellent scores
-                gradientStops = `#1e7e34 0deg, #28a745 ${percentage * 0.3}deg, #34ce57 ${percentage * 0.6}deg, #40d969 ${percentage}deg`;
-            } else if (score >= 70) {
-                // Dark yellow/amber to light yellow
-                gradientStops = `#e6a800 0deg, #ffc107 ${percentage * 0.3}deg, #ffce3a ${percentage * 0.6}deg, #ffd96a ${percentage}deg`;
-            } else if (score >= 50) {
-                // Dark orange to light orange
-                gradientStops = `#dc6002 0deg, #fd7e14 ${percentage * 0.3}deg, #ff8c42 ${percentage * 0.6}deg, #ff9a56 ${percentage}deg`;
-            } else {
-                // Dark red to light red
-                gradientStops = `#a71e2a 0deg, #dc3545 ${percentage * 0.3}deg, #e55666 ${percentage * 0.6}deg, #ee6674 ${percentage}deg`;
+        // Score ring geometry — must match the cx/cy/r in the rendered SVG
+        scoreRingRadius: 53,
+        scoreRingCircumference: function() { return 2 * Math.PI * this.scoreRingRadius; },
+
+        // Return the gradient stop colors for a given score band.
+        getScoreColors: function(score) {
+            if (score >= 90) return { start: '#1e7e34', end: '#40d969' };
+            if (score >= 70) return { start: '#e6a800', end: '#ffd96a' };
+            if (score >= 50) return { start: '#dc6002', end: '#ff9a56' };
+            return { start: '#a71e2a', end: '#ee6674' };
+        },
+
+        // Apply the score ring visuals (color + fill amount) to a score-circle element.
+        // `percent01` is 0..1 (animatable). Falls back to score/100 when omitted.
+        applyScoreVisual: function(scoreCircleEl, score, percent01) {
+            if (!scoreCircleEl) return;
+            const p = (percent01 == null) ? Math.max(0, Math.min(1, score / 100)) : Math.max(0, Math.min(1, percent01));
+            const circumference = this.scoreRingCircumference();
+            const progress = scoreCircleEl.querySelector('.uw-a11y-score-progress');
+            const gradStart = scoreCircleEl.querySelector('.uw-a11y-score-grad-start');
+            const gradEnd = scoreCircleEl.querySelector('.uw-a11y-score-grad-end');
+            const colors = this.getScoreColors(score);
+            if (progress) {
+                progress.setAttribute('stroke-dasharray', String(circumference));
+                progress.setAttribute('stroke-dashoffset', String(circumference * (1 - p)));
             }
-            
-            return `conic-gradient(from 0deg, ${gradientStops}, #e9ecef ${percentage}deg 360deg)`;
+            if (gradStart) gradStart.setAttribute('stop-color', colors.start);
+            if (gradEnd) gradEnd.setAttribute('stop-color', colors.end);
         },
 
         // Return a consistent SVG icon for a given issue type
@@ -8482,27 +8512,38 @@
 
         renderScoreDial: function(scoreData) {
             const score = scoreData.score;
-            const percentage = (score / 100) * 360; // Convert to degrees
-            const gradient = this.createScoreGradient(score, percentage);
-            
+            const colors = this.getScoreColors(score);
+            const circumference = this.scoreRingCircumference();
+            const r = this.scoreRingRadius;
+
             // Generate accessibility rating text
-            const ratingText = score >= 97 ? 'Excellent' : 
-                              score >= 90 ? 'Very Good - just a few issues to address' : 
-                              score >= 70 ? 'Fair accessibility with room for improvement' : 
-                              score >= 50 ? 'Several issues to address' : 
+            const ratingText = score >= 97 ? 'Excellent' :
+                              score >= 90 ? 'Very Good - just a few issues to address' :
+                              score >= 70 ? 'Fair accessibility with room for improvement' :
+                              score >= 50 ? 'Several issues to address' :
                               'Immediate attention needed';
-            
+
             return `
                 <div class="uw-a11y-score-container" role="region" aria-labelledby="uw-a11y-score-heading">
                     <h3 id="uw-a11y-score-heading" class="sr-only">Accessibility Score</h3>
-                    
+
                     <!-- Screen reader accessible score announcement -->
                     <div class="sr-only">
                         Accessibility score: ${score} out of 100. Rating: ${ratingText}
                     </div>
-                    
+
                     <div class="uw-a11y-score-dial" role="img" aria-label="Accessibility score ${score} out of 100, rated as ${ratingText}">
-                        <div class="uw-a11y-score-circle" style="background: ${this.createScoreGradient(0, 0)};">
+                        <div class="uw-a11y-score-circle">
+                            <svg class="uw-a11y-score-svg" viewBox="0 0 120 120" aria-hidden="true">
+                                <defs>
+                                    <linearGradient id="uw-a11y-score-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop class="uw-a11y-score-grad-start" offset="0%" stop-color="${colors.start}"/>
+                                        <stop class="uw-a11y-score-grad-end" offset="100%" stop-color="${colors.end}"/>
+                                    </linearGradient>
+                                </defs>
+                                <circle class="uw-a11y-score-track" cx="60" cy="60" r="${r}"/>
+                                <circle class="uw-a11y-score-progress" cx="60" cy="60" r="${r}" stroke="url(#uw-a11y-score-grad)" stroke-dasharray="${circumference}" stroke-dashoffset="${circumference}"/>
+                            </svg>
                             <div class="uw-a11y-score-inner">
                                 <div class="uw-a11y-score-number" aria-hidden="true">0</div>
                                 <div class="uw-a11y-score-label" aria-hidden="true">Score</div>
@@ -8543,7 +8584,7 @@
 
                 // Reset start state
                 scoreNumber.textContent = '0';
-                scoreCircle.style.background = this.createScoreGradient(0, 0);
+                this.applyScoreVisual(scoreCircle, finalScore, 0);
 
                 // Kill prior animation if any
                 if (this._scoreTween && window.gsap) {
@@ -8561,19 +8602,18 @@
                     scoreDial.setAttribute('aria-label', `Accessibility score ${current} out of 100, rated as ${ratingText}`);
                 };
 
-                const endDeg = (finalScore / 100) * 360;
                 if (window.gsap) {
-                    const state = { n: 0, deg: 0 };
+                    const state = { n: 0, p: 0 };
                     this._scoreTween = window.gsap.to(state, {
                         n: finalScore,
-                        deg: endDeg,
+                        p: finalScore / 100,
                         duration: 1.2,
                         ease: 'power2.out',
                         onUpdate: () => {
                             const currentScore = Math.round(state.n);
                             scoreNumber.textContent = String(currentScore);
-                            // Use currentScore for color banding and state.deg for fill
-                            scoreCircle.style.background = this.createScoreGradient(currentScore, state.deg);
+                            // Use currentScore for color banding and state.p for ring fill
+                            this.applyScoreVisual(scoreCircle, currentScore, state.p);
                             updateAria(state.n);
                         }
                     });
@@ -8584,9 +8624,9 @@
                     const step = (t) => {
                         const p = Math.min(1, (t - start) / dur);
                         const val = Math.round(finalScore * p);
-                        const deg = endDeg * p;
+                        const fillP = (finalScore / 100) * p;
                         scoreNumber.textContent = String(val);
-                        scoreCircle.style.background = this.createScoreGradient(val, deg);
+                        this.applyScoreVisual(scoreCircle, val, fillP);
                         updateAria(val);
                         if (p < 1) requestAnimationFrame(step);
                     };
@@ -8966,12 +9006,7 @@
             
             if (scoreNumber && scoreCircle) {
                 scoreNumber.textContent = newScore.score;
-                
-                // Update gradient based on score
-                const score = newScore.score;
-                const percentage = (score / 100) * 360;
-                const gradient = this.createScoreGradient(score, percentage);
-                scoreCircle.style.background = gradient;
+                this.applyScoreVisual(scoreCircle, newScore.score);
             }
             
             // Update the counts

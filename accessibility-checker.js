@@ -3789,6 +3789,34 @@
                                         </label>
                                     </fieldset>
                                 </div>
+
+                                <!-- Alternative Text Inspector -->
+                                <div class="uw-a11y-inspector-section">
+                                    <h4>Alternative Text</h4>
+                                    <p>Inspect every image, SVG, and image-role element on the page. The list shows the alt text each one exposes to assistive tech; the overlay draws that same text on top of the image itself for a quick visual scan.</p>
+                                    <div class="uw-a11y-inspector-controls">
+                                        <button id="uw-a11y-alt-list-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
+                                            <svg class="feather feather-list" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                <line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>
+                                            </svg>
+                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
+                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                            </svg>
+                                            <span class="uw-a11y-btn-text">Show Alt Text List</span>
+                                        </button>
+                                        <button id="uw-a11y-alt-overlay-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
+                                            <svg class="feather feather-image" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                <rect height="18" rx="2" ry="2" width="18" x="3" y="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                                            </svg>
+                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
+                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                            </svg>
+                                            <span class="uw-a11y-btn-text">Show Alt Text Overlays</span>
+                                        </button>
+                                        <span id="uw-a11y-alt-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                    </div>
+                                    <div id="uw-a11y-alt-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
+                                </div>
                             </div>
                         </div>
 
@@ -5698,6 +5726,13 @@
             flex-shrink: 0;
         }
 
+        .uw-a11y-alt-decorative {
+            color: #1d4ed8;
+            font-style: italic;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
         /* Color Blindness Simulation styles */
         .uw-a11y-cvd-list {
             margin: 0.75rem 0 0;
@@ -6576,6 +6611,24 @@
                     }
                 });
             }
+
+            // Alt text list toggle
+            const altListToggle = this.shadowRoot.getElementById('uw-a11y-alt-list-toggle');
+            if (altListToggle) {
+                altListToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.toggleAltTextList();
+                });
+            }
+
+            // Alt text overlay toggle
+            const altOverlayToggle = this.shadowRoot.getElementById('uw-a11y-alt-overlay-toggle');
+            if (altOverlayToggle) {
+                altOverlayToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.toggleAltTextOverlay();
+                });
+            }
         },
 
         // Toggle heading outline view (in-panel, not a page overlay)
@@ -7090,6 +7143,550 @@
                 ${perTypeRules}
             `;
             document.head.appendChild(styleEl);
+        },
+
+        // ================================================================
+        // Alternative Text Inspector (in-panel list + page overlays)
+        // ================================================================
+
+        // Scan the page for every element that exposes (or should expose) alt text
+        // and classify how each one presents itself to assistive tech.
+        detectImages: function() {
+            const selector = 'img, svg, input[type="image"], area[href], [role="img"]';
+            const nodes = Array.from(document.querySelectorAll(selector));
+            const results = [];
+            const seen = new Set();
+
+            nodes.forEach(el => {
+                // Skip anything inside the Pinpoint UI or its overlays
+                if (el.closest('uw-accessibility-checker') ||
+                    el.closest('[data-uw-a11y-overlay]') ||
+                    el.closest('#uw-a11y-panel') ||
+                    el.closest('#uw-a11y-container')) return;
+
+                // Deduplicate (an <svg> with role="img" matches both selectors)
+                if (seen.has(el)) return;
+                seen.add(el);
+
+                // Skip not-rendered elements
+                const style = window.getComputedStyle(el);
+                if (style.display === 'none' || style.visibility === 'hidden') return;
+
+                const info = this.getImageAltInfo(el);
+                if (info) results.push(info);
+            });
+
+            return results;
+        },
+
+        // Compute alt-text metadata for a single image-like element.
+        // Returns { element, type, altText, altSource, status, issues }.
+        getImageAltInfo: function(el) {
+            const tag = el.tagName ? el.tagName.toLowerCase() : '';
+            const role = el.getAttribute && el.getAttribute('role');
+            const ariaHidden = el.getAttribute && el.getAttribute('aria-hidden') === 'true';
+            let altText = '';
+            let altSource = null;
+            let isDecorative = false;
+            let isMissing = false;
+            const issues = [];
+
+            // aria-hidden / role="presentation" => decorative
+            if (ariaHidden || role === 'presentation' || role === 'none') {
+                isDecorative = true;
+                altSource = ariaHidden ? 'aria-hidden' : 'role="presentation"';
+            }
+
+            // aria-labelledby wins over everything else
+            const labelledBy = el.getAttribute && el.getAttribute('aria-labelledby');
+            if (!altText && labelledBy) {
+                const parts = labelledBy.split(/\s+/).filter(Boolean).map(id => {
+                    const ref = document.getElementById(id);
+                    return ref ? (ref.textContent || '').trim() : '';
+                }).filter(Boolean);
+                if (parts.length) {
+                    altText = parts.join(' ').replace(/\s+/g, ' ').trim();
+                    altSource = 'aria-labelledby';
+                    isDecorative = false;
+                }
+            }
+
+            // aria-label
+            if (!altText) {
+                const ariaLabel = el.getAttribute && el.getAttribute('aria-label');
+                if (ariaLabel) {
+                    altText = ariaLabel.trim();
+                    altSource = 'aria-label';
+                    if (altText) isDecorative = false;
+                }
+            }
+
+            // Native alt attribute (img / input[type=image] / area)
+            if (!altText && (tag === 'img' || tag === 'input' || tag === 'area')) {
+                if (el.hasAttribute('alt')) {
+                    const raw = el.getAttribute('alt') || '';
+                    altText = raw;
+                    altSource = 'alt';
+                    if (raw === '') isDecorative = true;
+                } else if (!isDecorative) {
+                    isMissing = true;
+                }
+            }
+
+            // SVG: look for a direct <title> child
+            if (!altText && tag === 'svg') {
+                const titleEl = el.querySelector(':scope > title');
+                const titleText = titleEl && titleEl.textContent ? titleEl.textContent.trim() : '';
+                if (titleText) {
+                    altText = titleText;
+                    altSource = '<title>';
+                    isDecorative = false;
+                } else if (!isDecorative && role !== 'img') {
+                    // SVG without role="img" and no title is conventionally decorative
+                    isDecorative = true;
+                    altSource = altSource || 'implicit (no role="img")';
+                }
+            }
+
+            // Classify status
+            let status;
+            if (isMissing) {
+                status = 'missing';
+                issues.push('Missing alt attribute');
+            } else if (isDecorative) {
+                status = 'decorative';
+            } else if (altText) {
+                status = 'has-alt';
+            } else {
+                // role="img" / SVG with role="img" and no accessible name
+                status = 'empty';
+                issues.push('Marked as an image but has no accessible name');
+            }
+
+            // Heuristic content issues
+            if (status === 'has-alt' && altText) {
+                const trimmed = altText.trim();
+                if (/\.(jpe?g|png|gif|webp|svg|bmp|avif)$/i.test(trimmed)) {
+                    issues.push('Alt text is a filename');
+                } else if (/^(image|img|photo|picture|graphic|icon)(\s*\d+)?$/i.test(trimmed)) {
+                    issues.push('Generic alt text');
+                } else if (/^(image|picture|photo|graphic|icon) of /i.test(trimmed)) {
+                    issues.push('Alt text starts with redundant "image of…" phrasing');
+                }
+                if (trimmed.length > 150) {
+                    issues.push('Alt text is very long — consider splitting to a longer description');
+                }
+            }
+
+            return {
+                element: el,
+                type: tag,
+                altText,
+                altSource,
+                status,
+                isDecorative,
+                isMissing,
+                issues
+            };
+        },
+
+        // Return a badge descriptor for a given alt-text status
+        getAltStatusBadge: function(status) {
+            switch (status) {
+                case 'has-alt':    return { label: 'ALT',    bg: '#d1fae5', color: '#065f46' };
+                case 'decorative': return { label: 'DECOR',  bg: '#dbeafe', color: '#1d4ed8' };
+                case 'missing':    return { label: 'MISSING',bg: '#fee2e2', color: '#991b1b' };
+                case 'empty':      return { label: 'EMPTY',  bg: '#fee2e2', color: '#991b1b' };
+                default:           return { label: '?',      bg: '#f3f4f6', color: '#374151' };
+            }
+        },
+
+        // Toggle the in-panel alt-text list
+        toggleAltTextList: function() {
+            const isActive = this.isAltTextListActive || false;
+            this.isAltTextListActive = !isActive;
+
+            const btn = this.shadowRoot.getElementById('uw-a11y-alt-list-toggle');
+            const countEl = this.shadowRoot.getElementById('uw-a11y-alt-count');
+            const content = this.shadowRoot.getElementById('uw-a11y-alt-content');
+
+            if (!isActive) {
+                if (content) {
+                    content.hidden = false;
+                    this.renderAltTextList(content, countEl);
+                }
+                if (btn) {
+                    btn.setAttribute('aria-pressed', 'true');
+                    btn.setAttribute('aria-expanded', 'true');
+                    btn.classList.add('active');
+                    const listIcon = btn.querySelector('.feather-list');
+                    const eyeOffIcon = btn.querySelector('.feather-eye-off');
+                    if (listIcon) listIcon.style.display = 'none';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'inline';
+                    const btnText = btn.querySelector('.uw-a11y-btn-text');
+                    if (btnText) btnText.textContent = 'Hide Alt Text List';
+                }
+                if (countEl) countEl.style.display = 'inline';
+            } else {
+                if (content) { content.hidden = true; content.innerHTML = ''; }
+                if (btn) {
+                    btn.setAttribute('aria-pressed', 'false');
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.classList.remove('active');
+                    const listIcon = btn.querySelector('.feather-list');
+                    const eyeOffIcon = btn.querySelector('.feather-eye-off');
+                    if (listIcon) listIcon.style.display = 'inline';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'none';
+                    const btnText = btn.querySelector('.uw-a11y-btn-text');
+                    if (btnText) btnText.textContent = 'Show Alt Text List';
+                }
+                // Only hide the count pill if the overlay isn't also using it
+                if (countEl && !this.isAltTextOverlayActive) countEl.style.display = 'none';
+            }
+        },
+
+        // Render the list of image alt-text rows into the given container
+        renderAltTextList: function(container, countEl) {
+            const images = this.detectImages();
+
+            if (!images.length) {
+                container.innerHTML = '<p class="uw-a11y-outline-item"><span class="uw-a11y-outline-empty-text">No images found on this page.</span></p>';
+                if (countEl) {
+                    countEl.textContent = 'No images found';
+                    countEl.style.color = '#6b7280';
+                }
+                return;
+            }
+
+            const warnSvg = `<svg fill="none" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
+
+            let issueCount = 0;
+            const rows = images.map((img, idx) => {
+                const hasIssue = img.issues.length > 0;
+                if (hasIssue) issueCount++;
+                const badge = this.getAltStatusBadge(img.status);
+
+                let displayText;
+                if (img.status === 'missing') {
+                    displayText = `<span class="uw-a11y-link-name is-empty">(no alt attribute)</span>`;
+                } else if (img.status === 'decorative' && !img.altText) {
+                    const source = img.altSource ? ` — ${this.escapeHtmlContent(img.altSource)}` : '';
+                    displayText = `<span class="uw-a11y-alt-decorative">Decorative${source}</span>`;
+                } else if (img.status === 'empty') {
+                    displayText = `<span class="uw-a11y-link-name is-empty">(no accessible name)</span>`;
+                } else {
+                    displayText = `<span class="uw-a11y-link-name">${this.escapeHtmlContent(img.altText)}</span>`;
+                }
+
+                const sourceHtml = img.altSource && img.status === 'has-alt' && img.altSource !== 'alt'
+                    ? `<span class="uw-a11y-link-url">from ${this.escapeHtmlContent(img.altSource)}</span>`
+                    : '';
+
+                const typeHtml = `<span class="uw-a11y-link-url">&lt;${this.escapeHtmlContent(img.type)}&gt;</span>`;
+
+                const issuesHtml = hasIssue
+                    ? `<span class="uw-a11y-link-issues">${warnSvg}<span>${this.escapeHtmlContent(img.issues.join(' · '))}</span></span>`
+                    : '';
+
+                const titleText = this.escapeHtmlAttribute(
+                    (img.altText ? `"${img.altText}"` : `Status: ${img.status}`) +
+                    (img.altSource ? `\nSource: ${img.altSource}` : '') +
+                    (hasIssue ? `\n\n${img.issues.join('\n')}` : '')
+                );
+
+                return `<button class="uw-a11y-link-row${hasIssue ? ' has-issue' : ''}" data-ai="${idx}" title="${titleText}">
+                    <span class="uw-a11y-link-badge" style="background:${badge.bg};color:${badge.color};">${badge.label}</span>
+                    <span class="uw-a11y-link-main">
+                        ${displayText}
+                        ${typeHtml}
+                        ${sourceHtml}
+                        ${issuesHtml}
+                    </span>
+                </button>`;
+            }).join('');
+
+            container.innerHTML = `<div class="uw-a11y-outline-list">${rows}</div>`;
+
+            if (countEl) {
+                countEl.textContent = issueCount > 0
+                    ? `${images.length} image${images.length !== 1 ? 's' : ''} · ${issueCount} issue${issueCount !== 1 ? 's' : ''}`
+                    : `${images.length} image${images.length !== 1 ? 's' : ''} · No issues`;
+                countEl.style.color = issueCount > 0 ? '#b45309' : '#059669';
+            }
+
+            container.querySelectorAll('.uw-a11y-link-row[data-ai]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = parseInt(btn.dataset.ai, 10);
+                    const target = images[idx] && images[idx].element;
+                    this.scrollAndFlashTarget(target);
+                });
+            });
+        },
+
+        // Toggle the on-page alt-text overlay
+        toggleAltTextOverlay: function() {
+            const isActive = this.isAltTextOverlayActive || false;
+
+            if (isActive) {
+                this.hideAltTextOverlay();
+            } else {
+                this.showAltTextOverlay();
+            }
+
+            const btn = this.shadowRoot.getElementById('uw-a11y-alt-overlay-toggle');
+            if (btn) {
+                btn.setAttribute('aria-pressed', String(!isActive));
+                const imageIcon = btn.querySelector('.feather-image');
+                const eyeOffIcon = btn.querySelector('.feather-eye-off');
+                const btnText = btn.querySelector('.uw-a11y-btn-text');
+
+                if (!isActive) {
+                    btn.classList.add('active');
+                    if (imageIcon) imageIcon.style.display = 'none';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'inline';
+                    if (btnText) btnText.textContent = 'Hide Alt Text Overlays';
+                } else {
+                    btn.classList.remove('active');
+                    if (imageIcon) imageIcon.style.display = 'inline';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'none';
+                    if (btnText) btnText.textContent = 'Show Alt Text Overlays';
+                }
+            }
+
+            this.isAltTextOverlayActive = !isActive;
+        },
+
+        // Build the overlay and position a label above each image
+        showAltTextOverlay: function() {
+            this.hideAltTextOverlay();
+
+            const images = this.detectImages();
+            this.cachedAltImages = images;
+
+            const overlay = document.createElement('div');
+            overlay.className = 'uw-a11y-alt-overlay';
+            overlay.setAttribute('data-uw-a11y-overlay', 'true');
+
+            images.forEach((img, index) => {
+                const indicator = this.createAltTextIndicator(img);
+                if (indicator) {
+                    indicator.style.animationDelay = `${Math.min(index * 15, 800)}ms`;
+                    overlay.appendChild(indicator);
+                }
+            });
+
+            document.body.appendChild(overlay);
+            this.injectAltTextOverlayStyles();
+            this.altTextOverlay = overlay;
+
+            this.setupAltTextOverlayEventHandlers();
+
+            // Share the same count pill as the list
+            const countEl = this.shadowRoot.getElementById('uw-a11y-alt-count');
+            if (countEl) {
+                const issueCount = images.reduce((n, i) => n + (i.issues.length ? 1 : 0), 0);
+                countEl.textContent = issueCount > 0
+                    ? `${images.length} image${images.length !== 1 ? 's' : ''} · ${issueCount} issue${issueCount !== 1 ? 's' : ''}`
+                    : `${images.length} image${images.length !== 1 ? 's' : ''} · No issues`;
+                countEl.style.color = issueCount > 0 ? '#b45309' : '#059669';
+                countEl.style.display = 'inline';
+            }
+        },
+
+        hideAltTextOverlay: function() {
+            if (this.altTextOverlay) {
+                this.altTextOverlay.remove();
+                this.altTextOverlay = null;
+            }
+            this.cachedAltImages = null;
+            this.cleanupAltTextOverlayEventHandlers();
+
+            // Only hide the count pill if the list isn't also open
+            if (!this.isAltTextListActive) {
+                const countEl = this.shadowRoot.getElementById('uw-a11y-alt-count');
+                if (countEl) countEl.style.display = 'none';
+            }
+
+            // Also sweep up any orphaned overlays
+            document.querySelectorAll('.uw-a11y-alt-overlay').forEach(o => o.remove());
+        },
+
+        // Create a label element for a single image's alt info
+        createAltTextIndicator: function(img) {
+            const rect = img.element.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return null;
+
+            const indicator = document.createElement('div');
+            indicator.className = `uw-a11y-alt-indicator uw-a11y-alt-indicator--${img.status}`;
+            if (img.issues.length) indicator.classList.add('has-issue');
+
+            const x = rect.left + window.scrollX;
+            const y = rect.top + window.scrollY;
+            indicator.style.left = `${x}px`;
+            indicator.style.top = `${y}px`;
+            // Cap the label width by the image width when the image is wide, with a
+            // sane floor so tiny icons still get a readable label.
+            const maxWidth = Math.max(Math.min(rect.width, 360), 160);
+            indicator.style.maxWidth = `${maxWidth}px`;
+
+            const badge = this.getAltStatusBadge(img.status);
+
+            let text;
+            if (img.status === 'missing') {
+                text = 'Missing alt attribute';
+            } else if (img.status === 'decorative' && !img.altText) {
+                text = `Decorative${img.altSource ? ` (${img.altSource})` : ''}`;
+            } else if (img.status === 'empty') {
+                text = 'No accessible name';
+            } else {
+                text = img.altText;
+            }
+
+            const badgeSpan = document.createElement('span');
+            badgeSpan.className = 'uw-a11y-alt-indicator-badge';
+            badgeSpan.textContent = badge.label;
+            badgeSpan.style.background = badge.bg;
+            badgeSpan.style.color = badge.color;
+
+            const textSpan = document.createElement('span');
+            textSpan.className = 'uw-a11y-alt-indicator-text';
+            textSpan.textContent = text;
+
+            indicator.appendChild(badgeSpan);
+            indicator.appendChild(textSpan);
+
+            // Full text + any issues available via title (native tooltip)
+            const tooltipParts = [text];
+            if (img.altSource) tooltipParts.push(`Source: ${img.altSource}`);
+            if (img.issues.length) tooltipParts.push('', ...img.issues);
+            indicator.title = tooltipParts.join('\n');
+
+            return indicator;
+        },
+
+        // Update indicator positions on scroll/resize using cached elements
+        updateAltTextOverlayPositions: function() {
+            if (!this.altTextOverlay || !this.cachedAltImages) return;
+            const indicators = this.altTextOverlay.querySelectorAll('.uw-a11y-alt-indicator');
+            indicators.forEach((indicator, index) => {
+                const img = this.cachedAltImages[index];
+                if (!img || !img.element || !img.element.isConnected) {
+                    indicator.style.display = 'none';
+                    return;
+                }
+                const rect = img.element.getBoundingClientRect();
+                if (rect.width > 0 && rect.height > 0) {
+                    indicator.style.left = `${rect.left + window.scrollX}px`;
+                    indicator.style.top = `${rect.top + window.scrollY}px`;
+                    indicator.style.display = 'inline-flex';
+                    const maxWidth = Math.max(Math.min(rect.width, 360), 160);
+                    indicator.style.maxWidth = `${maxWidth}px`;
+                } else {
+                    indicator.style.display = 'none';
+                }
+            });
+        },
+
+        setupAltTextOverlayEventHandlers: function() {
+            if (this.altTextOverlayScrollHandler || this.altTextOverlayResizeHandler) return;
+            let scrolling = false;
+            this.altTextOverlayScrollHandler = () => {
+                if (scrolling || this.isAnimating) return;
+                scrolling = true;
+                requestAnimationFrame(() => {
+                    if (!this.isAnimating) this.updateAltTextOverlayPositions();
+                    scrolling = false;
+                });
+            };
+            let resizeTimeout;
+            this.altTextOverlayResizeHandler = () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    if (this.isAltTextOverlayActive) this.showAltTextOverlay();
+                }, 100);
+            };
+            window.addEventListener('scroll', this.altTextOverlayScrollHandler, { passive: true });
+            window.addEventListener('resize', this.altTextOverlayResizeHandler);
+        },
+
+        cleanupAltTextOverlayEventHandlers: function() {
+            if (this.altTextOverlayScrollHandler) {
+                window.removeEventListener('scroll', this.altTextOverlayScrollHandler);
+                this.altTextOverlayScrollHandler = null;
+            }
+            if (this.altTextOverlayResizeHandler) {
+                window.removeEventListener('resize', this.altTextOverlayResizeHandler);
+                this.altTextOverlayResizeHandler = null;
+            }
+        },
+
+        injectAltTextOverlayStyles: function() {
+            if (document.getElementById('uw-a11y-alt-overlay-styles')) return;
+            const styleEl = document.createElement('style');
+            styleEl.id = 'uw-a11y-alt-overlay-styles';
+            styleEl.textContent = `
+                .uw-a11y-alt-overlay {
+                    pointer-events: none;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 999997;
+                }
+                .uw-a11y-alt-indicator {
+                    position: absolute;
+                    display: inline-flex;
+                    align-items: flex-start;
+                    gap: 6px;
+                    padding: 5px 8px;
+                    background: rgba(17, 24, 39, 0.92);
+                    color: #f9fafb;
+                    border-radius: 6px;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+                    font-size: 11px;
+                    line-height: 1.35;
+                    font-weight: 500;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+                    pointer-events: auto;
+                    z-index: 999998;
+                    animation: uw-alt-indicator-appear 0.3s ease-out both;
+                    border-left: 3px solid #10b981;
+                    max-width: 360px;
+                    box-sizing: border-box;
+                }
+                .uw-a11y-alt-indicator--decorative { border-left-color: #3b82f6; }
+                .uw-a11y-alt-indicator--missing,
+                .uw-a11y-alt-indicator--empty { border-left-color: #ef4444; }
+                .uw-a11y-alt-indicator.has-issue { border-left-color: #f59e0b; }
+                .uw-a11y-alt-indicator-badge {
+                    flex-shrink: 0;
+                    font-size: 9px;
+                    font-weight: 700;
+                    letter-spacing: 0.04em;
+                    padding: 1px 5px;
+                    border-radius: 3px;
+                    line-height: 1.5;
+                }
+                .uw-a11y-alt-indicator-text {
+                    word-break: break-word;
+                    overflow-wrap: anywhere;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+                @keyframes uw-alt-indicator-appear {
+                    0% { opacity: 0; transform: translateY(-4px); }
+                    100% { opacity: 1; transform: translateY(0); }
+                }
+            `;
+            document.head.appendChild(styleEl);
+        },
+
+        removeAltTextOverlayStyles: function() {
+            const el = document.getElementById('uw-a11y-alt-overlay-styles');
+            if (el) el.remove();
         },
 
         // Toggle tab order visualization
@@ -10062,6 +10659,10 @@
 
             // Clean up color blindness simulation
             this.removeColorBlindnessSimulation();
+
+            // Clean up alt text overlay
+            this.hideAltTextOverlay();
+            this.removeAltTextOverlayStyles();
             
             // Clean up injected styles
             this.removeTabOrderStyles();

@@ -3717,6 +3717,78 @@
                                     </div>
                                     <div id="uw-a11y-links-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
                                 </div>
+
+                                <!-- Color Blindness Simulation -->
+                                <div class="uw-a11y-inspector-section">
+                                    <h4>Color Blindness Simulation</h4>
+                                    <p>Preview the page as seen by users with color vision deficiencies. Applies an SVG color filter to the page while this tool is active.</p>
+                                    <fieldset class="uw-a11y-cvd-list" id="uw-a11y-cvd-list">
+                                        <legend class="sr-only">Color blindness simulation type</legend>
+                                        <label class="uw-a11y-cvd-option">
+                                            <input type="radio" name="uw-a11y-cvd" value="none" checked>
+                                            <span class="uw-a11y-cvd-main">
+                                                <span class="uw-a11y-cvd-name">Off</span>
+                                                <span class="uw-a11y-cvd-meta">Normal vision</span>
+                                            </span>
+                                        </label>
+                                        <label class="uw-a11y-cvd-option">
+                                            <input type="radio" name="uw-a11y-cvd" value="deuteranomaly">
+                                            <span class="uw-a11y-cvd-main">
+                                                <span class="uw-a11y-cvd-name">Green appears weak</span>
+                                                <span class="uw-a11y-cvd-meta">Deuteranomaly · ~5% of men</span>
+                                            </span>
+                                        </label>
+                                        <label class="uw-a11y-cvd-option">
+                                            <input type="radio" name="uw-a11y-cvd" value="deuteranopia">
+                                            <span class="uw-a11y-cvd-main">
+                                                <span class="uw-a11y-cvd-name">Green greatly reduced</span>
+                                                <span class="uw-a11y-cvd-meta">Deuteranopia · ~1% of men</span>
+                                            </span>
+                                        </label>
+                                        <label class="uw-a11y-cvd-option">
+                                            <input type="radio" name="uw-a11y-cvd" value="protanomaly">
+                                            <span class="uw-a11y-cvd-main">
+                                                <span class="uw-a11y-cvd-name">Red appears weak</span>
+                                                <span class="uw-a11y-cvd-meta">Protanomaly · ~1% of men</span>
+                                            </span>
+                                        </label>
+                                        <label class="uw-a11y-cvd-option">
+                                            <input type="radio" name="uw-a11y-cvd" value="protanopia">
+                                            <span class="uw-a11y-cvd-main">
+                                                <span class="uw-a11y-cvd-name">Red greatly reduced</span>
+                                                <span class="uw-a11y-cvd-meta">Protanopia · ~1% of men</span>
+                                            </span>
+                                        </label>
+                                        <label class="uw-a11y-cvd-option">
+                                            <input type="radio" name="uw-a11y-cvd" value="tritanomaly">
+                                            <span class="uw-a11y-cvd-main">
+                                                <span class="uw-a11y-cvd-name">Blue appears weak</span>
+                                                <span class="uw-a11y-cvd-meta">Tritanomaly · rare</span>
+                                            </span>
+                                        </label>
+                                        <label class="uw-a11y-cvd-option">
+                                            <input type="radio" name="uw-a11y-cvd" value="tritanopia">
+                                            <span class="uw-a11y-cvd-main">
+                                                <span class="uw-a11y-cvd-name">Blue greatly reduced</span>
+                                                <span class="uw-a11y-cvd-meta">Tritanopia · very rare</span>
+                                            </span>
+                                        </label>
+                                        <label class="uw-a11y-cvd-option">
+                                            <input type="radio" name="uw-a11y-cvd" value="achromatomaly">
+                                            <span class="uw-a11y-cvd-main">
+                                                <span class="uw-a11y-cvd-name">Color appears weak</span>
+                                                <span class="uw-a11y-cvd-meta">Achromatomaly · very rare</span>
+                                            </span>
+                                        </label>
+                                        <label class="uw-a11y-cvd-option">
+                                            <input type="radio" name="uw-a11y-cvd" value="achromatopsia">
+                                            <span class="uw-a11y-cvd-main">
+                                                <span class="uw-a11y-cvd-name">Color greatly reduced</span>
+                                                <span class="uw-a11y-cvd-meta">Achromatopsia · ~1 in 33,000</span>
+                                            </span>
+                                        </label>
+                                    </fieldset>
+                                </div>
                             </div>
                         </div>
 
@@ -5626,6 +5698,70 @@
             flex-shrink: 0;
         }
 
+        /* Color Blindness Simulation styles */
+        .uw-a11y-cvd-list {
+            margin: 0.75rem 0 0;
+            padding: 0;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .uw-a11y-cvd-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.12s;
+            border: 1px solid transparent;
+        }
+
+        .uw-a11y-cvd-option:hover {
+            background: rgba(109,40,217,0.06);
+        }
+
+        .uw-a11y-cvd-option:has(input:checked) {
+            background: rgba(109,40,217,0.10);
+            border-color: rgba(109,40,217,0.35);
+        }
+
+        .uw-a11y-cvd-option:focus-within {
+            outline: 2px solid #6d28d9;
+            outline-offset: 1px;
+        }
+
+        .uw-a11y-cvd-option input[type="radio"] {
+            flex-shrink: 0;
+            margin: 0;
+            accent-color: #6d28d9;
+            width: 16px;
+            height: 16px;
+        }
+
+        .uw-a11y-cvd-main {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .uw-a11y-cvd-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+            line-height: 1.4;
+        }
+
+        .uw-a11y-cvd-meta {
+            font-size: 11px;
+            color: #6b7280;
+            line-height: 1.3;
+        }
+
         .uw-a11y-coming-soon {
             background: #ffc107;
             color: #212529;
@@ -6429,6 +6565,17 @@
                     this.toggleLinksView();
                 });
             }
+
+            // Color blindness simulation radio group
+            const cvdList = this.shadowRoot.getElementById('uw-a11y-cvd-list');
+            if (cvdList) {
+                cvdList.addEventListener('change', (e) => {
+                    const target = e.target;
+                    if (target && target.name === 'uw-a11y-cvd' && target.checked) {
+                        this.setColorBlindnessSimulation(target.value);
+                    }
+                });
+            }
         },
 
         // Toggle heading outline view (in-panel, not a page overlay)
@@ -6836,6 +6983,113 @@
             }
 
             return issues;
+        },
+
+        // Color vision deficiency filter matrices. Values operate on sRGB channels
+        // (we set color-interpolation-filters="sRGB" so the matrix applies in sRGB space).
+        // Matrices from the commonly cited Machado/Oliveira/Fernandes and Brettel models.
+        getCvdFilterMatrices: function() {
+            return {
+                deuteranomaly:  '0.8 0.2 0 0 0  0.258 0.742 0 0 0  0 0.142 0.858 0 0  0 0 0 1 0',
+                deuteranopia:   '0.625 0.375 0 0 0  0.7 0.3 0 0 0  0 0.3 0.7 0 0  0 0 0 1 0',
+                protanomaly:    '0.817 0.183 0 0 0  0.333 0.667 0 0 0  0 0.125 0.875 0 0  0 0 0 1 0',
+                protanopia:     '0.567 0.433 0 0 0  0.558 0.442 0 0 0  0 0.242 0.758 0 0  0 0 0 1 0',
+                tritanomaly:    '0.967 0.033 0 0 0  0 0.733 0.267 0 0  0 0.183 0.817 0 0  0 0 0 1 0',
+                tritanopia:     '0.95 0.05 0 0 0  0 0.433 0.567 0 0  0 0.475 0.525 0 0  0 0 0 1 0',
+                achromatomaly:  '0.618 0.320 0.062 0 0  0.163 0.775 0.062 0 0  0.163 0.320 0.516 0 0  0 0 0 1 0',
+                achromatopsia:  '0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0 0 0 1 0'
+            };
+        },
+
+        // Apply a color vision deficiency filter to everything on the page except
+        // the Pinpoint panel itself. Passing 'none' (or falsy) removes the simulation.
+        setColorBlindnessSimulation: function(type) {
+            if (!type || type === 'none') {
+                this.removeColorBlindnessSimulation();
+                return;
+            }
+
+            const matrices = this.getCvdFilterMatrices();
+            if (!matrices[type]) {
+                this.removeColorBlindnessSimulation();
+                return;
+            }
+
+            this.injectColorBlindnessFilterDefs();
+            this.injectColorBlindnessStyles();
+
+            // data attribute drives the CSS variable + filter selector
+            document.body.setAttribute('data-uw-a11y-cvd', type);
+            this.activeColorBlindness = type;
+        },
+
+        // Remove the CVD simulation and associated DOM nodes
+        removeColorBlindnessSimulation: function() {
+            document.body.removeAttribute('data-uw-a11y-cvd');
+            this.activeColorBlindness = null;
+
+            const defs = document.getElementById('uw-a11y-cvd-filter-defs');
+            if (defs) defs.remove();
+
+            const styles = document.getElementById('uw-a11y-cvd-styles');
+            if (styles) styles.remove();
+        },
+
+        // Inject <svg><defs><filter>…</filter></defs></svg> containing one filter per
+        // CVD type. The SVG is hidden (0x0) and lives in <body> so filter url(#…) refs
+        // resolve in the same document.
+        injectColorBlindnessFilterDefs: function() {
+            if (document.getElementById('uw-a11y-cvd-filter-defs')) return;
+
+            const svgNS = 'http://www.w3.org/2000/svg';
+            const svg = document.createElementNS(svgNS, 'svg');
+            svg.setAttribute('id', 'uw-a11y-cvd-filter-defs');
+            svg.setAttribute('aria-hidden', 'true');
+            svg.setAttribute('width', '0');
+            svg.setAttribute('height', '0');
+            svg.style.position = 'absolute';
+            svg.style.width = '0';
+            svg.style.height = '0';
+            svg.style.overflow = 'hidden';
+            svg.style.pointerEvents = 'none';
+
+            const defs = document.createElementNS(svgNS, 'defs');
+            const matrices = this.getCvdFilterMatrices();
+            Object.keys(matrices).forEach(type => {
+                const filter = document.createElementNS(svgNS, 'filter');
+                filter.setAttribute('id', `uw-a11y-cvd-${type}`);
+                // sRGB so the matrix operates on gamma-corrected channels (what the
+                // standard matrices are designed for — otherwise linearRGB washes out).
+                filter.setAttribute('color-interpolation-filters', 'sRGB');
+                const matrix = document.createElementNS(svgNS, 'feColorMatrix');
+                matrix.setAttribute('type', 'matrix');
+                matrix.setAttribute('values', matrices[type]);
+                filter.appendChild(matrix);
+                defs.appendChild(filter);
+            });
+            svg.appendChild(defs);
+            document.body.appendChild(svg);
+        },
+
+        // Inject the CSS that applies the filter to every direct child of <body>
+        // except the Pinpoint panel and the hidden filter-defs SVG.
+        injectColorBlindnessStyles: function() {
+            if (document.getElementById('uw-a11y-cvd-styles')) return;
+
+            const matrices = this.getCvdFilterMatrices();
+            const perTypeRules = Object.keys(matrices).map(type => (
+                `body[data-uw-a11y-cvd="${type}"] { --uw-a11y-cvd-filter: url(#uw-a11y-cvd-${type}); }`
+            )).join('\n');
+
+            const styleEl = document.createElement('style');
+            styleEl.id = 'uw-a11y-cvd-styles';
+            styleEl.textContent = `
+                body[data-uw-a11y-cvd] > *:not(uw-accessibility-checker):not(#uw-a11y-cvd-filter-defs):not(#uw-a11y-container) {
+                    filter: var(--uw-a11y-cvd-filter);
+                }
+                ${perTypeRules}
+            `;
+            document.head.appendChild(styleEl);
         },
 
         // Toggle tab order visualization
@@ -9799,12 +10053,15 @@
 
             // Clean up tab order visualization
             this.hideTabOrderVisualization();
-            
+
             // Clean up focus indicators visualization
             this.hideFocusIndicatorsVisualization();
-            
+
             // Clean up landmark structure visualization
             this.hideLandmarkStructureVisualization();
+
+            // Clean up color blindness simulation
+            this.removeColorBlindnessSimulation();
             
             // Clean up injected styles
             this.removeTabOrderStyles();

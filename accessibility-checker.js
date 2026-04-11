@@ -3697,6 +3697,26 @@
                                     </div>
                                     <div id="uw-a11y-outline-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
                                 </div>
+
+                                <!-- Link List View -->
+                                <div class="uw-a11y-inspector-section">
+                                    <h4>Links</h4>
+                                    <p>List every link on the page with its accessible name — the text a screen reader actually announces. Click a link to jump to it. Empty, generic, or ambiguous link text is flagged.</p>
+                                    <div class="uw-a11y-inspector-controls">
+                                        <button id="uw-a11y-links-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
+                                            <svg class="feather feather-link" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+                                                <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+                                            </svg>
+                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
+                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                            </svg>
+                                            <span class="uw-a11y-btn-text">Show Links</span>
+                                        </button>
+                                        <span id="uw-a11y-links-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                    </div>
+                                    <div id="uw-a11y-links-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
+                                </div>
                             </div>
                         </div>
 
@@ -5508,6 +5528,104 @@
             flex-shrink: 0;
         }
 
+        /* Link List styles */
+        .uw-a11y-link-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            width: 100%;
+            background: none;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 8px;
+            cursor: pointer;
+            text-align: left;
+            font-family: inherit;
+            font-size: 13px;
+            color: #374151;
+            box-sizing: border-box;
+            transition: background 0.12s;
+        }
+
+        .uw-a11y-link-row:hover {
+            background: rgba(109,40,217,0.06);
+        }
+
+        .uw-a11y-link-row:focus-visible {
+            outline: 2px solid #6d28d9;
+            outline-offset: 1px;
+        }
+
+        .uw-a11y-link-row.has-issue {
+            background: rgba(239,68,68,0.04);
+        }
+
+        .uw-a11y-link-row.has-issue:hover {
+            background: rgba(239,68,68,0.10);
+        }
+
+        .uw-a11y-link-badge {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 4px;
+            letter-spacing: 0.04em;
+            min-width: 32px;
+            line-height: 1.4;
+            margin-top: 2px;
+        }
+
+        .uw-a11y-link-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .uw-a11y-link-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        .uw-a11y-link-name.is-empty {
+            color: #b91c1c;
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .uw-a11y-link-url {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            line-height: 1.3;
+            font-size: 11px;
+            color: #9ca3af;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+
+        .uw-a11y-link-issues {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #b45309;
+            line-height: 1.3;
+            margin-top: 2px;
+        }
+
+        .uw-a11y-link-issues svg {
+            stroke: #d97706;
+            flex-shrink: 0;
+        }
+
         .uw-a11y-coming-soon {
             background: #ffc107;
             color: #212529;
@@ -6302,6 +6420,15 @@
                     this.toggleOutlineView();
                 });
             }
+
+            // Links list toggle button
+            const linksToggle = this.shadowRoot.getElementById('uw-a11y-links-toggle');
+            if (linksToggle) {
+                linksToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.toggleLinksView();
+                });
+            }
         },
 
         // Toggle heading outline view (in-panel, not a page overlay)
@@ -6419,21 +6546,296 @@
                     const idx = parseInt(btn.dataset.hi, 10);
                     const target = headings[idx] && headings[idx].element;
                     if (!target) return;
-                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    // Briefly highlight the heading on the page
-                    const prevOutline = target.style.outline;
-                    const prevOffset = target.style.outlineOffset;
-                    const prevTransition = target.style.transition;
-                    target.style.transition = 'outline 0.15s';
-                    target.style.outline = '3px solid #6d28d9';
-                    target.style.outlineOffset = '4px';
-                    setTimeout(() => {
-                        target.style.outline = prevOutline;
-                        target.style.outlineOffset = prevOffset;
-                        target.style.transition = prevTransition;
-                    }, 1800);
+                    this.scrollAndFlashTarget(target);
                 });
             });
+        },
+
+        // Briefly highlight an element on the page and scroll it into view.
+        // Shared by the outline and link-list inspectors.
+        scrollAndFlashTarget: function(target) {
+            if (!target) return;
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const prevOutline = target.style.outline;
+            const prevOffset = target.style.outlineOffset;
+            const prevTransition = target.style.transition;
+            target.style.transition = 'outline 0.15s';
+            target.style.outline = '3px solid #6d28d9';
+            target.style.outlineOffset = '4px';
+            setTimeout(() => {
+                target.style.outline = prevOutline;
+                target.style.outlineOffset = prevOffset;
+                target.style.transition = prevTransition;
+            }, 1800);
+        },
+
+        // Toggle the Links inspector (in-panel list — does not annotate the page)
+        toggleLinksView: function() {
+            const isActive = this.isLinksViewActive || false;
+            this.isLinksViewActive = !isActive;
+
+            const btn = this.shadowRoot.getElementById('uw-a11y-links-toggle');
+            const countEl = this.shadowRoot.getElementById('uw-a11y-links-count');
+            const content = this.shadowRoot.getElementById('uw-a11y-links-content');
+
+            if (!isActive) {
+                if (content) {
+                    content.hidden = false;
+                    this.renderLinksView(content, countEl);
+                }
+                if (btn) {
+                    btn.setAttribute('aria-pressed', 'true');
+                    btn.setAttribute('aria-expanded', 'true');
+                    btn.classList.add('active');
+                    const linkIcon = btn.querySelector('.feather-link');
+                    const eyeOffIcon = btn.querySelector('.feather-eye-off');
+                    if (linkIcon) linkIcon.style.display = 'none';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'inline';
+                    const btnText = btn.querySelector('.uw-a11y-btn-text');
+                    if (btnText) btnText.textContent = 'Hide Links';
+                }
+                if (countEl) countEl.style.display = 'inline';
+            } else {
+                if (content) { content.hidden = true; content.innerHTML = ''; }
+                if (btn) {
+                    btn.setAttribute('aria-pressed', 'false');
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.classList.remove('active');
+                    const linkIcon = btn.querySelector('.feather-link');
+                    const eyeOffIcon = btn.querySelector('.feather-eye-off');
+                    if (linkIcon) linkIcon.style.display = 'inline';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'none';
+                    const btnText = btn.querySelector('.uw-a11y-btn-text');
+                    if (btnText) btnText.textContent = 'Show Links';
+                }
+                if (countEl) countEl.style.display = 'none';
+            }
+        },
+
+        // Render the links list into the given container
+        renderLinksView: function(container, countEl) {
+            const links = this.detectLinks();
+
+            if (!links.length) {
+                container.innerHTML = '<p class="uw-a11y-outline-item"><span class="uw-a11y-outline-empty-text">No links found on this page.</span></p>';
+                if (countEl) {
+                    countEl.textContent = 'No links found';
+                    countEl.style.color = '#6b7280';
+                }
+                return;
+            }
+
+            const warnSvg = `<svg fill="none" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
+
+            let issueCount = 0;
+            const rows = links.map((link, idx) => {
+                const hasIssue = link.issues.length > 0;
+                if (hasIssue) issueCount++;
+                const badge = link.type;
+                const name = link.accName;
+                const safeName = this.escapeHtmlContent(name);
+                const safeHref = this.escapeHtmlContent(link.href || '');
+                const titleText = this.escapeHtmlAttribute(
+                    (name ? `Announced as: "${name}"` : 'No accessible name') +
+                    (link.href ? `\n${link.href}` : '') +
+                    (hasIssue ? `\n\n${link.issues.join('\n')}` : '')
+                );
+
+                const nameHtml = name
+                    ? `<span class="uw-a11y-link-name">${safeName}</span>`
+                    : `<span class="uw-a11y-link-name is-empty">(no accessible name)</span>`;
+
+                const urlHtml = link.href
+                    ? `<span class="uw-a11y-link-url">${safeHref}</span>`
+                    : '';
+
+                const issuesHtml = hasIssue
+                    ? `<span class="uw-a11y-link-issues">${warnSvg}<span>${this.escapeHtmlContent(link.issues.join(' · '))}</span></span>`
+                    : '';
+
+                return `<button class="uw-a11y-link-row${hasIssue ? ' has-issue' : ''}" data-li="${idx}" title="${titleText}">
+                    <span class="uw-a11y-link-badge" style="background:${badge.bg};color:${badge.color};">${badge.label}</span>
+                    <span class="uw-a11y-link-main">
+                        ${nameHtml}
+                        ${urlHtml}
+                        ${issuesHtml}
+                    </span>
+                </button>`;
+            }).join('');
+
+            container.innerHTML = `<div class="uw-a11y-outline-list">${rows}</div>`;
+
+            if (countEl) {
+                countEl.textContent = issueCount > 0
+                    ? `${links.length} link${links.length !== 1 ? 's' : ''} · ${issueCount} issue${issueCount !== 1 ? 's' : ''}`
+                    : `${links.length} link${links.length !== 1 ? 's' : ''} · No issues`;
+                countEl.style.color = issueCount > 0 ? '#b45309' : '#059669';
+            }
+
+            container.querySelectorAll('.uw-a11y-link-row[data-li]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = parseInt(btn.dataset.li, 10);
+                    const target = links[idx] && links[idx].element;
+                    this.scrollAndFlashTarget(target);
+                });
+            });
+        },
+
+        // Gather all links on the page with computed accessible names and issue flags
+        detectLinks: function() {
+            const nodes = Array.from(document.querySelectorAll('a'));
+            const links = [];
+
+            nodes.forEach(el => {
+                // Skip any links inside the Pinpoint UI
+                if (el.closest('uw-accessibility-checker') ||
+                    el.closest('[data-uw-a11y-overlay]') ||
+                    el.closest('#uw-a11y-panel')) return;
+
+                // Skip links that aren't rendered (display:none / visibility:hidden).
+                // Keep aria-hidden links in the list so screen-reader-hidden links can be reviewed too.
+                const style = window.getComputedStyle(el);
+                if (style.display === 'none' || style.visibility === 'hidden') return;
+
+                // Require an href attribute — anchors without href are not focusable/announced
+                if (!el.hasAttribute('href')) return;
+
+                const href = el.getAttribute('href') || '';
+                const accName = this.computeLinkAccessibleName(el);
+                const type = this.classifyLink(href);
+                const issues = this.detectLinkIssues(el, accName, href);
+
+                links.push({ element: el, href, accName, type, issues });
+            });
+
+            return links;
+        },
+
+        // Compute a simplified accessible name for a link element.
+        // Follows the spec precedence loosely: aria-labelledby → aria-label → text/alt → title.
+        computeLinkAccessibleName: function(el) {
+            const labelledBy = el.getAttribute('aria-labelledby');
+            if (labelledBy) {
+                const parts = labelledBy.split(/\s+/).filter(Boolean).map(id => {
+                    const ref = document.getElementById(id);
+                    return ref ? (ref.textContent || '').trim() : '';
+                }).filter(Boolean);
+                if (parts.length) return parts.join(' ').replace(/\s+/g, ' ').trim();
+            }
+
+            const ariaLabel = (el.getAttribute('aria-label') || '').trim();
+            if (ariaLabel) return ariaLabel;
+
+            const fromContent = this.extractAccessibleText(el);
+            if (fromContent) return fromContent;
+
+            const title = (el.getAttribute('title') || '').trim();
+            if (title) return title;
+
+            return '';
+        },
+
+        // Walk an element's descendants collecting text + image alt text that a
+        // screen reader would announce. Skips aria-hidden subtrees.
+        extractAccessibleText: function(node) {
+            if (!node) return '';
+            const parts = [];
+            const walk = (current) => {
+                if (!current) return;
+                if (current.nodeType === Node.TEXT_NODE) {
+                    const txt = current.textContent;
+                    if (txt) parts.push(txt);
+                    return;
+                }
+                if (current.nodeType !== Node.ELEMENT_NODE) return;
+                if (current.getAttribute && current.getAttribute('aria-hidden') === 'true') return;
+
+                const tag = current.tagName;
+                if (tag === 'IMG') {
+                    const alt = current.getAttribute('alt');
+                    if (alt) parts.push(alt);
+                    return;
+                }
+                if (tag === 'SVG' || tag === 'svg') {
+                    const svgLabel = current.getAttribute('aria-label');
+                    if (svgLabel) { parts.push(svgLabel); return; }
+                    const titleEl = current.querySelector && current.querySelector('title');
+                    if (titleEl && titleEl.textContent) { parts.push(titleEl.textContent); return; }
+                    return;
+                }
+                // Use nested aria-label if present
+                const nestedLabel = current.getAttribute && current.getAttribute('aria-label');
+                if (nestedLabel) { parts.push(nestedLabel); return; }
+
+                current.childNodes.forEach(walk);
+            };
+            node.childNodes.forEach(walk);
+            return parts.join(' ').replace(/\s+/g, ' ').trim();
+        },
+
+        // Return a badge descriptor { label, bg, color } for the link type
+        classifyLink: function(href) {
+            const gray = { bg: '#f3f4f6', color: '#374151' };
+            if (!href || href === '#') return { label: 'NONE', ...gray };
+
+            const lower = href.toLowerCase();
+            if (lower.startsWith('mailto:')) return { label: 'MAIL', bg: '#fef3c7', color: '#92400e' };
+            if (lower.startsWith('tel:')) return { label: 'TEL', bg: '#fef3c7', color: '#92400e' };
+            if (lower.startsWith('javascript:')) return { label: 'JS', bg: '#fee2e2', color: '#991b1b' };
+            if (href.startsWith('#')) return { label: 'IN', bg: '#dbeafe', color: '#1d4ed8' };
+
+            try {
+                const url = new URL(href, document.baseURI);
+                if (url.origin && url.origin !== window.location.origin) {
+                    return { label: 'EXT', bg: '#ede9fe', color: '#6d28d9' };
+                }
+                return { label: 'INT', bg: '#d1fae5', color: '#065f46' };
+            } catch (e) {
+                return { label: 'INT', bg: '#d1fae5', color: '#065f46' };
+            }
+        },
+
+        // Identify common link-text problems a screen-reader user would encounter
+        detectLinkIssues: function(el, accName, href) {
+            const issues = [];
+            const name = (accName || '').trim();
+
+            if (!name) {
+                issues.push('No accessible name');
+            } else {
+                const lc = name.toLowerCase();
+                const generic = new Set([
+                    'click here', 'click', 'here', 'read more', 'more', 'learn more',
+                    'continue', 'continue reading', 'details', 'link', 'this link',
+                    'this', 'info', 'more info', 'go', 'view'
+                ]);
+                if (generic.has(lc)) {
+                    issues.push(`Generic link text ("${name}")`);
+                }
+                if (/^https?:\/\//i.test(name) && name.length > 25) {
+                    issues.push('Raw URL used as link text');
+                }
+            }
+
+            const target = el.getAttribute('target');
+            if (target === '_blank') {
+                const ariaLabel = (el.getAttribute('aria-label') || '').toLowerCase();
+                const title = (el.getAttribute('title') || '').toLowerCase();
+                const combined = `${name.toLowerCase()} ${ariaLabel} ${title}`;
+                if (!/(new tab|new window|opens in)/.test(combined)) {
+                    issues.push('Opens in new tab without warning');
+                }
+            }
+
+            if (href === '#' || /^javascript:/i.test(href || '')) {
+                // Non-real destinations - only flag when there's also no role
+                const role = el.getAttribute('role');
+                if (role !== 'button') {
+                    issues.push('Link has no real destination');
+                }
+            }
+
+            return issues;
         },
 
         // Toggle tab order visualization
@@ -6509,7 +6911,11 @@
             const overlay = document.createElement('div');
             overlay.className = 'uw-a11y-tab-order-overlay';
             overlay.setAttribute('data-uw-a11y-overlay', 'true');
-            
+
+            // Create SVG layer for the connecting lines (sits below the numbered indicators)
+            const svg = this.createTabOrderLineLayer(focusableElements);
+            if (svg) overlay.appendChild(svg);
+
             // Add tab order indicators with staggered animation delay
             focusableElements.forEach((element, index) => {
                 const indicator = this.createTabOrderIndicator(element, index + 1);
@@ -6559,9 +6965,10 @@
                 this.tabOrderOverlay.remove();
                 this.tabOrderOverlay = null;
             }
-            
-            // Clear cached elements
+
+            // Clear cached elements and line segment references
             this.cachedFocusableElements = null;
+            this.tabOrderLineSegments = null;
             
             // Disconnect mutation observer
             if (this.tabOrderMutationObserver) {
@@ -6697,9 +7104,10 @@
         // Update positions of existing tab order indicators
         updateTabOrderPositions: function() {
             if (!this.tabOrderOverlay || !this.cachedFocusableElements) return;
-            
+
             const indicators = this.tabOrderOverlay.querySelectorAll('.uw-a11y-tab-indicator');
-            
+            const visibility = new Array(this.cachedFocusableElements.length).fill(false);
+
             // Use cached elements to avoid expensive DOM queries on scroll
             indicators.forEach((indicator, index) => {
                 const element = this.cachedFocusableElements[index];
@@ -6711,12 +7119,53 @@
                         indicator.style.left = `${x}px`;
                         indicator.style.top = `${y}px`;
                         indicator.style.display = 'flex';
+                        visibility[index] = true;
                     } else {
                         indicator.style.display = 'none';
                     }
                 } else {
                     indicator.style.display = 'none';
                 }
+            });
+
+            // Refresh the connecting line segments to match current indicator positions
+            this.updateTabOrderLineSegments(visibility);
+        },
+
+        // Update the SVG line segments connecting consecutive tab stops
+        updateTabOrderLineSegments: function(visibility) {
+            if (!this.tabOrderLineSegments || !this.cachedFocusableElements) return;
+
+            const elements = this.cachedFocusableElements;
+            const getCenter = (el) => {
+                const r = el.getBoundingClientRect();
+                if (r.width === 0 || r.height === 0) return null;
+                return { x: r.left + window.scrollX, y: r.top + window.scrollY };
+            };
+
+            this.tabOrderLineSegments.forEach((segment, i) => {
+                const fromEl = elements[i];
+                const toEl = elements[i + 1];
+                const fromVisible = visibility ? visibility[i] : (fromEl && fromEl.isConnected);
+                const toVisible = visibility ? visibility[i + 1] : (toEl && toEl.isConnected);
+
+                if (!fromVisible || !toVisible) {
+                    segment.setAttribute('display', 'none');
+                    return;
+                }
+
+                const a = getCenter(fromEl);
+                const b = getCenter(toEl);
+                if (!a || !b) {
+                    segment.setAttribute('display', 'none');
+                    return;
+                }
+
+                segment.removeAttribute('display');
+                segment.setAttribute('x1', a.x);
+                segment.setAttribute('y1', a.y);
+                segment.setAttribute('x2', b.x);
+                segment.setAttribute('y2', b.y);
             });
         },
 
@@ -6808,8 +7257,81 @@
             // Add element info as title
             const elementInfo = this.getElementDescription(element);
             indicator.title = `Tab order ${order}: ${elementInfo}`;
-            
+
             return indicator;
+        },
+
+        // Build an SVG layer with a line segment (with arrowhead) between each consecutive tab stop.
+        // Stored segments are later updated in place by updateTabOrderLineSegments on scroll/resize.
+        createTabOrderLineLayer: function(elements) {
+            if (!elements || elements.length < 2) {
+                this.tabOrderLineSegments = [];
+                return null;
+            }
+
+            const svgNS = 'http://www.w3.org/2000/svg';
+            const svg = document.createElementNS(svgNS, 'svg');
+            svg.setAttribute('class', 'uw-a11y-tab-order-lines');
+            svg.setAttribute('aria-hidden', 'true');
+            svg.style.position = 'absolute';
+            svg.style.top = '0';
+            svg.style.left = '0';
+            svg.style.width = '100%';
+            svg.style.height = '100%';
+            svg.style.overflow = 'visible';
+            svg.style.pointerEvents = 'none';
+            svg.style.zIndex = '999998';
+
+            // Arrowhead marker so each segment shows direction of travel
+            const defs = document.createElementNS(svgNS, 'defs');
+            const marker = document.createElementNS(svgNS, 'marker');
+            marker.setAttribute('id', 'uw-a11y-tab-order-arrow');
+            marker.setAttribute('viewBox', '0 0 10 10');
+            marker.setAttribute('refX', '9');
+            marker.setAttribute('refY', '5');
+            marker.setAttribute('markerWidth', '5');
+            marker.setAttribute('markerHeight', '5');
+            marker.setAttribute('orient', 'auto-start-reverse');
+            marker.setAttribute('markerUnits', 'strokeWidth');
+            const arrowPath = document.createElementNS(svgNS, 'path');
+            arrowPath.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+            arrowPath.setAttribute('fill', '#ff6b35');
+            marker.appendChild(arrowPath);
+            defs.appendChild(marker);
+            svg.appendChild(defs);
+
+            const segments = [];
+            for (let i = 0; i < elements.length - 1; i++) {
+                const fromEl = elements[i];
+                const toEl = elements[i + 1];
+                const fromRect = fromEl.getBoundingClientRect();
+                const toRect = toEl.getBoundingClientRect();
+                const line = document.createElementNS(svgNS, 'line');
+                line.setAttribute('class', 'uw-a11y-tab-order-line');
+                line.setAttribute('stroke', '#ff6b35');
+                line.setAttribute('stroke-width', '2');
+                line.setAttribute('stroke-dasharray', '6 4');
+                line.setAttribute('stroke-linecap', 'round');
+                line.setAttribute('stroke-opacity', '0.75');
+                line.setAttribute('marker-end', 'url(#uw-a11y-tab-order-arrow)');
+
+                const fromVisible = fromRect.width > 0 && fromRect.height > 0;
+                const toVisible = toRect.width > 0 && toRect.height > 0;
+                if (fromVisible && toVisible) {
+                    line.setAttribute('x1', fromRect.left + window.scrollX);
+                    line.setAttribute('y1', fromRect.top + window.scrollY);
+                    line.setAttribute('x2', toRect.left + window.scrollX);
+                    line.setAttribute('y2', toRect.top + window.scrollY);
+                } else {
+                    line.setAttribute('display', 'none');
+                }
+
+                svg.appendChild(line);
+                segments.push(line);
+            }
+
+            this.tabOrderLineSegments = segments;
+            return svg;
         },
 
         // Inject tab order styles into the main document
@@ -6832,6 +7354,16 @@
                     z-index: 999998;
                 }
                 
+                .uw-a11y-tab-order-lines {
+                    animation: uw-tab-lines-appear 0.4s ease-out forwards;
+                    opacity: 0;
+                }
+
+                @keyframes uw-tab-lines-appear {
+                    0% { opacity: 0; }
+                    100% { opacity: 1; }
+                }
+
                 .uw-a11y-tab-indicator {
                     position: absolute;
                     background: #ff6b35;

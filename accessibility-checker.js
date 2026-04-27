@@ -3619,203 +3619,260 @@
 
                         <div id="uw-a11y-view-inspector" class="uw-a11y-view" hidden>
                             <div class="uw-a11y-inspector">
-                                <h3>Inspector Tools</h3>
-                                <p>Visual debugging tools to help you understand your page's accessibility structure.</p>
-                                
-                                <div class="uw-a11y-inspector-section">
-                                    <h4>Tab Order Visualization</h4>
-                                    <p>Display numbered indicators showing the keyboard tab order of focusable elements on your page.</p>
-                                    <div class="uw-a11y-inspector-controls">
-                                        <button id="uw-a11y-tab-order-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
-                                            <svg class="feather feather-move" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>
-                                            </svg>
-                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                            </svg>
-                                            <span class="uw-a11y-btn-text">Show Tab Order</span>
-                                        </button>
-                                        <span id="uw-a11y-tab-order-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                <div id="uw-a11y-inspector-hub">
+                                    <h3>Inspector Tools</h3>
+                                    <p>Visual debugging tools to help you understand your page's accessibility structure.</p>
+
+                                    <div class="uw-a11y-inspector-section">
+                                        <h4>Tab Order Visualization</h4>
+                                        <p>Display numbered indicators showing the keyboard tab order of focusable elements on your page.</p>
+                                        <div class="uw-a11y-inspector-controls">
+                                            <button id="uw-a11y-tab-order-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
+                                                <svg class="feather feather-move" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>
+                                                </svg>
+                                                <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                                                    <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                                </svg>
+                                                <span class="uw-a11y-btn-text">Show Tab Order</span>
+                                            </button>
+                                            <span id="uw-a11y-tab-order-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <!-- Focus Indicators Tool -->
-                                <div class="uw-a11y-inspector-section">
-                                    <h4>Focus Indicators</h4>
-                                    <p>Preview how focus styles appear on all focusable elements simultaneously to test focus visibility.</p>
-                                    <div class="uw-a11y-inspector-controls">
-                                        <button id="uw-a11y-focus-indicators-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
-                                            <svg class="feather feather-target" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
-                                                <circle cx="12" cy="12" r="10"/>
-                                                <circle cx="12" cy="12" r="6"/>
-                                                <circle cx="12" cy="12" r="2"/>
-                                            </svg>
-                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                            </svg>
-                                            <span class="uw-a11y-btn-text">Preview Focus Styles</span>
-                                        </button>
-                                        <span id="uw-a11y-focus-indicators-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+
+                                    <div class="uw-a11y-inspector-section">
+                                        <h4>Focus Indicators</h4>
+                                        <p>Preview how focus styles appear on all focusable elements simultaneously to test focus visibility.</p>
+                                        <div class="uw-a11y-inspector-controls">
+                                            <button id="uw-a11y-focus-indicators-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
+                                                <svg class="feather feather-target" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                                    <circle cx="12" cy="12" r="10"/>
+                                                    <circle cx="12" cy="12" r="6"/>
+                                                    <circle cx="12" cy="12" r="2"/>
+                                                </svg>
+                                                <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                                                    <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                                </svg>
+                                                <span class="uw-a11y-btn-text">Preview Focus Styles</span>
+                                            </button>
+                                            <span id="uw-a11y-focus-indicators-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <!-- Landmark Structure Tool -->
-                                <div class="uw-a11y-inspector-section">
-                                    <h4>Landmark Structure</h4>
-                                    <p>Visualize page landmarks and heading hierarchy to test document structure.</p>
-                                    <div class="uw-a11y-inspector-controls">
-                                        <button id="uw-a11y-landmark-structure-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
-                                            <svg class="feather feather-map" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
-                                                <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
-                                                <line x1="9" x2="9" y1="3" y2="18"/>
-                                                <line x1="15" x2="15" y1="6" y2="21"/>
-                                            </svg>
-                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                            </svg>
-                                            <span class="uw-a11y-btn-text">Show Landmarks</span>
+
+                                    <div class="uw-a11y-inspector-section">
+                                        <h4>Landmark Structure</h4>
+                                        <p>Visualize page landmarks and heading hierarchy to test document structure.</p>
+                                        <div class="uw-a11y-inspector-controls">
+                                            <button id="uw-a11y-landmark-structure-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
+                                                <svg class="feather feather-map" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                                    <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                                                    <line x1="9" x2="9" y1="3" y2="18"/>
+                                                    <line x1="15" x2="15" y1="6" y2="21"/>
+                                                </svg>
+                                                <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                                                    <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                                </svg>
+                                                <span class="uw-a11y-btn-text">Show Landmarks</span>
+                                            </button>
+                                            <span id="uw-a11y-landmark-structure-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="uw-a11y-inspector-tool-row">
+                                        <div class="uw-a11y-inspector-tool-row-main">
+                                            <h4>Page outline</h4>
+                                            <p class="uw-a11y-inspector-tool-teaser">Heading hierarchy, skipped levels, jump to each heading.</p>
+                                            <p id="uw-a11y-inspector-hub-status-outline" class="uw-a11y-inspector-hub-status" aria-live="polite">Not showing outline</p>
+                                        </div>
+                                        <button type="button" id="uw-a11y-inspector-open-outline" class="uw-a11y-btn uw-a11y-btn-secondary uw-a11y-inspector-tool-open" aria-label="Open page outline tool">
+                                            <svg class="feather feather-chevron-right" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
                                         </button>
-                                        <span id="uw-a11y-landmark-structure-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                    </div>
+
+                                    <div class="uw-a11y-inspector-tool-row">
+                                        <div class="uw-a11y-inspector-tool-row-main">
+                                            <h4>Links</h4>
+                                            <p class="uw-a11y-inspector-tool-teaser">Accessible names, issues, jump to each link.</p>
+                                            <p id="uw-a11y-inspector-hub-status-links" class="uw-a11y-inspector-hub-status" aria-live="polite">Not showing links</p>
+                                        </div>
+                                        <button type="button" id="uw-a11y-inspector-open-links" class="uw-a11y-btn uw-a11y-btn-secondary uw-a11y-inspector-tool-open" aria-label="Open links inspector">
+                                            <svg class="feather feather-chevron-right" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                                        </button>
+                                    </div>
+
+                                    <div class="uw-a11y-inspector-tool-row">
+                                        <div class="uw-a11y-inspector-tool-row-main">
+                                            <h4>Color blindness simulation</h4>
+                                            <p class="uw-a11y-inspector-tool-teaser">Preview the page with color vision deficiency filters.</p>
+                                            <p id="uw-a11y-inspector-hub-status-cvd" class="uw-a11y-inspector-hub-status" aria-live="polite">Off — normal vision</p>
+                                        </div>
+                                        <button type="button" id="uw-a11y-inspector-open-cvd" class="uw-a11y-btn uw-a11y-btn-secondary uw-a11y-inspector-tool-open" aria-label="Open color blindness simulation">
+                                            <svg class="feather feather-chevron-right" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                                        </button>
+                                    </div>
+
+                                    <div class="uw-a11y-inspector-tool-row">
+                                        <div class="uw-a11y-inspector-tool-row-main">
+                                            <h4>Alternative text</h4>
+                                            <p class="uw-a11y-inspector-tool-teaser">List alt text for images or show labels on the page.</p>
+                                            <p id="uw-a11y-inspector-hub-status-alt" class="uw-a11y-inspector-hub-status" aria-live="polite">Off</p>
+                                        </div>
+                                        <button type="button" id="uw-a11y-inspector-open-alt" class="uw-a11y-btn uw-a11y-btn-secondary uw-a11y-inspector-tool-open" aria-label="Open alternative text inspector">
+                                            <svg class="feather feather-chevron-right" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                                        </button>
                                     </div>
                                 </div>
 
-                                <!-- Heading Outline View -->
-                                <div class="uw-a11y-inspector-section">
-                                    <h4>Page Outline</h4>
-                                    <p>View the heading hierarchy to verify correct order and nesting. Skipped heading levels are flagged. Click any heading to jump to it on the page.</p>
-                                    <div class="uw-a11y-inspector-controls">
-                                        <button id="uw-a11y-outline-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
-                                            <svg class="feather feather-list" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                <line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>
-                                            </svg>
-                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
-                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                            </svg>
-                                            <span class="uw-a11y-btn-text">Show Outline</span>
+                                <div id="uw-a11y-inspector-detail" hidden>
+                                    <div class="uw-a11y-inspector-detail-header">
+                                        <button type="button" id="uw-a11y-inspector-back" class="uw-a11y-btn uw-a11y-btn-secondary uw-a11y-inspector-back-btn" aria-label="Back to inspector tools">
+                                            <svg class="feather feather-chevron-left" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
                                         </button>
-                                        <span id="uw-a11y-outline-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                        <h3 id="uw-a11y-inspector-detail-heading" class="uw-a11y-inspector-detail-heading"></h3>
                                     </div>
-                                    <div id="uw-a11y-outline-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
-                                </div>
 
-                                <!-- Link List View -->
-                                <div class="uw-a11y-inspector-section">
-                                    <h4>Links</h4>
-                                    <p>List every link on the page with its accessible name — the text a screen reader actually announces. Click a link to jump to it. Empty, generic, or ambiguous link text is flagged.</p>
-                                    <div class="uw-a11y-inspector-controls">
-                                        <button id="uw-a11y-links-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
-                                            <svg class="feather feather-link" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
-                                                <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
-                                            </svg>
-                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
-                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                            </svg>
-                                            <span class="uw-a11y-btn-text">Show Links</span>
-                                        </button>
-                                        <span id="uw-a11y-links-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                    <div id="uw-a11y-inspector-panel-outline" class="uw-a11y-inspector-detail-panel" hidden>
+                                        <div class="uw-a11y-inspector-section">
+                                            <h4>Page Outline</h4>
+                                            <p>View the heading hierarchy to verify correct order and nesting. Skipped heading levels are flagged. Click any heading to jump to it on the page.</p>
+                                            <div class="uw-a11y-inspector-controls">
+                                                <button id="uw-a11y-outline-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
+                                                    <svg class="feather feather-list" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                        <line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>
+                                                    </svg>
+                                                    <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
+                                                        <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                                    </svg>
+                                                    <span class="uw-a11y-btn-text">Show Outline</span>
+                                                </button>
+                                                <span id="uw-a11y-outline-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                            </div>
+                                            <div id="uw-a11y-outline-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
+                                        </div>
                                     </div>
-                                    <div id="uw-a11y-links-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
-                                </div>
 
-                                <!-- Color Blindness Simulation -->
-                                <div class="uw-a11y-inspector-section">
-                                    <h4>Color Blindness Simulation</h4>
-                                    <p>Preview the page as seen by users with color vision deficiencies. Applies an SVG color filter to the page while this tool is active.</p>
-                                    <fieldset class="uw-a11y-cvd-list" id="uw-a11y-cvd-list">
-                                        <legend class="sr-only">Color blindness simulation type</legend>
-                                        <label class="uw-a11y-cvd-option">
-                                            <input type="radio" name="uw-a11y-cvd" value="none" checked>
-                                            <span class="uw-a11y-cvd-main">
-                                                <span class="uw-a11y-cvd-name">Off</span>
-                                                <span class="uw-a11y-cvd-meta">Normal vision</span>
-                                            </span>
-                                        </label>
-                                        <label class="uw-a11y-cvd-option">
-                                            <input type="radio" name="uw-a11y-cvd" value="deuteranomaly">
-                                            <span class="uw-a11y-cvd-main">
-                                                <span class="uw-a11y-cvd-name">Green appears weak</span>
-                                                <span class="uw-a11y-cvd-meta">Deuteranomaly · ~5% of men</span>
-                                            </span>
-                                        </label>
-                                        <label class="uw-a11y-cvd-option">
-                                            <input type="radio" name="uw-a11y-cvd" value="deuteranopia">
-                                            <span class="uw-a11y-cvd-main">
-                                                <span class="uw-a11y-cvd-name">Green greatly reduced</span>
-                                                <span class="uw-a11y-cvd-meta">Deuteranopia · ~1% of men</span>
-                                            </span>
-                                        </label>
-                                        <label class="uw-a11y-cvd-option">
-                                            <input type="radio" name="uw-a11y-cvd" value="protanomaly">
-                                            <span class="uw-a11y-cvd-main">
-                                                <span class="uw-a11y-cvd-name">Red appears weak</span>
-                                                <span class="uw-a11y-cvd-meta">Protanomaly · ~1% of men</span>
-                                            </span>
-                                        </label>
-                                        <label class="uw-a11y-cvd-option">
-                                            <input type="radio" name="uw-a11y-cvd" value="protanopia">
-                                            <span class="uw-a11y-cvd-main">
-                                                <span class="uw-a11y-cvd-name">Red greatly reduced</span>
-                                                <span class="uw-a11y-cvd-meta">Protanopia · ~1% of men</span>
-                                            </span>
-                                        </label>
-                                        <label class="uw-a11y-cvd-option">
-                                            <input type="radio" name="uw-a11y-cvd" value="tritanomaly">
-                                            <span class="uw-a11y-cvd-main">
-                                                <span class="uw-a11y-cvd-name">Blue appears weak</span>
-                                                <span class="uw-a11y-cvd-meta">Tritanomaly · rare</span>
-                                            </span>
-                                        </label>
-                                        <label class="uw-a11y-cvd-option">
-                                            <input type="radio" name="uw-a11y-cvd" value="tritanopia">
-                                            <span class="uw-a11y-cvd-main">
-                                                <span class="uw-a11y-cvd-name">Blue greatly reduced</span>
-                                                <span class="uw-a11y-cvd-meta">Tritanopia · very rare</span>
-                                            </span>
-                                        </label>
-                                        <label class="uw-a11y-cvd-option">
-                                            <input type="radio" name="uw-a11y-cvd" value="achromatomaly">
-                                            <span class="uw-a11y-cvd-main">
-                                                <span class="uw-a11y-cvd-name">Color appears weak</span>
-                                                <span class="uw-a11y-cvd-meta">Achromatomaly · very rare</span>
-                                            </span>
-                                        </label>
-                                        <label class="uw-a11y-cvd-option">
-                                            <input type="radio" name="uw-a11y-cvd" value="achromatopsia">
-                                            <span class="uw-a11y-cvd-main">
-                                                <span class="uw-a11y-cvd-name">Color greatly reduced</span>
-                                                <span class="uw-a11y-cvd-meta">Achromatopsia · ~1 in 33,000</span>
-                                            </span>
-                                        </label>
-                                    </fieldset>
-                                </div>
-
-                                <!-- Alternative Text Inspector -->
-                                <div class="uw-a11y-inspector-section">
-                                    <h4>Alternative Text</h4>
-                                    <p>Inspect every image, SVG, and image-role element on the page. The list shows the alt text each one exposes to assistive tech; the overlay draws that same text on top of the image itself for a quick visual scan.</p>
-                                    <div class="uw-a11y-inspector-controls">
-                                        <button id="uw-a11y-alt-list-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
-                                            <svg class="feather feather-list" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                <line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>
-                                            </svg>
-                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
-                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                            </svg>
-                                            <span class="uw-a11y-btn-text">Show Alt Text List</span>
-                                        </button>
-                                        <button id="uw-a11y-alt-overlay-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
-                                            <svg class="feather feather-image" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                <rect height="18" rx="2" ry="2" width="18" x="3" y="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-                                            </svg>
-                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
-                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                            </svg>
-                                            <span class="uw-a11y-btn-text">Show Alt Text Overlays</span>
-                                        </button>
-                                        <span id="uw-a11y-alt-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                    <div id="uw-a11y-inspector-panel-links" class="uw-a11y-inspector-detail-panel" hidden>
+                                        <div class="uw-a11y-inspector-section">
+                                            <h4>Links</h4>
+                                            <p>List every link on the page with its accessible name — the text a screen reader actually announces. Click a link to jump to it. Empty, generic, or ambiguous link text is flagged.</p>
+                                            <div class="uw-a11y-inspector-controls">
+                                                <button id="uw-a11y-links-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
+                                                    <svg class="feather feather-link" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                        <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+                                                        <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+                                                    </svg>
+                                                    <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
+                                                        <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                                    </svg>
+                                                    <span class="uw-a11y-btn-text">Show Links</span>
+                                                </button>
+                                                <span id="uw-a11y-links-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                            </div>
+                                            <div id="uw-a11y-links-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
+                                        </div>
                                     </div>
-                                    <div id="uw-a11y-alt-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
+
+                                    <div id="uw-a11y-inspector-panel-cvd" class="uw-a11y-inspector-detail-panel" hidden>
+                                        <div class="uw-a11y-inspector-section">
+                                            <h4>Color Blindness Simulation</h4>
+                                            <p>Preview the page as seen by users with color vision deficiencies. Applies an SVG color filter to the page while this tool is active.</p>
+                                            <fieldset class="uw-a11y-cvd-list" id="uw-a11y-cvd-list">
+                                                <legend class="sr-only">Color blindness simulation type</legend>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="none" checked>
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Off</span>
+                                                        <span class="uw-a11y-cvd-meta">Normal vision</span>
+                                                    </span>
+                                                </label>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="deuteranomaly">
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Green appears weak</span>
+                                                        <span class="uw-a11y-cvd-meta">Deuteranomaly · ~5% of men</span>
+                                                    </span>
+                                                </label>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="deuteranopia">
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Green greatly reduced</span>
+                                                        <span class="uw-a11y-cvd-meta">Deuteranopia · ~1% of men</span>
+                                                    </span>
+                                                </label>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="protanomaly">
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Red appears weak</span>
+                                                        <span class="uw-a11y-cvd-meta">Protanomaly · ~1% of men</span>
+                                                    </span>
+                                                </label>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="protanopia">
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Red greatly reduced</span>
+                                                        <span class="uw-a11y-cvd-meta">Protanopia · ~1% of men</span>
+                                                    </span>
+                                                </label>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="tritanomaly">
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Blue appears weak</span>
+                                                        <span class="uw-a11y-cvd-meta">Tritanomaly · rare</span>
+                                                    </span>
+                                                </label>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="tritanopia">
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Blue greatly reduced</span>
+                                                        <span class="uw-a11y-cvd-meta">Tritanopia · very rare</span>
+                                                    </span>
+                                                </label>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="achromatomaly">
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Color appears weak</span>
+                                                        <span class="uw-a11y-cvd-meta">Achromatomaly · very rare</span>
+                                                    </span>
+                                                </label>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="achromatopsia">
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Color greatly reduced</span>
+                                                        <span class="uw-a11y-cvd-meta">Achromatopsia · ~1 in 33,000</span>
+                                                    </span>
+                                                </label>
+                                            </fieldset>
+                                        </div>
+                                    </div>
+
+                                    <div id="uw-a11y-inspector-panel-alt" class="uw-a11y-inspector-detail-panel" hidden>
+                                        <div class="uw-a11y-inspector-section">
+                                            <h4>Alternative Text</h4>
+                                            <p>Inspect every image, SVG, and image-role element on the page. The list shows the alt text each one exposes to assistive tech; the overlay draws that same text on top of the image itself for a quick visual scan.</p>
+                                            <div class="uw-a11y-inspector-controls">
+                                                <button id="uw-a11y-alt-list-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
+                                                    <svg class="feather feather-list" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                        <line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>
+                                                    </svg>
+                                                    <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
+                                                        <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                                    </svg>
+                                                    <span class="uw-a11y-btn-text">Show Alt Text List</span>
+                                                </button>
+                                                <button id="uw-a11y-alt-overlay-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
+                                                    <svg class="feather feather-image" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                        <rect height="18" rx="2" ry="2" width="18" x="3" y="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                                                    </svg>
+                                                    <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
+                                                        <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                                    </svg>
+                                                    <span class="uw-a11y-btn-text">Show Alt Text Overlays</span>
+                                                </button>
+                                                <span id="uw-a11y-alt-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                            </div>
+                                            <div id="uw-a11y-alt-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -5451,12 +5508,90 @@
             font-size: 18px;
             font-weight: 600;
         }
-        
-        .uw-a11y-inspector > p {
+
+        .uw-a11y-inspector-hub > p {
             margin: 0 0 1.5rem 0;
             color: #666;
             font-size: 14px;
             line-height: 1.5;
+        }
+
+        .uw-a11y-inspector-tool-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .uw-a11y-inspector-tool-row-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .uw-a11y-inspector-tool-row .uw-a11y-inspector-tool-open {
+            flex-shrink: 0;
+            align-self: center;
+        }
+
+        .uw-a11y-inspector-tool-row h4 {
+            margin: 0 0 0.35rem 0;
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .uw-a11y-inspector-tool-teaser {
+            margin: 0 0 0.35rem 0;
+            color: #666;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .uw-a11y-inspector-hub-status {
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .uw-a11y-inspector-detail-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .uw-a11y-inspector-back-btn,
+        .uw-a11y-inspector-tool-open {
+            flex-shrink: 0;
+            padding: 0.5rem;
+            min-width: 2.5rem;
+            justify-content: center;
+        }
+
+        .uw-a11y-inspector-back-btn svg,
+        .uw-a11y-inspector-tool-open svg {
+            flex-shrink: 0;
+        }
+
+        .uw-a11y-inspector-detail-heading {
+            margin: 0;
+            flex: 1;
+            min-width: 0;
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .uw-a11y-inspector-detail-panel > .uw-a11y-inspector-section:last-child {
+            margin-bottom: 0;
         }
         
         .uw-a11y-inspector-section {
@@ -6321,6 +6456,10 @@
             
             // Don't do anything if we're already on this view or currently animating
             if (currentView === view || this.isAnimating) return;
+
+            if (view === 'inspector' || currentView === 'inspector') {
+                this.resetInspectorToHub();
+            }
             
             // Update current view tracker
             this.currentView = view;
@@ -6554,6 +6693,172 @@
             return `WCAG ${wcagSpec} ${String(wcagLevel || '').toUpperCase()}`;
         },
 
+        // Inspector hub ↔ detail (heavy tools open on a second screen within the Inspector view)
+        _applyInspectorHubLayout: function() {
+            this.inspectorSubView = null;
+            const root = this.shadowRoot;
+            if (!root) return;
+            const hub = root.getElementById('uw-a11y-inspector-hub');
+            const detail = root.getElementById('uw-a11y-inspector-detail');
+            if (hub) hub.removeAttribute('hidden');
+            if (detail) detail.setAttribute('hidden', '');
+            ['outline', 'links', 'cvd', 'alt'].forEach((id) => {
+                const p = root.getElementById('uw-a11y-inspector-panel-' + id);
+                if (p) p.setAttribute('hidden', '');
+            });
+            const h = root.getElementById('uw-a11y-inspector-detail-heading');
+            if (h) h.textContent = '';
+        },
+
+        resetInspectorToHub: function() {
+            this._inspectorReturnFocusEl = null;
+            this._applyInspectorHubLayout();
+            this.syncInspectorHubStatus();
+        },
+
+        // Turn on list-style tools when entering a detail panel so users see content immediately.
+        _autoActivateInspectorDetailPanel: function(panelId) {
+            if (panelId === 'outline' && !this.isOutlineViewActive) {
+                this.toggleOutlineView();
+            } else if (panelId === 'links' && !this.isLinksViewActive) {
+                this.toggleLinksView();
+            } else if (panelId === 'alt' && !this.isAltTextListActive) {
+                this.toggleAltTextList();
+            }
+        },
+
+        openInspectorDetail: function(panelId) {
+            const titles = {
+                outline: 'Page outline',
+                links: 'Links',
+                cvd: 'Color blindness simulation',
+                alt: 'Alternative text'
+            };
+            if (!titles[panelId]) return;
+            const root = this.shadowRoot;
+            if (!root) return;
+
+            this._inspectorReturnFocusEl = document.activeElement;
+
+            const hub = root.getElementById('uw-a11y-inspector-hub');
+            const detail = root.getElementById('uw-a11y-inspector-detail');
+            if (hub) hub.setAttribute('hidden', '');
+            if (detail) detail.removeAttribute('hidden');
+
+            ['outline', 'links', 'cvd', 'alt'].forEach((id) => {
+                const p = root.getElementById('uw-a11y-inspector-panel-' + id);
+                if (p) {
+                    if (id === panelId) p.removeAttribute('hidden');
+                    else p.setAttribute('hidden', '');
+                }
+            });
+
+            const heading = root.getElementById('uw-a11y-inspector-detail-heading');
+            if (heading) heading.textContent = titles[panelId];
+
+            this.inspectorSubView = panelId;
+            this._autoActivateInspectorDetailPanel(panelId);
+            this.syncInspectorHubStatus();
+            this.syncInspectorContentHeight();
+
+            const back = root.getElementById('uw-a11y-inspector-back');
+            if (back) {
+                requestAnimationFrame(() => {
+                    try { back.focus(); } catch (_) {}
+                });
+            }
+        },
+
+        closeInspectorDetail: function() {
+            const ret = this._inspectorReturnFocusEl;
+            this._inspectorReturnFocusEl = null;
+            this._applyInspectorHubLayout();
+            this.syncInspectorHubStatus();
+            this.syncInspectorContentHeight();
+            requestAnimationFrame(() => {
+                if (ret && ret.isConnected) {
+                    try { ret.focus(); } catch (_) {}
+                }
+            });
+        },
+
+        syncInspectorContentHeight: function() {
+            if (this.currentView !== 'inspector') return;
+            const content = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-content');
+            if (!content) return;
+            const maxAllowedHeight = this.getMaxContentHeight();
+            const idealHeight = this.measureViewHeight('inspector');
+            if (idealHeight == null) return;
+            const newHeight = Math.min(idealHeight, maxAllowedHeight);
+            content.style.maxHeight = maxAllowedHeight + 'px';
+            if (this.isAnimating) {
+                content.style.height = newHeight + 'px';
+            } else if (window.gsap && !this.prefersReducedMotion()) {
+                window.gsap.killTweensOf(content);
+                window.gsap.to(content, {
+                    height: newHeight,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            } else {
+                content.style.height = newHeight + 'px';
+            }
+            content.style.overflowY = 'auto';
+        },
+
+        syncInspectorHubStatus: function() {
+            const root = this.shadowRoot;
+            if (!root) return;
+
+            const so = root.getElementById('uw-a11y-inspector-hub-status-outline');
+            if (so) {
+                if (this.isOutlineViewActive) {
+                    const c = root.getElementById('uw-a11y-outline-count');
+                    so.textContent = (c && c.style.display !== 'none' && c.textContent)
+                        ? c.textContent
+                        : 'Outline list open';
+                } else {
+                    so.textContent = 'Not showing outline';
+                }
+            }
+
+            const sl = root.getElementById('uw-a11y-inspector-hub-status-links');
+            if (sl) {
+                if (this.isLinksViewActive) {
+                    const c = root.getElementById('uw-a11y-links-count');
+                    sl.textContent = (c && c.style.display !== 'none' && c.textContent)
+                        ? c.textContent
+                        : 'Links list open';
+                } else {
+                    sl.textContent = 'Not showing links';
+                }
+            }
+
+            const sc = root.getElementById('uw-a11y-inspector-hub-status-cvd');
+            if (sc) {
+                const list = root.getElementById('uw-a11y-cvd-list');
+                const checked = list && list.querySelector('input[name="uw-a11y-cvd"]:checked');
+                if (!checked || checked.value === 'none') {
+                    sc.textContent = 'Off — normal vision';
+                } else {
+                    const label = checked.closest('label');
+                    const nameEl = label && label.querySelector('.uw-a11y-cvd-name');
+                    sc.textContent = nameEl ? nameEl.textContent.trim() : 'Simulation on';
+                }
+            }
+
+            const sa = root.getElementById('uw-a11y-inspector-hub-status-alt');
+            if (sa) {
+                const parts = [];
+                if (this.isAltTextListActive) {
+                    const c = root.getElementById('uw-a11y-alt-count');
+                    parts.push(c && c.textContent ? 'List: ' + c.textContent : 'List on');
+                }
+                if (this.isAltTextOverlayActive) parts.push('Overlays on');
+                sa.textContent = parts.length ? parts.join(' · ') : 'Off';
+            }
+        },
+
         // Initialize inspector tools event handlers
         initInspectorTools: function() {
             // Tab order toggle button
@@ -6629,6 +6934,57 @@
                     this.toggleAltTextOverlay();
                 });
             }
+
+            const openOutline = this.shadowRoot.getElementById('uw-a11y-inspector-open-outline');
+            if (openOutline) {
+                openOutline.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.openInspectorDetail('outline');
+                });
+            }
+            const openLinks = this.shadowRoot.getElementById('uw-a11y-inspector-open-links');
+            if (openLinks) {
+                openLinks.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.openInspectorDetail('links');
+                });
+            }
+            const openCvd = this.shadowRoot.getElementById('uw-a11y-inspector-open-cvd');
+            if (openCvd) {
+                openCvd.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.openInspectorDetail('cvd');
+                });
+            }
+            const openAlt = this.shadowRoot.getElementById('uw-a11y-inspector-open-alt');
+            if (openAlt) {
+                openAlt.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.openInspectorDetail('alt');
+                });
+            }
+
+            const backBtn = this.shadowRoot.getElementById('uw-a11y-inspector-back');
+            if (backBtn) {
+                backBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.closeInspectorDetail();
+                });
+            }
+
+            const panel = this.shadowRoot.getElementById('uw-a11y-panel');
+            if (panel && !this._inspectorDetailEscapeBound) {
+                this._inspectorDetailEscapeBound = true;
+                panel.addEventListener('keydown', (e) => {
+                    if (e.key !== 'Escape' || !this.inspectorSubView || this.currentView !== 'inspector') return;
+                    if (this.isPickerActive) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.closeInspectorDetail();
+                }, true);
+            }
+
+            this.syncInspectorHubStatus();
         },
 
         // Toggle heading outline view (in-panel, not a page overlay)
@@ -6674,6 +7030,8 @@
                 }
                 if (countEl) countEl.style.display = 'none';
             }
+            this.syncInspectorHubStatus();
+            if (this.currentView === 'inspector') this.syncInspectorContentHeight();
         },
 
         // Render the heading outline tree into the given container
@@ -6810,6 +7168,8 @@
                 }
                 if (countEl) countEl.style.display = 'none';
             }
+            this.syncInspectorHubStatus();
+            if (this.currentView === 'inspector') this.syncInspectorContentHeight();
         },
 
         // Render the links list into the given container
@@ -7074,6 +7434,7 @@
             // data attribute drives the CSS variable + filter selector
             document.body.setAttribute('data-uw-a11y-cvd', type);
             this.activeColorBlindness = type;
+            this.syncInspectorHubStatus();
         },
 
         // Remove the CVD simulation and associated DOM nodes
@@ -7086,6 +7447,7 @@
 
             const styles = document.getElementById('uw-a11y-cvd-styles');
             if (styles) styles.remove();
+            if (this.shadowRoot) this.syncInspectorHubStatus();
         },
 
         // Inject <svg><defs><filter>…</filter></defs></svg> containing one filter per
@@ -7343,6 +7705,8 @@
                 // Only hide the count pill if the overlay isn't also using it
                 if (countEl && !this.isAltTextOverlayActive) countEl.style.display = 'none';
             }
+            this.syncInspectorHubStatus();
+            if (this.currentView === 'inspector') this.syncInspectorContentHeight();
         },
 
         // Render the list of image alt-text rows into the given container
@@ -7454,6 +7818,8 @@
             }
 
             this.isAltTextOverlayActive = !isActive;
+            this.syncInspectorHubStatus();
+            if (this.currentView === 'inspector') this.syncInspectorContentHeight();
         },
 
         // Build the overlay and position a label above each image

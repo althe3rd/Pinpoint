@@ -3593,83 +3593,260 @@
 
                         <div id="uw-a11y-view-inspector" class="uw-a11y-view" hidden>
                             <div class="uw-a11y-inspector">
-                                <h3>Inspector Tools</h3>
-                                <p>Visual debugging tools to help you understand your page's accessibility structure.</p>
-                                
-                                <div class="uw-a11y-inspector-section">
-                                    <h4>Tab Order Visualization</h4>
-                                    <p>Display numbered indicators showing the keyboard tab order of focusable elements on your page.</p>
-                                    <div class="uw-a11y-inspector-controls">
-                                        <button id="uw-a11y-tab-order-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
-                                            <svg class="feather feather-move" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>
-                                            </svg>
-                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                            </svg>
-                                            <span class="uw-a11y-btn-text">Show Tab Order</span>
-                                        </button>
-                                        <span id="uw-a11y-tab-order-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                <div id="uw-a11y-inspector-hub">
+                                    <h3>Inspector Tools</h3>
+                                    <p>Visual debugging tools to help you understand your page's accessibility structure.</p>
+
+                                    <div class="uw-a11y-inspector-section">
+                                        <h4>Tab Order Visualization</h4>
+                                        <p>Display numbered indicators showing the keyboard tab order of focusable elements on your page.</p>
+                                        <div class="uw-a11y-inspector-controls">
+                                            <button id="uw-a11y-tab-order-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
+                                                <svg class="feather feather-move" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>
+                                                </svg>
+                                                <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                                                    <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                                </svg>
+                                                <span class="uw-a11y-btn-text">Show Tab Order</span>
+                                            </button>
+                                            <span id="uw-a11y-tab-order-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <!-- Focus Indicators Tool -->
-                                <div class="uw-a11y-inspector-section">
-                                    <h4>Focus Indicators</h4>
-                                    <p>Preview how focus styles appear on all focusable elements simultaneously to test focus visibility.</p>
-                                    <div class="uw-a11y-inspector-controls">
-                                        <button id="uw-a11y-focus-indicators-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
-                                            <svg class="feather feather-target" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
-                                                <circle cx="12" cy="12" r="10"/>
-                                                <circle cx="12" cy="12" r="6"/>
-                                                <circle cx="12" cy="12" r="2"/>
-                                            </svg>
-                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                            </svg>
-                                            <span class="uw-a11y-btn-text">Preview Focus Styles</span>
-                                        </button>
-                                        <span id="uw-a11y-focus-indicators-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+
+                                    <div class="uw-a11y-inspector-section">
+                                        <h4>Focus Indicators</h4>
+                                        <p>Preview how focus styles appear on all focusable elements simultaneously to test focus visibility.</p>
+                                        <div class="uw-a11y-inspector-controls">
+                                            <button id="uw-a11y-focus-indicators-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
+                                                <svg class="feather feather-target" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                                    <circle cx="12" cy="12" r="10"/>
+                                                    <circle cx="12" cy="12" r="6"/>
+                                                    <circle cx="12" cy="12" r="2"/>
+                                                </svg>
+                                                <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                                                    <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                                </svg>
+                                                <span class="uw-a11y-btn-text">Preview Focus Styles</span>
+                                            </button>
+                                            <span id="uw-a11y-focus-indicators-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <!-- Landmark Structure Tool -->
-                                <div class="uw-a11y-inspector-section">
-                                    <h4>Landmark Structure</h4>
-                                    <p>Visualize page landmarks and heading hierarchy to test document structure.</p>
-                                    <div class="uw-a11y-inspector-controls">
-                                        <button id="uw-a11y-landmark-structure-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
-                                            <svg class="feather feather-map" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
-                                                <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
-                                                <line x1="9" x2="9" y1="3" y2="18"/>
-                                                <line x1="15" x2="15" y1="6" y2="21"/>
-                                            </svg>
-                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                            </svg>
-                                            <span class="uw-a11y-btn-text">Show Landmarks</span>
+
+                                    <div class="uw-a11y-inspector-section">
+                                        <h4>Landmark Structure</h4>
+                                        <p>Visualize page landmarks and heading hierarchy to test document structure.</p>
+                                        <div class="uw-a11y-inspector-controls">
+                                            <button id="uw-a11y-landmark-structure-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
+                                                <svg class="feather feather-map" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                                    <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                                                    <line x1="9" x2="9" y1="3" y2="18"/>
+                                                    <line x1="15" x2="15" y1="6" y2="21"/>
+                                                </svg>
+                                                <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                                                    <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                                </svg>
+                                                <span class="uw-a11y-btn-text">Show Landmarks</span>
+                                            </button>
+                                            <span id="uw-a11y-landmark-structure-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="uw-a11y-inspector-tool-row">
+                                        <div class="uw-a11y-inspector-tool-row-main">
+                                            <h4>Page outline</h4>
+                                            <p class="uw-a11y-inspector-tool-teaser">Heading hierarchy, skipped levels, jump to each heading.</p>
+                                            <p id="uw-a11y-inspector-hub-status-outline" class="uw-a11y-inspector-hub-status" aria-live="polite">Not showing outline</p>
+                                        </div>
+                                        <button type="button" id="uw-a11y-inspector-open-outline" class="uw-a11y-btn uw-a11y-btn-secondary uw-a11y-inspector-tool-open" aria-label="Open page outline tool">
+                                            <svg class="feather feather-chevron-right" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
                                         </button>
-                                        <span id="uw-a11y-landmark-structure-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                    </div>
+
+                                    <div class="uw-a11y-inspector-tool-row">
+                                        <div class="uw-a11y-inspector-tool-row-main">
+                                            <h4>Links</h4>
+                                            <p class="uw-a11y-inspector-tool-teaser">Accessible names, issues, jump to each link.</p>
+                                            <p id="uw-a11y-inspector-hub-status-links" class="uw-a11y-inspector-hub-status" aria-live="polite">Not showing links</p>
+                                        </div>
+                                        <button type="button" id="uw-a11y-inspector-open-links" class="uw-a11y-btn uw-a11y-btn-secondary uw-a11y-inspector-tool-open" aria-label="Open links inspector">
+                                            <svg class="feather feather-chevron-right" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                                        </button>
+                                    </div>
+
+                                    <div class="uw-a11y-inspector-tool-row">
+                                        <div class="uw-a11y-inspector-tool-row-main">
+                                            <h4>Color blindness simulation</h4>
+                                            <p class="uw-a11y-inspector-tool-teaser">Preview the page with color vision deficiency filters.</p>
+                                            <p id="uw-a11y-inspector-hub-status-cvd" class="uw-a11y-inspector-hub-status" aria-live="polite">Off — normal vision</p>
+                                        </div>
+                                        <button type="button" id="uw-a11y-inspector-open-cvd" class="uw-a11y-btn uw-a11y-btn-secondary uw-a11y-inspector-tool-open" aria-label="Open color blindness simulation">
+                                            <svg class="feather feather-chevron-right" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                                        </button>
+                                    </div>
+
+                                    <div class="uw-a11y-inspector-tool-row">
+                                        <div class="uw-a11y-inspector-tool-row-main">
+                                            <h4>Alternative text</h4>
+                                            <p class="uw-a11y-inspector-tool-teaser">List alt text for images or show labels on the page.</p>
+                                            <p id="uw-a11y-inspector-hub-status-alt" class="uw-a11y-inspector-hub-status" aria-live="polite">Off</p>
+                                        </div>
+                                        <button type="button" id="uw-a11y-inspector-open-alt" class="uw-a11y-btn uw-a11y-btn-secondary uw-a11y-inspector-tool-open" aria-label="Open alternative text inspector">
+                                            <svg class="feather feather-chevron-right" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                                        </button>
                                     </div>
                                 </div>
 
-                                <!-- Heading Outline View -->
-                                <div class="uw-a11y-inspector-section">
-                                    <h4>Page Outline</h4>
-                                    <p>View the heading hierarchy to verify correct order and nesting. Skipped heading levels are flagged. Click any heading to jump to it on the page.</p>
-                                    <div class="uw-a11y-inspector-controls">
-                                        <button id="uw-a11y-outline-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
-                                            <svg class="feather feather-list" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                <line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>
-                                            </svg>
-                                            <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
-                                                <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                            </svg>
-                                            <span class="uw-a11y-btn-text">Show Outline</span>
+                                <div id="uw-a11y-inspector-detail" hidden>
+                                    <div class="uw-a11y-inspector-detail-header">
+                                        <button type="button" id="uw-a11y-inspector-back" class="uw-a11y-btn uw-a11y-btn-secondary uw-a11y-inspector-back-btn" aria-label="Back to inspector tools">
+                                            <svg class="feather feather-chevron-left" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
                                         </button>
-                                        <span id="uw-a11y-outline-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                        <h3 id="uw-a11y-inspector-detail-heading" class="uw-a11y-inspector-detail-heading"></h3>
                                     </div>
-                                    <div id="uw-a11y-outline-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
+
+                                    <div id="uw-a11y-inspector-panel-outline" class="uw-a11y-inspector-detail-panel" hidden>
+                                        <div class="uw-a11y-inspector-section">
+                                            <h4>Page Outline</h4>
+                                            <p>View the heading hierarchy to verify correct order and nesting. Skipped heading levels are flagged. Click any heading to jump to it on the page.</p>
+                                            <div class="uw-a11y-inspector-controls">
+                                                <button id="uw-a11y-outline-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
+                                                    <svg class="feather feather-list" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                        <line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>
+                                                    </svg>
+                                                    <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
+                                                        <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                                    </svg>
+                                                    <span class="uw-a11y-btn-text">Show Outline</span>
+                                                </button>
+                                                <span id="uw-a11y-outline-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                            </div>
+                                            <div id="uw-a11y-outline-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
+                                        </div>
+                                    </div>
+
+                                    <div id="uw-a11y-inspector-panel-links" class="uw-a11y-inspector-detail-panel" hidden>
+                                        <div class="uw-a11y-inspector-section">
+                                            <h4>Links</h4>
+                                            <p>List every link on the page with its accessible name — the text a screen reader actually announces. Click a link to jump to it. Empty, generic, or ambiguous link text is flagged.</p>
+                                            <div class="uw-a11y-inspector-controls">
+                                                <button id="uw-a11y-links-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
+                                                    <svg class="feather feather-link" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                        <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+                                                        <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+                                                    </svg>
+                                                    <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
+                                                        <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                                    </svg>
+                                                    <span class="uw-a11y-btn-text">Show Links</span>
+                                                </button>
+                                                <span id="uw-a11y-links-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                            </div>
+                                            <div id="uw-a11y-links-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
+                                        </div>
+                                    </div>
+
+                                    <div id="uw-a11y-inspector-panel-cvd" class="uw-a11y-inspector-detail-panel" hidden>
+                                        <div class="uw-a11y-inspector-section">
+                                            <h4>Color Blindness Simulation</h4>
+                                            <p>Preview the page as seen by users with color vision deficiencies. Applies an SVG color filter to the page while this tool is active.</p>
+                                            <fieldset class="uw-a11y-cvd-list" id="uw-a11y-cvd-list">
+                                                <legend class="sr-only">Color blindness simulation type</legend>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="none" checked>
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Off</span>
+                                                        <span class="uw-a11y-cvd-meta">Normal vision</span>
+                                                    </span>
+                                                </label>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="deuteranomaly">
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Green appears weak</span>
+                                                        <span class="uw-a11y-cvd-meta">Deuteranomaly · ~5% of men</span>
+                                                    </span>
+                                                </label>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="deuteranopia">
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Green greatly reduced</span>
+                                                        <span class="uw-a11y-cvd-meta">Deuteranopia · ~1% of men</span>
+                                                    </span>
+                                                </label>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="protanomaly">
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Red appears weak</span>
+                                                        <span class="uw-a11y-cvd-meta">Protanomaly · ~1% of men</span>
+                                                    </span>
+                                                </label>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="protanopia">
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Red greatly reduced</span>
+                                                        <span class="uw-a11y-cvd-meta">Protanopia · ~1% of men</span>
+                                                    </span>
+                                                </label>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="tritanomaly">
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Blue appears weak</span>
+                                                        <span class="uw-a11y-cvd-meta">Tritanomaly · rare</span>
+                                                    </span>
+                                                </label>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="tritanopia">
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Blue greatly reduced</span>
+                                                        <span class="uw-a11y-cvd-meta">Tritanopia · very rare</span>
+                                                    </span>
+                                                </label>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="achromatomaly">
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Color appears weak</span>
+                                                        <span class="uw-a11y-cvd-meta">Achromatomaly · very rare</span>
+                                                    </span>
+                                                </label>
+                                                <label class="uw-a11y-cvd-option">
+                                                    <input type="radio" name="uw-a11y-cvd" value="achromatopsia">
+                                                    <span class="uw-a11y-cvd-main">
+                                                        <span class="uw-a11y-cvd-name">Color greatly reduced</span>
+                                                        <span class="uw-a11y-cvd-meta">Achromatopsia · ~1 in 33,000</span>
+                                                    </span>
+                                                </label>
+                                            </fieldset>
+                                        </div>
+                                    </div>
+
+                                    <div id="uw-a11y-inspector-panel-alt" class="uw-a11y-inspector-detail-panel" hidden>
+                                        <div class="uw-a11y-inspector-section">
+                                            <h4>Alternative Text</h4>
+                                            <p>Inspect every image, SVG, and image-role element on the page. The list shows the alt text each one exposes to assistive tech; the overlay draws that same text on top of the image itself for a quick visual scan.</p>
+                                            <div class="uw-a11y-inspector-controls">
+                                                <button id="uw-a11y-alt-list-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
+                                                    <svg class="feather feather-list" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                        <line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>
+                                                    </svg>
+                                                    <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
+                                                        <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                                    </svg>
+                                                    <span class="uw-a11y-btn-text">Show Alt Text List</span>
+                                                </button>
+                                                <button id="uw-a11y-alt-overlay-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
+                                                    <svg class="feather feather-image" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                        <rect height="18" rx="2" ry="2" width="18" x="3" y="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                                                    </svg>
+                                                    <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
+                                                        <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
+                                                    </svg>
+                                                    <span class="uw-a11y-btn-text">Show Alt Text Overlays</span>
+                                                </button>
+                                                <span id="uw-a11y-alt-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                            </div>
+                                            <div id="uw-a11y-alt-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -5305,12 +5482,90 @@
             font-size: 18px;
             font-weight: 600;
         }
-        
-        .uw-a11y-inspector > p {
+
+        .uw-a11y-inspector-hub > p {
             margin: 0 0 1.5rem 0;
             color: #666;
             font-size: 14px;
             line-height: 1.5;
+        }
+
+        .uw-a11y-inspector-tool-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .uw-a11y-inspector-tool-row-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .uw-a11y-inspector-tool-row .uw-a11y-inspector-tool-open {
+            flex-shrink: 0;
+            align-self: center;
+        }
+
+        .uw-a11y-inspector-tool-row h4 {
+            margin: 0 0 0.35rem 0;
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .uw-a11y-inspector-tool-teaser {
+            margin: 0 0 0.35rem 0;
+            color: #666;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .uw-a11y-inspector-hub-status {
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .uw-a11y-inspector-detail-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .uw-a11y-inspector-back-btn,
+        .uw-a11y-inspector-tool-open {
+            flex-shrink: 0;
+            padding: 0.5rem;
+            min-width: 2.5rem;
+            justify-content: center;
+        }
+
+        .uw-a11y-inspector-back-btn svg,
+        .uw-a11y-inspector-tool-open svg {
+            flex-shrink: 0;
+        }
+
+        .uw-a11y-inspector-detail-heading {
+            margin: 0;
+            flex: 1;
+            min-width: 0;
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .uw-a11y-inspector-detail-panel > .uw-a11y-inspector-section:last-child {
+            margin-bottom: 0;
         }
         
         .uw-a11y-inspector-section {
@@ -5480,6 +5735,175 @@
         .uw-a11y-outline-skip svg {
             stroke: #d97706;
             flex-shrink: 0;
+        }
+
+        /* Link List styles */
+        .uw-a11y-link-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            width: 100%;
+            background: none;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 8px;
+            cursor: pointer;
+            text-align: left;
+            font-family: inherit;
+            font-size: 13px;
+            color: #374151;
+            box-sizing: border-box;
+            transition: background 0.12s;
+        }
+
+        .uw-a11y-link-row:hover {
+            background: rgba(109,40,217,0.06);
+        }
+
+        .uw-a11y-link-row:focus-visible {
+            outline: 2px solid #6d28d9;
+            outline-offset: 1px;
+        }
+
+        .uw-a11y-link-row.has-issue {
+            background: rgba(239,68,68,0.04);
+        }
+
+        .uw-a11y-link-row.has-issue:hover {
+            background: rgba(239,68,68,0.10);
+        }
+
+        .uw-a11y-link-badge {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 4px;
+            letter-spacing: 0.04em;
+            min-width: 32px;
+            line-height: 1.4;
+            margin-top: 2px;
+        }
+
+        .uw-a11y-link-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .uw-a11y-link-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        .uw-a11y-link-name.is-empty {
+            color: #b91c1c;
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .uw-a11y-link-url {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            line-height: 1.3;
+            font-size: 11px;
+            color: #9ca3af;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+
+        .uw-a11y-link-issues {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #b45309;
+            line-height: 1.3;
+            margin-top: 2px;
+        }
+
+        .uw-a11y-link-issues svg {
+            stroke: #d97706;
+            flex-shrink: 0;
+        }
+
+        .uw-a11y-alt-decorative {
+            color: #1d4ed8;
+            font-style: italic;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        /* Color Blindness Simulation styles */
+        .uw-a11y-cvd-list {
+            margin: 0.75rem 0 0;
+            padding: 0;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .uw-a11y-cvd-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.12s;
+            border: 1px solid transparent;
+        }
+
+        .uw-a11y-cvd-option:hover {
+            background: rgba(109,40,217,0.06);
+        }
+
+        .uw-a11y-cvd-option:has(input:checked) {
+            background: rgba(109,40,217,0.10);
+            border-color: rgba(109,40,217,0.35);
+        }
+
+        .uw-a11y-cvd-option:focus-within {
+            outline: 2px solid #6d28d9;
+            outline-offset: 1px;
+        }
+
+        .uw-a11y-cvd-option input[type="radio"] {
+            flex-shrink: 0;
+            margin: 0;
+            accent-color: #6d28d9;
+            width: 16px;
+            height: 16px;
+        }
+
+        .uw-a11y-cvd-main {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .uw-a11y-cvd-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+            line-height: 1.4;
+        }
+
+        .uw-a11y-cvd-meta {
+            font-size: 11px;
+            color: #6b7280;
+            line-height: 1.3;
         }
 
         .uw-a11y-coming-soon {
@@ -5975,6 +6399,10 @@
             
             // Don't do anything if we're already on this view or currently animating
             if (currentView === view || this.isAnimating) return;
+
+            if (view === 'inspector' || currentView === 'inspector') {
+                this.resetInspectorToHub();
+            }
             
             // Update current view tracker
             this.currentView = view;
@@ -6208,6 +6636,172 @@
             return `WCAG ${wcagSpec} ${String(wcagLevel || '').toUpperCase()}`;
         },
 
+        // Inspector hub ↔ detail (heavy tools open on a second screen within the Inspector view)
+        _applyInspectorHubLayout: function() {
+            this.inspectorSubView = null;
+            const root = this.shadowRoot;
+            if (!root) return;
+            const hub = root.getElementById('uw-a11y-inspector-hub');
+            const detail = root.getElementById('uw-a11y-inspector-detail');
+            if (hub) hub.removeAttribute('hidden');
+            if (detail) detail.setAttribute('hidden', '');
+            ['outline', 'links', 'cvd', 'alt'].forEach((id) => {
+                const p = root.getElementById('uw-a11y-inspector-panel-' + id);
+                if (p) p.setAttribute('hidden', '');
+            });
+            const h = root.getElementById('uw-a11y-inspector-detail-heading');
+            if (h) h.textContent = '';
+        },
+
+        resetInspectorToHub: function() {
+            this._inspectorReturnFocusEl = null;
+            this._applyInspectorHubLayout();
+            this.syncInspectorHubStatus();
+        },
+
+        // Turn on list-style tools when entering a detail panel so users see content immediately.
+        _autoActivateInspectorDetailPanel: function(panelId) {
+            if (panelId === 'outline' && !this.isOutlineViewActive) {
+                this.toggleOutlineView();
+            } else if (panelId === 'links' && !this.isLinksViewActive) {
+                this.toggleLinksView();
+            } else if (panelId === 'alt' && !this.isAltTextListActive) {
+                this.toggleAltTextList();
+            }
+        },
+
+        openInspectorDetail: function(panelId) {
+            const titles = {
+                outline: 'Page outline',
+                links: 'Links',
+                cvd: 'Color blindness simulation',
+                alt: 'Alternative text'
+            };
+            if (!titles[panelId]) return;
+            const root = this.shadowRoot;
+            if (!root) return;
+
+            this._inspectorReturnFocusEl = document.activeElement;
+
+            const hub = root.getElementById('uw-a11y-inspector-hub');
+            const detail = root.getElementById('uw-a11y-inspector-detail');
+            if (hub) hub.setAttribute('hidden', '');
+            if (detail) detail.removeAttribute('hidden');
+
+            ['outline', 'links', 'cvd', 'alt'].forEach((id) => {
+                const p = root.getElementById('uw-a11y-inspector-panel-' + id);
+                if (p) {
+                    if (id === panelId) p.removeAttribute('hidden');
+                    else p.setAttribute('hidden', '');
+                }
+            });
+
+            const heading = root.getElementById('uw-a11y-inspector-detail-heading');
+            if (heading) heading.textContent = titles[panelId];
+
+            this.inspectorSubView = panelId;
+            this._autoActivateInspectorDetailPanel(panelId);
+            this.syncInspectorHubStatus();
+            this.syncInspectorContentHeight();
+
+            const back = root.getElementById('uw-a11y-inspector-back');
+            if (back) {
+                requestAnimationFrame(() => {
+                    try { back.focus(); } catch (_) {}
+                });
+            }
+        },
+
+        closeInspectorDetail: function() {
+            const ret = this._inspectorReturnFocusEl;
+            this._inspectorReturnFocusEl = null;
+            this._applyInspectorHubLayout();
+            this.syncInspectorHubStatus();
+            this.syncInspectorContentHeight();
+            requestAnimationFrame(() => {
+                if (ret && ret.isConnected) {
+                    try { ret.focus(); } catch (_) {}
+                }
+            });
+        },
+
+        syncInspectorContentHeight: function() {
+            if (this.currentView !== 'inspector') return;
+            const content = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-content');
+            if (!content) return;
+            const maxAllowedHeight = this.getMaxContentHeight();
+            const idealHeight = this.measureViewHeight('inspector');
+            if (idealHeight == null) return;
+            const newHeight = Math.min(idealHeight, maxAllowedHeight);
+            content.style.maxHeight = maxAllowedHeight + 'px';
+            if (this.isAnimating) {
+                content.style.height = newHeight + 'px';
+            } else if (window.gsap && !this.prefersReducedMotion()) {
+                window.gsap.killTweensOf(content);
+                window.gsap.to(content, {
+                    height: newHeight,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            } else {
+                content.style.height = newHeight + 'px';
+            }
+            content.style.overflowY = 'auto';
+        },
+
+        syncInspectorHubStatus: function() {
+            const root = this.shadowRoot;
+            if (!root) return;
+
+            const so = root.getElementById('uw-a11y-inspector-hub-status-outline');
+            if (so) {
+                if (this.isOutlineViewActive) {
+                    const c = root.getElementById('uw-a11y-outline-count');
+                    so.textContent = (c && c.style.display !== 'none' && c.textContent)
+                        ? c.textContent
+                        : 'Outline list open';
+                } else {
+                    so.textContent = 'Not showing outline';
+                }
+            }
+
+            const sl = root.getElementById('uw-a11y-inspector-hub-status-links');
+            if (sl) {
+                if (this.isLinksViewActive) {
+                    const c = root.getElementById('uw-a11y-links-count');
+                    sl.textContent = (c && c.style.display !== 'none' && c.textContent)
+                        ? c.textContent
+                        : 'Links list open';
+                } else {
+                    sl.textContent = 'Not showing links';
+                }
+            }
+
+            const sc = root.getElementById('uw-a11y-inspector-hub-status-cvd');
+            if (sc) {
+                const list = root.getElementById('uw-a11y-cvd-list');
+                const checked = list && list.querySelector('input[name="uw-a11y-cvd"]:checked');
+                if (!checked || checked.value === 'none') {
+                    sc.textContent = 'Off — normal vision';
+                } else {
+                    const label = checked.closest('label');
+                    const nameEl = label && label.querySelector('.uw-a11y-cvd-name');
+                    sc.textContent = nameEl ? nameEl.textContent.trim() : 'Simulation on';
+                }
+            }
+
+            const sa = root.getElementById('uw-a11y-inspector-hub-status-alt');
+            if (sa) {
+                const parts = [];
+                if (this.isAltTextListActive) {
+                    const c = root.getElementById('uw-a11y-alt-count');
+                    parts.push(c && c.textContent ? 'List: ' + c.textContent : 'List on');
+                }
+                if (this.isAltTextOverlayActive) parts.push('Overlays on');
+                sa.textContent = parts.length ? parts.join(' · ') : 'Off';
+            }
+        },
+
         // Initialize inspector tools event handlers
         initInspectorTools: function() {
             // Tab order toggle button
@@ -6245,6 +6839,95 @@
                     this.toggleOutlineView();
                 });
             }
+
+            // Links list toggle button
+            const linksToggle = this.shadowRoot.getElementById('uw-a11y-links-toggle');
+            if (linksToggle) {
+                linksToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.toggleLinksView();
+                });
+            }
+
+            // Color blindness simulation radio group
+            const cvdList = this.shadowRoot.getElementById('uw-a11y-cvd-list');
+            if (cvdList) {
+                cvdList.addEventListener('change', (e) => {
+                    const target = e.target;
+                    if (target && target.name === 'uw-a11y-cvd' && target.checked) {
+                        this.setColorBlindnessSimulation(target.value);
+                    }
+                });
+            }
+
+            // Alt text list toggle
+            const altListToggle = this.shadowRoot.getElementById('uw-a11y-alt-list-toggle');
+            if (altListToggle) {
+                altListToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.toggleAltTextList();
+                });
+            }
+
+            // Alt text overlay toggle
+            const altOverlayToggle = this.shadowRoot.getElementById('uw-a11y-alt-overlay-toggle');
+            if (altOverlayToggle) {
+                altOverlayToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.toggleAltTextOverlay();
+                });
+            }
+
+            const openOutline = this.shadowRoot.getElementById('uw-a11y-inspector-open-outline');
+            if (openOutline) {
+                openOutline.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.openInspectorDetail('outline');
+                });
+            }
+            const openLinks = this.shadowRoot.getElementById('uw-a11y-inspector-open-links');
+            if (openLinks) {
+                openLinks.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.openInspectorDetail('links');
+                });
+            }
+            const openCvd = this.shadowRoot.getElementById('uw-a11y-inspector-open-cvd');
+            if (openCvd) {
+                openCvd.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.openInspectorDetail('cvd');
+                });
+            }
+            const openAlt = this.shadowRoot.getElementById('uw-a11y-inspector-open-alt');
+            if (openAlt) {
+                openAlt.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.openInspectorDetail('alt');
+                });
+            }
+
+            const backBtn = this.shadowRoot.getElementById('uw-a11y-inspector-back');
+            if (backBtn) {
+                backBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.closeInspectorDetail();
+                });
+            }
+
+            const panel = this.shadowRoot.getElementById('uw-a11y-panel');
+            if (panel && !this._inspectorDetailEscapeBound) {
+                this._inspectorDetailEscapeBound = true;
+                panel.addEventListener('keydown', (e) => {
+                    if (e.key !== 'Escape' || !this.inspectorSubView || this.currentView !== 'inspector') return;
+                    if (this.isPickerActive) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.closeInspectorDetail();
+                }, true);
+            }
+
+            this.syncInspectorHubStatus();
         },
 
         // Toggle heading outline view (in-panel, not a page overlay)
@@ -6290,6 +6973,8 @@
                 }
                 if (countEl) countEl.style.display = 'none';
             }
+            this.syncInspectorHubStatus();
+            if (this.currentView === 'inspector') this.syncInspectorContentHeight();
         },
 
         // Render the heading outline tree into the given container
@@ -6362,21 +7047,955 @@
                     const idx = parseInt(btn.dataset.hi, 10);
                     const target = headings[idx] && headings[idx].element;
                     if (!target) return;
-                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    // Briefly highlight the heading on the page
-                    const prevOutline = target.style.outline;
-                    const prevOffset = target.style.outlineOffset;
-                    const prevTransition = target.style.transition;
-                    target.style.transition = 'outline 0.15s';
-                    target.style.outline = '3px solid #6d28d9';
-                    target.style.outlineOffset = '4px';
-                    setTimeout(() => {
-                        target.style.outline = prevOutline;
-                        target.style.outlineOffset = prevOffset;
-                        target.style.transition = prevTransition;
-                    }, 1800);
+                    this.scrollAndFlashTarget(target);
                 });
             });
+        },
+
+        // Briefly highlight an element on the page and scroll it into view.
+        // Shared by the outline and link-list inspectors.
+        scrollAndFlashTarget: function(target) {
+            if (!target) return;
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const prevOutline = target.style.outline;
+            const prevOffset = target.style.outlineOffset;
+            const prevTransition = target.style.transition;
+            target.style.transition = 'outline 0.15s';
+            target.style.outline = '3px solid #6d28d9';
+            target.style.outlineOffset = '4px';
+            setTimeout(() => {
+                target.style.outline = prevOutline;
+                target.style.outlineOffset = prevOffset;
+                target.style.transition = prevTransition;
+            }, 1800);
+        },
+
+        // Toggle the Links inspector (in-panel list — does not annotate the page)
+        toggleLinksView: function() {
+            const isActive = this.isLinksViewActive || false;
+            this.isLinksViewActive = !isActive;
+
+            const btn = this.shadowRoot.getElementById('uw-a11y-links-toggle');
+            const countEl = this.shadowRoot.getElementById('uw-a11y-links-count');
+            const content = this.shadowRoot.getElementById('uw-a11y-links-content');
+
+            if (!isActive) {
+                if (content) {
+                    content.hidden = false;
+                    this.renderLinksView(content, countEl);
+                }
+                if (btn) {
+                    btn.setAttribute('aria-pressed', 'true');
+                    btn.setAttribute('aria-expanded', 'true');
+                    btn.classList.add('active');
+                    const linkIcon = btn.querySelector('.feather-link');
+                    const eyeOffIcon = btn.querySelector('.feather-eye-off');
+                    if (linkIcon) linkIcon.style.display = 'none';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'inline';
+                    const btnText = btn.querySelector('.uw-a11y-btn-text');
+                    if (btnText) btnText.textContent = 'Hide Links';
+                }
+                if (countEl) countEl.style.display = 'inline';
+            } else {
+                if (content) { content.hidden = true; content.innerHTML = ''; }
+                if (btn) {
+                    btn.setAttribute('aria-pressed', 'false');
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.classList.remove('active');
+                    const linkIcon = btn.querySelector('.feather-link');
+                    const eyeOffIcon = btn.querySelector('.feather-eye-off');
+                    if (linkIcon) linkIcon.style.display = 'inline';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'none';
+                    const btnText = btn.querySelector('.uw-a11y-btn-text');
+                    if (btnText) btnText.textContent = 'Show Links';
+                }
+                if (countEl) countEl.style.display = 'none';
+            }
+            this.syncInspectorHubStatus();
+            if (this.currentView === 'inspector') this.syncInspectorContentHeight();
+        },
+
+        // Render the links list into the given container
+        renderLinksView: function(container, countEl) {
+            const links = this.detectLinks();
+
+            if (!links.length) {
+                container.innerHTML = '<p class="uw-a11y-outline-item"><span class="uw-a11y-outline-empty-text">No links found on this page.</span></p>';
+                if (countEl) {
+                    countEl.textContent = 'No links found';
+                    countEl.style.color = '#6b7280';
+                }
+                return;
+            }
+
+            const warnSvg = `<svg fill="none" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
+
+            let issueCount = 0;
+            const rows = links.map((link, idx) => {
+                const hasIssue = link.issues.length > 0;
+                if (hasIssue) issueCount++;
+                const badge = link.type;
+                const name = link.accName;
+                const safeName = this.escapeHtmlContent(name);
+                const safeHref = this.escapeHtmlContent(link.href || '');
+                const titleText = this.escapeHtmlAttribute(
+                    (name ? `Announced as: "${name}"` : 'No accessible name') +
+                    (link.href ? `\n${link.href}` : '') +
+                    (hasIssue ? `\n\n${link.issues.join('\n')}` : '')
+                );
+
+                const nameHtml = name
+                    ? `<span class="uw-a11y-link-name">${safeName}</span>`
+                    : `<span class="uw-a11y-link-name is-empty">(no accessible name)</span>`;
+
+                const urlHtml = link.href
+                    ? `<span class="uw-a11y-link-url">${safeHref}</span>`
+                    : '';
+
+                const issuesHtml = hasIssue
+                    ? `<span class="uw-a11y-link-issues">${warnSvg}<span>${this.escapeHtmlContent(link.issues.join(' · '))}</span></span>`
+                    : '';
+
+                return `<button class="uw-a11y-link-row${hasIssue ? ' has-issue' : ''}" data-li="${idx}" title="${titleText}">
+                    <span class="uw-a11y-link-badge" style="background:${badge.bg};color:${badge.color};">${badge.label}</span>
+                    <span class="uw-a11y-link-main">
+                        ${nameHtml}
+                        ${urlHtml}
+                        ${issuesHtml}
+                    </span>
+                </button>`;
+            }).join('');
+
+            container.innerHTML = `<div class="uw-a11y-outline-list">${rows}</div>`;
+
+            if (countEl) {
+                countEl.textContent = issueCount > 0
+                    ? `${links.length} link${links.length !== 1 ? 's' : ''} · ${issueCount} issue${issueCount !== 1 ? 's' : ''}`
+                    : `${links.length} link${links.length !== 1 ? 's' : ''} · No issues`;
+                countEl.style.color = issueCount > 0 ? '#b45309' : '#059669';
+            }
+
+            container.querySelectorAll('.uw-a11y-link-row[data-li]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = parseInt(btn.dataset.li, 10);
+                    const target = links[idx] && links[idx].element;
+                    this.scrollAndFlashTarget(target);
+                });
+            });
+        },
+
+        // Gather all links on the page with computed accessible names and issue flags
+        detectLinks: function() {
+            const nodes = Array.from(document.querySelectorAll('a'));
+            const links = [];
+
+            nodes.forEach(el => {
+                // Skip any links inside the Pinpoint UI
+                if (el.closest('uw-accessibility-checker') ||
+                    el.closest('[data-uw-a11y-overlay]') ||
+                    el.closest('#uw-a11y-panel')) return;
+
+                // Skip links that aren't rendered (display:none / visibility:hidden).
+                // Keep aria-hidden links in the list so screen-reader-hidden links can be reviewed too.
+                const style = window.getComputedStyle(el);
+                if (style.display === 'none' || style.visibility === 'hidden') return;
+
+                // Require an href attribute — anchors without href are not focusable/announced
+                if (!el.hasAttribute('href')) return;
+
+                const href = el.getAttribute('href') || '';
+                const accName = this.computeLinkAccessibleName(el);
+                const type = this.classifyLink(href);
+                const issues = this.detectLinkIssues(el, accName, href);
+
+                links.push({ element: el, href, accName, type, issues });
+            });
+
+            return links;
+        },
+
+        // Compute a simplified accessible name for a link element.
+        // Follows the spec precedence loosely: aria-labelledby → aria-label → text/alt → title.
+        computeLinkAccessibleName: function(el) {
+            const labelledBy = el.getAttribute('aria-labelledby');
+            if (labelledBy) {
+                const parts = labelledBy.split(/\s+/).filter(Boolean).map(id => {
+                    const ref = document.getElementById(id);
+                    return ref ? (ref.textContent || '').trim() : '';
+                }).filter(Boolean);
+                if (parts.length) return parts.join(' ').replace(/\s+/g, ' ').trim();
+            }
+
+            const ariaLabel = (el.getAttribute('aria-label') || '').trim();
+            if (ariaLabel) return ariaLabel;
+
+            const fromContent = this.extractAccessibleText(el);
+            if (fromContent) return fromContent;
+
+            const title = (el.getAttribute('title') || '').trim();
+            if (title) return title;
+
+            return '';
+        },
+
+        // Walk an element's descendants collecting text + image alt text that a
+        // screen reader would announce. Skips aria-hidden subtrees.
+        extractAccessibleText: function(node) {
+            if (!node) return '';
+            const parts = [];
+            const walk = (current) => {
+                if (!current) return;
+                if (current.nodeType === Node.TEXT_NODE) {
+                    const txt = current.textContent;
+                    if (txt) parts.push(txt);
+                    return;
+                }
+                if (current.nodeType !== Node.ELEMENT_NODE) return;
+                if (current.getAttribute && current.getAttribute('aria-hidden') === 'true') return;
+
+                const tag = current.tagName;
+                if (tag === 'IMG') {
+                    const alt = current.getAttribute('alt');
+                    if (alt) parts.push(alt);
+                    return;
+                }
+                if (tag === 'SVG' || tag === 'svg') {
+                    const svgLabel = current.getAttribute('aria-label');
+                    if (svgLabel) { parts.push(svgLabel); return; }
+                    const titleEl = current.querySelector && current.querySelector('title');
+                    if (titleEl && titleEl.textContent) { parts.push(titleEl.textContent); return; }
+                    return;
+                }
+                // Use nested aria-label if present
+                const nestedLabel = current.getAttribute && current.getAttribute('aria-label');
+                if (nestedLabel) { parts.push(nestedLabel); return; }
+
+                current.childNodes.forEach(walk);
+            };
+            node.childNodes.forEach(walk);
+            return parts.join(' ').replace(/\s+/g, ' ').trim();
+        },
+
+        // Return a badge descriptor { label, bg, color } for the link type
+        classifyLink: function(href) {
+            const gray = { bg: '#f3f4f6', color: '#374151' };
+            if (!href || href === '#') return { label: 'NONE', ...gray };
+
+            const lower = href.toLowerCase();
+            if (lower.startsWith('mailto:')) return { label: 'MAIL', bg: '#fef3c7', color: '#92400e' };
+            if (lower.startsWith('tel:')) return { label: 'TEL', bg: '#fef3c7', color: '#92400e' };
+            if (lower.startsWith('javascript:')) return { label: 'JS', bg: '#fee2e2', color: '#991b1b' };
+            if (href.startsWith('#')) return { label: 'IN', bg: '#dbeafe', color: '#1d4ed8' };
+
+            try {
+                const url = new URL(href, document.baseURI);
+                if (url.origin && url.origin !== window.location.origin) {
+                    return { label: 'EXT', bg: '#ede9fe', color: '#6d28d9' };
+                }
+                return { label: 'INT', bg: '#d1fae5', color: '#065f46' };
+            } catch (e) {
+                return { label: 'INT', bg: '#d1fae5', color: '#065f46' };
+            }
+        },
+
+        // Identify common link-text problems a screen-reader user would encounter
+        detectLinkIssues: function(el, accName, href) {
+            const issues = [];
+            const name = (accName || '').trim();
+
+            if (!name) {
+                issues.push('No accessible name');
+            } else {
+                const lc = name.toLowerCase();
+                const generic = new Set([
+                    'click here', 'click', 'here', 'read more', 'more', 'learn more',
+                    'continue', 'continue reading', 'details', 'link', 'this link',
+                    'this', 'info', 'more info', 'go', 'view'
+                ]);
+                if (generic.has(lc)) {
+                    issues.push(`Generic link text ("${name}")`);
+                }
+                if (/^https?:\/\//i.test(name) && name.length > 25) {
+                    issues.push('Raw URL used as link text');
+                }
+            }
+
+            const target = el.getAttribute('target');
+            if (target === '_blank') {
+                const ariaLabel = (el.getAttribute('aria-label') || '').toLowerCase();
+                const title = (el.getAttribute('title') || '').toLowerCase();
+                const combined = `${name.toLowerCase()} ${ariaLabel} ${title}`;
+                if (!/(new tab|new window|opens in)/.test(combined)) {
+                    issues.push('Opens in new tab without warning');
+                }
+            }
+
+            if (href === '#' || /^javascript:/i.test(href || '')) {
+                // Non-real destinations - only flag when there's also no role
+                const role = el.getAttribute('role');
+                if (role !== 'button') {
+                    issues.push('Link has no real destination');
+                }
+            }
+
+            return issues;
+        },
+
+        // Color vision deficiency filter matrices. Values operate on sRGB channels
+        // (we set color-interpolation-filters="sRGB" so the matrix applies in sRGB space).
+        // Matrices from the commonly cited Machado/Oliveira/Fernandes and Brettel models.
+        getCvdFilterMatrices: function() {
+            return {
+                deuteranomaly:  '0.8 0.2 0 0 0  0.258 0.742 0 0 0  0 0.142 0.858 0 0  0 0 0 1 0',
+                deuteranopia:   '0.625 0.375 0 0 0  0.7 0.3 0 0 0  0 0.3 0.7 0 0  0 0 0 1 0',
+                protanomaly:    '0.817 0.183 0 0 0  0.333 0.667 0 0 0  0 0.125 0.875 0 0  0 0 0 1 0',
+                protanopia:     '0.567 0.433 0 0 0  0.558 0.442 0 0 0  0 0.242 0.758 0 0  0 0 0 1 0',
+                tritanomaly:    '0.967 0.033 0 0 0  0 0.733 0.267 0 0  0 0.183 0.817 0 0  0 0 0 1 0',
+                tritanopia:     '0.95 0.05 0 0 0  0 0.433 0.567 0 0  0 0.475 0.525 0 0  0 0 0 1 0',
+                achromatomaly:  '0.618 0.320 0.062 0 0  0.163 0.775 0.062 0 0  0.163 0.320 0.516 0 0  0 0 0 1 0',
+                achromatopsia:  '0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0 0 0 1 0'
+            };
+        },
+
+        // Apply a color vision deficiency filter to everything on the page except
+        // the Pinpoint panel itself. Passing 'none' (or falsy) removes the simulation.
+        setColorBlindnessSimulation: function(type) {
+            if (!type || type === 'none') {
+                this.removeColorBlindnessSimulation();
+                return;
+            }
+
+            const matrices = this.getCvdFilterMatrices();
+            if (!matrices[type]) {
+                this.removeColorBlindnessSimulation();
+                return;
+            }
+
+            this.injectColorBlindnessFilterDefs();
+            this.injectColorBlindnessStyles();
+
+            // data attribute drives the CSS variable + filter selector
+            document.body.setAttribute('data-uw-a11y-cvd', type);
+            this.activeColorBlindness = type;
+            this.syncInspectorHubStatus();
+        },
+
+        // Remove the CVD simulation and associated DOM nodes
+        removeColorBlindnessSimulation: function() {
+            document.body.removeAttribute('data-uw-a11y-cvd');
+            this.activeColorBlindness = null;
+
+            const defs = document.getElementById('uw-a11y-cvd-filter-defs');
+            if (defs) defs.remove();
+
+            const styles = document.getElementById('uw-a11y-cvd-styles');
+            if (styles) styles.remove();
+            if (this.shadowRoot) this.syncInspectorHubStatus();
+        },
+
+        // Inject <svg><defs><filter>…</filter></defs></svg> containing one filter per
+        // CVD type. The SVG is hidden (0x0) and lives in <body> so filter url(#…) refs
+        // resolve in the same document.
+        injectColorBlindnessFilterDefs: function() {
+            if (document.getElementById('uw-a11y-cvd-filter-defs')) return;
+
+            const svgNS = 'http://www.w3.org/2000/svg';
+            const svg = document.createElementNS(svgNS, 'svg');
+            svg.setAttribute('id', 'uw-a11y-cvd-filter-defs');
+            svg.setAttribute('aria-hidden', 'true');
+            svg.setAttribute('width', '0');
+            svg.setAttribute('height', '0');
+            svg.style.position = 'absolute';
+            svg.style.width = '0';
+            svg.style.height = '0';
+            svg.style.overflow = 'hidden';
+            svg.style.pointerEvents = 'none';
+
+            const defs = document.createElementNS(svgNS, 'defs');
+            const matrices = this.getCvdFilterMatrices();
+            Object.keys(matrices).forEach(type => {
+                const filter = document.createElementNS(svgNS, 'filter');
+                filter.setAttribute('id', `uw-a11y-cvd-${type}`);
+                // sRGB so the matrix operates on gamma-corrected channels (what the
+                // standard matrices are designed for — otherwise linearRGB washes out).
+                filter.setAttribute('color-interpolation-filters', 'sRGB');
+                const matrix = document.createElementNS(svgNS, 'feColorMatrix');
+                matrix.setAttribute('type', 'matrix');
+                matrix.setAttribute('values', matrices[type]);
+                filter.appendChild(matrix);
+                defs.appendChild(filter);
+            });
+            svg.appendChild(defs);
+            document.body.appendChild(svg);
+        },
+
+        // Inject the CSS that applies the filter to every direct child of <body>
+        // except the Pinpoint panel and the hidden filter-defs SVG.
+        injectColorBlindnessStyles: function() {
+            if (document.getElementById('uw-a11y-cvd-styles')) return;
+
+            const matrices = this.getCvdFilterMatrices();
+            const perTypeRules = Object.keys(matrices).map(type => (
+                `body[data-uw-a11y-cvd="${type}"] { --uw-a11y-cvd-filter: url(#uw-a11y-cvd-${type}); }`
+            )).join('\n');
+
+            const styleEl = document.createElement('style');
+            styleEl.id = 'uw-a11y-cvd-styles';
+            styleEl.textContent = `
+                body[data-uw-a11y-cvd] > *:not(uw-accessibility-checker):not(#uw-a11y-cvd-filter-defs):not(#uw-a11y-container) {
+                    filter: var(--uw-a11y-cvd-filter);
+                }
+                ${perTypeRules}
+            `;
+            document.head.appendChild(styleEl);
+        },
+
+        // ================================================================
+        // Alternative Text Inspector (in-panel list + page overlays)
+        // ================================================================
+
+        // Scan the page for every element that exposes (or should expose) alt text
+        // and classify how each one presents itself to assistive tech.
+        detectImages: function() {
+            const selector = 'img, svg, input[type="image"], area[href], [role="img"]';
+            const nodes = Array.from(document.querySelectorAll(selector));
+            const results = [];
+            const seen = new Set();
+
+            nodes.forEach(el => {
+                // Skip anything inside the Pinpoint UI or its overlays
+                if (el.closest('uw-accessibility-checker') ||
+                    el.closest('[data-uw-a11y-overlay]') ||
+                    el.closest('#uw-a11y-panel') ||
+                    el.closest('#uw-a11y-container')) return;
+
+                // Deduplicate (an <svg> with role="img" matches both selectors)
+                if (seen.has(el)) return;
+                seen.add(el);
+
+                // Skip not-rendered elements
+                const style = window.getComputedStyle(el);
+                if (style.display === 'none' || style.visibility === 'hidden') return;
+
+                const info = this.getImageAltInfo(el);
+                if (info) results.push(info);
+            });
+
+            return results;
+        },
+
+        // Compute alt-text metadata for a single image-like element.
+        // Returns { element, type, altText, altSource, status, issues }.
+        getImageAltInfo: function(el) {
+            const tag = el.tagName ? el.tagName.toLowerCase() : '';
+            const role = el.getAttribute && el.getAttribute('role');
+            const ariaHidden = el.getAttribute && el.getAttribute('aria-hidden') === 'true';
+            let altText = '';
+            let altSource = null;
+            let isDecorative = false;
+            let isMissing = false;
+            const issues = [];
+
+            // aria-hidden / role="presentation" => decorative
+            if (ariaHidden || role === 'presentation' || role === 'none') {
+                isDecorative = true;
+                altSource = ariaHidden ? 'aria-hidden' : 'role="presentation"';
+            }
+
+            // aria-labelledby wins over everything else
+            const labelledBy = el.getAttribute && el.getAttribute('aria-labelledby');
+            if (!altText && labelledBy) {
+                const parts = labelledBy.split(/\s+/).filter(Boolean).map(id => {
+                    const ref = document.getElementById(id);
+                    return ref ? (ref.textContent || '').trim() : '';
+                }).filter(Boolean);
+                if (parts.length) {
+                    altText = parts.join(' ').replace(/\s+/g, ' ').trim();
+                    altSource = 'aria-labelledby';
+                    isDecorative = false;
+                }
+            }
+
+            // aria-label
+            if (!altText) {
+                const ariaLabel = el.getAttribute && el.getAttribute('aria-label');
+                if (ariaLabel) {
+                    altText = ariaLabel.trim();
+                    altSource = 'aria-label';
+                    if (altText) isDecorative = false;
+                }
+            }
+
+            // Native alt attribute (img / input[type=image] / area)
+            if (!altText && (tag === 'img' || tag === 'input' || tag === 'area')) {
+                if (el.hasAttribute('alt')) {
+                    const raw = el.getAttribute('alt') || '';
+                    altText = raw;
+                    altSource = 'alt';
+                    if (raw === '') isDecorative = true;
+                } else if (!isDecorative) {
+                    isMissing = true;
+                }
+            }
+
+            // SVG: look for a direct <title> child
+            if (!altText && tag === 'svg') {
+                const titleEl = el.querySelector(':scope > title');
+                const titleText = titleEl && titleEl.textContent ? titleEl.textContent.trim() : '';
+                if (titleText) {
+                    altText = titleText;
+                    altSource = '<title>';
+                    isDecorative = false;
+                } else if (!isDecorative && role !== 'img') {
+                    // SVG without role="img" and no title is conventionally decorative
+                    isDecorative = true;
+                    altSource = altSource || 'implicit (no role="img")';
+                }
+            }
+
+            // Classify status
+            let status;
+            if (isMissing) {
+                status = 'missing';
+                issues.push('Missing alt attribute');
+            } else if (isDecorative) {
+                status = 'decorative';
+            } else if (altText) {
+                status = 'has-alt';
+            } else {
+                // role="img" / SVG with role="img" and no accessible name
+                status = 'empty';
+                issues.push('Marked as an image but has no accessible name');
+            }
+
+            // Heuristic content issues
+            if (status === 'has-alt' && altText) {
+                const trimmed = altText.trim();
+                if (/\.(jpe?g|png|gif|webp|svg|bmp|avif)$/i.test(trimmed)) {
+                    issues.push('Alt text is a filename');
+                } else if (/^(image|img|photo|picture|graphic|icon)(\s*\d+)?$/i.test(trimmed)) {
+                    issues.push('Generic alt text');
+                } else if (/^(image|picture|photo|graphic|icon) of /i.test(trimmed)) {
+                    issues.push('Alt text starts with redundant "image of…" phrasing');
+                }
+                if (trimmed.length > 150) {
+                    issues.push('Alt text is very long — consider splitting to a longer description');
+                }
+            }
+
+            return {
+                element: el,
+                type: tag,
+                altText,
+                altSource,
+                status,
+                isDecorative,
+                isMissing,
+                issues
+            };
+        },
+
+        // Return a badge descriptor for a given alt-text status
+        getAltStatusBadge: function(status) {
+            switch (status) {
+                case 'has-alt':    return { label: 'ALT',    bg: '#d1fae5', color: '#065f46' };
+                case 'decorative': return { label: 'DECOR',  bg: '#dbeafe', color: '#1d4ed8' };
+                case 'missing':    return { label: 'MISSING',bg: '#fee2e2', color: '#991b1b' };
+                case 'empty':      return { label: 'EMPTY',  bg: '#fee2e2', color: '#991b1b' };
+                default:           return { label: '?',      bg: '#f3f4f6', color: '#374151' };
+            }
+        },
+
+        // Toggle the in-panel alt-text list
+        toggleAltTextList: function() {
+            const isActive = this.isAltTextListActive || false;
+            this.isAltTextListActive = !isActive;
+
+            const btn = this.shadowRoot.getElementById('uw-a11y-alt-list-toggle');
+            const countEl = this.shadowRoot.getElementById('uw-a11y-alt-count');
+            const content = this.shadowRoot.getElementById('uw-a11y-alt-content');
+
+            if (!isActive) {
+                if (content) {
+                    content.hidden = false;
+                    this.renderAltTextList(content, countEl);
+                }
+                if (btn) {
+                    btn.setAttribute('aria-pressed', 'true');
+                    btn.setAttribute('aria-expanded', 'true');
+                    btn.classList.add('active');
+                    const listIcon = btn.querySelector('.feather-list');
+                    const eyeOffIcon = btn.querySelector('.feather-eye-off');
+                    if (listIcon) listIcon.style.display = 'none';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'inline';
+                    const btnText = btn.querySelector('.uw-a11y-btn-text');
+                    if (btnText) btnText.textContent = 'Hide Alt Text List';
+                }
+                if (countEl) countEl.style.display = 'inline';
+            } else {
+                if (content) { content.hidden = true; content.innerHTML = ''; }
+                if (btn) {
+                    btn.setAttribute('aria-pressed', 'false');
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.classList.remove('active');
+                    const listIcon = btn.querySelector('.feather-list');
+                    const eyeOffIcon = btn.querySelector('.feather-eye-off');
+                    if (listIcon) listIcon.style.display = 'inline';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'none';
+                    const btnText = btn.querySelector('.uw-a11y-btn-text');
+                    if (btnText) btnText.textContent = 'Show Alt Text List';
+                }
+                // Only hide the count pill if the overlay isn't also using it
+                if (countEl && !this.isAltTextOverlayActive) countEl.style.display = 'none';
+            }
+            this.syncInspectorHubStatus();
+            if (this.currentView === 'inspector') this.syncInspectorContentHeight();
+        },
+
+        // Render the list of image alt-text rows into the given container
+        renderAltTextList: function(container, countEl) {
+            const images = this.detectImages();
+
+            if (!images.length) {
+                container.innerHTML = '<p class="uw-a11y-outline-item"><span class="uw-a11y-outline-empty-text">No images found on this page.</span></p>';
+                if (countEl) {
+                    countEl.textContent = 'No images found';
+                    countEl.style.color = '#6b7280';
+                }
+                return;
+            }
+
+            const warnSvg = `<svg fill="none" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="12" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
+
+            let issueCount = 0;
+            const rows = images.map((img, idx) => {
+                const hasIssue = img.issues.length > 0;
+                if (hasIssue) issueCount++;
+                const badge = this.getAltStatusBadge(img.status);
+
+                let displayText;
+                if (img.status === 'missing') {
+                    displayText = `<span class="uw-a11y-link-name is-empty">(no alt attribute)</span>`;
+                } else if (img.status === 'decorative' && !img.altText) {
+                    const source = img.altSource ? ` — ${this.escapeHtmlContent(img.altSource)}` : '';
+                    displayText = `<span class="uw-a11y-alt-decorative">Decorative${source}</span>`;
+                } else if (img.status === 'empty') {
+                    displayText = `<span class="uw-a11y-link-name is-empty">(no accessible name)</span>`;
+                } else {
+                    displayText = `<span class="uw-a11y-link-name">${this.escapeHtmlContent(img.altText)}</span>`;
+                }
+
+                const sourceHtml = img.altSource && img.status === 'has-alt' && img.altSource !== 'alt'
+                    ? `<span class="uw-a11y-link-url">from ${this.escapeHtmlContent(img.altSource)}</span>`
+                    : '';
+
+                const typeHtml = `<span class="uw-a11y-link-url">&lt;${this.escapeHtmlContent(img.type)}&gt;</span>`;
+
+                const issuesHtml = hasIssue
+                    ? `<span class="uw-a11y-link-issues">${warnSvg}<span>${this.escapeHtmlContent(img.issues.join(' · '))}</span></span>`
+                    : '';
+
+                const titleText = this.escapeHtmlAttribute(
+                    (img.altText ? `"${img.altText}"` : `Status: ${img.status}`) +
+                    (img.altSource ? `\nSource: ${img.altSource}` : '') +
+                    (hasIssue ? `\n\n${img.issues.join('\n')}` : '')
+                );
+
+                return `<button class="uw-a11y-link-row${hasIssue ? ' has-issue' : ''}" data-ai="${idx}" title="${titleText}">
+                    <span class="uw-a11y-link-badge" style="background:${badge.bg};color:${badge.color};">${badge.label}</span>
+                    <span class="uw-a11y-link-main">
+                        ${displayText}
+                        ${typeHtml}
+                        ${sourceHtml}
+                        ${issuesHtml}
+                    </span>
+                </button>`;
+            }).join('');
+
+            container.innerHTML = `<div class="uw-a11y-outline-list">${rows}</div>`;
+
+            if (countEl) {
+                countEl.textContent = issueCount > 0
+                    ? `${images.length} image${images.length !== 1 ? 's' : ''} · ${issueCount} issue${issueCount !== 1 ? 's' : ''}`
+                    : `${images.length} image${images.length !== 1 ? 's' : ''} · No issues`;
+                countEl.style.color = issueCount > 0 ? '#b45309' : '#059669';
+            }
+
+            container.querySelectorAll('.uw-a11y-link-row[data-ai]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = parseInt(btn.dataset.ai, 10);
+                    const target = images[idx] && images[idx].element;
+                    this.scrollAndFlashTarget(target);
+                });
+            });
+        },
+
+        // Toggle the on-page alt-text overlay
+        toggleAltTextOverlay: function() {
+            const isActive = this.isAltTextOverlayActive || false;
+
+            if (isActive) {
+                this.hideAltTextOverlay();
+            } else {
+                this.showAltTextOverlay();
+            }
+
+            const btn = this.shadowRoot.getElementById('uw-a11y-alt-overlay-toggle');
+            if (btn) {
+                btn.setAttribute('aria-pressed', String(!isActive));
+                const imageIcon = btn.querySelector('.feather-image');
+                const eyeOffIcon = btn.querySelector('.feather-eye-off');
+                const btnText = btn.querySelector('.uw-a11y-btn-text');
+
+                if (!isActive) {
+                    btn.classList.add('active');
+                    if (imageIcon) imageIcon.style.display = 'none';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'inline';
+                    if (btnText) btnText.textContent = 'Hide Alt Text Overlays';
+                } else {
+                    btn.classList.remove('active');
+                    if (imageIcon) imageIcon.style.display = 'inline';
+                    if (eyeOffIcon) eyeOffIcon.style.display = 'none';
+                    if (btnText) btnText.textContent = 'Show Alt Text Overlays';
+                }
+            }
+
+            this.isAltTextOverlayActive = !isActive;
+            this.syncInspectorHubStatus();
+            if (this.currentView === 'inspector') this.syncInspectorContentHeight();
+        },
+
+        // Build the overlay and position a label above each image
+        showAltTextOverlay: function() {
+            this.hideAltTextOverlay();
+
+            const images = this.detectImages();
+            this.cachedAltImages = images;
+
+            const overlay = document.createElement('div');
+            overlay.className = 'uw-a11y-alt-overlay';
+            overlay.setAttribute('data-uw-a11y-overlay', 'true');
+
+            images.forEach((img, index) => {
+                const indicator = this.createAltTextIndicator(img);
+                if (indicator) {
+                    indicator.style.animationDelay = `${Math.min(index * 15, 800)}ms`;
+                    overlay.appendChild(indicator);
+                }
+            });
+
+            document.body.appendChild(overlay);
+            this.injectAltTextOverlayStyles();
+            this.altTextOverlay = overlay;
+
+            this.setupAltTextOverlayEventHandlers();
+
+            // Share the same count pill as the list
+            const countEl = this.shadowRoot.getElementById('uw-a11y-alt-count');
+            if (countEl) {
+                const issueCount = images.reduce((n, i) => n + (i.issues.length ? 1 : 0), 0);
+                countEl.textContent = issueCount > 0
+                    ? `${images.length} image${images.length !== 1 ? 's' : ''} · ${issueCount} issue${issueCount !== 1 ? 's' : ''}`
+                    : `${images.length} image${images.length !== 1 ? 's' : ''} · No issues`;
+                countEl.style.color = issueCount > 0 ? '#b45309' : '#059669';
+                countEl.style.display = 'inline';
+            }
+        },
+
+        hideAltTextOverlay: function() {
+            if (this.altTextOverlay) {
+                this.altTextOverlay.remove();
+                this.altTextOverlay = null;
+            }
+            this.cachedAltImages = null;
+            this.cleanupAltTextOverlayEventHandlers();
+
+            // Only hide the count pill if the list isn't also open
+            if (!this.isAltTextListActive) {
+                const countEl = this.shadowRoot.getElementById('uw-a11y-alt-count');
+                if (countEl) countEl.style.display = 'none';
+            }
+
+            // Also sweep up any orphaned overlays
+            document.querySelectorAll('.uw-a11y-alt-overlay').forEach(o => o.remove());
+        },
+
+        // Create a label element for a single image's alt info
+        createAltTextIndicator: function(img) {
+            const rect = img.element.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return null;
+
+            const indicator = document.createElement('div');
+            indicator.className = `uw-a11y-alt-indicator uw-a11y-alt-indicator--${img.status}`;
+            if (img.issues.length) indicator.classList.add('has-issue');
+
+            const x = rect.left + window.scrollX;
+            const y = rect.top + window.scrollY;
+            indicator.style.left = `${x}px`;
+            indicator.style.top = `${y}px`;
+            // Cap the label width by the image width when the image is wide, with a
+            // sane floor so tiny icons still get a readable label.
+            const maxWidth = Math.max(Math.min(rect.width, 360), 160);
+            indicator.style.maxWidth = `${maxWidth}px`;
+
+            const badge = this.getAltStatusBadge(img.status);
+
+            let text;
+            if (img.status === 'missing') {
+                text = 'Missing alt attribute';
+            } else if (img.status === 'decorative' && !img.altText) {
+                text = `Decorative${img.altSource ? ` (${img.altSource})` : ''}`;
+            } else if (img.status === 'empty') {
+                text = 'No accessible name';
+            } else {
+                text = img.altText;
+            }
+
+            const badgeSpan = document.createElement('span');
+            badgeSpan.className = 'uw-a11y-alt-indicator-badge';
+            badgeSpan.textContent = badge.label;
+            badgeSpan.style.background = badge.bg;
+            badgeSpan.style.color = badge.color;
+
+            const textSpan = document.createElement('span');
+            textSpan.className = 'uw-a11y-alt-indicator-text';
+            textSpan.textContent = text;
+
+            indicator.appendChild(badgeSpan);
+            indicator.appendChild(textSpan);
+
+            // Full text + any issues available via title (native tooltip)
+            const tooltipParts = [text];
+            if (img.altSource) tooltipParts.push(`Source: ${img.altSource}`);
+            if (img.issues.length) tooltipParts.push('', ...img.issues);
+            indicator.title = tooltipParts.join('\n');
+
+            return indicator;
+        },
+
+        // Update indicator positions on scroll/resize using cached elements
+        updateAltTextOverlayPositions: function() {
+            if (!this.altTextOverlay || !this.cachedAltImages) return;
+            const indicators = this.altTextOverlay.querySelectorAll('.uw-a11y-alt-indicator');
+            indicators.forEach((indicator, index) => {
+                const img = this.cachedAltImages[index];
+                if (!img || !img.element || !img.element.isConnected) {
+                    indicator.style.display = 'none';
+                    return;
+                }
+                const rect = img.element.getBoundingClientRect();
+                if (rect.width > 0 && rect.height > 0) {
+                    indicator.style.left = `${rect.left + window.scrollX}px`;
+                    indicator.style.top = `${rect.top + window.scrollY}px`;
+                    indicator.style.display = 'inline-flex';
+                    const maxWidth = Math.max(Math.min(rect.width, 360), 160);
+                    indicator.style.maxWidth = `${maxWidth}px`;
+                } else {
+                    indicator.style.display = 'none';
+                }
+            });
+        },
+
+        setupAltTextOverlayEventHandlers: function() {
+            if (this.altTextOverlayScrollHandler || this.altTextOverlayResizeHandler) return;
+            let scrolling = false;
+            this.altTextOverlayScrollHandler = () => {
+                if (scrolling || this.isAnimating) return;
+                scrolling = true;
+                requestAnimationFrame(() => {
+                    if (!this.isAnimating) this.updateAltTextOverlayPositions();
+                    scrolling = false;
+                });
+            };
+            let resizeTimeout;
+            this.altTextOverlayResizeHandler = () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    if (this.isAltTextOverlayActive) this.showAltTextOverlay();
+                }, 100);
+            };
+            window.addEventListener('scroll', this.altTextOverlayScrollHandler, { passive: true });
+            window.addEventListener('resize', this.altTextOverlayResizeHandler);
+        },
+
+        cleanupAltTextOverlayEventHandlers: function() {
+            if (this.altTextOverlayScrollHandler) {
+                window.removeEventListener('scroll', this.altTextOverlayScrollHandler);
+                this.altTextOverlayScrollHandler = null;
+            }
+            if (this.altTextOverlayResizeHandler) {
+                window.removeEventListener('resize', this.altTextOverlayResizeHandler);
+                this.altTextOverlayResizeHandler = null;
+            }
+        },
+
+        injectAltTextOverlayStyles: function() {
+            if (document.getElementById('uw-a11y-alt-overlay-styles')) return;
+            const styleEl = document.createElement('style');
+            styleEl.id = 'uw-a11y-alt-overlay-styles';
+            styleEl.textContent = `
+                .uw-a11y-alt-overlay {
+                    pointer-events: none;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 999997;
+                }
+                .uw-a11y-alt-indicator {
+                    position: absolute;
+                    display: inline-flex;
+                    align-items: flex-start;
+                    gap: 6px;
+                    padding: 5px 8px;
+                    background: rgba(17, 24, 39, 0.92);
+                    color: #f9fafb;
+                    border-radius: 6px;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+                    font-size: 11px;
+                    line-height: 1.35;
+                    font-weight: 500;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+                    pointer-events: auto;
+                    z-index: 999998;
+                    animation: uw-alt-indicator-appear 0.3s ease-out both;
+                    border-left: 3px solid #10b981;
+                    max-width: 360px;
+                    box-sizing: border-box;
+                }
+                .uw-a11y-alt-indicator--decorative { border-left-color: #3b82f6; }
+                .uw-a11y-alt-indicator--missing,
+                .uw-a11y-alt-indicator--empty { border-left-color: #ef4444; }
+                .uw-a11y-alt-indicator.has-issue { border-left-color: #f59e0b; }
+                .uw-a11y-alt-indicator-badge {
+                    flex-shrink: 0;
+                    font-size: 9px;
+                    font-weight: 700;
+                    letter-spacing: 0.04em;
+                    padding: 1px 5px;
+                    border-radius: 3px;
+                    line-height: 1.5;
+                }
+                .uw-a11y-alt-indicator-text {
+                    word-break: break-word;
+                    overflow-wrap: anywhere;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+                @keyframes uw-alt-indicator-appear {
+                    0% { opacity: 0; transform: translateY(-4px); }
+                    100% { opacity: 1; transform: translateY(0); }
+                }
+            `;
+            document.head.appendChild(styleEl);
+        },
+
+        removeAltTextOverlayStyles: function() {
+            const el = document.getElementById('uw-a11y-alt-overlay-styles');
+            if (el) el.remove();
         },
 
         // Toggle tab order visualization
@@ -6452,7 +8071,11 @@
             const overlay = document.createElement('div');
             overlay.className = 'uw-a11y-tab-order-overlay';
             overlay.setAttribute('data-uw-a11y-overlay', 'true');
-            
+
+            // Create SVG layer for the connecting lines (sits below the numbered indicators)
+            const svg = this.createTabOrderLineLayer(focusableElements);
+            if (svg) overlay.appendChild(svg);
+
             // Add tab order indicators with staggered animation delay
             focusableElements.forEach((element, index) => {
                 const indicator = this.createTabOrderIndicator(element, index + 1);
@@ -6502,9 +8125,10 @@
                 this.tabOrderOverlay.remove();
                 this.tabOrderOverlay = null;
             }
-            
-            // Clear cached elements
+
+            // Clear cached elements and line segment references
             this.cachedFocusableElements = null;
+            this.tabOrderLineSegments = null;
             
             // Disconnect mutation observer
             if (this.tabOrderMutationObserver) {
@@ -6640,9 +8264,10 @@
         // Update positions of existing tab order indicators
         updateTabOrderPositions: function() {
             if (!this.tabOrderOverlay || !this.cachedFocusableElements) return;
-            
+
             const indicators = this.tabOrderOverlay.querySelectorAll('.uw-a11y-tab-indicator');
-            
+            const visibility = new Array(this.cachedFocusableElements.length).fill(false);
+
             // Use cached elements to avoid expensive DOM queries on scroll
             indicators.forEach((indicator, index) => {
                 const element = this.cachedFocusableElements[index];
@@ -6654,12 +8279,53 @@
                         indicator.style.left = `${x}px`;
                         indicator.style.top = `${y}px`;
                         indicator.style.display = 'flex';
+                        visibility[index] = true;
                     } else {
                         indicator.style.display = 'none';
                     }
                 } else {
                     indicator.style.display = 'none';
                 }
+            });
+
+            // Refresh the connecting line segments to match current indicator positions
+            this.updateTabOrderLineSegments(visibility);
+        },
+
+        // Update the SVG line segments connecting consecutive tab stops
+        updateTabOrderLineSegments: function(visibility) {
+            if (!this.tabOrderLineSegments || !this.cachedFocusableElements) return;
+
+            const elements = this.cachedFocusableElements;
+            const getCenter = (el) => {
+                const r = el.getBoundingClientRect();
+                if (r.width === 0 || r.height === 0) return null;
+                return { x: r.left + window.scrollX, y: r.top + window.scrollY };
+            };
+
+            this.tabOrderLineSegments.forEach((segment, i) => {
+                const fromEl = elements[i];
+                const toEl = elements[i + 1];
+                const fromVisible = visibility ? visibility[i] : (fromEl && fromEl.isConnected);
+                const toVisible = visibility ? visibility[i + 1] : (toEl && toEl.isConnected);
+
+                if (!fromVisible || !toVisible) {
+                    segment.setAttribute('display', 'none');
+                    return;
+                }
+
+                const a = getCenter(fromEl);
+                const b = getCenter(toEl);
+                if (!a || !b) {
+                    segment.setAttribute('display', 'none');
+                    return;
+                }
+
+                segment.removeAttribute('display');
+                segment.setAttribute('x1', a.x);
+                segment.setAttribute('y1', a.y);
+                segment.setAttribute('x2', b.x);
+                segment.setAttribute('y2', b.y);
             });
         },
 
@@ -6751,8 +8417,81 @@
             // Add element info as title
             const elementInfo = this.getElementDescription(element);
             indicator.title = `Tab order ${order}: ${elementInfo}`;
-            
+
             return indicator;
+        },
+
+        // Build an SVG layer with a line segment (with arrowhead) between each consecutive tab stop.
+        // Stored segments are later updated in place by updateTabOrderLineSegments on scroll/resize.
+        createTabOrderLineLayer: function(elements) {
+            if (!elements || elements.length < 2) {
+                this.tabOrderLineSegments = [];
+                return null;
+            }
+
+            const svgNS = 'http://www.w3.org/2000/svg';
+            const svg = document.createElementNS(svgNS, 'svg');
+            svg.setAttribute('class', 'uw-a11y-tab-order-lines');
+            svg.setAttribute('aria-hidden', 'true');
+            svg.style.position = 'absolute';
+            svg.style.top = '0';
+            svg.style.left = '0';
+            svg.style.width = '100%';
+            svg.style.height = '100%';
+            svg.style.overflow = 'visible';
+            svg.style.pointerEvents = 'none';
+            svg.style.zIndex = '999998';
+
+            // Arrowhead marker so each segment shows direction of travel
+            const defs = document.createElementNS(svgNS, 'defs');
+            const marker = document.createElementNS(svgNS, 'marker');
+            marker.setAttribute('id', 'uw-a11y-tab-order-arrow');
+            marker.setAttribute('viewBox', '0 0 10 10');
+            marker.setAttribute('refX', '9');
+            marker.setAttribute('refY', '5');
+            marker.setAttribute('markerWidth', '5');
+            marker.setAttribute('markerHeight', '5');
+            marker.setAttribute('orient', 'auto-start-reverse');
+            marker.setAttribute('markerUnits', 'strokeWidth');
+            const arrowPath = document.createElementNS(svgNS, 'path');
+            arrowPath.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+            arrowPath.setAttribute('fill', '#ff6b35');
+            marker.appendChild(arrowPath);
+            defs.appendChild(marker);
+            svg.appendChild(defs);
+
+            const segments = [];
+            for (let i = 0; i < elements.length - 1; i++) {
+                const fromEl = elements[i];
+                const toEl = elements[i + 1];
+                const fromRect = fromEl.getBoundingClientRect();
+                const toRect = toEl.getBoundingClientRect();
+                const line = document.createElementNS(svgNS, 'line');
+                line.setAttribute('class', 'uw-a11y-tab-order-line');
+                line.setAttribute('stroke', '#ff6b35');
+                line.setAttribute('stroke-width', '2');
+                line.setAttribute('stroke-dasharray', '6 4');
+                line.setAttribute('stroke-linecap', 'round');
+                line.setAttribute('stroke-opacity', '0.75');
+                line.setAttribute('marker-end', 'url(#uw-a11y-tab-order-arrow)');
+
+                const fromVisible = fromRect.width > 0 && fromRect.height > 0;
+                const toVisible = toRect.width > 0 && toRect.height > 0;
+                if (fromVisible && toVisible) {
+                    line.setAttribute('x1', fromRect.left + window.scrollX);
+                    line.setAttribute('y1', fromRect.top + window.scrollY);
+                    line.setAttribute('x2', toRect.left + window.scrollX);
+                    line.setAttribute('y2', toRect.top + window.scrollY);
+                } else {
+                    line.setAttribute('display', 'none');
+                }
+
+                svg.appendChild(line);
+                segments.push(line);
+            }
+
+            this.tabOrderLineSegments = segments;
+            return svg;
         },
 
         // Inject tab order styles into the main document
@@ -6775,6 +8514,16 @@
                     z-index: 999998;
                 }
                 
+                .uw-a11y-tab-order-lines {
+                    animation: uw-tab-lines-appear 0.4s ease-out forwards;
+                    opacity: 0;
+                }
+
+                @keyframes uw-tab-lines-appear {
+                    0% { opacity: 0; }
+                    100% { opacity: 1; }
+                }
+
                 .uw-a11y-tab-indicator {
                     position: absolute;
                     background: #ff6b35;
@@ -9210,12 +10959,19 @@
 
             // Clean up tab order visualization
             this.hideTabOrderVisualization();
-            
+
             // Clean up focus indicators visualization
             this.hideFocusIndicatorsVisualization();
-            
+
             // Clean up landmark structure visualization
             this.hideLandmarkStructureVisualization();
+
+            // Clean up color blindness simulation
+            this.removeColorBlindnessSimulation();
+
+            // Clean up alt text overlay
+            this.hideAltTextOverlay();
+            this.removeAltTextOverlayStyles();
             
             // Clean up injected styles
             this.removeTabOrderStyles();

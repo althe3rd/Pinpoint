@@ -3721,6 +3721,17 @@
                                             <svg class="feather feather-chevron-right" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
                                         </button>
                                     </div>
+
+                                    <div class="uw-a11y-inspector-tool-row">
+                                        <div class="uw-a11y-inspector-tool-row-main">
+                                            <h4>Contrast checker</h4>
+                                            <p class="uw-a11y-inspector-tool-teaser">Pick any two elements and compare their colors against WCAG contrast thresholds.</p>
+                                            <p id="uw-a11y-inspector-hub-status-contrast" class="uw-a11y-inspector-hub-status" aria-live="polite">No colors picked</p>
+                                        </div>
+                                        <button type="button" id="uw-a11y-inspector-open-contrast" class="uw-a11y-btn uw-a11y-btn-secondary uw-a11y-inspector-tool-open" aria-label="Open contrast checker">
+                                            <svg class="feather feather-chevron-right" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div id="uw-a11y-inspector-detail" hidden>
@@ -3871,6 +3882,71 @@
                                                 <span id="uw-a11y-alt-count" class="uw-a11y-inspector-status" style="display: none;"></span>
                                             </div>
                                             <div id="uw-a11y-alt-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
+                                        </div>
+                                    </div>
+
+                                    <div id="uw-a11y-inspector-panel-contrast" class="uw-a11y-inspector-detail-panel" hidden>
+                                        <div class="uw-a11y-inspector-section">
+                                            <h4>Contrast Checker</h4>
+                                            <p>Click <strong>Pick element</strong> and choose any text on the page — both the foreground and background colors will fill in automatically. For elements over a CSS gradient, the worst-case gradient stop within the text region is sampled. You can also edit the hex values directly or use the swatches to test arbitrary color pairs.</p>
+                                            <div class="uw-a11y-contrast-controls-row uw-a11y-contrast-pick-row">
+                                                <button type="button" id="uw-a11y-contrast-pick-element" class="uw-a11y-btn uw-a11y-btn-secondary">
+                                                    <svg class="feather feather-target" fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="14" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                                                    <span>Pick element</span>
+                                                </button>
+                                            </div>
+                                            <div class="uw-a11y-contrast-fields">
+                                                <div class="uw-a11y-contrast-field" data-role="foreground">
+                                                    <div class="uw-a11y-contrast-field-header">
+                                                        <span class="uw-a11y-contrast-field-label">Foreground (text)</span>
+                                                    </div>
+                                                    <div class="uw-a11y-contrast-input-row">
+                                                        <span class="uw-a11y-contrast-swatch" id="uw-a11y-contrast-swatch-fg" aria-hidden="true"></span>
+                                                        <input type="color" id="uw-a11y-contrast-color-fg" class="uw-a11y-contrast-color" value="#000000" aria-label="Foreground color picker">
+                                                        <input type="text" id="uw-a11y-contrast-hex-fg" class="uw-a11y-contrast-hex" value="#000000" spellcheck="false" autocomplete="off" aria-label="Foreground hex value">
+                                                    </div>
+                                                </div>
+                                                <div class="uw-a11y-contrast-field" data-role="background">
+                                                    <div class="uw-a11y-contrast-field-header">
+                                                        <span class="uw-a11y-contrast-field-label">Background</span>
+                                                    </div>
+                                                    <div class="uw-a11y-contrast-input-row">
+                                                        <span class="uw-a11y-contrast-swatch" id="uw-a11y-contrast-swatch-bg" aria-hidden="true"></span>
+                                                        <input type="color" id="uw-a11y-contrast-color-bg" class="uw-a11y-contrast-color" value="#ffffff" aria-label="Background color picker">
+                                                        <input type="text" id="uw-a11y-contrast-hex-bg" class="uw-a11y-contrast-hex" value="#ffffff" spellcheck="false" autocomplete="off" aria-label="Background hex value">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="uw-a11y-contrast-controls-row">
+                                                <button type="button" id="uw-a11y-contrast-swap" class="uw-a11y-btn uw-a11y-btn-secondary">
+                                                    <svg class="feather feather-shuffle" fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="14" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+                                                    <span>Swap</span>
+                                                </button>
+                                                <button type="button" id="uw-a11y-contrast-reset" class="uw-a11y-btn uw-a11y-btn-secondary">
+                                                    <svg class="feather feather-rotate-ccw" fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="14" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                                                    <span>Reset</span>
+                                                </button>
+                                            </div>
+
+                                            <div class="uw-a11y-contrast-preview" id="uw-a11y-contrast-preview">
+                                                <span class="uw-a11y-contrast-preview-large">Aa</span>
+                                                <span class="uw-a11y-contrast-preview-normal">The quick brown fox jumps over the lazy dog.</span>
+                                            </div>
+
+                                            <div class="uw-a11y-contrast-result" id="uw-a11y-contrast-result" aria-live="polite">
+                                                <div class="uw-a11y-contrast-ratio">
+                                                    <span class="uw-a11y-contrast-ratio-value" id="uw-a11y-contrast-ratio-value">—</span>
+                                                    <span class="uw-a11y-contrast-ratio-label">contrast ratio</span>
+                                                </div>
+                                                <ul class="uw-a11y-contrast-checks" id="uw-a11y-contrast-checks">
+                                                    <li data-check="aa-normal"><span class="uw-a11y-contrast-check-badge">—</span><span class="uw-a11y-contrast-check-label">AA · normal text</span><span class="uw-a11y-contrast-check-req">4.5:1</span></li>
+                                                    <li data-check="aa-large"><span class="uw-a11y-contrast-check-badge">—</span><span class="uw-a11y-contrast-check-label">AA · large text</span><span class="uw-a11y-contrast-check-req">3:1</span></li>
+                                                    <li data-check="aaa-normal"><span class="uw-a11y-contrast-check-badge">—</span><span class="uw-a11y-contrast-check-label">AAA · normal text</span><span class="uw-a11y-contrast-check-req">7:1</span></li>
+                                                    <li data-check="aaa-large"><span class="uw-a11y-contrast-check-badge">—</span><span class="uw-a11y-contrast-check-label">AAA · large text</span><span class="uw-a11y-contrast-check-req">4.5:1</span></li>
+                                                    <li data-check="ui"><span class="uw-a11y-contrast-check-badge">—</span><span class="uw-a11y-contrast-check-label">AA · UI components &amp; graphics</span><span class="uw-a11y-contrast-check-req">3:1</span></li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -5932,6 +6008,208 @@
             line-height: 1.3;
         }
 
+        /* Contrast checker */
+        .uw-a11y-contrast-pick-row {
+            margin: 0 0 10px 0;
+        }
+
+        .uw-a11y-contrast-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .uw-a11y-contrast-field {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .uw-a11y-contrast-field-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .uw-a11y-contrast-field-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .uw-a11y-contrast-pick {
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        .uw-a11y-contrast-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .uw-a11y-contrast-swatch {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6);
+            flex-shrink: 0;
+            background: #fff;
+        }
+
+        .uw-a11y-contrast-color {
+            width: 36px;
+            height: 28px;
+            padding: 0;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .uw-a11y-contrast-hex {
+            flex: 1;
+            min-width: 0;
+            padding: 6px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font: 13px/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            text-transform: uppercase;
+            color: #111827;
+            background: #fff;
+        }
+
+        .uw-a11y-contrast-hex:focus {
+            outline: 2px solid #6d28d9;
+            outline-offset: 1px;
+        }
+
+        .uw-a11y-contrast-controls-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .uw-a11y-contrast-controls-row .uw-a11y-btn {
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        .uw-a11y-contrast-preview {
+            margin-top: 12px;
+            padding: 14px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            min-height: 60px;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .uw-a11y-contrast-preview-large {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .uw-a11y-contrast-preview-normal {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .uw-a11y-contrast-result {
+            margin-top: 12px;
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .uw-a11y-contrast-ratio {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .uw-a11y-contrast-ratio-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1;
+        }
+
+        .uw-a11y-contrast-ratio-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .uw-a11y-contrast-checks {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .uw-a11y-contrast-checks li {
+            display: grid;
+            grid-template-columns: 56px 1fr auto;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 8px;
+            border-radius: 4px;
+            background: #f8f9fa;
+            font-size: 13px;
+        }
+
+        .uw-a11y-contrast-check-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .uw-a11y-contrast-checks li.is-pass .uw-a11y-contrast-check-badge {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .uw-a11y-contrast-checks li.is-fail .uw-a11y-contrast-check-badge {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .uw-a11y-contrast-check-label {
+            color: #111827;
+        }
+
+        .uw-a11y-contrast-check-req {
+            font-size: 12px;
+            color: #6b7280;
+            font-variant-numeric: tabular-nums;
+        }
+
         .uw-a11y-coming-soon {
             background: #ffc107;
             color: #212529;
@@ -6702,7 +6980,7 @@
             const detail = root.getElementById('uw-a11y-inspector-detail');
             if (hub) hub.removeAttribute('hidden');
             if (detail) detail.setAttribute('hidden', '');
-            ['outline', 'links', 'cvd', 'alt'].forEach((id) => {
+            ['outline', 'links', 'cvd', 'alt', 'contrast'].forEach((id) => {
                 const p = root.getElementById('uw-a11y-inspector-panel-' + id);
                 if (p) p.setAttribute('hidden', '');
             });
@@ -6732,7 +7010,8 @@
                 outline: 'Page outline',
                 links: 'Links',
                 cvd: 'Color blindness simulation',
-                alt: 'Alternative text'
+                alt: 'Alternative text',
+                contrast: 'Contrast checker'
             };
             if (!titles[panelId]) return;
             const root = this.shadowRoot;
@@ -6745,7 +7024,7 @@
             if (hub) hub.setAttribute('hidden', '');
             if (detail) detail.removeAttribute('hidden');
 
-            ['outline', 'links', 'cvd', 'alt'].forEach((id) => {
+            ['outline', 'links', 'cvd', 'alt', 'contrast'].forEach((id) => {
                 const p = root.getElementById('uw-a11y-inspector-panel-' + id);
                 if (p) {
                     if (id === panelId) p.removeAttribute('hidden');
@@ -6857,6 +7136,16 @@
                 if (this.isAltTextOverlayActive) parts.push('Overlays on');
                 sa.textContent = parts.length ? parts.join(' · ') : 'Off';
             }
+
+            const scc = root.getElementById('uw-a11y-inspector-hub-status-contrast');
+            if (scc) {
+                const s = this.contrastCheckerState;
+                if (s && s.ratio != null) {
+                    scc.textContent = `${s.ratio.toFixed(2)}:1 — ${s.fg.toUpperCase()} on ${s.bg.toUpperCase()}`;
+                } else {
+                    scc.textContent = 'No colors picked';
+                }
+            }
         },
 
         // Initialize inspector tools event handlers
@@ -6964,6 +7253,16 @@
                 });
             }
 
+            const openContrast = this.shadowRoot.getElementById('uw-a11y-inspector-open-contrast');
+            if (openContrast) {
+                openContrast.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.openInspectorDetail('contrast');
+                });
+            }
+
+            this.initContrastChecker();
+
             const backBtn = this.shadowRoot.getElementById('uw-a11y-inspector-back');
             if (backBtn) {
                 backBtn.addEventListener('click', (e) => {
@@ -6985,6 +7284,348 @@
             }
 
             this.syncInspectorHubStatus();
+        },
+
+        // ── Contrast checker ─────────────────────────────────────────────
+        initContrastChecker: function() {
+            if (this._contrastCheckerInitialized) return;
+            this._contrastCheckerInitialized = true;
+
+            this.contrastCheckerState = { fg: '#000000', bg: '#ffffff', ratio: null };
+
+            const root = this.shadowRoot;
+            if (!root) return;
+
+            const hexFg = root.getElementById('uw-a11y-contrast-hex-fg');
+            const hexBg = root.getElementById('uw-a11y-contrast-hex-bg');
+            const colorFg = root.getElementById('uw-a11y-contrast-color-fg');
+            const colorBg = root.getElementById('uw-a11y-contrast-color-bg');
+            const pickElementBtn = root.getElementById('uw-a11y-contrast-pick-element');
+            const swapBtn = root.getElementById('uw-a11y-contrast-swap');
+            const resetBtn = root.getElementById('uw-a11y-contrast-reset');
+
+            const onHexInput = (role, input) => {
+                const v = (input.value || '').trim();
+                const hex = this.normalizeHexColor(v);
+                if (hex) this.setContrastColor(role, hex, { source: 'hex' });
+            };
+            if (hexFg) hexFg.addEventListener('change', () => onHexInput('foreground', hexFg));
+            if (hexBg) hexBg.addEventListener('change', () => onHexInput('background', hexBg));
+            if (hexFg) hexFg.addEventListener('blur', () => onHexInput('foreground', hexFg));
+            if (hexBg) hexBg.addEventListener('blur', () => onHexInput('background', hexBg));
+            if (colorFg) colorFg.addEventListener('input', () => this.setContrastColor('foreground', colorFg.value, { source: 'color' }));
+            if (colorBg) colorBg.addEventListener('input', () => this.setContrastColor('background', colorBg.value, { source: 'color' }));
+
+            if (pickElementBtn) pickElementBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.startContrastPickerMode();
+            });
+
+            if (swapBtn) swapBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const s = this.contrastCheckerState;
+                const fg = s.fg, bg = s.bg;
+                this.setContrastColor('foreground', bg, { silent: true });
+                this.setContrastColor('background', fg);
+            });
+
+            if (resetBtn) resetBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.setContrastColor('foreground', '#000000', { silent: true });
+                this.setContrastColor('background', '#ffffff');
+            });
+
+            this.recomputeContrastResult();
+        },
+
+        // Accept '#abc', '#aabbcc', 'rgb(...)' and return '#rrggbb' (or null).
+        normalizeHexColor: function(value) {
+            if (!value) return null;
+            const v = String(value).trim().toLowerCase();
+            const hexMatch = v.match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/);
+            if (hexMatch) {
+                let h = hexMatch[1];
+                if (h.length === 3) h = h.split('').map(c => c + c).join('');
+                return '#' + h;
+            }
+            const rgbMatch = v.match(/rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+            if (rgbMatch) {
+                const r = Math.max(0, Math.min(255, parseInt(rgbMatch[1], 10)));
+                const g = Math.max(0, Math.min(255, parseInt(rgbMatch[2], 10)));
+                const b = Math.max(0, Math.min(255, parseInt(rgbMatch[3], 10)));
+                return '#' + [r, g, b].map(n => n.toString(16).padStart(2, '0')).join('');
+            }
+            return null;
+        },
+
+        setContrastColor: function(role, hexInput, opts) {
+            const hex = this.normalizeHexColor(hexInput);
+            if (!hex) return;
+            const state = this.contrastCheckerState || (this.contrastCheckerState = { fg: '#000000', bg: '#ffffff', ratio: null });
+            if (role === 'foreground') state.fg = hex;
+            else if (role === 'background') state.bg = hex;
+            else return;
+
+            const root = this.shadowRoot;
+            if (!root) return;
+
+            const suffix = role === 'foreground' ? 'fg' : 'bg';
+            const hexInputEl = root.getElementById('uw-a11y-contrast-hex-' + suffix);
+            const colorInputEl = root.getElementById('uw-a11y-contrast-color-' + suffix);
+            if (hexInputEl && hexInputEl.value.toLowerCase() !== hex) hexInputEl.value = hex;
+            if (colorInputEl && colorInputEl.value.toLowerCase() !== hex) colorInputEl.value = hex;
+
+            if (!opts || !opts.silent) this.recomputeContrastResult();
+        },
+
+        recomputeContrastResult: function() {
+            const root = this.shadowRoot;
+            const state = this.contrastCheckerState;
+            if (!root || !state) return;
+
+            const swatchFg = root.getElementById('uw-a11y-contrast-swatch-fg');
+            const swatchBg = root.getElementById('uw-a11y-contrast-swatch-bg');
+            if (swatchFg) swatchFg.style.background = state.fg;
+            if (swatchBg) swatchBg.style.background = state.bg;
+
+            const preview = root.getElementById('uw-a11y-contrast-preview');
+            if (preview) {
+                preview.style.color = state.fg;
+                preview.style.background = state.bg;
+            }
+
+            const ratio = this.calculateContrastRatio(state.fg, state.bg);
+            state.ratio = ratio;
+
+            const ratioValue = root.getElementById('uw-a11y-contrast-ratio-value');
+            if (ratioValue) ratioValue.textContent = ratio != null ? `${ratio.toFixed(2)}:1` : '—';
+
+            const checks = [
+                { key: 'aa-normal', threshold: 4.5 },
+                { key: 'aa-large', threshold: 3.0 },
+                { key: 'aaa-normal', threshold: 7.0 },
+                { key: 'aaa-large', threshold: 4.5 },
+                { key: 'ui', threshold: 3.0 }
+            ];
+            const list = root.getElementById('uw-a11y-contrast-checks');
+            if (list) {
+                checks.forEach(({ key, threshold }) => {
+                    const li = list.querySelector(`[data-check="${key}"]`);
+                    if (!li) return;
+                    const badge = li.querySelector('.uw-a11y-contrast-check-badge');
+                    li.classList.remove('is-pass', 'is-fail');
+                    if (ratio == null) {
+                        if (badge) badge.textContent = '—';
+                    } else if (ratio >= threshold) {
+                        li.classList.add('is-pass');
+                        if (badge) badge.textContent = 'Pass';
+                    } else {
+                        li.classList.add('is-fail');
+                        if (badge) badge.textContent = 'Fail';
+                    }
+                });
+            }
+
+            this.syncInspectorHubStatus();
+            if (this.currentView === 'inspector') this.syncInspectorContentHeight();
+        },
+
+        // Detect a gradient on the element or up to 3 ancestors. Skips thin
+        // decorative gradients (background-size height ≤ 4px). Returns
+        // { gradientCss, gradientEl } or null.
+        findContrastGradientSource: function(el) {
+            const check = (node) => {
+                if (!node || node.nodeType !== 1) return null;
+                const cs = window.getComputedStyle(node);
+                const bgImg = cs.backgroundImage;
+                if (!bgImg || bgImg === 'none' || !bgImg.includes('gradient')) return null;
+                const bgSize = cs.backgroundSize;
+                if (bgSize) {
+                    const parts = bgSize.trim().split(/\s+/);
+                    const heightStr = parts[1] || parts[0];
+                    const pxMatch = heightStr && heightStr.match(/^([\d.]+)px$/);
+                    if (pxMatch && parseFloat(pxMatch[1]) <= 4) return null;
+                }
+                return bgImg;
+            };
+
+            let g = check(el);
+            if (g) return { gradientCss: g, gradientEl: el };
+            let anc = el.parentElement;
+            for (let d = 0; d < 3 && anc; d++, anc = anc.parentElement) {
+                g = check(anc);
+                if (g) return { gradientCss: g, gradientEl: anc };
+            }
+            return null;
+        },
+
+        // Sample fg + bg for the contrast checker, handling gradients by
+        // delegating to analyzeGradientBackground (worst-case stop within the
+        // text element's region, matching how the scan engine reports it).
+        sampleElementContrastColors: function(el) {
+            const fgCss = window.getComputedStyle(el).color;
+            const fgHex = this.normalizeHexColor(fgCss);
+
+            const gradient = this.findContrastGradientSource(el);
+            if (gradient && fgCss) {
+                const result = this.analyzeGradientBackground(gradient.gradientCss, fgCss, el, gradient.gradientEl);
+                if (result && result.background) {
+                    const bgHex = this.normalizeHexColor(result.background);
+                    if (bgHex) {
+                        return { fg: fgHex, bg: bgHex, gradient: true, sampleCount: result.sampleCount };
+                    }
+                }
+            }
+
+            return { fg: fgHex, bg: this.getElementEffectiveBackground(el), gradient: false };
+        },
+
+        // Walk up the ancestor chain to find the first non-transparent background-color.
+        getElementEffectiveBackground: function(el) {
+            let node = el;
+            while (node && node.nodeType === 1) {
+                const cs = window.getComputedStyle(node);
+                const bg = cs.backgroundColor;
+                if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
+                    const m = bg.match(/rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?/);
+                    if (m) {
+                        const alpha = m[4] != null ? parseFloat(m[4]) : 1;
+                        if (alpha > 0) {
+                            const r = parseInt(m[1], 10), g = parseInt(m[2], 10), b = parseInt(m[3], 10);
+                            return '#' + [r, g, b].map(n => n.toString(16).padStart(2, '0')).join('');
+                        }
+                    }
+                }
+                node = node.parentElement;
+            }
+            return '#ffffff';
+        },
+
+        // Picker mode dedicated to sampling colors for the contrast tool.
+        // Samples both foreground (computed `color`) and background (effective
+        // ancestor `background-color`) from a single element click.
+        startContrastPickerMode: function() {
+            if (this.isPickerActive) return;
+            this.isPickerActive = true;
+
+            const wrapper = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-wrapper');
+            if (wrapper) {
+                wrapper.dataset.pickerOrigOpacity = wrapper.style.opacity || '';
+                wrapper.style.opacity = '0.15';
+                wrapper.style.pointerEvents = 'none';
+            }
+
+            this.injectPickerStyles();
+
+            const highlight = document.createElement('div');
+            highlight.id = 'uw-a11y-picker-highlight';
+            highlight.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(highlight);
+            this.pickerHighlightEl = highlight;
+
+            const tooltip = document.createElement('div');
+            tooltip.id = 'uw-a11y-picker-tooltip';
+            tooltip.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(tooltip);
+            this.pickerTooltipEl = tooltip;
+
+            const doneBtn = document.createElement('button');
+            doneBtn.id = 'uw-a11y-picker-done';
+            doneBtn.textContent = 'Cancel — click any element to sample its colors';
+            doneBtn.setAttribute('aria-label', 'Cancel picking and return to contrast checker');
+            document.body.appendChild(doneBtn);
+            this.pickerDoneBtn = doneBtn;
+            doneBtn.addEventListener('click', () => this.stopContrastPickerMode());
+
+            document.body.style.cursor = 'crosshair';
+            this.playSound('ui');
+
+            this._pickerMoveHandler = (e) => this.onContrastPickerMouseMove(e);
+            this._pickerClickHandler = (e) => this.onContrastPickerClick(e);
+            this._pickerKeyHandler = (e) => { if (e.key === 'Escape') this.stopContrastPickerMode(); };
+
+            document.addEventListener('mousemove', this._pickerMoveHandler);
+            document.addEventListener('click', this._pickerClickHandler, true);
+            document.addEventListener('keydown', this._pickerKeyHandler, true);
+        },
+
+        stopContrastPickerMode: function() {
+            if (!this.isPickerActive) return;
+            this.isPickerActive = false;
+
+            const wrapper = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-wrapper');
+            if (wrapper) {
+                wrapper.style.opacity = wrapper.dataset.pickerOrigOpacity || '';
+                wrapper.style.pointerEvents = '';
+                delete wrapper.dataset.pickerOrigOpacity;
+            }
+
+            if (this.pickerHighlightEl) { this.pickerHighlightEl.remove(); this.pickerHighlightEl = null; }
+            if (this.pickerTooltipEl) { this.pickerTooltipEl.remove(); this.pickerTooltipEl = null; }
+            if (this.pickerDoneBtn) { this.pickerDoneBtn.remove(); this.pickerDoneBtn = null; }
+
+            const st = document.getElementById('uw-a11y-picker-styles');
+            if (st) st.remove();
+
+            if (this._pickerMoveHandler) document.removeEventListener('mousemove', this._pickerMoveHandler);
+            if (this._pickerClickHandler) document.removeEventListener('click', this._pickerClickHandler, true);
+            if (this._pickerKeyHandler) document.removeEventListener('keydown', this._pickerKeyHandler, true);
+            this._pickerMoveHandler = null;
+            this._pickerClickHandler = null;
+            this._pickerKeyHandler = null;
+
+            document.body.style.cursor = '';
+            this.playSound('ui');
+        },
+
+        onContrastPickerMouseMove: function(e) {
+            const el = this.getPickerTargetAt(e.clientX, e.clientY);
+            if (!el) {
+                if (this.pickerHighlightEl) this.pickerHighlightEl.style.display = 'none';
+                if (this.pickerTooltipEl) this.pickerTooltipEl.style.display = 'none';
+                return;
+            }
+            const rect = el.getBoundingClientRect();
+            const h = this.pickerHighlightEl;
+            if (h) {
+                h.style.display = 'block';
+                h.style.left   = (rect.left + window.scrollX) + 'px';
+                h.style.top    = (rect.top  + window.scrollY) + 'px';
+                h.style.width  = rect.width  + 'px';
+                h.style.height = rect.height + 'px';
+            }
+            const t = this.pickerTooltipEl;
+            if (t) {
+                t.style.display = 'block';
+                const sample = this.sampleElementContrastColors(el);
+                const fgLabel = sample.fg ? sample.fg.toUpperCase() : '?';
+                const bgLabel = sample.bg ? sample.bg.toUpperCase() : '?';
+                const tail = sample.gradient ? ' (gradient · worst stop)' : '';
+                t.textContent = `${this.getPickerBadgeText(el)} — ${fgLabel} on ${bgLabel}${tail}`;
+                const badgeTop = rect.top + window.scrollY - 28;
+                t.style.left = (rect.left + window.scrollX) + 'px';
+                t.style.top  = (badgeTop > 0 ? badgeTop : rect.bottom + window.scrollY + 4) + 'px';
+            }
+        },
+
+        onContrastPickerClick: function(e) {
+            const el = this.getPickerTargetAt(e.clientX, e.clientY);
+            if (!el) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const sample = this.sampleElementContrastColors(el);
+
+            if (sample.fg) this.setContrastColor('foreground', sample.fg, { silent: true });
+            if (sample.bg) this.setContrastColor('background', sample.bg);
+
+            if (sample.fg || sample.bg) {
+                this.playSound('verify');
+                if (this.pickerHighlightEl) this.pickerHighlightEl.classList.add('uw-a11y-picker-selected');
+            }
+
+            setTimeout(() => this.stopContrastPickerMode(), 350);
         },
 
         // Toggle heading outline view (in-panel, not a page overlay)

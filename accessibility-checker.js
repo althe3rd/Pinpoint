@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.6.3', // Current version
+            version: '1.6.4', // Current version
             websiteUrl: 'https://pinpoint.heroicpixel.com/', // Main website URL
             legacyDomainUrl: 'https://althe3rd.github.io/Pinpoint/', // Legacy domain for transition
             issues: [],

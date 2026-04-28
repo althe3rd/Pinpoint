@@ -73,8 +73,48 @@
                         overflow: visible !important;
                     }
                     [hidden][data-uw-a11y-reveal] { display: block !important; }
+
+                    /* Docked-right mode: shift the page so the panel doesn't cover content. */
+                    body[data-uw-a11y-dock="right"] {
+                        padding-right: 510px !important;
+                        box-sizing: border-box;
+                        transition: padding-right 0.3s ease;
+                    }
                 `;
                 document.head.appendChild(globalStyle);
+            }
+
+            this.applyDockPosition(this.getDockPosition());
+        },
+
+        getDockPosition: function() {
+            const s = this.loadSettings();
+            return s.dockPosition === 'right' ? 'right' : 'floating';
+        },
+
+        setDockPosition: function(pos) {
+            const s = this.loadSettings();
+            s.dockPosition = pos === 'right' ? 'right' : 'floating';
+            this.saveSettings(s);
+            this.applyDockPosition(s.dockPosition);
+        },
+
+        applyDockPosition: function(pos) {
+            const value = pos === 'right' ? 'right' : 'floating';
+            if (value === 'right') {
+                document.body.setAttribute('data-uw-a11y-dock', 'right');
+            } else {
+                document.body.removeAttribute('data-uw-a11y-dock');
+            }
+            const wrapper = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-wrapper');
+            if (wrapper) {
+                wrapper.classList.toggle('uw-a11y-docked-right', value === 'right');
+                if (value === 'right') {
+                    // Clear any drag-applied inline position so the dock CSS wins
+                    wrapper.style.left = '';
+                    wrapper.style.top = '';
+                    wrapper.style.right = '';
+                }
             }
         },
         
@@ -102,8 +142,9 @@
             
             // Add event listeners
             this.shadowRoot.getElementById('uw-a11y-close').onclick = () => this.remove();
+            this.applyDockPosition(this.getDockPosition());
         },
-        
+
         // Load axe-core dynamically
         loadAxeCore: function() {
             // Check if axe is already loaded (pre-loaded by content script)
@@ -3988,6 +4029,7 @@
             this.initNavigation();
             this.renderSettings();
             this.renderHelp();
+            this.applyDockPosition(this.getDockPosition());
 
             // Load GSAP and animate panel
             this.loadGSAP().then(() => {
@@ -4038,8 +4080,8 @@
                     position: fixed;
                     top: 20px;
                     right: 20px;
-                    width: 450px;
-                    
+                    width: 500px;
+
                     z-index: 999999;
                     gap: .4rem;
                     background: rgba(0,0,0,0.7);
@@ -4047,6 +4089,24 @@
                     padding: 4px;
                     border-radius: 16px;
                     transition: height 0.4s;
+                }
+
+                /* Docked-right mode: pin to the right edge full-height instead of floating. */
+                #uw-a11y-wrapper.uw-a11y-docked-right {
+                    top: 0;
+                    right: 0;
+                    bottom: 0;
+                    width: 510px;
+                    height: 100vh;
+                    border-radius: 0;
+                    padding: 8px;
+                }
+                #uw-a11y-wrapper.uw-a11y-docked-right #uw-a11y-panel {
+                    height: 100%;
+                    max-height: none;
+                }
+                #uw-a11y-wrapper.uw-a11y-docked-right #uw-a11y-content {
+                    max-height: calc(100vh - 80px);
                 }
 
                 #uw-a11y-nav {
@@ -4342,7 +4402,7 @@
                     text-transform: uppercase;
                     letter-spacing: 0.08em;
                     color: #595959;
-                    margin: 1.25rem 0 0.5rem;
+                    margin: 2.25rem 0 0.5rem;
                     padding-bottom: 7px;
                     border-bottom: 1px solid rgba(0,0,0,0.08);
                 }
@@ -6390,6 +6450,8 @@
             const onPointerDown = (e) => {
                 // Only left-click/primary pointer drags
                 if (e.button !== undefined && e.button !== 0) return;
+                // Disable dragging when docked
+                if (wrapper.classList.contains('uw-a11y-docked-right')) return;
                 // Do not start a drag when clicking header controls (close, etc.)
                 if (e.target && e.target.closest && e.target.closest('.uw-a11y-header-buttons')) {
                     return; // allow normal button clicks
@@ -6440,6 +6502,8 @@
 
         // Apply previously saved position to the wrapper, if present
         applySavedPosition: function() {
+            // Skip when docked — the dock CSS controls placement.
+            if (this.getDockPosition() === 'right') return;
             try {
                 const raw = sessionStorage.getItem('uw-a11y-pos');
                 if (!raw) return;
@@ -9423,6 +9487,17 @@
 
                     <div class="uw-a11y-pref-row">
                         <div class="uw-a11y-pref-label">
+                            <strong>Dock to right side</strong>
+                            <span>Pin the panel to the right edge full-height. Page content shifts to make room. Off by default — the panel floats and is draggable.</span>
+                        </div>
+                        <label class="uw-a11y-toggle" aria-label="Dock panel to right side">
+                            <input id="uw-a11y-dock-toggle" type="checkbox" ${this.getDockPosition() === 'right' ? 'checked' : ''}>
+                            <span class="uw-a11y-toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="uw-a11y-pref-row">
+                        <div class="uw-a11y-pref-label">
                             <strong>UI Sounds</strong>
                             <span>Subtle audio cues on scan complete, navigation, and interactions.</span>
                         </div>
@@ -9590,6 +9665,15 @@
                     } else {
                         localStorage.setItem('uw-a11y-sounds', 'off');
                     }
+                });
+            }
+
+            // Dock toggle — applies instantly, no re-scan needed
+            const dockToggle = this.shadowRoot.getElementById('uw-a11y-dock-toggle');
+            if (dockToggle) {
+                dockToggle.addEventListener('change', () => {
+                    this.setDockPosition(dockToggle.checked ? 'right' : 'floating');
+                    this.playSound('ui');
                 });
             }
 
@@ -11650,10 +11734,13 @@
             // Clean up element picker if active
             this.stopPickerMode();
 
-            // Remove any data-pinpoint-scope attributes injected by the picker
-            document.querySelectorAll('[data-pinpoint-scope]').forEach(el => {
-                el.removeAttribute('data-pinpoint-scope');
-            });
+            // Restore page layout if we were docked
+            document.body.removeAttribute('data-uw-a11y-dock');
+
+            // Note: data-pinpoint-scope attributes are intentionally left on the
+            // page so a saved scope selector still resolves the next time Pinpoint
+            // is opened. They have no visual or behavioral effect on the page, and
+            // are cleared explicitly by the "Clear scan scope" button in Settings.
 
             // Clean up tab order visualization
             this.hideTabOrderVisualization();

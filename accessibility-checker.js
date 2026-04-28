@@ -26,7 +26,7 @@
             _pickerClickHandler: null,
             _pickerKeyHandler: null,
             _pickerScopeSeq: 0, // Counter for unique data-pinpoint-scope values
-            heightPadding: 35, // Extra pixels added to content height to avoid tiny scrollbars
+            heightPadding: 60, // Extra pixels added to content height to avoid tiny scrollbars and to give the bottom of the panel breathing room when there is room to grow
             scoreAnimationPlayed: false, // Run score animation only once
             // Visibility filters for list rendering
             filters: { errors: true, warnings: true, info: true },
@@ -90,6 +90,18 @@
         getDockPosition: function() {
             const s = this.loadSettings();
             return s.dockPosition === 'right' ? 'right' : 'floating';
+        },
+
+        // 'guided' (default) shows a curated top-N list; 'advanced' shows full results.
+        getDefaultResultsView: function() {
+            const s = this.loadSettings();
+            return s.defaultResultsView === 'advanced' ? 'advanced' : 'guided';
+        },
+
+        setDefaultResultsView: function(mode) {
+            const s = this.loadSettings();
+            s.defaultResultsView = mode === 'advanced' ? 'advanced' : 'guided';
+            this.saveSettings(s);
         },
 
         setDockPosition: function(pos) {
@@ -3649,9 +3661,11 @@
                         </div>
                     </div>
                     <div id="uw-a11y-content">
-                        <div id="uw-a11y-view-results" class="uw-a11y-view">
+                        <div id="uw-a11y-view-results" class="uw-a11y-view" data-results-mode="guided">
+                            <div id="uw-a11y-results-header"></div>
                             <div id="uw-a11y-summary"></div>
-                            <p class="if-issues">
+                            <div id="uw-a11y-guided"></div>
+                            <p class="if-issues uw-a11y-advanced-only">
                                 <span class="mouse-icon"></span>
                                 <small>Select any issue to highlight the element on the page. Press <kbd>Escape</kbd> to return here from a highlighted element.</small>
                             </p>
@@ -4181,7 +4195,7 @@
                 .uw-a11y-helptext { font-size: 12px; color: #555; margin-top: 4px; }
                 .uw-a11y-actions { display: flex; gap: .5rem; margin-top: .75rem; }
                 .uw-a11y-btn { appearance: none; border: 1px solid #b6bcc2; background: #fff; color: #111; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 13px; }
-                .uw-a11y-btn.primary { background: #0d6efd; border-color: #0d6efd; color: #fff; }
+                .uw-a11y-btn.primary { background: #4f46e5; border-color: #4f46e5; color: #fff; }
                 .uw-a11y-btn:disabled { opacity: .6; cursor: not-allowed; }
                 .uw-a11y-reset-icon { width: 16px; height: 16px; vertical-align: text-bottom; margin-right: 6px; }
                 .uw-a11y-msg { font-size: 12px; margin-top: 6px; }
@@ -4464,8 +4478,8 @@
                     margin: 0 -20px -20px -20px;
                     padding: 12px 20px;
                     background: rgba(240,246,255,0.97);
-                    border-top: 1px solid rgba(13,110,253,0.22);
-                    box-shadow: 0 -2px 8px rgba(13,110,253,0.08);
+                    border-top: 1px solid rgba(79,70,229,0.22);
+                    box-shadow: 0 -2px 8px rgba(79,70,229,0.08);
                     border-radius: 0 0 14px 14px;
                     animation: uw-a11y-slideup 0.18s ease;
                 }
@@ -4481,8 +4495,8 @@
                     border-radius: 8px;
                 }
                 .uw-a11y-actions-bar .uw-a11y-btn.primary {
-                    background: #0d6efd;
-                    border-color: #0d6efd;
+                    background: #4f46e5;
+                    border-color: #4f46e5;
                     color: #fff;
                 }
                 .uw-a11y-actions-bar .uw-a11y-msg {
@@ -4789,7 +4803,7 @@
                 
                 #uw-a11y-panel #uw-a11y-minimize { display: none; }
                 #uw-a11y-panel #uw-a11y-content {
-                    max-height: calc(85vh - 60px);
+                    max-height: calc(100vh - 108px);
                     overflow-y: auto;
                     padding: 20px;
                     transition: height 0.4s ease-in-out;
@@ -5080,7 +5094,7 @@
                     background: none;
                     border: none;
                     padding: 0;
-                    color: #2563eb;
+                    color: #4f46e5;
                     font-size: inherit;
                     font-family: inherit;
                     cursor: pointer;
@@ -5308,13 +5322,13 @@
                 }
                 #uw-a11y-panel .uw-a11y-score-info:hover,
                 #uw-a11y-panel .uw-a11y-score-info:focus {
-                    background: #0056b3;
+                    background: #4338ca;
                     transform: scale(1.1);
                     color: #fff;
                     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
                 }
                 #uw-a11y-panel .uw-a11y-score-info:focus-visible {
-                    outline: 2px solid #005a87;
+                    outline: 2px solid #4f46e5;
                     outline-offset: 2px;
                 }
                 #uw-a11y-panel .uw-a11y-details {
@@ -5528,18 +5542,18 @@
         .uw-a11y-explanation-close:hover,
         .uw-a11y-explanation-close:focus {
             color: #333;
-            outline: 2px solid #007bff;
+            outline: 2px solid #4f46e5;
             outline-offset: 2px;
         }
-        
+
         .uw-a11y-explanation-body {
             padding: 0 20px 20px 20px;
             color: #333;
             line-height: 1.6;
         }
-        
+
         .uw-a11y-explanation-body h4 {
-            color: #007bff;
+            color: #4f46e5;
             margin: 20px 0 10px 0;
             font-size: 16px;
             font-weight: 600;
@@ -5787,19 +5801,19 @@
         }
         
         .uw-a11y-btn-secondary:focus:not(:disabled) {
-            outline: 2px solid #007bff;
+            outline: 2px solid #4f46e5;
             outline-offset: 2px;
         }
-        
+
         .uw-a11y-btn-secondary.active {
-            background: #007bff;
+            background: #4f46e5;
             color: white;
-            border-color: #007bff;
+            border-color: #4f46e5;
         }
-        
+
         .uw-a11y-btn-secondary.active:hover {
-            background: #0056b3;
-            border-color: #0056b3;
+            background: #4338ca;
+            border-color: #4338ca;
         }
         
         .uw-a11y-btn:disabled {
@@ -5845,11 +5859,11 @@
         }
 
         .uw-a11y-outline-item:hover {
-            background: rgba(109,40,217,0.06);
+            background: rgba(79,70,229,0.06);
         }
 
         .uw-a11y-outline-item:focus-visible {
-            outline: 2px solid #6d28d9;
+            outline: 2px solid #4f46e5;
             outline-offset: 1px;
         }
 
@@ -5919,11 +5933,11 @@
         }
 
         .uw-a11y-link-row:hover {
-            background: rgba(109,40,217,0.06);
+            background: rgba(79,70,229,0.06);
         }
 
         .uw-a11y-link-row:focus-visible {
-            outline: 2px solid #6d28d9;
+            outline: 2px solid #4f46e5;
             outline-offset: 1px;
         }
 
@@ -6026,23 +6040,23 @@
         }
 
         .uw-a11y-cvd-option:hover {
-            background: rgba(109,40,217,0.06);
+            background: rgba(79,70,229,0.06);
         }
 
         .uw-a11y-cvd-option:has(input:checked) {
-            background: rgba(109,40,217,0.10);
-            border-color: rgba(109,40,217,0.35);
+            background: rgba(79,70,229,0.10);
+            border-color: rgba(79,70,229,0.35);
         }
 
         .uw-a11y-cvd-option:focus-within {
-            outline: 2px solid #6d28d9;
+            outline: 2px solid #4f46e5;
             outline-offset: 1px;
         }
 
         .uw-a11y-cvd-option input[type="radio"] {
             flex-shrink: 0;
             margin: 0;
-            accent-color: #6d28d9;
+            accent-color: #4f46e5;
             width: 16px;
             height: 16px;
         }
@@ -6146,7 +6160,7 @@
         }
 
         .uw-a11y-contrast-hex:focus {
-            outline: 2px solid #6d28d9;
+            outline: 2px solid #4f46e5;
             outline-offset: 1px;
         }
 
@@ -6268,6 +6282,519 @@
             font-size: 12px;
             color: #6b7280;
             font-variant-numeric: tabular-nums;
+        }
+
+        /* ── Guided / Advanced view toggle ────────────────────────────── */
+        #uw-a11y-results-header {
+            margin-bottom: 14px;
+        }
+
+        .uw-a11y-view-toggle {
+            display: inline-flex;
+            background: rgba(0,0,0,0.05);
+            border-radius: 999px;
+            padding: 3px;
+            gap: 2px;
+        }
+
+        .uw-a11y-view-toggle-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 14px;
+            font: 600 13px/1 inherit;
+            color: #555;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .uw-a11y-view-toggle-btn:hover {
+            color: #111827;
+        }
+
+        .uw-a11y-view-toggle-btn.is-active {
+            background: #fff;
+            color: #4f46e5;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .uw-a11y-view-toggle-btn:focus-visible {
+            outline: 2px solid #4f46e5;
+            outline-offset: 2px;
+        }
+
+        /* Mode-driven show/hide */
+        #uw-a11y-view-results[data-results-mode="guided"] #uw-a11y-results,
+        #uw-a11y-view-results[data-results-mode="guided"] .uw-a11y-advanced-only {
+            display: none;
+        }
+
+        #uw-a11y-view-results[data-results-mode="advanced"] #uw-a11y-guided {
+            display: none;
+        }
+
+        /* ── Guided "Top things to fix" landing ───────────────────────── */
+        .uw-a11y-guided-wrap {
+            background: #f8f9fa;
+            border-radius: 14px;
+            padding: 18px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .uw-a11y-guided-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .uw-a11y-guided-heading {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .uw-a11y-guided-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 24px;
+            padding: 0 8px;
+            border-radius: 999px;
+            background: #dc6002;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .uw-a11y-guided-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .uw-a11y-guided-card {
+            display: grid;
+            grid-template-columns: 40px 1fr 20px;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            font-family: inherit;
+            transition: border-color 0.15s, box-shadow 0.15s, transform 0.05s;
+        }
+
+        .uw-a11y-guided-card:hover {
+            border-color: rgba(79,70,229,0.4);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .uw-a11y-guided-card:active {
+            transform: translateY(1px);
+        }
+
+        .uw-a11y-guided-card:focus-visible {
+            outline: 2px solid #4f46e5;
+            outline-offset: 2px;
+        }
+
+        .uw-a11y-guided-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #fde2e1;
+            color: #dc2626;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .uw-a11y-guided-card.is-manual .uw-a11y-guided-icon {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .uw-a11y-guided-card-badge {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 8px;
+            padding: 2px 7px;
+            border-radius: 999px;
+            background: #fef3c7;
+            color: #b45309;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            line-height: 1.4;
+            white-space: nowrap;
+        }
+
+        .uw-a11y-walk-badge {
+            margin-left: 8px;
+            margin-right: 0;
+            font-size: 10px;
+            vertical-align: middle;
+        }
+
+        .uw-a11y-guided-card-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .uw-a11y-guided-card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1.3;
+        }
+
+        .uw-a11y-guided-card-meta {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .uw-a11y-guided-arrow {
+            color: #9ca3af;
+            font-size: 18px;
+            line-height: 1;
+            text-align: right;
+        }
+
+        .uw-a11y-guided-walkthrough {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px 18px;
+            background: #4f46e5;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font: 700 15px/1 inherit;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.05s;
+        }
+
+        .uw-a11y-guided-walkthrough:hover {
+            background: #4338ca;
+        }
+
+        .uw-a11y-guided-walkthrough:active {
+            transform: translateY(1px);
+        }
+
+        .uw-a11y-guided-walkthrough:focus-visible {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 4px rgba(79,70,229,0.5);
+        }
+
+        .uw-a11y-guided-walk-icon {
+            flex-shrink: 0;
+        }
+
+        .uw-a11y-guided-see-all {
+            display: block;
+            margin: 14px auto 0;
+            background: none;
+            border: none;
+            color: #4f46e5;
+            font: 600 13px/1 inherit;
+            cursor: pointer;
+            padding: 6px 4px;
+        }
+
+        .uw-a11y-guided-see-all:hover {
+            text-decoration: underline;
+        }
+
+        .uw-a11y-guided-empty {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .uw-a11y-guided-empty h3 {
+            margin: 0 0 6px;
+            color: #065f46;
+            font-size: 16px;
+        }
+
+        .uw-a11y-guided-empty p {
+            margin: 0 0 10px;
+            color: #047857;
+            font-size: 13px;
+        }
+
+        .uw-a11y-guided-empty--neutral {
+            background: #f8f9fa;
+            border-color: rgba(0,0,0,0.08);
+        }
+
+        .uw-a11y-guided-empty--neutral h3 { color: #111827; }
+        .uw-a11y-guided-empty--neutral p { color: #4b5563; }
+
+        /* ── Walkthrough (stepped one-issue-at-a-time view) ───────────── */
+        .uw-a11y-walkthrough {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .uw-a11y-walk-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 10px 14px;
+            background: #f8f9fa;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .uw-a11y-walk-back,
+        .uw-a11y-walk-close {
+            background: none;
+            border: none;
+            padding: 4px 8px;
+            cursor: pointer;
+            color: #555;
+            font-size: 16px;
+            border-radius: 6px;
+        }
+
+        .uw-a11y-walk-back:hover,
+        .uw-a11y-walk-close:hover {
+            background: rgba(0,0,0,0.05);
+            color: #111827;
+        }
+
+        .uw-a11y-walk-step {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .uw-a11y-walk-body {
+            padding: 18px;
+        }
+
+        .uw-a11y-walk-headline {
+            margin: 0 0 6px;
+            font-size: 18px;
+            color: #111827;
+        }
+
+        .uw-a11y-walk-meta {
+            margin: 0 0 14px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .uw-a11y-walk-instance-pager {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 0 0 14px;
+            padding: 6px 8px;
+            background: rgba(79,70,229,0.06);
+            border: 1px solid rgba(79,70,229,0.18);
+            border-radius: 8px;
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        .uw-a11y-walk-instance-label {
+            flex: 1;
+            text-align: center;
+        }
+
+        .uw-a11y-walk-instance-label strong {
+            color: #4f46e5;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .uw-a11y-walk-instance-progress {
+            color: #6b7280;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        .uw-a11y-walk-instance-check {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            margin-left: 6px;
+            border-radius: 999px;
+            background: #10b981;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+        .uw-a11y-walk-instance-pager button {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 6px;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            color: #4f46e5;
+            font-size: 16px;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .uw-a11y-walk-instance-pager button:hover:not(:disabled) {
+            background: #4f46e5;
+            color: #fff;
+        }
+
+        .uw-a11y-walk-instance-pager button:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .uw-a11y-walk-fix {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .uw-a11y-walk-fix strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #111827;
+        }
+
+        .uw-a11y-walk-fix-body {
+            color: #374151;
+        }
+
+        .uw-a11y-walk-details {
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .uw-a11y-walk-details summary {
+            cursor: pointer;
+            color: #4f46e5;
+            font-weight: 600;
+            padding: 4px 0;
+        }
+
+        .uw-a11y-walk-details p {
+            margin: 6px 0 0;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        .uw-a11y-walk-learn {
+            display: inline-block;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .uw-a11y-walk-learn:hover {
+            text-decoration: underline;
+        }
+
+        .uw-a11y-walk-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .uw-a11y-walk-actions .uw-a11y-walk-show {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .uw-a11y-walk-verify {
+            flex: 1;
+            min-width: 140px;
+            justify-content: center;
+            background: #4f46e5;
+            color: #fff;
+            border: none;
+            font-weight: 700;
+            transition: background 0.15s;
+        }
+
+        .uw-a11y-walk-verify:hover {
+            background: #4338ca;
+        }
+
+        .uw-a11y-walk-verify.is-verified {
+            background: #fff;
+            color: #065f46;
+            border: 1px solid #10b981;
+            font-weight: 600;
+        }
+
+        .uw-a11y-walk-verify.is-verified:hover {
+            filter: none;
+            background: #f0fdf4;
+        }
+
+        .uw-a11y-walk-nav {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 12px 18px;
+            border-top: 1px solid rgba(0,0,0,0.06);
+            background: #fafafa;
+        }
+
+        .uw-a11y-walk-nav .uw-a11y-btn {
+            min-width: 100px;
+            justify-content: center;
+        }
+
+        .uw-a11y-walk-next {
+            background: #4f46e5;
+            color: #fff;
+        }
+
+        .uw-a11y-walk-next:hover {
+            background: #4338ca;
+        }
+
+        .uw-a11y-walk-prev:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
 
         .uw-a11y-coming-soon {
@@ -6632,9 +7159,12 @@
 
         // Calculate the maximum allowed content height
         getMaxContentHeight: function() {
-            // Calculate 85vh minus the header height (approximately 60px)
-            const maxHeight = Math.floor(window.innerHeight * 0.85) - 60;
-            return Math.max(200, maxHeight); // Minimum height of 200px
+            // Account for the wrapper's actual layout: 20px top offset + 4px wrapper
+            // padding + ~60px header + 4px wrapper padding + 20px bottom breathing room.
+            // Using 0.85vh would leave ~100px of usable viewport unused on tall windows
+            // and force a tiny scrollbar even when there's room to grow.
+            const maxHeight = window.innerHeight - 108;
+            return Math.max(200, maxHeight);
         },
 
         // Measure the height of a specific view section with max-height constraint
@@ -7823,7 +8353,7 @@
             const prevOffset = target.style.outlineOffset;
             const prevTransition = target.style.transition;
             target.style.transition = 'outline 0.15s';
-            target.style.outline = '3px solid #6d28d9';
+            target.style.outline = '3px solid #4f46e5';
             target.style.outlineOffset = '4px';
             setTimeout(() => {
                 target.style.outline = prevOutline;
@@ -9498,6 +10028,17 @@
 
                     <div class="uw-a11y-pref-row">
                         <div class="uw-a11y-pref-label">
+                            <strong>Default to advanced view</strong>
+                            <span>Skip the curated "Top things to fix" landing and open straight to the full filterable list of every finding.</span>
+                        </div>
+                        <label class="uw-a11y-toggle" aria-label="Default to advanced results view">
+                            <input id="uw-a11y-default-advanced-toggle" type="checkbox" ${this.getDefaultResultsView() === 'advanced' ? 'checked' : ''}>
+                            <span class="uw-a11y-toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="uw-a11y-pref-row">
+                        <div class="uw-a11y-pref-label">
                             <strong>UI Sounds</strong>
                             <span>Subtle audio cues on scan complete, navigation, and interactions.</span>
                         </div>
@@ -9673,6 +10214,16 @@
             if (dockToggle) {
                 dockToggle.addEventListener('change', () => {
                     this.setDockPosition(dockToggle.checked ? 'right' : 'floating');
+                    this.playSound('ui');
+                });
+            }
+
+            // Default-to-advanced toggle — saves preference, takes effect on next scan
+            // (or when results panel re-renders).
+            const defaultAdvToggle = this.shadowRoot.getElementById('uw-a11y-default-advanced-toggle');
+            if (defaultAdvToggle) {
+                defaultAdvToggle.addEventListener('change', () => {
+                    this.setDefaultResultsView(defaultAdvToggle.checked ? 'advanced' : 'guided');
                     this.playSound('ui');
                 });
             }
@@ -10547,7 +11098,26 @@
             const dismissed = this.getDismissedIssues();
             const groupedIssues = this.groupIssuesByRule(issuesToShow);
             // Filter out dismissed rule groups
-            const visibleRuleIds = Object.keys(groupedIssues).filter(id => !dismissed.has(id));
+            // Order rule groups by type (violations → manual review → best practice),
+            // then by axe impact (critical → serious → moderate → minor → unknown),
+            // then by node count desc so broader symptoms surface first.
+            const typeRank = { error: 0, warning: 1, info: 2 };
+            const impactRank = { critical: 0, serious: 1, moderate: 2, minor: 3 };
+            const visibleRuleIds = Object.keys(groupedIssues)
+                .filter(id => !dismissed.has(id))
+                .sort((a, b) => {
+                    const ga = groupedIssues[a][0];
+                    const gb = groupedIssues[b][0];
+                    const ta = typeRank[ga.type] == null ? 3 : typeRank[ga.type];
+                    const tb = typeRank[gb.type] == null ? 3 : typeRank[gb.type];
+                    if (ta !== tb) return ta - tb;
+                    const ia = impactRank[(ga.impact || '').toLowerCase()];
+                    const ib = impactRank[(gb.impact || '').toLowerCase()];
+                    const iaR = ia == null ? 4 : ia;
+                    const ibR = ib == null ? 4 : ib;
+                    if (iaR !== ibR) return iaR - ibR;
+                    return groupedIssues[b].length - groupedIssues[a].length;
+                });
             if (visibleRuleIds.length === 0) {
                 const dismissedCount = dismissed.size;
                 results.innerHTML = `
@@ -10782,11 +11352,521 @@
             });
         },
         
+        // ── Guided view ────────────────────────────────────────────────────
+        // Friendly, plain-English headlines for the most common axe rule IDs.
+        // Anything not in this map falls back to the rule's own title/description,
+        // so adding entries is purely additive — broken rules just look like the
+        // existing detailed view.
+        getFriendlyRuleHeadline: function(ruleId, fallback) {
+            const map = {
+                'color-contrast': 'Text is hard to read in places',
+                'color-contrast-enhanced': 'Text contrast is below the AAA threshold',
+                'image-alt': 'Some images are missing alt text',
+                'input-image-alt': 'An image button needs alt text',
+                'area-alt': 'An image-map area is missing alt text',
+                'svg-img-alt': 'An SVG used as an image is missing a label',
+                'role-img-alt': 'An element with role="img" needs a label',
+                'label': 'A form input has no label',
+                'form-field-multiple-labels': 'A form field has conflicting labels',
+                'select-name': 'A select dropdown has no accessible name',
+                'button-name': 'A button has no accessible name',
+                'link-name': 'A link has no readable text',
+                'link-in-text-block': 'A link blends in with surrounding text',
+                'empty-heading': 'A heading is empty',
+                'heading-order': 'Headings skip levels in the page outline',
+                'page-has-heading-one': 'The page is missing an <h1>',
+                'document-title': 'The page is missing a <title>',
+                'html-has-lang': 'The page is missing a language attribute',
+                'html-lang-valid': 'The page’s language code looks invalid',
+                'valid-lang': 'A language code on an element looks invalid',
+                'aria-allowed-attr': 'Some ARIA attributes look wrong',
+                'aria-allowed-role': 'A role is being used on the wrong kind of element',
+                'aria-required-attr': 'An ARIA widget is missing required attributes',
+                'aria-required-children': 'An ARIA container is missing expected children',
+                'aria-required-parent': 'An ARIA element needs a specific parent',
+                'aria-roles': 'An ARIA role looks invalid',
+                'aria-valid-attr': 'An ARIA attribute name looks invalid',
+                'aria-valid-attr-value': 'An ARIA attribute has an unexpected value',
+                'aria-hidden-body': 'The whole page is hidden from screen readers',
+                'aria-hidden-focus': 'Something focusable is hidden from screen readers',
+                'aria-input-field-name': 'An ARIA input has no accessible name',
+                'aria-toggle-field-name': 'An ARIA toggle has no accessible name',
+                'aria-command-name': 'An ARIA command has no accessible name',
+                'aria-progressbar-name': 'A progress bar has no accessible name',
+                'aria-meter-name': 'A meter has no accessible name',
+                'aria-tooltip-name': 'A tooltip has no accessible name',
+                'aria-treeitem-name': 'A tree item has no accessible name',
+                'list': 'A list contains the wrong kind of children',
+                'listitem': 'A list item is outside of a list',
+                'definition-list': 'A definition list is structured incorrectly',
+                'dlitem': 'A definition list item is outside of a <dl>',
+                'duplicate-id': 'Two elements share the same ID',
+                'duplicate-id-active': 'Two interactive elements share the same ID',
+                'duplicate-id-aria': 'Two ARIA-referenced elements share the same ID',
+                'frame-title': 'An iframe has no title',
+                'frame-title-unique': 'Two iframes share the same title',
+                'object-alt': 'An <object> element has no text alternative',
+                'video-caption': 'A video is missing captions',
+                'audio-caption': 'Audio is missing a caption track',
+                'meta-viewport': 'The viewport disables zoom',
+                'meta-refresh': 'The page auto-refreshes, which is disorienting',
+                'tabindex': 'A positive tabindex disrupts the tab order',
+                'bypass': 'There’s no skip-to-content shortcut',
+                'region': 'Some content sits outside any landmark region',
+                'landmark-one-main': 'The page has no <main> landmark',
+                'landmark-no-duplicate-banner': 'The page has more than one banner',
+                'landmark-no-duplicate-contentinfo': 'The page has more than one contentinfo',
+                'landmark-no-duplicate-main': 'The page has more than one <main>',
+                'scope-attr-valid': 'A table’s scope attribute is invalid',
+                'scrollable-region-focusable': 'A scrollable region isn’t keyboard reachable',
+                'autocomplete-valid': 'A form field’s autocomplete value is invalid',
+                'avoid-inline-spacing': 'Inline styles override accessibility spacing',
+                'nested-interactive': 'An interactive element is nested inside another',
+                'no-autoplay-audio': 'Audio plays automatically and can’t be paused',
+                'blink': 'A <blink> element will distract some users',
+                'marquee': 'A <marquee> element will distract some users'
+            };
+            return map[ruleId] || fallback;
+        },
+
+        // Allowlist of axe rule IDs whose problems and fixes are understandable
+        // to non-developers (content authors, designers, marketers). Anything
+        // that requires reading/writing ARIA, understanding landmark roles, or
+        // editing markup structure is intentionally excluded — those land in
+        // Advanced view, where the tone matches the audience. Every entry here
+        // should also have a friendly headline in `getFriendlyRuleHeadline`.
+        getApproachableRules: function() {
+            return new Set([
+                'color-contrast',
+                'color-contrast-enhanced',
+                'image-alt',
+                'input-image-alt',
+                'area-alt',
+                'svg-img-alt',
+                'role-img-alt',
+                'object-alt',
+                'label',
+                'form-field-multiple-labels',
+                'select-name',
+                'button-name',
+                'link-name',
+                'link-in-text-block',
+                'empty-heading',
+                'heading-order',
+                'page-has-heading-one',
+                'document-title',
+                'html-has-lang',
+                'html-lang-valid',
+                'valid-lang',
+                'frame-title',
+                'frame-title-unique',
+                'video-caption',
+                'audio-caption',
+                'meta-viewport',
+                'meta-refresh',
+                'no-autoplay-audio',
+                'duplicate-id',
+                'blink',
+                'marquee'
+            ]);
+        },
+
+        // Pick the top N issue groups to surface in Guided mode.
+        // Includes hard violations AND unverified manual-review items whose rule
+        // ID is in the approachable allowlist — for example, axe will flag a
+        // gradient-background contrast as manual review when it can't compute
+        // the ratio confidently, and that's still very much something a non-
+        // developer cares about. Verified manual-review items are excluded
+        // (the user already confirmed them OK). Best-practice info items stay
+        // out — Guided is about what's broken.
+        // Sort: severity (critical → serious → moderate → minor → unknown),
+        // then node count desc.
+        getGuidedTopGroups: function(limit) {
+            const max = limit || 3;
+            const dismissed = this.getDismissedIssues();
+            const approachable = this.getApproachableRules();
+
+            const candidates = this.issues.filter(i => {
+                if (i.type === 'error') return true;
+                if (i.type === 'warning' && i.uniqueId && !this.checkedItems.has(i.uniqueId)) return true;
+                return false;
+            });
+            const grouped = this.groupIssuesByRule(candidates);
+
+            const impactWeight = { critical: 0, serious: 1, moderate: 2, minor: 3 };
+            const ranked = Object.keys(grouped)
+                .filter(id => !dismissed.has(id))
+                .map(id => {
+                    const group = grouped[id];
+                    const first = group[0];
+                    const w = impactWeight[(first.impact || '').toLowerCase()];
+                    return {
+                        ruleId: id,
+                        group: group,
+                        first: first,
+                        impactWeight: w == null ? 4 : w,
+                        nodeCount: group.length,
+                        // Strip the type suffix that groupIssuesByRule appends ("-error", etc.)
+                        // so we can compare against axe rule IDs directly.
+                        baseRuleId: (first.ruleId || '').toLowerCase()
+                    };
+                })
+                .filter(entry => approachable.has(entry.baseRuleId))
+                .sort((a, b) => {
+                    if (a.impactWeight !== b.impactWeight) return a.impactWeight - b.impactWeight;
+                    return b.nodeCount - a.nodeCount;
+                });
+
+            return ranked.slice(0, max);
+        },
+
+        // Render the guided "Top things to fix" landing into #uw-a11y-guided.
+        renderGuidedView: function() {
+            const guided = this.shadowRoot.getElementById('uw-a11y-guided');
+            if (!guided) return;
+
+            const top = this.getGuidedTopGroups(3);
+            const totalFindings = this.issues.length;
+
+            if (top.length === 0) {
+                // Either there are zero issues to act on, or all remaining ones
+                // are developer-level (ARIA wiring, landmark structure, etc.)
+                // and got filtered out of Guided. Word the message accordingly.
+                const candidateCount = this.issues.filter(i => {
+                    if (i.type === 'error') return true;
+                    if (i.type === 'warning' && i.uniqueId && !this.checkedItems.has(i.uniqueId)) return true;
+                    return false;
+                }).length;
+                const hasTechnicalOnly = candidateCount > 0;
+                const heading = hasTechnicalOnly ? 'Nothing common to fix here' : 'Looks great';
+                const body = hasTechnicalOnly
+                    ? `The remaining ${candidateCount} issue${candidateCount === 1 ? '' : 's'} ${candidateCount === 1 ? 'is' : 'are'} more technical (ARIA wiring, landmark structure, and similar). Open the Advanced view to review them.`
+                    : `No automated violations were found on this page.${totalFindings > 0 ? ' You may still want to review the manual-review and best-practice items.' : ''}`;
+                guided.innerHTML = `
+                    <div class="uw-a11y-guided-empty${hasTechnicalOnly ? ' uw-a11y-guided-empty--neutral' : ''}">
+                        <h3>${heading}</h3>
+                        <p>${body}</p>
+                        ${totalFindings > 0
+                            ? `<button class="uw-a11y-link-btn uw-a11y-guided-see-all" type="button">See all ${totalFindings} findings →</button>`
+                            : ''}
+                    </div>
+                `;
+                const seeAllEmpty = guided.querySelector('.uw-a11y-guided-see-all');
+                if (seeAllEmpty) seeAllEmpty.addEventListener('click', () => this.setResultsViewMode('advanced'));
+                return;
+            }
+
+            const cards = top.map((entry, idx) => {
+                const headline = this.getFriendlyRuleHeadline(entry.first.ruleId, entry.first.title);
+                const count = entry.nodeCount;
+                const affectsLine = count === 1
+                    ? 'Affects 1 element on this page.'
+                    : `Affects ${count} elements on this page.`;
+                const isManual = entry.first.type === 'warning';
+                const variantClass = isManual ? 'is-manual' : 'is-violation';
+                // Magnifying-glass for manual review, "!" for hard violations.
+                const iconHtml = isManual
+                    ? `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`
+                    : '!';
+                const badgeHtml = isManual
+                    ? `<span class="uw-a11y-guided-card-badge">Needs review</span>`
+                    : '';
+                return `
+                    <button type="button" class="uw-a11y-guided-card ${variantClass}" data-step="${idx}" data-rule-id="${this.escapeHtmlAttribute(entry.ruleId)}">
+                        <span class="uw-a11y-guided-icon" aria-hidden="true">${iconHtml}</span>
+                        <span class="uw-a11y-guided-card-text">
+                            <span class="uw-a11y-guided-card-title">${this.escapeHtmlContent(headline)}</span>
+                            <span class="uw-a11y-guided-card-meta">${badgeHtml}${this.escapeHtmlContent(affectsLine)}</span>
+                        </span>
+                        <span class="uw-a11y-guided-arrow" aria-hidden="true">→</span>
+                    </button>
+                `;
+            }).join('');
+
+            guided.innerHTML = `
+                <div class="uw-a11y-guided-wrap">
+                    <div class="uw-a11y-guided-header">
+                        <h3 class="uw-a11y-guided-heading">Top things to fix</h3>
+                        <span class="uw-a11y-guided-count">${top.length}</span>
+                    </div>
+                    <div class="uw-a11y-guided-cards">${cards}</div>
+                    <button type="button" class="uw-a11y-guided-walkthrough" id="uw-a11y-guided-walk">
+                        <svg class="uw-a11y-guided-walk-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="3 7 5 9 9 5"/>
+                            <polyline points="3 13 5 15 9 11"/>
+                            <polyline points="3 19 5 21 9 17"/>
+                            <line x1="13" y1="7" x2="21" y2="7"/>
+                            <line x1="13" y1="13" x2="21" y2="13"/>
+                            <line x1="13" y1="19" x2="21" y2="19"/>
+                        </svg>
+                        Walk me through these
+                    </button>
+                    <button type="button" class="uw-a11y-link-btn uw-a11y-guided-see-all">See all ${totalFindings} findings →</button>
+                </div>
+            `;
+
+            // Card click → jump straight into walkthrough at that step
+            guided.querySelectorAll('.uw-a11y-guided-card').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const step = parseInt(btn.dataset.step, 10) || 0;
+                    this.openWalkthrough(step);
+                });
+            });
+
+            const walkBtn = guided.querySelector('#uw-a11y-guided-walk');
+            if (walkBtn) walkBtn.addEventListener('click', () => this.openWalkthrough(0));
+
+            const seeAll = guided.querySelector('.uw-a11y-guided-see-all');
+            if (seeAll) seeAll.addEventListener('click', () => this.setResultsViewMode('advanced'));
+        },
+
+        // Render the small "Guided / Advanced" toggle pinned at the top of
+        // the results view. Always visible so users can flip back and forth.
+        renderResultsHeader: function() {
+            const header = this.shadowRoot.getElementById('uw-a11y-results-header');
+            if (!header) return;
+            const mode = this.resultsViewMode || 'guided';
+            header.innerHTML = `
+                <div class="uw-a11y-view-toggle" role="tablist" aria-label="Results view">
+                    <button type="button" role="tab" class="uw-a11y-view-toggle-btn ${mode === 'guided' ? 'is-active' : ''}" data-mode="guided" aria-selected="${mode === 'guided'}">Guided</button>
+                    <button type="button" role="tab" class="uw-a11y-view-toggle-btn ${mode === 'advanced' ? 'is-active' : ''}" data-mode="advanced" aria-selected="${mode === 'advanced'}">Advanced</button>
+                </div>
+            `;
+            header.querySelectorAll('.uw-a11y-view-toggle-btn').forEach(btn => {
+                btn.addEventListener('click', () => this.setResultsViewMode(btn.dataset.mode));
+            });
+        },
+
+        setResultsViewMode: function(mode) {
+            const next = mode === 'advanced' ? 'advanced' : 'guided';
+            if (this.resultsViewMode === next) return;
+            this.resultsViewMode = next;
+            const view = this.shadowRoot.getElementById('uw-a11y-view-results');
+            if (view) view.setAttribute('data-results-mode', next);
+            this.renderResultsHeader();
+            if (next === 'guided') {
+                this.closeWalkthrough(true);
+                this.renderGuidedView();
+            }
+            this.playSound('ui');
+            // Re-fit the panel height to the new content.
+            if (this.currentView === 'results') {
+                const content = this.shadowRoot.getElementById('uw-a11y-content');
+                if (content) {
+                    const target = this.measureViewHeight('results');
+                    const max = this.getMaxContentHeight();
+                    if (target) content.style.height = Math.min(target, max) + 'px';
+                }
+            }
+        },
+
+        // ── Walkthrough (one issue at a time) ──────────────────────────────
+        openWalkthrough: function(startIndex) {
+            const top = this.getGuidedTopGroups(3);
+            if (top.length === 0) return;
+            this.walkthroughGroups = top;
+            this.walkthroughIndex = Math.max(0, Math.min(startIndex || 0, top.length - 1));
+
+            // Build a modal-style overlay inside the results view.
+            const guided = this.shadowRoot.getElementById('uw-a11y-guided');
+            if (!guided) return;
+            guided.innerHTML = `<div class="uw-a11y-walkthrough" id="uw-a11y-walkthrough"></div>`;
+            this.renderWalkthroughStep();
+        },
+
+        renderWalkthroughStep: function() {
+            const host = this.shadowRoot.getElementById('uw-a11y-walkthrough');
+            if (!host || !this.walkthroughGroups) return;
+            const idx = this.walkthroughIndex || 0;
+            const total = this.walkthroughGroups.length;
+            const entry = this.walkthroughGroups[idx];
+            if (!entry) return;
+            const first = entry.first;
+            const headline = this.getFriendlyRuleHeadline(first.ruleId, first.title);
+            const count = entry.nodeCount;
+            const countLine = count === 1 ? '1 element' : `${count} elements`;
+
+            // Reset the instance pointer for this rule when stepping into a new rule.
+            const ruleId = entry.ruleId;
+            if (this.currentInstances[ruleId] == null) this.currentInstances[ruleId] = 0;
+            const instanceIdx = Math.min(this.currentInstances[ruleId], count - 1);
+            this.currentInstances[ruleId] = instanceIdx;
+
+            // Per-instance verification state for manual-review rules. Each
+            // instance has its own uniqueId tracked in checkedItems.
+            const currentInstance = entry.group[instanceIdx];
+            const isManualReview = first.type === 'warning';
+            const instanceVerified = isManualReview
+                && currentInstance && currentInstance.uniqueId
+                && this.checkedItems.has(currentInstance.uniqueId);
+            const verifiedSoFar = isManualReview
+                ? entry.group.filter(i => i.uniqueId && this.checkedItems.has(i.uniqueId)).length
+                : 0;
+
+            const instancePagerHtml = count > 1 ? `
+                <div class="uw-a11y-walk-instance-pager" role="group" aria-label="Navigate instances of this issue">
+                    <button type="button" class="uw-a11y-walk-instance-prev" aria-label="Previous instance" ${instanceIdx === 0 ? 'disabled' : ''}>‹</button>
+                    <span class="uw-a11y-walk-instance-label">Instance <strong>${instanceIdx + 1}</strong> of ${count}${isManualReview ? ` <span class="uw-a11y-walk-instance-progress">· ${verifiedSoFar}/${count} reviewed</span>` : ''}${instanceVerified ? ' <span class="uw-a11y-walk-instance-check" aria-label="This instance is reviewed">✓</span>' : ''}</span>
+                    <button type="button" class="uw-a11y-walk-instance-next" aria-label="Next instance" ${instanceIdx === count - 1 ? 'disabled' : ''}>›</button>
+                </div>
+            ` : '';
+
+            host.innerHTML = `
+                <div class="uw-a11y-walk-header">
+                    <button type="button" class="uw-a11y-walk-back" aria-label="Back to Top things to fix">←</button>
+                    <span class="uw-a11y-walk-step">Step ${idx + 1} of ${total}</span>
+                    <button type="button" class="uw-a11y-walk-close" aria-label="Close walkthrough">✕</button>
+                </div>
+                <div class="uw-a11y-walk-body">
+                    <h3 class="uw-a11y-walk-headline">
+                        ${this.escapeHtmlContent(headline)}
+                        ${first.type === 'warning' ? '<span class="uw-a11y-guided-card-badge uw-a11y-walk-badge">Needs review</span>' : ''}
+                    </h3>
+                    <p class="uw-a11y-walk-meta">Affects ${this.escapeHtmlContent(countLine)} on this page.${first.type === 'warning' ? ' Please verify each one yourself.' : ''}</p>
+                    ${instancePagerHtml}
+                    <div class="uw-a11y-walk-fix">
+                        <strong>How to fix</strong>
+                        <div class="uw-a11y-walk-fix-body">${first.recommendation || this.escapeHtmlContent(first.description || '')}</div>
+                    </div>
+                    ${first.description && first.recommendation ? `
+                        <details class="uw-a11y-walk-details">
+                            <summary>Why this matters</summary>
+                            <p>${this.escapeHtmlContent(first.description)}</p>
+                        </details>
+                    ` : ''}
+                    ${first.helpUrl ? `<a class="uw-a11y-walk-learn" href="${this.escapeUrl(first.helpUrl)}" target="_blank" rel="noopener noreferrer">Learn more about this rule →</a>` : ''}
+                    <div class="uw-a11y-walk-actions">
+                        <button type="button" class="uw-a11y-btn uw-a11y-btn-secondary uw-a11y-walk-show">${count > 1 ? `Show instance ${instanceIdx + 1} on the page` : 'Show me on the page'}</button>
+                        ${isManualReview ? `<button type="button" class="uw-a11y-btn uw-a11y-walk-verify ${instanceVerified ? 'is-verified' : ''}">${instanceVerified ? 'Reviewed ✓ — undo' : (count > 1 ? `Mark instance ${instanceIdx + 1} as reviewed` : 'Mark as reviewed')}</button>` : ''}
+                    </div>
+                </div>
+                <div class="uw-a11y-walk-nav">
+                    <button type="button" class="uw-a11y-btn uw-a11y-btn-secondary uw-a11y-walk-prev" ${idx === 0 ? 'disabled' : ''}>‹ Previous</button>
+                    <button type="button" class="uw-a11y-btn uw-a11y-walk-next">${idx === total - 1 ? 'Done' : 'Next ›'}</button>
+                </div>
+            `;
+
+            host.querySelector('.uw-a11y-walk-back').addEventListener('click', () => this.closeWalkthrough());
+            host.querySelector('.uw-a11y-walk-close').addEventListener('click', () => this.closeWalkthrough());
+            host.querySelector('.uw-a11y-walk-show').addEventListener('click', () => {
+                this.highlightCurrentInstance(ruleId);
+            });
+            host.querySelector('.uw-a11y-walk-prev').addEventListener('click', () => this.stepWalkthrough(-1));
+            host.querySelector('.uw-a11y-walk-next').addEventListener('click', () => {
+                if (idx === total - 1) this.closeWalkthrough();
+                else this.stepWalkthrough(1);
+            });
+
+            const instPrev = host.querySelector('.uw-a11y-walk-instance-prev');
+            const instNext = host.querySelector('.uw-a11y-walk-instance-next');
+            if (instPrev) instPrev.addEventListener('click', () => this.stepWalkthroughInstance(ruleId, -1));
+            if (instNext) instNext.addEventListener('click', () => this.stepWalkthroughInstance(ruleId, 1));
+
+            const verifyBtn = host.querySelector('.uw-a11y-walk-verify');
+            if (verifyBtn && isManualReview && currentInstance && currentInstance.uniqueId) {
+                verifyBtn.addEventListener('click', () => {
+                    const uniqueId = currentInstance.uniqueId;
+                    const wasVerified = this.checkedItems.has(uniqueId);
+                    if (wasVerified) {
+                        this.checkedItems.delete(uniqueId);
+                    } else {
+                        this.checkedItems.add(uniqueId);
+                    }
+                    sessionStorage.setItem('uw-a11y-checked', JSON.stringify(Array.from(this.checkedItems)));
+                    this.updateScore();
+                    this.playSound(wasVerified ? 'ui' : 'verify');
+
+                    if (wasVerified) {
+                        // Un-marked — just refresh this step so labels update.
+                        this.renderWalkthroughStep();
+                        return;
+                    }
+
+                    // Auto-advance to the next unverified instance in this rule.
+                    let nextInstanceIdx = -1;
+                    for (let j = instanceIdx + 1; j < entry.group.length; j++) {
+                        const it = entry.group[j];
+                        if (it && it.uniqueId && !this.checkedItems.has(it.uniqueId)) { nextInstanceIdx = j; break; }
+                    }
+                    if (nextInstanceIdx === -1) {
+                        for (let j = 0; j < instanceIdx; j++) {
+                            const it = entry.group[j];
+                            if (it && it.uniqueId && !this.checkedItems.has(it.uniqueId)) { nextInstanceIdx = j; break; }
+                        }
+                    }
+                    if (nextInstanceIdx !== -1) {
+                        this.currentInstances[ruleId] = nextInstanceIdx;
+                        this.highlightCurrentInstance(ruleId, true);
+                        this.renderWalkthroughStep();
+                        return;
+                    }
+
+                    // All instances of this rule are reviewed — advance to the next walkthrough step.
+                    if (idx === total - 1) this.closeWalkthrough();
+                    else this.stepWalkthrough(1);
+                });
+            }
+
+            if (this.currentView === 'results') {
+                const content = this.shadowRoot.getElementById('uw-a11y-content');
+                if (content) {
+                    const target = this.measureViewHeight('results');
+                    const max = this.getMaxContentHeight();
+                    if (target) content.style.height = Math.min(target, max) + 'px';
+                }
+            }
+        },
+
+        stepWalkthrough: function(direction) {
+            if (!this.walkthroughGroups) return;
+            const total = this.walkthroughGroups.length;
+            const next = (this.walkthroughIndex || 0) + direction;
+            if (next < 0 || next >= total) return;
+            this.walkthroughIndex = next;
+            this.renderWalkthroughStep();
+            this.playSound('navigate');
+        },
+
+        // Step through individual instances of the current walkthrough rule
+        // (e.g. all four "input has no label" elements). Uses the same
+        // currentInstances pointer as the advanced view so navigation state
+        // stays consistent if the user flips modes.
+        stepWalkthroughInstance: function(ruleId, direction) {
+            if (!this.walkthroughGroups) return;
+            const idx = this.walkthroughIndex || 0;
+            const entry = this.walkthroughGroups[idx];
+            if (!entry || entry.ruleId !== ruleId) return;
+            const total = entry.nodeCount;
+            const cur = this.currentInstances[ruleId] || 0;
+            const nextIdx = cur + direction;
+            if (nextIdx < 0 || nextIdx >= total) return;
+            this.currentInstances[ruleId] = nextIdx;
+            // Highlight the new instance immediately so the user sees the change on the page.
+            this.highlightCurrentInstance(ruleId, true);
+            this.playSound('navigate');
+            // Re-render the step so the pager label and button text update.
+            this.renderWalkthroughStep();
+        },
+
+        closeWalkthrough: function(silent) {
+            this.walkthroughGroups = null;
+            this.walkthroughIndex = 0;
+            // Re-render guided list (only if we're still in guided mode).
+            if (this.resultsViewMode === 'guided') this.renderGuidedView();
+            if (!silent) this.playSound('ui');
+        },
+
         displayResults: function() {
             const panel = this.createPanel();
             const summary = this.shadowRoot.getElementById('uw-a11y-summary');
             const results = this.shadowRoot.getElementById('uw-a11y-results');
-            
+
+            // Initialize results view mode from settings on each render.
+            this.resultsViewMode = this.getDefaultResultsView();
+            const resultsView = this.shadowRoot.getElementById('uw-a11y-view-results');
+            if (resultsView) resultsView.setAttribute('data-results-mode', this.resultsViewMode);
+            this.renderResultsHeader();
+
             // Apply saved position for draggable panel (replaces minimize feature)
             this.applySavedPosition();
             
@@ -10819,16 +11899,16 @@
                 ${scoreData ? this.renderScoreDial(scoreData) : ''}
 
                 ${this.getEffectiveIncludeSelectors().length > 0 ? `
-                <div role="status" style="background:rgba(13,110,253,0.07);border:1px solid rgba(13,110,253,0.25);border-radius:8px;padding:8px 12px;font-size:12px;color:#0d6efd;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+                <div role="status" style="background:rgba(79,70,229,0.07);border:1px solid rgba(79,70,229,0.25);border-radius:8px;padding:8px 12px;font-size:12px;color:#4f46e5;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     <span><strong>Partial scan</strong> — scoped to: <code style="font-size:11px;">${this.escapeHtmlAttr(this.getScopeDisplayLabel())}</code></span>
                     <a href="#" onclick="window.uwAccessibilityChecker.showView('settings');return false;" style="margin-left:auto;font-size:11px;color:inherit;text-decoration:underline;">Edit scope</a>
                 </div>` : ''}
 
                 <!-- Accessible summary section -->
-                <div role="region" aria-labelledby="uw-a11y-summary-heading">
+                <div role="region" aria-labelledby="uw-a11y-summary-heading" class="uw-a11y-advanced-only">
                     <h3 id="uw-a11y-summary-heading" class="sr-only">Accessibility Test Results Summary</h3>
-                    
+
                     <p><strong>Total Issues Found:</strong> ${this.issues.length}</p>
                     
                     <div style="margin: 8px 0;" role="list" aria-label="Issue breakdown by type">
@@ -10877,7 +11957,7 @@
                 </div>
                 
                 ${this.axeResults ? `
-                    <div class="axe-summary">
+                    <div class="axe-summary uw-a11y-advanced-only">
                         <strong>Standard:</strong> ${this.getWcagLabel()}
                     </div>
                 ` : ''}
@@ -10919,7 +11999,10 @@
                 // Render issue list using current filters
                 this.refreshIssueList();
             }
-            
+
+            // Always populate the guided view; CSS hides it in advanced mode.
+            this.renderGuidedView();
+
             // Announce results to screen readers
             this.announceResults(scoreData, counts);
             

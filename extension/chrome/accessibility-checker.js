@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.6.3', // Current version
+            version: '1.6.5', // Current version
             websiteUrl: 'https://pinpoint.heroicpixel.com/', // Main website URL
             legacyDomainUrl: 'https://althe3rd.github.io/Pinpoint/', // Legacy domain for transition
             issues: [],
@@ -26,7 +26,7 @@
             _pickerClickHandler: null,
             _pickerKeyHandler: null,
             _pickerScopeSeq: 0, // Counter for unique data-pinpoint-scope values
-            heightPadding: 35, // Extra pixels added to content height to avoid tiny scrollbars
+            heightPadding: 60, // Extra pixels added to content height to avoid tiny scrollbars and to give the bottom of the panel breathing room when there is room to grow
             scoreAnimationPlayed: false, // Run score animation only once
             // Visibility filters for list rendering
             filters: { errors: true, warnings: true, info: true },
@@ -73,8 +73,60 @@
                         overflow: visible !important;
                     }
                     [hidden][data-uw-a11y-reveal] { display: block !important; }
+
+                    /* Docked-right mode: shift the page so the panel doesn't cover content. */
+                    body[data-uw-a11y-dock="right"] {
+                        padding-right: 510px !important;
+                        box-sizing: border-box;
+                        transition: padding-right 0.3s ease;
+                    }
                 `;
                 document.head.appendChild(globalStyle);
+            }
+
+            this.applyDockPosition(this.getDockPosition());
+        },
+
+        getDockPosition: function() {
+            const s = this.loadSettings();
+            return s.dockPosition === 'right' ? 'right' : 'floating';
+        },
+
+        // 'guided' (default) shows a curated top-N list; 'advanced' shows full results.
+        getDefaultResultsView: function() {
+            const s = this.loadSettings();
+            return s.defaultResultsView === 'advanced' ? 'advanced' : 'guided';
+        },
+
+        setDefaultResultsView: function(mode) {
+            const s = this.loadSettings();
+            s.defaultResultsView = mode === 'advanced' ? 'advanced' : 'guided';
+            this.saveSettings(s);
+        },
+
+        setDockPosition: function(pos) {
+            const s = this.loadSettings();
+            s.dockPosition = pos === 'right' ? 'right' : 'floating';
+            this.saveSettings(s);
+            this.applyDockPosition(s.dockPosition);
+        },
+
+        applyDockPosition: function(pos) {
+            const value = pos === 'right' ? 'right' : 'floating';
+            if (value === 'right') {
+                document.body.setAttribute('data-uw-a11y-dock', 'right');
+            } else {
+                document.body.removeAttribute('data-uw-a11y-dock');
+            }
+            const wrapper = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-wrapper');
+            if (wrapper) {
+                wrapper.classList.toggle('uw-a11y-docked-right', value === 'right');
+                if (value === 'right') {
+                    // Clear any drag-applied inline position so the dock CSS wins
+                    wrapper.style.left = '';
+                    wrapper.style.top = '';
+                    wrapper.style.right = '';
+                }
             }
         },
         
@@ -102,8 +154,9 @@
             
             // Add event listeners
             this.shadowRoot.getElementById('uw-a11y-close').onclick = () => this.remove();
+            this.applyDockPosition(this.getDockPosition());
         },
-        
+
         // Load axe-core dynamically
         loadAxeCore: function() {
             // Check if axe is already loaded (pre-loaded by content script)
@@ -3582,9 +3635,11 @@
                         </div>
                     </div>
                     <div id="uw-a11y-content">
-                        <div id="uw-a11y-view-results" class="uw-a11y-view">
+                        <div id="uw-a11y-view-results" class="uw-a11y-view" data-results-mode="guided">
+                            <div id="uw-a11y-results-header"></div>
                             <div id="uw-a11y-summary"></div>
-                            <p class="if-issues">
+                            <div id="uw-a11y-guided"></div>
+                            <p class="if-issues uw-a11y-advanced-only">
                                 <span class="mouse-icon"></span>
                                 <small>Select any issue to highlight the element on the page. Press <kbd>Escape</kbd> to return here from a highlighted element.</small>
                             </p>
@@ -3597,59 +3652,40 @@
                                     <h3>Inspector Tools</h3>
                                     <p>Visual debugging tools to help you understand your page's accessibility structure.</p>
 
-                                    <div class="uw-a11y-inspector-section">
-                                        <h4>Tab Order Visualization</h4>
-                                        <p>Display numbered indicators showing the keyboard tab order of focusable elements on your page.</p>
-                                        <div class="uw-a11y-inspector-controls">
-                                            <button id="uw-a11y-tab-order-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
-                                                <svg class="feather feather-move" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>
-                                                </svg>
-                                                <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                                                    <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                                </svg>
-                                                <span class="uw-a11y-btn-text">Show Tab Order</span>
-                                            </button>
+                                    <div class="uw-a11y-inspector-toggle-row">
+                                        <div class="uw-a11y-inspector-toggle-main">
+                                            <h4>Tab Order</h4>
+                                            <p>Numbered indicators show the keyboard tab order of focusable elements.</p>
                                             <span id="uw-a11y-tab-order-count" class="uw-a11y-inspector-status" style="display: none;"></span>
                                         </div>
+                                        <label class="uw-a11y-toggle" aria-label="Toggle tab order visualization">
+                                            <input id="uw-a11y-tab-order-toggle" type="checkbox">
+                                            <span class="uw-a11y-toggle-slider"></span>
+                                        </label>
                                     </div>
 
-                                    <div class="uw-a11y-inspector-section">
-                                        <h4>Focus Indicators</h4>
-                                        <p>Preview how focus styles appear on all focusable elements simultaneously to test focus visibility.</p>
-                                        <div class="uw-a11y-inspector-controls">
-                                            <button id="uw-a11y-focus-indicators-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
-                                                <svg class="feather feather-target" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
-                                                    <circle cx="12" cy="12" r="10"/>
-                                                    <circle cx="12" cy="12" r="6"/>
-                                                    <circle cx="12" cy="12" r="2"/>
-                                                </svg>
-                                                <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                                                    <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                                </svg>
-                                                <span class="uw-a11y-btn-text">Preview Focus Styles</span>
-                                            </button>
+                                    <div class="uw-a11y-inspector-toggle-row">
+                                        <div class="uw-a11y-inspector-toggle-main">
+                                            <h4>Focus Indicators</h4>
+                                            <p>Preview focus styles on all focusable elements at once.</p>
                                             <span id="uw-a11y-focus-indicators-count" class="uw-a11y-inspector-status" style="display: none;"></span>
                                         </div>
+                                        <label class="uw-a11y-toggle" aria-label="Toggle focus indicator preview">
+                                            <input id="uw-a11y-focus-indicators-toggle" type="checkbox">
+                                            <span class="uw-a11y-toggle-slider"></span>
+                                        </label>
                                     </div>
 
-                                    <div class="uw-a11y-inspector-section">
-                                        <h4>Landmark Structure</h4>
-                                        <p>Visualize page landmarks and heading hierarchy to test document structure.</p>
-                                        <div class="uw-a11y-inspector-controls">
-                                            <button id="uw-a11y-landmark-structure-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
-                                                <svg class="feather feather-map" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
-                                                    <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
-                                                    <line x1="9" x2="9" y1="3" y2="18"/>
-                                                    <line x1="15" x2="15" y1="6" y2="21"/>
-                                                </svg>
-                                                <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                                                    <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                                </svg>
-                                                <span class="uw-a11y-btn-text">Show Landmarks</span>
-                                            </button>
+                                    <div class="uw-a11y-inspector-toggle-row">
+                                        <div class="uw-a11y-inspector-toggle-main">
+                                            <h4>Landmark Structure</h4>
+                                            <p>Visualize landmarks and heading hierarchy on the page.</p>
                                             <span id="uw-a11y-landmark-structure-count" class="uw-a11y-inspector-status" style="display: none;"></span>
                                         </div>
+                                        <label class="uw-a11y-toggle" aria-label="Toggle landmark structure visualization">
+                                            <input id="uw-a11y-landmark-structure-toggle" type="checkbox">
+                                            <span class="uw-a11y-toggle-slider"></span>
+                                        </label>
                                     </div>
 
                                     <div class="uw-a11y-inspector-tool-row">
@@ -3695,6 +3731,17 @@
                                             <svg class="feather feather-chevron-right" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
                                         </button>
                                     </div>
+
+                                    <div class="uw-a11y-inspector-tool-row">
+                                        <div class="uw-a11y-inspector-tool-row-main">
+                                            <h4>Contrast checker</h4>
+                                            <p class="uw-a11y-inspector-tool-teaser">Pick any two elements and compare their colors against WCAG contrast thresholds.</p>
+                                            <p id="uw-a11y-inspector-hub-status-contrast" class="uw-a11y-inspector-hub-status" aria-live="polite">No colors picked</p>
+                                        </div>
+                                        <button type="button" id="uw-a11y-inspector-open-contrast" class="uw-a11y-btn uw-a11y-btn-secondary uw-a11y-inspector-tool-open" aria-label="Open contrast checker">
+                                            <svg class="feather feather-chevron-right" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div id="uw-a11y-inspector-detail" hidden>
@@ -3707,41 +3754,22 @@
 
                                     <div id="uw-a11y-inspector-panel-outline" class="uw-a11y-inspector-detail-panel" hidden>
                                         <div class="uw-a11y-inspector-section">
-                                            <h4>Page Outline</h4>
-                                            <p>View the heading hierarchy to verify correct order and nesting. Skipped heading levels are flagged. Click any heading to jump to it on the page.</p>
-                                            <div class="uw-a11y-inspector-controls">
-                                                <button id="uw-a11y-outline-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
-                                                    <svg class="feather feather-list" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                        <line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>
-                                                    </svg>
-                                                    <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
-                                                        <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                                    </svg>
-                                                    <span class="uw-a11y-btn-text">Show Outline</span>
-                                                </button>
+                                            <div class="uw-a11y-inspector-section-header">
+                                                <h4>Page Outline</h4>
                                                 <span id="uw-a11y-outline-count" class="uw-a11y-inspector-status" style="display: none;"></span>
                                             </div>
+                                            <p>View the heading hierarchy to verify correct order and nesting. Skipped levels are flagged. Click any heading to jump to it on the page.</p>
                                             <div id="uw-a11y-outline-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
                                         </div>
                                     </div>
 
                                     <div id="uw-a11y-inspector-panel-links" class="uw-a11y-inspector-detail-panel" hidden>
                                         <div class="uw-a11y-inspector-section">
-                                            <h4>Links</h4>
-                                            <p>List every link on the page with its accessible name — the text a screen reader actually announces. Click a link to jump to it. Empty, generic, or ambiguous link text is flagged.</p>
-                                            <div class="uw-a11y-inspector-controls">
-                                                <button id="uw-a11y-links-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
-                                                    <svg class="feather feather-link" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                        <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
-                                                        <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
-                                                    </svg>
-                                                    <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
-                                                        <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                                    </svg>
-                                                    <span class="uw-a11y-btn-text">Show Links</span>
-                                                </button>
+                                            <div class="uw-a11y-inspector-section-header">
+                                                <h4>Links</h4>
                                                 <span id="uw-a11y-links-count" class="uw-a11y-inspector-status" style="display: none;"></span>
                                             </div>
+                                            <p>Every link on the page with its accessible name — the text a screen reader announces. Click a link to jump to it. Empty, generic, or ambiguous link text is flagged.</p>
                                             <div id="uw-a11y-links-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
                                         </div>
                                     </div>
@@ -3821,30 +3849,87 @@
 
                                     <div id="uw-a11y-inspector-panel-alt" class="uw-a11y-inspector-detail-panel" hidden>
                                         <div class="uw-a11y-inspector-section">
-                                            <h4>Alternative Text</h4>
-                                            <p>Inspect every image, SVG, and image-role element on the page. The list shows the alt text each one exposes to assistive tech; the overlay draws that same text on top of the image itself for a quick visual scan.</p>
-                                            <div class="uw-a11y-inspector-controls">
-                                                <button id="uw-a11y-alt-list-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
-                                                    <svg class="feather feather-list" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                        <line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>
-                                                    </svg>
-                                                    <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
-                                                        <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                                    </svg>
-                                                    <span class="uw-a11y-btn-text">Show Alt Text List</span>
-                                                </button>
-                                                <button id="uw-a11y-alt-overlay-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
-                                                    <svg class="feather feather-image" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                        <rect height="18" rx="2" ry="2" width="18" x="3" y="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-                                                    </svg>
-                                                    <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
-                                                        <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                                    </svg>
-                                                    <span class="uw-a11y-btn-text">Show Alt Text Overlays</span>
-                                                </button>
+                                            <div class="uw-a11y-inspector-section-header">
+                                                <h4>Alternative Text</h4>
                                                 <span id="uw-a11y-alt-count" class="uw-a11y-inspector-status" style="display: none;"></span>
                                             </div>
+                                            <p>Every image, SVG, and image-role element on the page along with the alt text it exposes to assistive tech.</p>
+                                            <div class="uw-a11y-inspector-toggle-row uw-a11y-inspector-toggle-row--inline">
+                                                <div class="uw-a11y-inspector-toggle-main">
+                                                    <h4>Show overlays on the page</h4>
+                                                    <p>Draw each alt-text label on top of its image for a quick visual scan.</p>
+                                                </div>
+                                                <label class="uw-a11y-toggle" aria-label="Toggle alt-text overlays on the page">
+                                                    <input id="uw-a11y-alt-overlay-toggle" type="checkbox">
+                                                    <span class="uw-a11y-toggle-slider"></span>
+                                                </label>
+                                            </div>
                                             <div id="uw-a11y-alt-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
+                                        </div>
+                                    </div>
+
+                                    <div id="uw-a11y-inspector-panel-contrast" class="uw-a11y-inspector-detail-panel" hidden>
+                                        <div class="uw-a11y-inspector-section">
+                                            <h4>Contrast Checker</h4>
+                                            <p>Click <strong>Pick element</strong> and choose any text on the page — both the foreground and background colors will fill in automatically. For elements over a CSS gradient, the worst-case gradient stop within the text region is sampled. You can also edit the hex values directly or use the swatches to test arbitrary color pairs.</p>
+                                            <div class="uw-a11y-contrast-controls-row uw-a11y-contrast-pick-row">
+                                                <button type="button" id="uw-a11y-contrast-pick-element" class="uw-a11y-btn uw-a11y-btn-secondary">
+                                                    <svg class="feather feather-target" fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="14" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                                                    <span>Pick element</span>
+                                                </button>
+                                            </div>
+                                            <div class="uw-a11y-contrast-fields">
+                                                <div class="uw-a11y-contrast-field" data-role="foreground">
+                                                    <div class="uw-a11y-contrast-field-header">
+                                                        <span class="uw-a11y-contrast-field-label">Foreground (text)</span>
+                                                    </div>
+                                                    <div class="uw-a11y-contrast-input-row">
+                                                        <span class="uw-a11y-contrast-swatch" id="uw-a11y-contrast-swatch-fg" aria-hidden="true"></span>
+                                                        <input type="color" id="uw-a11y-contrast-color-fg" class="uw-a11y-contrast-color" value="#000000" aria-label="Foreground color picker">
+                                                        <input type="text" id="uw-a11y-contrast-hex-fg" class="uw-a11y-contrast-hex" value="#000000" spellcheck="false" autocomplete="off" aria-label="Foreground hex value">
+                                                    </div>
+                                                </div>
+                                                <div class="uw-a11y-contrast-field" data-role="background">
+                                                    <div class="uw-a11y-contrast-field-header">
+                                                        <span class="uw-a11y-contrast-field-label">Background</span>
+                                                    </div>
+                                                    <div class="uw-a11y-contrast-input-row">
+                                                        <span class="uw-a11y-contrast-swatch" id="uw-a11y-contrast-swatch-bg" aria-hidden="true"></span>
+                                                        <input type="color" id="uw-a11y-contrast-color-bg" class="uw-a11y-contrast-color" value="#ffffff" aria-label="Background color picker">
+                                                        <input type="text" id="uw-a11y-contrast-hex-bg" class="uw-a11y-contrast-hex" value="#ffffff" spellcheck="false" autocomplete="off" aria-label="Background hex value">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="uw-a11y-contrast-controls-row">
+                                                <button type="button" id="uw-a11y-contrast-swap" class="uw-a11y-btn uw-a11y-btn-secondary">
+                                                    <svg class="feather feather-shuffle" fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="14" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+                                                    <span>Swap</span>
+                                                </button>
+                                                <button type="button" id="uw-a11y-contrast-reset" class="uw-a11y-btn uw-a11y-btn-secondary">
+                                                    <svg class="feather feather-rotate-ccw" fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="14" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                                                    <span>Reset</span>
+                                                </button>
+                                            </div>
+
+                                            <div class="uw-a11y-contrast-preview" id="uw-a11y-contrast-preview">
+                                                <span class="uw-a11y-contrast-preview-large">Aa</span>
+                                                <span class="uw-a11y-contrast-preview-normal">The quick brown fox jumps over the lazy dog.</span>
+                                            </div>
+
+                                            <div class="uw-a11y-contrast-result" id="uw-a11y-contrast-result" aria-live="polite">
+                                                <div class="uw-a11y-contrast-ratio">
+                                                    <span class="uw-a11y-contrast-ratio-value" id="uw-a11y-contrast-ratio-value">—</span>
+                                                    <span class="uw-a11y-contrast-ratio-label">contrast ratio</span>
+                                                </div>
+                                                <ul class="uw-a11y-contrast-checks" id="uw-a11y-contrast-checks">
+                                                    <li data-check="aa-normal"><span class="uw-a11y-contrast-check-badge">—</span><span class="uw-a11y-contrast-check-label">AA · normal text</span><span class="uw-a11y-contrast-check-req">4.5:1</span></li>
+                                                    <li data-check="aa-large"><span class="uw-a11y-contrast-check-badge">—</span><span class="uw-a11y-contrast-check-label">AA · large text</span><span class="uw-a11y-contrast-check-req">3:1</span></li>
+                                                    <li data-check="aaa-normal"><span class="uw-a11y-contrast-check-badge">—</span><span class="uw-a11y-contrast-check-label">AAA · normal text</span><span class="uw-a11y-contrast-check-req">7:1</span></li>
+                                                    <li data-check="aaa-large"><span class="uw-a11y-contrast-check-badge">—</span><span class="uw-a11y-contrast-check-label">AAA · large text</span><span class="uw-a11y-contrast-check-req">4.5:1</span></li>
+                                                    <li data-check="ui"><span class="uw-a11y-contrast-check-badge">—</span><span class="uw-a11y-contrast-check-label">AA · UI components &amp; graphics</span><span class="uw-a11y-contrast-check-req">3:1</span></li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -3856,7 +3941,7 @@
                                 <h3>About Pinpoint</h3>
                                 <p>Version: <strong>${this.version}</strong> · Engine: axe-core v${this.getAxeVersion ? (this.getAxeVersion() || 'unknown') : 'unknown'}</p>
                                 <p>Pinpoint Accessibility Checker helps quickly find accessibility issues and best-practice improvements, pairing automated results with guidance.</p>
-                                <p><a href="https://github.com/althe3rd/Pinpoint" target="_blank" rel="noopener noreferrer">Project on GitHub</a> | <a href="https://github.com/althe3rd/Pinpoint/issues" target="_blank" rel="noopener noreferrer">Report an Issue</a> | <a href="https://github.com/althe3rd/Pinpoint/releases" target="_blank" rel="noopener noreferrer">Changelog</a></p>
+                                <p><a href="https://github.com/Heroic-Pixel/Pinpoint-Accessibility-Checker" target="_blank" rel="noopener noreferrer">Project on GitHub</a> | <a href="https://github.com/Heroic-Pixel/Pinpoint-Accessibility-Checker/issues" target="_blank" rel="noopener noreferrer">Report an Issue</a> | <a href="https://github.com/Heroic-Pixel/Pinpoint-Accessibility-Checker/releases" target="_blank" rel="noopener noreferrer">Changelog</a></p>
                                 
                             </div>
                         </div>
@@ -3886,6 +3971,7 @@
             this.initNavigation();
             this.renderSettings();
             this.renderHelp();
+            this.applyDockPosition(this.getDockPosition());
 
             // Load GSAP and animate panel
             this.loadGSAP().then(() => {
@@ -3936,8 +4022,8 @@
                     position: fixed;
                     top: 20px;
                     right: 20px;
-                    width: 450px;
-                    
+                    width: 500px;
+
                     z-index: 999999;
                     gap: .4rem;
                     background: rgba(0,0,0,0.7);
@@ -3945,6 +4031,24 @@
                     padding: 4px;
                     border-radius: 16px;
                     transition: height 0.4s;
+                }
+
+                /* Docked-right mode: pin to the right edge full-height instead of floating. */
+                #uw-a11y-wrapper.uw-a11y-docked-right {
+                    top: 0;
+                    right: 0;
+                    bottom: 0;
+                    width: 510px;
+                    height: 100vh;
+                    border-radius: 0;
+                    padding: 8px;
+                }
+                #uw-a11y-wrapper.uw-a11y-docked-right #uw-a11y-panel {
+                    height: 100%;
+                    max-height: none;
+                }
+                #uw-a11y-wrapper.uw-a11y-docked-right #uw-a11y-content {
+                    max-height: calc(100vh - 80px);
                 }
 
                 #uw-a11y-nav {
@@ -4019,7 +4123,7 @@
                 .uw-a11y-helptext { font-size: 12px; color: #555; margin-top: 4px; }
                 .uw-a11y-actions { display: flex; gap: .5rem; margin-top: .75rem; }
                 .uw-a11y-btn { appearance: none; border: 1px solid #b6bcc2; background: #fff; color: #111; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 13px; }
-                .uw-a11y-btn.primary { background: #0d6efd; border-color: #0d6efd; color: #fff; }
+                .uw-a11y-btn.primary { background: #4f46e5; border-color: #4f46e5; color: #fff; }
                 .uw-a11y-btn:disabled { opacity: .6; cursor: not-allowed; }
                 .uw-a11y-reset-icon { width: 16px; height: 16px; vertical-align: text-bottom; margin-right: 6px; }
                 .uw-a11y-msg { font-size: 12px; margin-top: 6px; }
@@ -4240,7 +4344,7 @@
                     text-transform: uppercase;
                     letter-spacing: 0.08em;
                     color: #595959;
-                    margin: 1.25rem 0 0.5rem;
+                    margin: 2.25rem 0 0.5rem;
                     padding-bottom: 7px;
                     border-bottom: 1px solid rgba(0,0,0,0.08);
                 }
@@ -4302,8 +4406,8 @@
                     margin: 0 -20px -20px -20px;
                     padding: 12px 20px;
                     background: rgba(240,246,255,0.97);
-                    border-top: 1px solid rgba(13,110,253,0.22);
-                    box-shadow: 0 -2px 8px rgba(13,110,253,0.08);
+                    border-top: 1px solid rgba(79,70,229,0.22);
+                    box-shadow: 0 -2px 8px rgba(79,70,229,0.08);
                     border-radius: 0 0 14px 14px;
                     animation: uw-a11y-slideup 0.18s ease;
                 }
@@ -4319,8 +4423,8 @@
                     border-radius: 8px;
                 }
                 .uw-a11y-actions-bar .uw-a11y-btn.primary {
-                    background: #0d6efd;
-                    border-color: #0d6efd;
+                    background: #4f46e5;
+                    border-color: #4f46e5;
                     color: #fff;
                 }
                 .uw-a11y-actions-bar .uw-a11y-msg {
@@ -4627,7 +4731,7 @@
                 
                 #uw-a11y-panel #uw-a11y-minimize { display: none; }
                 #uw-a11y-panel #uw-a11y-content {
-                    max-height: calc(85vh - 60px);
+                    max-height: calc(100vh - 108px);
                     overflow-y: auto;
                     padding: 20px;
                     transition: height 0.4s ease-in-out;
@@ -4918,7 +5022,7 @@
                     background: none;
                     border: none;
                     padding: 0;
-                    color: #2563eb;
+                    color: #4f46e5;
                     font-size: inherit;
                     font-family: inherit;
                     cursor: pointer;
@@ -5146,13 +5250,13 @@
                 }
                 #uw-a11y-panel .uw-a11y-score-info:hover,
                 #uw-a11y-panel .uw-a11y-score-info:focus {
-                    background: #0056b3;
+                    background: #4338ca;
                     transform: scale(1.1);
                     color: #fff;
                     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
                 }
                 #uw-a11y-panel .uw-a11y-score-info:focus-visible {
-                    outline: 2px solid #005a87;
+                    outline: 2px solid #4f46e5;
                     outline-offset: 2px;
                 }
                 #uw-a11y-panel .uw-a11y-details {
@@ -5366,18 +5470,18 @@
         .uw-a11y-explanation-close:hover,
         .uw-a11y-explanation-close:focus {
             color: #333;
-            outline: 2px solid #007bff;
+            outline: 2px solid #4f46e5;
             outline-offset: 2px;
         }
-        
+
         .uw-a11y-explanation-body {
             padding: 0 20px 20px 20px;
             color: #333;
             line-height: 1.6;
         }
-        
+
         .uw-a11y-explanation-body h4 {
-            color: #007bff;
+            color: #4f46e5;
             margin: 20px 0 10px 0;
             font-size: 16px;
             font-weight: 600;
@@ -5498,8 +5602,8 @@
             background: #f8f9fa;
             border: 1px solid #e9ecef;
             border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
+            padding: 12px 14px;
+            margin-bottom: 8px;
         }
 
         .uw-a11y-inspector-tool-row-main {
@@ -5513,25 +5617,86 @@
         }
 
         .uw-a11y-inspector-tool-row h4 {
-            margin: 0 0 0.35rem 0;
+            margin: 0 0 4px 0;
             color: #333;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
         }
 
         .uw-a11y-inspector-tool-teaser {
-            margin: 0 0 0.35rem 0;
+            margin: 0 0 2px 0;
             color: #666;
-            font-size: 13px;
+            font-size: 12px;
             line-height: 1.4;
         }
 
         .uw-a11y-inspector-hub-status {
             margin: 0;
+            font-size: 11px;
+            line-height: 1.4;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        /* Compact slide-toggle row used for overlay tools (Tab Order, Focus
+           Indicators, Landmark Structure) and the alt-text overlay control.
+           Mirrors the Settings .uw-a11y-pref-row pattern. */
+        .uw-a11y-inspector-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+        }
+
+        .uw-a11y-inspector-toggle-row--inline {
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.08);
+            margin-top: 8px;
+            margin-bottom: 12px;
+        }
+
+        .uw-a11y-inspector-toggle-main {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .uw-a11y-inspector-toggle-main h4 {
+            margin: 0;
+            color: #333;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .uw-a11y-inspector-toggle-main p {
+            margin: 0;
+            color: #666;
             font-size: 12px;
             line-height: 1.4;
-            color: #495057;
-            font-weight: 500;
+        }
+
+        .uw-a11y-inspector-toggle-main .uw-a11y-inspector-status {
+            margin-top: 2px;
+        }
+
+        /* Compact section header for sub-page detail panels */
+        .uw-a11y-inspector-section-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+
+        .uw-a11y-inspector-section-header h4 {
+            margin: 0;
         }
 
         .uw-a11y-inspector-detail-header {
@@ -5625,19 +5790,19 @@
         }
         
         .uw-a11y-btn-secondary:focus:not(:disabled) {
-            outline: 2px solid #007bff;
+            outline: 2px solid #4f46e5;
             outline-offset: 2px;
         }
-        
+
         .uw-a11y-btn-secondary.active {
-            background: #007bff;
+            background: #4f46e5;
             color: white;
-            border-color: #007bff;
+            border-color: #4f46e5;
         }
-        
+
         .uw-a11y-btn-secondary.active:hover {
-            background: #0056b3;
-            border-color: #0056b3;
+            background: #4338ca;
+            border-color: #4338ca;
         }
         
         .uw-a11y-btn:disabled {
@@ -5683,11 +5848,11 @@
         }
 
         .uw-a11y-outline-item:hover {
-            background: rgba(109,40,217,0.06);
+            background: rgba(79,70,229,0.06);
         }
 
         .uw-a11y-outline-item:focus-visible {
-            outline: 2px solid #6d28d9;
+            outline: 2px solid #4f46e5;
             outline-offset: 1px;
         }
 
@@ -5757,11 +5922,11 @@
         }
 
         .uw-a11y-link-row:hover {
-            background: rgba(109,40,217,0.06);
+            background: rgba(79,70,229,0.06);
         }
 
         .uw-a11y-link-row:focus-visible {
-            outline: 2px solid #6d28d9;
+            outline: 2px solid #4f46e5;
             outline-offset: 1px;
         }
 
@@ -5864,23 +6029,23 @@
         }
 
         .uw-a11y-cvd-option:hover {
-            background: rgba(109,40,217,0.06);
+            background: rgba(79,70,229,0.06);
         }
 
         .uw-a11y-cvd-option:has(input:checked) {
-            background: rgba(109,40,217,0.10);
-            border-color: rgba(109,40,217,0.35);
+            background: rgba(79,70,229,0.10);
+            border-color: rgba(79,70,229,0.35);
         }
 
         .uw-a11y-cvd-option:focus-within {
-            outline: 2px solid #6d28d9;
+            outline: 2px solid #4f46e5;
             outline-offset: 1px;
         }
 
         .uw-a11y-cvd-option input[type="radio"] {
             flex-shrink: 0;
             margin: 0;
-            accent-color: #6d28d9;
+            accent-color: #4f46e5;
             width: 16px;
             height: 16px;
         }
@@ -5904,6 +6069,721 @@
             font-size: 11px;
             color: #6b7280;
             line-height: 1.3;
+        }
+
+        /* Contrast checker */
+        .uw-a11y-contrast-pick-row {
+            margin: 0 0 10px 0;
+        }
+
+        .uw-a11y-contrast-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .uw-a11y-contrast-field {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .uw-a11y-contrast-field-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .uw-a11y-contrast-field-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .uw-a11y-contrast-pick {
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        .uw-a11y-contrast-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .uw-a11y-contrast-swatch {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6);
+            flex-shrink: 0;
+            background: #fff;
+        }
+
+        .uw-a11y-contrast-color {
+            width: 36px;
+            height: 28px;
+            padding: 0;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .uw-a11y-contrast-hex {
+            flex: 1;
+            min-width: 0;
+            padding: 6px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font: 13px/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            text-transform: uppercase;
+            color: #111827;
+            background: #fff;
+        }
+
+        .uw-a11y-contrast-hex:focus {
+            outline: 2px solid #4f46e5;
+            outline-offset: 1px;
+        }
+
+        .uw-a11y-contrast-controls-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .uw-a11y-contrast-controls-row .uw-a11y-btn {
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        .uw-a11y-contrast-preview {
+            margin-top: 12px;
+            padding: 14px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            min-height: 60px;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .uw-a11y-contrast-preview-large {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .uw-a11y-contrast-preview-normal {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .uw-a11y-contrast-result {
+            margin-top: 12px;
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .uw-a11y-contrast-ratio {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .uw-a11y-contrast-ratio-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1;
+        }
+
+        .uw-a11y-contrast-ratio-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .uw-a11y-contrast-checks {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .uw-a11y-contrast-checks li {
+            display: grid;
+            grid-template-columns: 56px 1fr auto;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 8px;
+            border-radius: 4px;
+            background: #f8f9fa;
+            font-size: 13px;
+        }
+
+        .uw-a11y-contrast-check-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .uw-a11y-contrast-checks li.is-pass .uw-a11y-contrast-check-badge {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .uw-a11y-contrast-checks li.is-fail .uw-a11y-contrast-check-badge {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .uw-a11y-contrast-check-label {
+            color: #111827;
+        }
+
+        .uw-a11y-contrast-check-req {
+            font-size: 12px;
+            color: #6b7280;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ── Guided / Advanced view toggle ────────────────────────────── */
+        #uw-a11y-results-header {
+            margin-bottom: 14px;
+        }
+
+        .uw-a11y-view-toggle {
+            display: inline-flex;
+            background: rgba(0,0,0,0.05);
+            border-radius: 999px;
+            padding: 3px;
+            gap: 2px;
+        }
+
+        .uw-a11y-view-toggle-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 14px;
+            font: 600 13px/1 inherit;
+            color: #555;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .uw-a11y-view-toggle-btn:hover {
+            color: #111827;
+        }
+
+        .uw-a11y-view-toggle-btn.is-active {
+            background: #fff;
+            color: #4f46e5;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .uw-a11y-view-toggle-btn:focus-visible {
+            outline: 2px solid #4f46e5;
+            outline-offset: 2px;
+        }
+
+        /* Mode-driven show/hide */
+        #uw-a11y-view-results[data-results-mode="guided"] #uw-a11y-results,
+        #uw-a11y-view-results[data-results-mode="guided"] .uw-a11y-advanced-only {
+            display: none;
+        }
+
+        #uw-a11y-view-results[data-results-mode="advanced"] #uw-a11y-guided {
+            display: none;
+        }
+
+        /* ── Guided "Top things to fix" landing ───────────────────────── */
+        .uw-a11y-guided-wrap {
+            background: #f8f9fa;
+            border-radius: 14px;
+            padding: 18px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .uw-a11y-guided-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .uw-a11y-guided-heading {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .uw-a11y-guided-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 24px;
+            padding: 0 8px;
+            border-radius: 999px;
+            background: #dc6002;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .uw-a11y-guided-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .uw-a11y-guided-card {
+            display: grid;
+            grid-template-columns: 40px 1fr 20px;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            font-family: inherit;
+            transition: border-color 0.15s, box-shadow 0.15s, transform 0.05s;
+        }
+
+        .uw-a11y-guided-card:hover {
+            border-color: rgba(79,70,229,0.4);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .uw-a11y-guided-card:active {
+            transform: translateY(1px);
+        }
+
+        .uw-a11y-guided-card:focus-visible {
+            outline: 2px solid #4f46e5;
+            outline-offset: 2px;
+        }
+
+        .uw-a11y-guided-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #fde2e1;
+            color: #dc2626;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .uw-a11y-guided-card.is-manual .uw-a11y-guided-icon {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .uw-a11y-guided-card-badge {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 8px;
+            padding: 2px 7px;
+            border-radius: 999px;
+            background: #fef3c7;
+            color: #b45309;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            line-height: 1.4;
+            white-space: nowrap;
+        }
+
+        .uw-a11y-walk-badge {
+            margin-left: 8px;
+            margin-right: 0;
+            font-size: 10px;
+            vertical-align: middle;
+        }
+
+        .uw-a11y-guided-card-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .uw-a11y-guided-card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1.3;
+        }
+
+        .uw-a11y-guided-card-meta {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .uw-a11y-guided-arrow {
+            color: #9ca3af;
+            font-size: 18px;
+            line-height: 1;
+            text-align: right;
+        }
+
+        .uw-a11y-guided-walkthrough {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px 18px;
+            background: #4f46e5;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font: 700 15px/1 inherit;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.05s;
+        }
+
+        .uw-a11y-guided-walkthrough:hover {
+            background: #4338ca;
+        }
+
+        .uw-a11y-guided-walkthrough:active {
+            transform: translateY(1px);
+        }
+
+        .uw-a11y-guided-walkthrough:focus-visible {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 4px rgba(79,70,229,0.5);
+        }
+
+        .uw-a11y-guided-walk-icon {
+            flex-shrink: 0;
+        }
+
+        .uw-a11y-guided-see-all {
+            display: block;
+            margin: 14px auto 0;
+            background: none;
+            border: none;
+            color: #4f46e5;
+            font: 600 13px/1 inherit;
+            cursor: pointer;
+            padding: 6px 4px;
+        }
+
+        .uw-a11y-guided-see-all:hover {
+            text-decoration: underline;
+        }
+
+        .uw-a11y-guided-empty {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .uw-a11y-guided-empty h3 {
+            margin: 0 0 6px;
+            color: #065f46;
+            font-size: 16px;
+        }
+
+        .uw-a11y-guided-empty p {
+            margin: 0 0 10px;
+            color: #047857;
+            font-size: 13px;
+        }
+
+        .uw-a11y-guided-empty--neutral {
+            background: #f8f9fa;
+            border-color: rgba(0,0,0,0.08);
+        }
+
+        .uw-a11y-guided-empty--neutral h3 { color: #111827; }
+        .uw-a11y-guided-empty--neutral p { color: #4b5563; }
+
+        /* ── Walkthrough (stepped one-issue-at-a-time view) ───────────── */
+        .uw-a11y-walkthrough {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .uw-a11y-walk-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 10px 14px;
+            background: #f8f9fa;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .uw-a11y-walk-back,
+        .uw-a11y-walk-close {
+            background: none;
+            border: none;
+            padding: 4px 8px;
+            cursor: pointer;
+            color: #555;
+            font-size: 16px;
+            border-radius: 6px;
+        }
+
+        .uw-a11y-walk-back:hover,
+        .uw-a11y-walk-close:hover {
+            background: rgba(0,0,0,0.05);
+            color: #111827;
+        }
+
+        .uw-a11y-walk-step {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .uw-a11y-walk-body {
+            padding: 18px;
+        }
+
+        .uw-a11y-walk-headline {
+            margin: 0 0 6px;
+            font-size: 18px;
+            color: #111827;
+        }
+
+        .uw-a11y-walk-meta {
+            margin: 0 0 14px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .uw-a11y-walk-instance-pager {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 0 0 14px;
+            padding: 6px 8px;
+            background: rgba(79,70,229,0.06);
+            border: 1px solid rgba(79,70,229,0.18);
+            border-radius: 8px;
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        .uw-a11y-walk-instance-label {
+            flex: 1;
+            text-align: center;
+        }
+
+        .uw-a11y-walk-instance-label strong {
+            color: #4f46e5;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .uw-a11y-walk-instance-progress {
+            color: #6b7280;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        .uw-a11y-walk-instance-check {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            margin-left: 6px;
+            border-radius: 999px;
+            background: #10b981;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+        .uw-a11y-walk-instance-pager button {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 6px;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            color: #4f46e5;
+            font-size: 16px;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .uw-a11y-walk-instance-pager button:hover:not(:disabled) {
+            background: #4f46e5;
+            color: #fff;
+        }
+
+        .uw-a11y-walk-instance-pager button:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .uw-a11y-walk-fix {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .uw-a11y-walk-fix strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #111827;
+        }
+
+        .uw-a11y-walk-fix-body {
+            color: #374151;
+        }
+
+        .uw-a11y-walk-details {
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .uw-a11y-walk-details summary {
+            cursor: pointer;
+            color: #4f46e5;
+            font-weight: 600;
+            padding: 4px 0;
+        }
+
+        .uw-a11y-walk-details p {
+            margin: 6px 0 0;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        .uw-a11y-walk-learn {
+            display: inline-block;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .uw-a11y-walk-learn:hover {
+            text-decoration: underline;
+        }
+
+        .uw-a11y-walk-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .uw-a11y-walk-actions .uw-a11y-walk-show {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .uw-a11y-walk-verify {
+            flex: 1;
+            min-width: 140px;
+            justify-content: center;
+            background: #4f46e5;
+            color: #fff;
+            border: none;
+            font-weight: 700;
+            transition: background 0.15s;
+        }
+
+        .uw-a11y-walk-verify:hover {
+            background: #4338ca;
+        }
+
+        .uw-a11y-walk-verify.is-verified {
+            background: #fff;
+            color: #065f46;
+            border: 1px solid #10b981;
+            font-weight: 600;
+        }
+
+        .uw-a11y-walk-verify.is-verified:hover {
+            filter: none;
+            background: #f0fdf4;
+        }
+
+        .uw-a11y-walk-nav {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 12px 18px;
+            border-top: 1px solid rgba(0,0,0,0.06);
+            background: #fafafa;
+        }
+
+        .uw-a11y-walk-nav .uw-a11y-btn {
+            min-width: 100px;
+            justify-content: center;
+        }
+
+        .uw-a11y-walk-next {
+            background: #4f46e5;
+            color: #fff;
+        }
+
+        .uw-a11y-walk-next:hover {
+            background: #4338ca;
+        }
+
+        .uw-a11y-walk-prev:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
 
         .uw-a11y-coming-soon {
@@ -6055,6 +6935,8 @@
             const onPointerDown = (e) => {
                 // Only left-click/primary pointer drags
                 if (e.button !== undefined && e.button !== 0) return;
+                // Disable dragging when docked
+                if (wrapper.classList.contains('uw-a11y-docked-right')) return;
                 // Do not start a drag when clicking header controls (close, etc.)
                 if (e.target && e.target.closest && e.target.closest('.uw-a11y-header-buttons')) {
                     return; // allow normal button clicks
@@ -6105,6 +6987,8 @@
 
         // Apply previously saved position to the wrapper, if present
         applySavedPosition: function() {
+            // Skip when docked — the dock CSS controls placement.
+            if (this.getDockPosition() === 'right') return;
             try {
                 const raw = sessionStorage.getItem('uw-a11y-pos');
                 if (!raw) return;
@@ -6233,9 +7117,12 @@
 
         // Calculate the maximum allowed content height
         getMaxContentHeight: function() {
-            // Calculate 85vh minus the header height (approximately 60px)
-            const maxHeight = Math.floor(window.innerHeight * 0.85) - 60;
-            return Math.max(200, maxHeight); // Minimum height of 200px
+            // Account for the wrapper's actual layout: 20px top offset + 4px wrapper
+            // padding + ~60px header + 4px wrapper padding + 20px bottom breathing room.
+            // Using 0.85vh would leave ~100px of usable viewport unused on tall windows
+            // and force a tiny scrollbar even when there's room to grow.
+            const maxHeight = window.innerHeight - 108;
+            return Math.max(200, maxHeight);
         },
 
         // Measure the height of a specific view section with max-height constraint
@@ -6645,7 +7532,7 @@
             const detail = root.getElementById('uw-a11y-inspector-detail');
             if (hub) hub.removeAttribute('hidden');
             if (detail) detail.setAttribute('hidden', '');
-            ['outline', 'links', 'cvd', 'alt'].forEach((id) => {
+            ['outline', 'links', 'cvd', 'alt', 'contrast'].forEach((id) => {
                 const p = root.getElementById('uw-a11y-inspector-panel-' + id);
                 if (p) p.setAttribute('hidden', '');
             });
@@ -6675,7 +7562,8 @@
                 outline: 'Page outline',
                 links: 'Links',
                 cvd: 'Color blindness simulation',
-                alt: 'Alternative text'
+                alt: 'Alternative text',
+                contrast: 'Contrast checker'
             };
             if (!titles[panelId]) return;
             const root = this.shadowRoot;
@@ -6688,7 +7576,7 @@
             if (hub) hub.setAttribute('hidden', '');
             if (detail) detail.removeAttribute('hidden');
 
-            ['outline', 'links', 'cvd', 'alt'].forEach((id) => {
+            ['outline', 'links', 'cvd', 'alt', 'contrast'].forEach((id) => {
                 const p = root.getElementById('uw-a11y-inspector-panel-' + id);
                 if (p) {
                     if (id === panelId) p.removeAttribute('hidden');
@@ -6800,54 +7688,46 @@
                 if (this.isAltTextOverlayActive) parts.push('Overlays on');
                 sa.textContent = parts.length ? parts.join(' · ') : 'Off';
             }
+
+            const scc = root.getElementById('uw-a11y-inspector-hub-status-contrast');
+            if (scc) {
+                const s = this.contrastCheckerState;
+                if (s && s.ratio != null) {
+                    scc.textContent = `${s.ratio.toFixed(2)}:1 — ${s.fg.toUpperCase()} on ${s.bg.toUpperCase()}`;
+                } else {
+                    scc.textContent = 'No colors picked';
+                }
+            }
         },
 
         // Initialize inspector tools event handlers
         initInspectorTools: function() {
-            // Tab order toggle button
+            // Overlay tool slide toggles. The toggle*Visualization functions
+            // flip internal state (isTabOrderActive, etc.) and show/hide the
+            // page overlay; we just hook the checkbox change event to them and
+            // sync each checkbox to the current state on init so re-entering
+            // the Inspector view reflects whatever's actually on the page.
             const tabOrderToggle = this.shadowRoot.getElementById('uw-a11y-tab-order-toggle');
             if (tabOrderToggle) {
-                tabOrderToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.toggleTabOrderVisualization();
-                });
+                tabOrderToggle.checked = !!this.isTabOrderActive;
+                tabOrderToggle.addEventListener('change', () => this.toggleTabOrderVisualization());
             }
 
-            // Focus indicators toggle button
             const focusIndicatorsToggle = this.shadowRoot.getElementById('uw-a11y-focus-indicators-toggle');
             if (focusIndicatorsToggle) {
-                focusIndicatorsToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.toggleFocusIndicatorsVisualization();
-                });
+                focusIndicatorsToggle.checked = !!this.isFocusIndicatorsActive;
+                focusIndicatorsToggle.addEventListener('change', () => this.toggleFocusIndicatorsVisualization());
             }
 
-            // Landmark structure toggle button
             const landmarkStructureToggle = this.shadowRoot.getElementById('uw-a11y-landmark-structure-toggle');
             if (landmarkStructureToggle) {
-                landmarkStructureToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.toggleLandmarkStructureVisualization();
-                });
+                landmarkStructureToggle.checked = !!this.isLandmarkStructureActive;
+                landmarkStructureToggle.addEventListener('change', () => this.toggleLandmarkStructureVisualization());
             }
 
-            // Outline view toggle button
-            const outlineToggle = this.shadowRoot.getElementById('uw-a11y-outline-toggle');
-            if (outlineToggle) {
-                outlineToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.toggleOutlineView();
-                });
-            }
-
-            // Links list toggle button
-            const linksToggle = this.shadowRoot.getElementById('uw-a11y-links-toggle');
-            if (linksToggle) {
-                linksToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.toggleLinksView();
-                });
-            }
+            // Outline / Links / Alt list — these sub-pages auto-show their list
+            // on entry (see _autoActivateInspectorDetailPanel) so there's no
+            // user-facing toggle for them anymore.
 
             // Color blindness simulation radio group
             const cvdList = this.shadowRoot.getElementById('uw-a11y-cvd-list');
@@ -6860,22 +7740,12 @@
                 });
             }
 
-            // Alt text list toggle
-            const altListToggle = this.shadowRoot.getElementById('uw-a11y-alt-list-toggle');
-            if (altListToggle) {
-                altListToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.toggleAltTextList();
-                });
-            }
-
-            // Alt text overlay toggle
+            // Alt-text overlays slide toggle (only the page-overlay variant
+            // remains as a user-facing control; the list itself auto-shows).
             const altOverlayToggle = this.shadowRoot.getElementById('uw-a11y-alt-overlay-toggle');
             if (altOverlayToggle) {
-                altOverlayToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.toggleAltTextOverlay();
-                });
+                altOverlayToggle.checked = !!this.isAltTextOverlayActive;
+                altOverlayToggle.addEventListener('change', () => this.toggleAltTextOverlay());
             }
 
             const openOutline = this.shadowRoot.getElementById('uw-a11y-inspector-open-outline');
@@ -6907,6 +7777,16 @@
                 });
             }
 
+            const openContrast = this.shadowRoot.getElementById('uw-a11y-inspector-open-contrast');
+            if (openContrast) {
+                openContrast.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.openInspectorDetail('contrast');
+                });
+            }
+
+            this.initContrastChecker();
+
             const backBtn = this.shadowRoot.getElementById('uw-a11y-inspector-back');
             if (backBtn) {
                 backBtn.addEventListener('click', (e) => {
@@ -6928,6 +7808,348 @@
             }
 
             this.syncInspectorHubStatus();
+        },
+
+        // ── Contrast checker ─────────────────────────────────────────────
+        initContrastChecker: function() {
+            if (this._contrastCheckerInitialized) return;
+            this._contrastCheckerInitialized = true;
+
+            this.contrastCheckerState = { fg: '#000000', bg: '#ffffff', ratio: null };
+
+            const root = this.shadowRoot;
+            if (!root) return;
+
+            const hexFg = root.getElementById('uw-a11y-contrast-hex-fg');
+            const hexBg = root.getElementById('uw-a11y-contrast-hex-bg');
+            const colorFg = root.getElementById('uw-a11y-contrast-color-fg');
+            const colorBg = root.getElementById('uw-a11y-contrast-color-bg');
+            const pickElementBtn = root.getElementById('uw-a11y-contrast-pick-element');
+            const swapBtn = root.getElementById('uw-a11y-contrast-swap');
+            const resetBtn = root.getElementById('uw-a11y-contrast-reset');
+
+            const onHexInput = (role, input) => {
+                const v = (input.value || '').trim();
+                const hex = this.normalizeHexColor(v);
+                if (hex) this.setContrastColor(role, hex, { source: 'hex' });
+            };
+            if (hexFg) hexFg.addEventListener('change', () => onHexInput('foreground', hexFg));
+            if (hexBg) hexBg.addEventListener('change', () => onHexInput('background', hexBg));
+            if (hexFg) hexFg.addEventListener('blur', () => onHexInput('foreground', hexFg));
+            if (hexBg) hexBg.addEventListener('blur', () => onHexInput('background', hexBg));
+            if (colorFg) colorFg.addEventListener('input', () => this.setContrastColor('foreground', colorFg.value, { source: 'color' }));
+            if (colorBg) colorBg.addEventListener('input', () => this.setContrastColor('background', colorBg.value, { source: 'color' }));
+
+            if (pickElementBtn) pickElementBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.startContrastPickerMode();
+            });
+
+            if (swapBtn) swapBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const s = this.contrastCheckerState;
+                const fg = s.fg, bg = s.bg;
+                this.setContrastColor('foreground', bg, { silent: true });
+                this.setContrastColor('background', fg);
+            });
+
+            if (resetBtn) resetBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.setContrastColor('foreground', '#000000', { silent: true });
+                this.setContrastColor('background', '#ffffff');
+            });
+
+            this.recomputeContrastResult();
+        },
+
+        // Accept '#abc', '#aabbcc', 'rgb(...)' and return '#rrggbb' (or null).
+        normalizeHexColor: function(value) {
+            if (!value) return null;
+            const v = String(value).trim().toLowerCase();
+            const hexMatch = v.match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/);
+            if (hexMatch) {
+                let h = hexMatch[1];
+                if (h.length === 3) h = h.split('').map(c => c + c).join('');
+                return '#' + h;
+            }
+            const rgbMatch = v.match(/rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+            if (rgbMatch) {
+                const r = Math.max(0, Math.min(255, parseInt(rgbMatch[1], 10)));
+                const g = Math.max(0, Math.min(255, parseInt(rgbMatch[2], 10)));
+                const b = Math.max(0, Math.min(255, parseInt(rgbMatch[3], 10)));
+                return '#' + [r, g, b].map(n => n.toString(16).padStart(2, '0')).join('');
+            }
+            return null;
+        },
+
+        setContrastColor: function(role, hexInput, opts) {
+            const hex = this.normalizeHexColor(hexInput);
+            if (!hex) return;
+            const state = this.contrastCheckerState || (this.contrastCheckerState = { fg: '#000000', bg: '#ffffff', ratio: null });
+            if (role === 'foreground') state.fg = hex;
+            else if (role === 'background') state.bg = hex;
+            else return;
+
+            const root = this.shadowRoot;
+            if (!root) return;
+
+            const suffix = role === 'foreground' ? 'fg' : 'bg';
+            const hexInputEl = root.getElementById('uw-a11y-contrast-hex-' + suffix);
+            const colorInputEl = root.getElementById('uw-a11y-contrast-color-' + suffix);
+            if (hexInputEl && hexInputEl.value.toLowerCase() !== hex) hexInputEl.value = hex;
+            if (colorInputEl && colorInputEl.value.toLowerCase() !== hex) colorInputEl.value = hex;
+
+            if (!opts || !opts.silent) this.recomputeContrastResult();
+        },
+
+        recomputeContrastResult: function() {
+            const root = this.shadowRoot;
+            const state = this.contrastCheckerState;
+            if (!root || !state) return;
+
+            const swatchFg = root.getElementById('uw-a11y-contrast-swatch-fg');
+            const swatchBg = root.getElementById('uw-a11y-contrast-swatch-bg');
+            if (swatchFg) swatchFg.style.background = state.fg;
+            if (swatchBg) swatchBg.style.background = state.bg;
+
+            const preview = root.getElementById('uw-a11y-contrast-preview');
+            if (preview) {
+                preview.style.color = state.fg;
+                preview.style.background = state.bg;
+            }
+
+            const ratio = this.calculateContrastRatio(state.fg, state.bg);
+            state.ratio = ratio;
+
+            const ratioValue = root.getElementById('uw-a11y-contrast-ratio-value');
+            if (ratioValue) ratioValue.textContent = ratio != null ? `${ratio.toFixed(2)}:1` : '—';
+
+            const checks = [
+                { key: 'aa-normal', threshold: 4.5 },
+                { key: 'aa-large', threshold: 3.0 },
+                { key: 'aaa-normal', threshold: 7.0 },
+                { key: 'aaa-large', threshold: 4.5 },
+                { key: 'ui', threshold: 3.0 }
+            ];
+            const list = root.getElementById('uw-a11y-contrast-checks');
+            if (list) {
+                checks.forEach(({ key, threshold }) => {
+                    const li = list.querySelector(`[data-check="${key}"]`);
+                    if (!li) return;
+                    const badge = li.querySelector('.uw-a11y-contrast-check-badge');
+                    li.classList.remove('is-pass', 'is-fail');
+                    if (ratio == null) {
+                        if (badge) badge.textContent = '—';
+                    } else if (ratio >= threshold) {
+                        li.classList.add('is-pass');
+                        if (badge) badge.textContent = 'Pass';
+                    } else {
+                        li.classList.add('is-fail');
+                        if (badge) badge.textContent = 'Fail';
+                    }
+                });
+            }
+
+            this.syncInspectorHubStatus();
+            if (this.currentView === 'inspector') this.syncInspectorContentHeight();
+        },
+
+        // Detect a gradient on the element or up to 3 ancestors. Skips thin
+        // decorative gradients (background-size height ≤ 4px). Returns
+        // { gradientCss, gradientEl } or null.
+        findContrastGradientSource: function(el) {
+            const check = (node) => {
+                if (!node || node.nodeType !== 1) return null;
+                const cs = window.getComputedStyle(node);
+                const bgImg = cs.backgroundImage;
+                if (!bgImg || bgImg === 'none' || !bgImg.includes('gradient')) return null;
+                const bgSize = cs.backgroundSize;
+                if (bgSize) {
+                    const parts = bgSize.trim().split(/\s+/);
+                    const heightStr = parts[1] || parts[0];
+                    const pxMatch = heightStr && heightStr.match(/^([\d.]+)px$/);
+                    if (pxMatch && parseFloat(pxMatch[1]) <= 4) return null;
+                }
+                return bgImg;
+            };
+
+            let g = check(el);
+            if (g) return { gradientCss: g, gradientEl: el };
+            let anc = el.parentElement;
+            for (let d = 0; d < 3 && anc; d++, anc = anc.parentElement) {
+                g = check(anc);
+                if (g) return { gradientCss: g, gradientEl: anc };
+            }
+            return null;
+        },
+
+        // Sample fg + bg for the contrast checker, handling gradients by
+        // delegating to analyzeGradientBackground (worst-case stop within the
+        // text element's region, matching how the scan engine reports it).
+        sampleElementContrastColors: function(el) {
+            const fgCss = window.getComputedStyle(el).color;
+            const fgHex = this.normalizeHexColor(fgCss);
+
+            const gradient = this.findContrastGradientSource(el);
+            if (gradient && fgCss) {
+                const result = this.analyzeGradientBackground(gradient.gradientCss, fgCss, el, gradient.gradientEl);
+                if (result && result.background) {
+                    const bgHex = this.normalizeHexColor(result.background);
+                    if (bgHex) {
+                        return { fg: fgHex, bg: bgHex, gradient: true, sampleCount: result.sampleCount };
+                    }
+                }
+            }
+
+            return { fg: fgHex, bg: this.getElementEffectiveBackground(el), gradient: false };
+        },
+
+        // Walk up the ancestor chain to find the first non-transparent background-color.
+        getElementEffectiveBackground: function(el) {
+            let node = el;
+            while (node && node.nodeType === 1) {
+                const cs = window.getComputedStyle(node);
+                const bg = cs.backgroundColor;
+                if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
+                    const m = bg.match(/rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?/);
+                    if (m) {
+                        const alpha = m[4] != null ? parseFloat(m[4]) : 1;
+                        if (alpha > 0) {
+                            const r = parseInt(m[1], 10), g = parseInt(m[2], 10), b = parseInt(m[3], 10);
+                            return '#' + [r, g, b].map(n => n.toString(16).padStart(2, '0')).join('');
+                        }
+                    }
+                }
+                node = node.parentElement;
+            }
+            return '#ffffff';
+        },
+
+        // Picker mode dedicated to sampling colors for the contrast tool.
+        // Samples both foreground (computed `color`) and background (effective
+        // ancestor `background-color`) from a single element click.
+        startContrastPickerMode: function() {
+            if (this.isPickerActive) return;
+            this.isPickerActive = true;
+
+            const wrapper = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-wrapper');
+            if (wrapper) {
+                wrapper.dataset.pickerOrigOpacity = wrapper.style.opacity || '';
+                wrapper.style.opacity = '0.15';
+                wrapper.style.pointerEvents = 'none';
+            }
+
+            this.injectPickerStyles();
+
+            const highlight = document.createElement('div');
+            highlight.id = 'uw-a11y-picker-highlight';
+            highlight.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(highlight);
+            this.pickerHighlightEl = highlight;
+
+            const tooltip = document.createElement('div');
+            tooltip.id = 'uw-a11y-picker-tooltip';
+            tooltip.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(tooltip);
+            this.pickerTooltipEl = tooltip;
+
+            const doneBtn = document.createElement('button');
+            doneBtn.id = 'uw-a11y-picker-done';
+            doneBtn.textContent = 'Cancel — click any element to sample its colors';
+            doneBtn.setAttribute('aria-label', 'Cancel picking and return to contrast checker');
+            document.body.appendChild(doneBtn);
+            this.pickerDoneBtn = doneBtn;
+            doneBtn.addEventListener('click', () => this.stopContrastPickerMode());
+
+            document.body.style.cursor = 'crosshair';
+            this.playSound('ui');
+
+            this._pickerMoveHandler = (e) => this.onContrastPickerMouseMove(e);
+            this._pickerClickHandler = (e) => this.onContrastPickerClick(e);
+            this._pickerKeyHandler = (e) => { if (e.key === 'Escape') this.stopContrastPickerMode(); };
+
+            document.addEventListener('mousemove', this._pickerMoveHandler);
+            document.addEventListener('click', this._pickerClickHandler, true);
+            document.addEventListener('keydown', this._pickerKeyHandler, true);
+        },
+
+        stopContrastPickerMode: function() {
+            if (!this.isPickerActive) return;
+            this.isPickerActive = false;
+
+            const wrapper = this.shadowRoot && this.shadowRoot.getElementById('uw-a11y-wrapper');
+            if (wrapper) {
+                wrapper.style.opacity = wrapper.dataset.pickerOrigOpacity || '';
+                wrapper.style.pointerEvents = '';
+                delete wrapper.dataset.pickerOrigOpacity;
+            }
+
+            if (this.pickerHighlightEl) { this.pickerHighlightEl.remove(); this.pickerHighlightEl = null; }
+            if (this.pickerTooltipEl) { this.pickerTooltipEl.remove(); this.pickerTooltipEl = null; }
+            if (this.pickerDoneBtn) { this.pickerDoneBtn.remove(); this.pickerDoneBtn = null; }
+
+            const st = document.getElementById('uw-a11y-picker-styles');
+            if (st) st.remove();
+
+            if (this._pickerMoveHandler) document.removeEventListener('mousemove', this._pickerMoveHandler);
+            if (this._pickerClickHandler) document.removeEventListener('click', this._pickerClickHandler, true);
+            if (this._pickerKeyHandler) document.removeEventListener('keydown', this._pickerKeyHandler, true);
+            this._pickerMoveHandler = null;
+            this._pickerClickHandler = null;
+            this._pickerKeyHandler = null;
+
+            document.body.style.cursor = '';
+            this.playSound('ui');
+        },
+
+        onContrastPickerMouseMove: function(e) {
+            const el = this.getPickerTargetAt(e.clientX, e.clientY);
+            if (!el) {
+                if (this.pickerHighlightEl) this.pickerHighlightEl.style.display = 'none';
+                if (this.pickerTooltipEl) this.pickerTooltipEl.style.display = 'none';
+                return;
+            }
+            const rect = el.getBoundingClientRect();
+            const h = this.pickerHighlightEl;
+            if (h) {
+                h.style.display = 'block';
+                h.style.left   = (rect.left + window.scrollX) + 'px';
+                h.style.top    = (rect.top  + window.scrollY) + 'px';
+                h.style.width  = rect.width  + 'px';
+                h.style.height = rect.height + 'px';
+            }
+            const t = this.pickerTooltipEl;
+            if (t) {
+                t.style.display = 'block';
+                const sample = this.sampleElementContrastColors(el);
+                const fgLabel = sample.fg ? sample.fg.toUpperCase() : '?';
+                const bgLabel = sample.bg ? sample.bg.toUpperCase() : '?';
+                const tail = sample.gradient ? ' (gradient · worst stop)' : '';
+                t.textContent = `${this.getPickerBadgeText(el)} — ${fgLabel} on ${bgLabel}${tail}`;
+                const badgeTop = rect.top + window.scrollY - 28;
+                t.style.left = (rect.left + window.scrollX) + 'px';
+                t.style.top  = (badgeTop > 0 ? badgeTop : rect.bottom + window.scrollY + 4) + 'px';
+            }
+        },
+
+        onContrastPickerClick: function(e) {
+            const el = this.getPickerTargetAt(e.clientX, e.clientY);
+            if (!el) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const sample = this.sampleElementContrastColors(el);
+
+            if (sample.fg) this.setContrastColor('foreground', sample.fg, { silent: true });
+            if (sample.bg) this.setContrastColor('background', sample.bg);
+
+            if (sample.fg || sample.bg) {
+                this.playSound('verify');
+                if (this.pickerHighlightEl) this.pickerHighlightEl.classList.add('uw-a11y-picker-selected');
+            }
+
+            setTimeout(() => this.stopContrastPickerMode(), 350);
         },
 
         // Toggle heading outline view (in-panel, not a page overlay)
@@ -7061,7 +8283,7 @@
             const prevOffset = target.style.outlineOffset;
             const prevTransition = target.style.transition;
             target.style.transition = 'outline 0.15s';
-            target.style.outline = '3px solid #6d28d9';
+            target.style.outline = '3px solid #4f46e5';
             target.style.outlineOffset = '4px';
             setTimeout(() => {
                 target.style.outline = prevOutline;
@@ -8725,6 +9947,28 @@
 
                     <div class="uw-a11y-pref-row">
                         <div class="uw-a11y-pref-label">
+                            <strong>Dock to right side</strong>
+                            <span>Pin the panel to the right edge full-height. Page content shifts to make room. Off by default — the panel floats and is draggable.</span>
+                        </div>
+                        <label class="uw-a11y-toggle" aria-label="Dock panel to right side">
+                            <input id="uw-a11y-dock-toggle" type="checkbox" ${this.getDockPosition() === 'right' ? 'checked' : ''}>
+                            <span class="uw-a11y-toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="uw-a11y-pref-row">
+                        <div class="uw-a11y-pref-label">
+                            <strong>Default to advanced view</strong>
+                            <span>Skip the curated "Top things to fix" landing and open straight to the full filterable list of every finding.</span>
+                        </div>
+                        <label class="uw-a11y-toggle" aria-label="Default to advanced results view">
+                            <input id="uw-a11y-default-advanced-toggle" type="checkbox" ${this.getDefaultResultsView() === 'advanced' ? 'checked' : ''}>
+                            <span class="uw-a11y-toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="uw-a11y-pref-row">
+                        <div class="uw-a11y-pref-label">
                             <strong>UI Sounds</strong>
                             <span>Subtle audio cues on scan complete, navigation, and interactions.</span>
                         </div>
@@ -8892,6 +10136,25 @@
                     } else {
                         localStorage.setItem('uw-a11y-sounds', 'off');
                     }
+                });
+            }
+
+            // Dock toggle — applies instantly, no re-scan needed
+            const dockToggle = this.shadowRoot.getElementById('uw-a11y-dock-toggle');
+            if (dockToggle) {
+                dockToggle.addEventListener('change', () => {
+                    this.setDockPosition(dockToggle.checked ? 'right' : 'floating');
+                    this.playSound('ui');
+                });
+            }
+
+            // Default-to-advanced toggle — saves preference, takes effect on next scan
+            // (or when results panel re-renders).
+            const defaultAdvToggle = this.shadowRoot.getElementById('uw-a11y-default-advanced-toggle');
+            if (defaultAdvToggle) {
+                defaultAdvToggle.addEventListener('change', () => {
+                    this.setDefaultResultsView(defaultAdvToggle.checked ? 'advanced' : 'guided');
+                    this.playSound('ui');
                 });
             }
 
@@ -9765,7 +11028,26 @@
             const dismissed = this.getDismissedIssues();
             const groupedIssues = this.groupIssuesByRule(issuesToShow);
             // Filter out dismissed rule groups
-            const visibleRuleIds = Object.keys(groupedIssues).filter(id => !dismissed.has(id));
+            // Order rule groups by type (violations → manual review → best practice),
+            // then by axe impact (critical → serious → moderate → minor → unknown),
+            // then by node count desc so broader symptoms surface first.
+            const typeRank = { error: 0, warning: 1, info: 2 };
+            const impactRank = { critical: 0, serious: 1, moderate: 2, minor: 3 };
+            const visibleRuleIds = Object.keys(groupedIssues)
+                .filter(id => !dismissed.has(id))
+                .sort((a, b) => {
+                    const ga = groupedIssues[a][0];
+                    const gb = groupedIssues[b][0];
+                    const ta = typeRank[ga.type] == null ? 3 : typeRank[ga.type];
+                    const tb = typeRank[gb.type] == null ? 3 : typeRank[gb.type];
+                    if (ta !== tb) return ta - tb;
+                    const ia = impactRank[(ga.impact || '').toLowerCase()];
+                    const ib = impactRank[(gb.impact || '').toLowerCase()];
+                    const iaR = ia == null ? 4 : ia;
+                    const ibR = ib == null ? 4 : ib;
+                    if (iaR !== ibR) return iaR - ibR;
+                    return groupedIssues[b].length - groupedIssues[a].length;
+                });
             if (visibleRuleIds.length === 0) {
                 const dismissedCount = dismissed.size;
                 results.innerHTML = `
@@ -10000,11 +11282,524 @@
             });
         },
         
+        // ── Guided view ────────────────────────────────────────────────────
+        // Friendly, plain-English headlines for the most common axe rule IDs.
+        // Anything not in this map falls back to the rule's own title/description,
+        // so adding entries is purely additive — broken rules just look like the
+        // existing detailed view.
+        getFriendlyRuleHeadline: function(ruleId, fallback) {
+            const map = {
+                'color-contrast': 'Text is hard to read in places',
+                'color-contrast-enhanced': 'Text contrast is below the AAA threshold',
+                'image-alt': 'Some images are missing alt text',
+                'input-image-alt': 'An image button needs alt text',
+                'area-alt': 'An image-map area is missing alt text',
+                'svg-img-alt': 'An SVG used as an image is missing a label',
+                'role-img-alt': 'An element with role="img" needs a label',
+                'label': 'A form input has no label',
+                'form-field-multiple-labels': 'A form field has conflicting labels',
+                'select-name': 'A select dropdown has no accessible name',
+                'button-name': 'A button has no accessible name',
+                'link-name': 'A link has no readable text',
+                'link-in-text-block': 'A link blends in with surrounding text',
+                'empty-heading': 'A heading is empty',
+                'heading-order': 'Headings skip levels in the page outline',
+                'page-has-heading-one': 'The page is missing an <h1>',
+                'document-title': 'The page is missing a <title>',
+                'html-has-lang': 'The page is missing a language attribute',
+                'html-lang-valid': 'The page’s language code looks invalid',
+                'valid-lang': 'A language code on an element looks invalid',
+                'aria-allowed-attr': 'Some ARIA attributes look wrong',
+                'aria-allowed-role': 'A role is being used on the wrong kind of element',
+                'aria-required-attr': 'An ARIA widget is missing required attributes',
+                'aria-required-children': 'An ARIA container is missing expected children',
+                'aria-required-parent': 'An ARIA element needs a specific parent',
+                'aria-roles': 'An ARIA role looks invalid',
+                'aria-valid-attr': 'An ARIA attribute name looks invalid',
+                'aria-valid-attr-value': 'An ARIA attribute has an unexpected value',
+                'aria-hidden-body': 'The whole page is hidden from screen readers',
+                'aria-hidden-focus': 'Something focusable is hidden from screen readers',
+                'aria-input-field-name': 'An ARIA input has no accessible name',
+                'aria-toggle-field-name': 'An ARIA toggle has no accessible name',
+                'aria-command-name': 'An ARIA command has no accessible name',
+                'aria-progressbar-name': 'A progress bar has no accessible name',
+                'aria-meter-name': 'A meter has no accessible name',
+                'aria-tooltip-name': 'A tooltip has no accessible name',
+                'aria-treeitem-name': 'A tree item has no accessible name',
+                'list': 'A list contains the wrong kind of children',
+                'listitem': 'A list item is outside of a list',
+                'definition-list': 'A definition list is structured incorrectly',
+                'dlitem': 'A definition list item is outside of a <dl>',
+                'duplicate-id': 'Two elements share the same ID',
+                'duplicate-id-active': 'Two interactive elements share the same ID',
+                'duplicate-id-aria': 'Two ARIA-referenced elements share the same ID',
+                'frame-title': 'An iframe has no title',
+                'frame-title-unique': 'Two iframes share the same title',
+                'object-alt': 'An <object> element has no text alternative',
+                'video-caption': 'A video is missing captions',
+                'audio-caption': 'Audio is missing a caption track',
+                'meta-viewport': 'The viewport disables zoom',
+                'meta-refresh': 'The page auto-refreshes, which is disorienting',
+                'tabindex': 'A positive tabindex disrupts the tab order',
+                'bypass': 'There’s no skip-to-content shortcut',
+                'region': 'Some content sits outside any landmark region',
+                'landmark-one-main': 'The page has no <main> landmark',
+                'landmark-no-duplicate-banner': 'The page has more than one banner',
+                'landmark-no-duplicate-contentinfo': 'The page has more than one contentinfo',
+                'landmark-no-duplicate-main': 'The page has more than one <main>',
+                'scope-attr-valid': 'A table’s scope attribute is invalid',
+                'scrollable-region-focusable': 'A scrollable region isn’t keyboard reachable',
+                'autocomplete-valid': 'A form field’s autocomplete value is invalid',
+                'avoid-inline-spacing': 'Inline styles override accessibility spacing',
+                'nested-interactive': 'An interactive element is nested inside another',
+                'no-autoplay-audio': 'Audio plays automatically and can’t be paused',
+                'blink': 'A <blink> element will distract some users',
+                'marquee': 'A <marquee> element will distract some users'
+            };
+            return map[ruleId] || fallback;
+        },
+
+        // Allowlist of axe rule IDs whose problems and fixes are understandable
+        // to non-developers (content authors, designers, marketers). Anything
+        // that requires reading/writing ARIA, understanding landmark roles, or
+        // editing markup structure is intentionally excluded — those land in
+        // Advanced view, where the tone matches the audience. Every entry here
+        // should also have a friendly headline in `getFriendlyRuleHeadline`.
+        getApproachableRules: function() {
+            return new Set([
+                'color-contrast',
+                'color-contrast-enhanced',
+                'image-alt',
+                'input-image-alt',
+                'area-alt',
+                'svg-img-alt',
+                'role-img-alt',
+                'object-alt',
+                'label',
+                'form-field-multiple-labels',
+                'select-name',
+                'button-name',
+                'link-name',
+                'link-in-text-block',
+                'empty-heading',
+                'heading-order',
+                'page-has-heading-one',
+                'document-title',
+                'html-has-lang',
+                'html-lang-valid',
+                'valid-lang',
+                'frame-title',
+                'frame-title-unique',
+                'video-caption',
+                'audio-caption',
+                'meta-viewport',
+                'meta-refresh',
+                'no-autoplay-audio',
+                'duplicate-id',
+                'blink',
+                'marquee'
+            ]);
+        },
+
+        // Pick the top N issue groups to surface in Guided mode.
+        // Includes hard violations AND unverified manual-review items whose rule
+        // ID is in the approachable allowlist — for example, axe will flag a
+        // gradient-background contrast as manual review when it can't compute
+        // the ratio confidently, and that's still very much something a non-
+        // developer cares about. Verified manual-review items are excluded
+        // (the user already confirmed them OK). Best-practice info items stay
+        // out — Guided is about what's broken.
+        // Sort: severity (critical → serious → moderate → minor → unknown),
+        // then node count desc.
+        getGuidedTopGroups: function(limit) {
+            const max = limit || 3;
+            const dismissed = this.getDismissedIssues();
+            const approachable = this.getApproachableRules();
+
+            const candidates = this.issues.filter(i => {
+                if (i.type === 'error') return true;
+                if (i.type === 'warning' && i.uniqueId && !this.checkedItems.has(i.uniqueId)) return true;
+                return false;
+            });
+            const grouped = this.groupIssuesByRule(candidates);
+
+            const impactWeight = { critical: 0, serious: 1, moderate: 2, minor: 3 };
+            const ranked = Object.keys(grouped)
+                .filter(id => !dismissed.has(id))
+                .map(id => {
+                    const group = grouped[id];
+                    const first = group[0];
+                    const w = impactWeight[(first.impact || '').toLowerCase()];
+                    return {
+                        ruleId: id,
+                        group: group,
+                        first: first,
+                        impactWeight: w == null ? 4 : w,
+                        nodeCount: group.length,
+                        // Strip the type suffix that groupIssuesByRule appends ("-error", etc.)
+                        // so we can compare against axe rule IDs directly.
+                        baseRuleId: (first.ruleId || '').toLowerCase()
+                    };
+                })
+                .filter(entry => approachable.has(entry.baseRuleId))
+                .sort((a, b) => {
+                    if (a.impactWeight !== b.impactWeight) return a.impactWeight - b.impactWeight;
+                    return b.nodeCount - a.nodeCount;
+                });
+
+            return ranked.slice(0, max);
+        },
+
+        // Render the guided "Top things to fix" landing into #uw-a11y-guided.
+        renderGuidedView: function() {
+            const guided = this.shadowRoot.getElementById('uw-a11y-guided');
+            if (!guided) return;
+
+            const top = this.getGuidedTopGroups(3);
+            const totalFindings = this.issues.length;
+
+            if (top.length === 0) {
+                // Either there are zero issues to act on, or all remaining ones
+                // are developer-level (ARIA wiring, landmark structure, etc.)
+                // and got filtered out of Guided. Word the message accordingly.
+                const candidateCount = this.issues.filter(i => {
+                    if (i.type === 'error') return true;
+                    if (i.type === 'warning' && i.uniqueId && !this.checkedItems.has(i.uniqueId)) return true;
+                    return false;
+                }).length;
+                const hasTechnicalOnly = candidateCount > 0;
+                const heading = hasTechnicalOnly ? 'Nothing common to fix here' : 'Looks great';
+                const body = hasTechnicalOnly
+                    ? `The remaining ${candidateCount} issue${candidateCount === 1 ? '' : 's'} ${candidateCount === 1 ? 'is' : 'are'} more technical (ARIA wiring, landmark structure, and similar). Open the Advanced view to review them.`
+                    : `No automated violations were found on this page.${totalFindings > 0 ? ' You may still want to review the manual-review and best-practice items.' : ''}`;
+                guided.innerHTML = `
+                    <div class="uw-a11y-guided-empty${hasTechnicalOnly ? ' uw-a11y-guided-empty--neutral' : ''}">
+                        <h3>${heading}</h3>
+                        <p>${body}</p>
+                        ${totalFindings > 0
+                            ? `<button class="uw-a11y-link-btn uw-a11y-guided-see-all" type="button">See all ${totalFindings} findings →</button>`
+                            : ''}
+                    </div>
+                `;
+                const seeAllEmpty = guided.querySelector('.uw-a11y-guided-see-all');
+                if (seeAllEmpty) seeAllEmpty.addEventListener('click', () => this.setResultsViewMode('advanced'));
+                return;
+            }
+
+            const cards = top.map((entry, idx) => {
+                const headline = this.getFriendlyRuleHeadline(entry.first.ruleId, entry.first.title);
+                const count = entry.nodeCount;
+                const affectsLine = count === 1
+                    ? 'Affects 1 element on this page.'
+                    : `Affects ${count} elements on this page.`;
+                const isManual = entry.first.type === 'warning';
+                const variantClass = isManual ? 'is-manual' : 'is-violation';
+                // Magnifying-glass for manual review, "!" for hard violations.
+                const iconHtml = isManual
+                    ? `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`
+                    : '!';
+                const badgeHtml = isManual
+                    ? `<span class="uw-a11y-guided-card-badge">Needs review</span>`
+                    : '';
+                return `
+                    <button type="button" class="uw-a11y-guided-card ${variantClass}" data-step="${idx}" data-rule-id="${this.escapeHtmlAttribute(entry.ruleId)}">
+                        <span class="uw-a11y-guided-icon" aria-hidden="true">${iconHtml}</span>
+                        <span class="uw-a11y-guided-card-text">
+                            <span class="uw-a11y-guided-card-title">${this.escapeHtmlContent(headline)}</span>
+                            <span class="uw-a11y-guided-card-meta">${badgeHtml}${this.escapeHtmlContent(affectsLine)}</span>
+                        </span>
+                        <span class="uw-a11y-guided-arrow" aria-hidden="true">→</span>
+                    </button>
+                `;
+            }).join('');
+
+            guided.innerHTML = `
+                <div class="uw-a11y-guided-wrap">
+                    <div class="uw-a11y-guided-header">
+                        <h3 class="uw-a11y-guided-heading">Top things to fix</h3>
+                        <span class="uw-a11y-guided-count">${top.length}</span>
+                    </div>
+                    <div class="uw-a11y-guided-cards">${cards}</div>
+                    <button type="button" class="uw-a11y-guided-walkthrough" id="uw-a11y-guided-walk">
+                        <svg class="uw-a11y-guided-walk-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="3 7 5 9 9 5"/>
+                            <polyline points="3 13 5 15 9 11"/>
+                            <polyline points="3 19 5 21 9 17"/>
+                            <line x1="13" y1="7" x2="21" y2="7"/>
+                            <line x1="13" y1="13" x2="21" y2="13"/>
+                            <line x1="13" y1="19" x2="21" y2="19"/>
+                        </svg>
+                        Walk me through these
+                    </button>
+                    <button type="button" class="uw-a11y-link-btn uw-a11y-guided-see-all">See all ${totalFindings} findings →</button>
+                </div>
+            `;
+
+            // Card click → jump straight into walkthrough at that step
+            guided.querySelectorAll('.uw-a11y-guided-card').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const step = parseInt(btn.dataset.step, 10) || 0;
+                    this.openWalkthrough(step);
+                });
+            });
+
+            const walkBtn = guided.querySelector('#uw-a11y-guided-walk');
+            if (walkBtn) walkBtn.addEventListener('click', () => this.openWalkthrough(0));
+
+            const seeAll = guided.querySelector('.uw-a11y-guided-see-all');
+            if (seeAll) seeAll.addEventListener('click', () => this.setResultsViewMode('advanced'));
+        },
+
+        // Render the small "Guided / Advanced" toggle pinned at the top of
+        // the results view. Always visible so users can flip back and forth.
+        renderResultsHeader: function() {
+            const header = this.shadowRoot.getElementById('uw-a11y-results-header');
+            if (!header) return;
+            const mode = this.resultsViewMode || 'guided';
+            header.innerHTML = `
+                <div class="uw-a11y-view-toggle" role="tablist" aria-label="Results view">
+                    <button type="button" role="tab" class="uw-a11y-view-toggle-btn ${mode === 'guided' ? 'is-active' : ''}" data-mode="guided" aria-selected="${mode === 'guided'}">Guided</button>
+                    <button type="button" role="tab" class="uw-a11y-view-toggle-btn ${mode === 'advanced' ? 'is-active' : ''}" data-mode="advanced" aria-selected="${mode === 'advanced'}">Advanced</button>
+                </div>
+            `;
+            header.querySelectorAll('.uw-a11y-view-toggle-btn').forEach(btn => {
+                btn.addEventListener('click', () => this.setResultsViewMode(btn.dataset.mode));
+            });
+        },
+
+        setResultsViewMode: function(mode) {
+            const next = mode === 'advanced' ? 'advanced' : 'guided';
+            if (this.resultsViewMode === next) return;
+            this.resultsViewMode = next;
+            const view = this.shadowRoot.getElementById('uw-a11y-view-results');
+            if (view) view.setAttribute('data-results-mode', next);
+            this.renderResultsHeader();
+            if (next === 'guided') {
+                this.closeWalkthrough(true);
+                this.renderGuidedView();
+            }
+            this.playSound('ui');
+            // Re-fit the panel height to the new content.
+            if (this.currentView === 'results') {
+                const content = this.shadowRoot.getElementById('uw-a11y-content');
+                if (content) {
+                    const target = this.measureViewHeight('results');
+                    const max = this.getMaxContentHeight();
+                    if (target) content.style.height = Math.min(target, max) + 'px';
+                }
+            }
+        },
+
+        // ── Walkthrough (one issue at a time) ──────────────────────────────
+        openWalkthrough: function(startIndex) {
+            const top = this.getGuidedTopGroups(3);
+            if (top.length === 0) return;
+            this.walkthroughGroups = top;
+            this.walkthroughIndex = Math.max(0, Math.min(startIndex || 0, top.length - 1));
+
+            // Build a modal-style overlay inside the results view.
+            const guided = this.shadowRoot.getElementById('uw-a11y-guided');
+            if (!guided) return;
+            guided.innerHTML = `<div class="uw-a11y-walkthrough" id="uw-a11y-walkthrough"></div>`;
+            this.renderWalkthroughStep();
+        },
+
+        renderWalkthroughStep: function() {
+            const host = this.shadowRoot.getElementById('uw-a11y-walkthrough');
+            if (!host || !this.walkthroughGroups) return;
+            const idx = this.walkthroughIndex || 0;
+            const total = this.walkthroughGroups.length;
+            const entry = this.walkthroughGroups[idx];
+            if (!entry) return;
+            const first = entry.first;
+            const headline = this.getFriendlyRuleHeadline(first.ruleId, first.title);
+            const count = entry.nodeCount;
+            const countLine = count === 1 ? '1 element' : `${count} elements`;
+
+            // Reset the instance pointer for this rule when stepping into a new rule.
+            const ruleId = entry.ruleId;
+            if (this.currentInstances[ruleId] == null) this.currentInstances[ruleId] = 0;
+            const instanceIdx = Math.min(this.currentInstances[ruleId], count - 1);
+            this.currentInstances[ruleId] = instanceIdx;
+
+            // Per-instance verification state for manual-review rules. Each
+            // instance has its own uniqueId tracked in checkedItems.
+            const currentInstance = entry.group[instanceIdx];
+            const isManualReview = first.type === 'warning';
+            const instanceVerified = isManualReview
+                && currentInstance && currentInstance.uniqueId
+                && this.checkedItems.has(currentInstance.uniqueId);
+            const verifiedSoFar = isManualReview
+                ? entry.group.filter(i => i.uniqueId && this.checkedItems.has(i.uniqueId)).length
+                : 0;
+
+            const instancePagerHtml = count > 1 ? `
+                <div class="uw-a11y-walk-instance-pager" role="group" aria-label="Navigate instances of this issue">
+                    <button type="button" class="uw-a11y-walk-instance-prev" aria-label="Previous instance" ${instanceIdx === 0 ? 'disabled' : ''}>‹</button>
+                    <span class="uw-a11y-walk-instance-label">Instance <strong>${instanceIdx + 1}</strong> of ${count}${isManualReview ? ` <span class="uw-a11y-walk-instance-progress">· ${verifiedSoFar}/${count} reviewed</span>` : ''}${instanceVerified ? ' <span class="uw-a11y-walk-instance-check" aria-label="This instance is reviewed">✓</span>' : ''}</span>
+                    <button type="button" class="uw-a11y-walk-instance-next" aria-label="Next instance" ${instanceIdx === count - 1 ? 'disabled' : ''}>›</button>
+                </div>
+            ` : '';
+
+            host.innerHTML = `
+                <div class="uw-a11y-walk-header">
+                    <button type="button" class="uw-a11y-walk-back" aria-label="Back to Top things to fix">←</button>
+                    <span class="uw-a11y-walk-step">Step ${idx + 1} of ${total}</span>
+                    <button type="button" class="uw-a11y-walk-close" aria-label="Close walkthrough">✕</button>
+                </div>
+                <div class="uw-a11y-walk-body">
+                    <h3 class="uw-a11y-walk-headline">
+                        ${this.escapeHtmlContent(headline)}
+                        ${first.type === 'warning' ? '<span class="uw-a11y-guided-card-badge uw-a11y-walk-badge">Needs review</span>' : ''}
+                    </h3>
+                    <p class="uw-a11y-walk-meta">Affects ${this.escapeHtmlContent(countLine)} on this page.${first.type === 'warning' ? ' Please verify each one yourself.' : ''}</p>
+                    ${instancePagerHtml}
+                    <div class="uw-a11y-walk-fix">
+                        <strong>How to fix</strong>
+                        <div class="uw-a11y-walk-fix-body">${first.recommendation || this.escapeHtmlContent(first.description || '')}</div>
+                    </div>
+                    ${first.description && first.recommendation ? `
+                        <details class="uw-a11y-walk-details">
+                            <summary>Why this matters</summary>
+                            <p>${this.escapeHtmlContent(first.description)}</p>
+                        </details>
+                    ` : ''}
+                    ${first.helpUrl ? `<a class="uw-a11y-walk-learn" href="${this.escapeUrl(first.helpUrl)}" target="_blank" rel="noopener noreferrer">Learn more about this rule →</a>` : ''}
+                    <div class="uw-a11y-walk-actions">
+                        <button type="button" class="uw-a11y-btn uw-a11y-btn-secondary uw-a11y-walk-show">${count > 1 ? `Show instance ${instanceIdx + 1} on the page` : 'Show me on the page'}</button>
+                        ${isManualReview ? `<button type="button" class="uw-a11y-btn uw-a11y-walk-verify ${instanceVerified ? 'is-verified' : ''}">${instanceVerified ? 'Reviewed ✓ — undo' : (count > 1 ? `Mark instance ${instanceIdx + 1} as reviewed` : 'Mark as reviewed')}</button>` : ''}
+                    </div>
+                </div>
+                <div class="uw-a11y-walk-nav">
+                    <button type="button" class="uw-a11y-btn uw-a11y-btn-secondary uw-a11y-walk-prev" ${idx === 0 ? 'disabled' : ''}>‹ Previous</button>
+                    <button type="button" class="uw-a11y-btn uw-a11y-walk-next">${idx === total - 1 ? 'Done' : 'Next ›'}</button>
+                </div>
+            `;
+
+            host.querySelector('.uw-a11y-walk-back').addEventListener('click', () => this.closeWalkthrough());
+            host.querySelector('.uw-a11y-walk-close').addEventListener('click', () => this.closeWalkthrough());
+            host.querySelector('.uw-a11y-walk-show').addEventListener('click', () => {
+                this.highlightCurrentInstance(ruleId);
+            });
+            host.querySelector('.uw-a11y-walk-prev').addEventListener('click', () => this.stepWalkthrough(-1));
+            host.querySelector('.uw-a11y-walk-next').addEventListener('click', () => {
+                if (idx === total - 1) this.closeWalkthrough();
+                else this.stepWalkthrough(1);
+            });
+
+            const instPrev = host.querySelector('.uw-a11y-walk-instance-prev');
+            const instNext = host.querySelector('.uw-a11y-walk-instance-next');
+            if (instPrev) instPrev.addEventListener('click', () => this.stepWalkthroughInstance(ruleId, -1));
+            if (instNext) instNext.addEventListener('click', () => this.stepWalkthroughInstance(ruleId, 1));
+
+            const verifyBtn = host.querySelector('.uw-a11y-walk-verify');
+            if (verifyBtn && isManualReview && currentInstance && currentInstance.uniqueId) {
+                verifyBtn.addEventListener('click', () => {
+                    const uniqueId = currentInstance.uniqueId;
+                    const wasVerified = this.checkedItems.has(uniqueId);
+                    if (wasVerified) {
+                        this.checkedItems.delete(uniqueId);
+                    } else {
+                        this.checkedItems.add(uniqueId);
+                    }
+                    sessionStorage.setItem('uw-a11y-checked', JSON.stringify(Array.from(this.checkedItems)));
+                    // Keep the Advanced view's checkbox/label in lockstep so
+                    // flipping over to it reflects what the user just did.
+                    this.syncAdvancedRuleUI(ruleId);
+                    this.updateScore();
+                    this.playSound(wasVerified ? 'ui' : 'verify');
+
+                    if (wasVerified) {
+                        // Un-marked — just refresh this step so labels update.
+                        this.renderWalkthroughStep();
+                        return;
+                    }
+
+                    // Auto-advance to the next unverified instance in this rule.
+                    let nextInstanceIdx = -1;
+                    for (let j = instanceIdx + 1; j < entry.group.length; j++) {
+                        const it = entry.group[j];
+                        if (it && it.uniqueId && !this.checkedItems.has(it.uniqueId)) { nextInstanceIdx = j; break; }
+                    }
+                    if (nextInstanceIdx === -1) {
+                        for (let j = 0; j < instanceIdx; j++) {
+                            const it = entry.group[j];
+                            if (it && it.uniqueId && !this.checkedItems.has(it.uniqueId)) { nextInstanceIdx = j; break; }
+                        }
+                    }
+                    if (nextInstanceIdx !== -1) {
+                        this.currentInstances[ruleId] = nextInstanceIdx;
+                        this.highlightCurrentInstance(ruleId, true);
+                        this.renderWalkthroughStep();
+                        return;
+                    }
+
+                    // All instances of this rule are reviewed — advance to the next walkthrough step.
+                    if (idx === total - 1) this.closeWalkthrough();
+                    else this.stepWalkthrough(1);
+                });
+            }
+
+            if (this.currentView === 'results') {
+                const content = this.shadowRoot.getElementById('uw-a11y-content');
+                if (content) {
+                    const target = this.measureViewHeight('results');
+                    const max = this.getMaxContentHeight();
+                    if (target) content.style.height = Math.min(target, max) + 'px';
+                }
+            }
+        },
+
+        stepWalkthrough: function(direction) {
+            if (!this.walkthroughGroups) return;
+            const total = this.walkthroughGroups.length;
+            const next = (this.walkthroughIndex || 0) + direction;
+            if (next < 0 || next >= total) return;
+            this.walkthroughIndex = next;
+            this.renderWalkthroughStep();
+            this.playSound('navigate');
+        },
+
+        // Step through individual instances of the current walkthrough rule
+        // (e.g. all four "input has no label" elements). Uses the same
+        // currentInstances pointer as the advanced view so navigation state
+        // stays consistent if the user flips modes.
+        stepWalkthroughInstance: function(ruleId, direction) {
+            if (!this.walkthroughGroups) return;
+            const idx = this.walkthroughIndex || 0;
+            const entry = this.walkthroughGroups[idx];
+            if (!entry || entry.ruleId !== ruleId) return;
+            const total = entry.nodeCount;
+            const cur = this.currentInstances[ruleId] || 0;
+            const nextIdx = cur + direction;
+            if (nextIdx < 0 || nextIdx >= total) return;
+            this.currentInstances[ruleId] = nextIdx;
+            // Highlight the new instance immediately so the user sees the change on the page.
+            this.highlightCurrentInstance(ruleId, true);
+            this.playSound('navigate');
+            // Re-render the step so the pager label and button text update.
+            this.renderWalkthroughStep();
+        },
+
+        closeWalkthrough: function(silent) {
+            this.walkthroughGroups = null;
+            this.walkthroughIndex = 0;
+            // Re-render guided list (only if we're still in guided mode).
+            if (this.resultsViewMode === 'guided') this.renderGuidedView();
+            if (!silent) this.playSound('ui');
+        },
+
         displayResults: function() {
             const panel = this.createPanel();
             const summary = this.shadowRoot.getElementById('uw-a11y-summary');
             const results = this.shadowRoot.getElementById('uw-a11y-results');
-            
+
+            // Initialize results view mode from settings on each render.
+            this.resultsViewMode = this.getDefaultResultsView();
+            const resultsView = this.shadowRoot.getElementById('uw-a11y-view-results');
+            if (resultsView) resultsView.setAttribute('data-results-mode', this.resultsViewMode);
+            this.renderResultsHeader();
+
             // Apply saved position for draggable panel (replaces minimize feature)
             this.applySavedPosition();
             
@@ -10037,16 +11832,16 @@
                 ${scoreData ? this.renderScoreDial(scoreData) : ''}
 
                 ${this.getEffectiveIncludeSelectors().length > 0 ? `
-                <div role="status" style="background:rgba(13,110,253,0.07);border:1px solid rgba(13,110,253,0.25);border-radius:8px;padding:8px 12px;font-size:12px;color:#0d6efd;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+                <div role="status" style="background:rgba(79,70,229,0.07);border:1px solid rgba(79,70,229,0.25);border-radius:8px;padding:8px 12px;font-size:12px;color:#4f46e5;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     <span><strong>Partial scan</strong> — scoped to: <code style="font-size:11px;">${this.escapeHtmlAttr(this.getScopeDisplayLabel())}</code></span>
                     <a href="#" onclick="window.uwAccessibilityChecker.showView('settings');return false;" style="margin-left:auto;font-size:11px;color:inherit;text-decoration:underline;">Edit scope</a>
                 </div>` : ''}
 
                 <!-- Accessible summary section -->
-                <div role="region" aria-labelledby="uw-a11y-summary-heading">
+                <div role="region" aria-labelledby="uw-a11y-summary-heading" class="uw-a11y-advanced-only">
                     <h3 id="uw-a11y-summary-heading" class="sr-only">Accessibility Test Results Summary</h3>
-                    
+
                     <p><strong>Total Issues Found:</strong> ${this.issues.length}</p>
                     
                     <div style="margin: 8px 0;" role="list" aria-label="Issue breakdown by type">
@@ -10095,7 +11890,7 @@
                 </div>
                 
                 ${this.axeResults ? `
-                    <div class="axe-summary">
+                    <div class="axe-summary uw-a11y-advanced-only">
                         <strong>Standard:</strong> ${this.getWcagLabel()}
                     </div>
                 ` : ''}
@@ -10137,7 +11932,10 @@
                 // Render issue list using current filters
                 this.refreshIssueList();
             }
-            
+
+            // Always populate the guided view; CSS hides it in advanced mode.
+            this.renderGuidedView();
+
             // Announce results to screen readers
             this.announceResults(scoreData, counts);
             
@@ -10578,11 +12376,11 @@
         toggleRuleVerification: function(ruleId) {
             const groupedIssues = this.groupIssuesByRule(this.issues);
             const issueGroup = groupedIssues[ruleId];
-            
+
             if (!issueGroup) return;
-            
+
             const isCurrentlyVerified = this.isRuleVerified(ruleId);
-            
+
             issueGroup.forEach(issue => {
                 if (issue.uniqueId) {
                     if (isCurrentlyVerified) {
@@ -10592,35 +12390,44 @@
                     }
                 }
             });
-            
-            // Update the UI
-            const sanitizedRuleId = this.sanitizeHtmlId(ruleId);
-            const checkbox = this.shadowRoot.getElementById(`check-${sanitizedRuleId}`);
-            const label = checkbox?.parentNode.querySelector('.uw-a11y-check-label');
-            const issueDiv = this.shadowRoot.getElementById(`issue-${sanitizedRuleId}`);
-            
-            const newVerificationState = this.isRuleVerified(ruleId);
-            
-            if (checkbox) checkbox.checked = newVerificationState;
-            if (label) {
-                label.textContent = newVerificationState 
-                    ? `All ${issueGroup.length} instances manually verified ✓` 
-                    : `Mark all ${issueGroup.length} instances as verified`;
-            }
-            if (issueDiv) {
-                if (newVerificationState) {
-                    issueDiv.classList.add('checked');
-                } else {
-                    issueDiv.classList.remove('checked');
-                }
-            }
-            
+
+            this.syncAdvancedRuleUI(ruleId);
+
             // Update score and save state
             this.updateScore();
             sessionStorage.setItem('uw-a11y-checked', JSON.stringify(Array.from(this.checkedItems)));
 
             // Sound feedback
+            const newVerificationState = this.isRuleVerified(ruleId);
             this.playSound(newVerificationState ? 'verify' : 'ui');
+        },
+
+        // Reflect the current verification state of a rule onto the Advanced
+        // view's existing DOM (checkbox, label, "checked" card class). Used by
+        // both bulk verification (toggleRuleVerification) and per-instance
+        // verification from the Guided walkthrough so the two views stay in
+        // sync without re-rendering the whole Advanced list.
+        syncAdvancedRuleUI: function(ruleId) {
+            const sanitizedRuleId = this.sanitizeHtmlId(ruleId);
+            const checkbox = this.shadowRoot.getElementById(`check-${sanitizedRuleId}`);
+            const label = checkbox && checkbox.parentNode && checkbox.parentNode.querySelector('.uw-a11y-check-label');
+            const issueDiv = this.shadowRoot.getElementById(`issue-${sanitizedRuleId}`);
+            const groupedIssues = this.groupIssuesByRule(this.issues);
+            const issueGroup = groupedIssues[ruleId];
+            if (!issueGroup) return;
+
+            const newVerificationState = this.isRuleVerified(ruleId);
+
+            if (checkbox) checkbox.checked = newVerificationState;
+            if (label) {
+                label.textContent = newVerificationState
+                    ? `All ${issueGroup.length} instances manually verified ✓`
+                    : `Mark all ${issueGroup.length} instances as verified`;
+            }
+            if (issueDiv) {
+                if (newVerificationState) issueDiv.classList.add('checked');
+                else issueDiv.classList.remove('checked');
+            }
         },
 
         // Toggle detailed information display
@@ -10798,7 +12605,7 @@
             sessionStorage.setItem('uw-a11y-update-checked', 'true');
             
             // Fetch latest version info from GitHub (bookmarklet only)
-            fetch('https://api.github.com/repos/althe3rd/Pinpoint/releases/latest')
+            fetch('https://api.github.com/repos/Heroic-Pixel/Pinpoint-Accessibility-Checker/releases/latest')
                 .then(response => response.json())
                 .then(data => {
                     const latestVersion = data.tag_name.replace('v', '');
@@ -10952,10 +12759,13 @@
             // Clean up element picker if active
             this.stopPickerMode();
 
-            // Remove any data-pinpoint-scope attributes injected by the picker
-            document.querySelectorAll('[data-pinpoint-scope]').forEach(el => {
-                el.removeAttribute('data-pinpoint-scope');
-            });
+            // Restore page layout if we were docked
+            document.body.removeAttribute('data-uw-a11y-dock');
+
+            // Note: data-pinpoint-scope attributes are intentionally left on the
+            // page so a saved scope selector still resolves the next time Pinpoint
+            // is opened. They have no visual or behavioral effect on the page, and
+            // are cleared explicitly by the "Clear scan scope" button in Settings.
 
             // Clean up tab order visualization
             this.hideTabOrderVisualization();
@@ -11020,7 +12830,7 @@
 
         // Debug method to trigger update notification
         debugShowUpdateNotification: function() {
-            this.showUpdateNotification('1.5.0', 'https://github.com/althe3rd/Pinpoint/releases/tag/v1.5.0');
+            this.showUpdateNotification('1.5.0', 'https://github.com/Heroic-Pixel/Pinpoint-Accessibility-Checker/releases/tag/v1.5.0');
         }
     };
     

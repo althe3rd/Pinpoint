@@ -9,7 +9,7 @@
     
             // Main accessibility checker object
         window.uwAccessibilityChecker = {
-            version: '1.6.4', // Current version
+            version: '1.6.5', // Current version
             websiteUrl: 'https://pinpoint.heroicpixel.com/', // Main website URL
             legacyDomainUrl: 'https://althe3rd.github.io/Pinpoint/', // Legacy domain for transition
             issues: [],
@@ -3967,7 +3967,7 @@
                                 <h3>About Pinpoint</h3>
                                 <p>Version: <strong>${this.version}</strong> · Engine: axe-core v${this.getAxeVersion ? (this.getAxeVersion() || 'unknown') : 'unknown'}</p>
                                 <p>Pinpoint Accessibility Checker helps quickly find accessibility issues and best-practice improvements, pairing automated results with guidance.</p>
-                                <p><a href="https://github.com/althe3rd/Pinpoint" target="_blank" rel="noopener noreferrer">Project on GitHub</a> | <a href="https://github.com/althe3rd/Pinpoint/issues" target="_blank" rel="noopener noreferrer">Report an Issue</a> | <a href="https://github.com/althe3rd/Pinpoint/releases" target="_blank" rel="noopener noreferrer">Changelog</a></p>
+                                <p><a href="https://github.com/Heroic-Pixel/Pinpoint-Accessibility-Checker" target="_blank" rel="noopener noreferrer">Project on GitHub</a> | <a href="https://github.com/Heroic-Pixel/Pinpoint-Accessibility-Checker/issues" target="_blank" rel="noopener noreferrer">Report an Issue</a> | <a href="https://github.com/Heroic-Pixel/Pinpoint-Accessibility-Checker/releases" target="_blank" rel="noopener noreferrer">Changelog</a></p>
                                 
                             </div>
                         </div>
@@ -12662,7 +12662,7 @@
             sessionStorage.setItem('uw-a11y-update-checked', 'true');
             
             // Fetch latest version info from GitHub (bookmarklet only)
-            fetch('https://api.github.com/repos/althe3rd/Pinpoint/releases/latest')
+            fetch('https://api.github.com/repos/Heroic-Pixel/Pinpoint-Accessibility-Checker/releases/latest')
                 .then(response => response.json())
                 .then(data => {
                     const latestVersion = data.tag_name.replace('v', '');
@@ -12887,7 +12887,7 @@
 
         // Debug method to trigger update notification
         debugShowUpdateNotification: function() {
-            this.showUpdateNotification('1.5.0', 'https://github.com/althe3rd/Pinpoint/releases/tag/v1.5.0');
+            this.showUpdateNotification('1.5.0', 'https://github.com/Heroic-Pixel/Pinpoint-Accessibility-Checker/releases/tag/v1.5.0');
         }
     };
     

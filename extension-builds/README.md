@@ -46,7 +46,7 @@ This directory contains browser extension packages for the Pinpoint Accessibilit
 
 ## Version
 
-Current version: 1.6.3
+Current version: 1.6.5
 
 ## Building
 
@@ -103,7 +103,7 @@ This creates an App Store ready project with:
 ## Support
 
 - **Website**: https://althe3rd.github.io/Pinpoint/
-- **GitHub**: https://github.com/althe3rd/Pinpoint
+- **GitHub**: https://github.com/Heroic-Pixel/Pinpoint-Accessibility-Checker
 - **Issues**: Report bugs and feature requests on GitHub
 
 Built with ❤️ for accessibility testing.

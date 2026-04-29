@@ -182,7 +182,7 @@ All permissions are required for core functionality and are used responsibly.
 
 ## 📞 Support
 
-- **GitHub Issues**: [Report bugs and feature requests](https://github.com/althe3rd/Pinpoint/issues)
+- **GitHub Issues**: [Report bugs and feature requests](https://github.com/Heroic-Pixel/Pinpoint-Accessibility-Checker/issues)
 - **Website**: [https://pinpointchecker.com/](https://pinpointchecker.com/)
 - **Documentation**: See project README.md for bookmarklet version
 

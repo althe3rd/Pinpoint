@@ -109,8 +109,8 @@ When updating third-party libraries:
 ## Contact
 
 For questions about third-party library usage in this extension:
-- **GitHub Issues**: https://github.com/althe3rd/Pinpoint/issues
-- **Project Repository**: https://github.com/althe3rd/Pinpoint
+- **GitHub Issues**: https://github.com/Heroic-Pixel/Pinpoint-Accessibility-Checker/issues
+- **Project Repository**: https://github.com/Heroic-Pixel/Pinpoint-Accessibility-Checker
 
 ---
 

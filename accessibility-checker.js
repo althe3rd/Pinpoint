@@ -3678,59 +3678,40 @@
                                     <h3>Inspector Tools</h3>
                                     <p>Visual debugging tools to help you understand your page's accessibility structure.</p>
 
-                                    <div class="uw-a11y-inspector-section">
-                                        <h4>Tab Order Visualization</h4>
-                                        <p>Display numbered indicators showing the keyboard tab order of focusable elements on your page.</p>
-                                        <div class="uw-a11y-inspector-controls">
-                                            <button id="uw-a11y-tab-order-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
-                                                <svg class="feather feather-move" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>
-                                                </svg>
-                                                <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                                                    <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                                </svg>
-                                                <span class="uw-a11y-btn-text">Show Tab Order</span>
-                                            </button>
+                                    <div class="uw-a11y-inspector-toggle-row">
+                                        <div class="uw-a11y-inspector-toggle-main">
+                                            <h4>Tab Order</h4>
+                                            <p>Numbered indicators show the keyboard tab order of focusable elements.</p>
                                             <span id="uw-a11y-tab-order-count" class="uw-a11y-inspector-status" style="display: none;"></span>
                                         </div>
+                                        <label class="uw-a11y-toggle" aria-label="Toggle tab order visualization">
+                                            <input id="uw-a11y-tab-order-toggle" type="checkbox">
+                                            <span class="uw-a11y-toggle-slider"></span>
+                                        </label>
                                     </div>
 
-                                    <div class="uw-a11y-inspector-section">
-                                        <h4>Focus Indicators</h4>
-                                        <p>Preview how focus styles appear on all focusable elements simultaneously to test focus visibility.</p>
-                                        <div class="uw-a11y-inspector-controls">
-                                            <button id="uw-a11y-focus-indicators-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
-                                                <svg class="feather feather-target" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
-                                                    <circle cx="12" cy="12" r="10"/>
-                                                    <circle cx="12" cy="12" r="6"/>
-                                                    <circle cx="12" cy="12" r="2"/>
-                                                </svg>
-                                                <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                                                    <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                                </svg>
-                                                <span class="uw-a11y-btn-text">Preview Focus Styles</span>
-                                            </button>
+                                    <div class="uw-a11y-inspector-toggle-row">
+                                        <div class="uw-a11y-inspector-toggle-main">
+                                            <h4>Focus Indicators</h4>
+                                            <p>Preview focus styles on all focusable elements at once.</p>
                                             <span id="uw-a11y-focus-indicators-count" class="uw-a11y-inspector-status" style="display: none;"></span>
                                         </div>
+                                        <label class="uw-a11y-toggle" aria-label="Toggle focus indicator preview">
+                                            <input id="uw-a11y-focus-indicators-toggle" type="checkbox">
+                                            <span class="uw-a11y-toggle-slider"></span>
+                                        </label>
                                     </div>
 
-                                    <div class="uw-a11y-inspector-section">
-                                        <h4>Landmark Structure</h4>
-                                        <p>Visualize page landmarks and heading hierarchy to test document structure.</p>
-                                        <div class="uw-a11y-inspector-controls">
-                                            <button id="uw-a11y-landmark-structure-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
-                                                <svg class="feather feather-map" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
-                                                    <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
-                                                    <line x1="9" x2="9" y1="3" y2="18"/>
-                                                    <line x1="15" x2="15" y1="6" y2="21"/>
-                                                </svg>
-                                                <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                                                    <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                                </svg>
-                                                <span class="uw-a11y-btn-text">Show Landmarks</span>
-                                            </button>
+                                    <div class="uw-a11y-inspector-toggle-row">
+                                        <div class="uw-a11y-inspector-toggle-main">
+                                            <h4>Landmark Structure</h4>
+                                            <p>Visualize landmarks and heading hierarchy on the page.</p>
                                             <span id="uw-a11y-landmark-structure-count" class="uw-a11y-inspector-status" style="display: none;"></span>
                                         </div>
+                                        <label class="uw-a11y-toggle" aria-label="Toggle landmark structure visualization">
+                                            <input id="uw-a11y-landmark-structure-toggle" type="checkbox">
+                                            <span class="uw-a11y-toggle-slider"></span>
+                                        </label>
                                     </div>
 
                                     <div class="uw-a11y-inspector-tool-row">
@@ -3799,41 +3780,22 @@
 
                                     <div id="uw-a11y-inspector-panel-outline" class="uw-a11y-inspector-detail-panel" hidden>
                                         <div class="uw-a11y-inspector-section">
-                                            <h4>Page Outline</h4>
-                                            <p>View the heading hierarchy to verify correct order and nesting. Skipped heading levels are flagged. Click any heading to jump to it on the page.</p>
-                                            <div class="uw-a11y-inspector-controls">
-                                                <button id="uw-a11y-outline-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
-                                                    <svg class="feather feather-list" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                        <line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>
-                                                    </svg>
-                                                    <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
-                                                        <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                                    </svg>
-                                                    <span class="uw-a11y-btn-text">Show Outline</span>
-                                                </button>
+                                            <div class="uw-a11y-inspector-section-header">
+                                                <h4>Page Outline</h4>
                                                 <span id="uw-a11y-outline-count" class="uw-a11y-inspector-status" style="display: none;"></span>
                                             </div>
+                                            <p>View the heading hierarchy to verify correct order and nesting. Skipped levels are flagged. Click any heading to jump to it on the page.</p>
                                             <div id="uw-a11y-outline-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
                                         </div>
                                     </div>
 
                                     <div id="uw-a11y-inspector-panel-links" class="uw-a11y-inspector-detail-panel" hidden>
                                         <div class="uw-a11y-inspector-section">
-                                            <h4>Links</h4>
-                                            <p>List every link on the page with its accessible name — the text a screen reader actually announces. Click a link to jump to it. Empty, generic, or ambiguous link text is flagged.</p>
-                                            <div class="uw-a11y-inspector-controls">
-                                                <button id="uw-a11y-links-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
-                                                    <svg class="feather feather-link" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                        <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
-                                                        <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
-                                                    </svg>
-                                                    <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
-                                                        <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                                    </svg>
-                                                    <span class="uw-a11y-btn-text">Show Links</span>
-                                                </button>
+                                            <div class="uw-a11y-inspector-section-header">
+                                                <h4>Links</h4>
                                                 <span id="uw-a11y-links-count" class="uw-a11y-inspector-status" style="display: none;"></span>
                                             </div>
+                                            <p>Every link on the page with its accessible name — the text a screen reader announces. Click a link to jump to it. Empty, generic, or ambiguous link text is flagged.</p>
                                             <div id="uw-a11y-links-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
                                         </div>
                                     </div>
@@ -3913,28 +3875,20 @@
 
                                     <div id="uw-a11y-inspector-panel-alt" class="uw-a11y-inspector-detail-panel" hidden>
                                         <div class="uw-a11y-inspector-section">
-                                            <h4>Alternative Text</h4>
-                                            <p>Inspect every image, SVG, and image-role element on the page. The list shows the alt text each one exposes to assistive tech; the overlay draws that same text on top of the image itself for a quick visual scan.</p>
-                                            <div class="uw-a11y-inspector-controls">
-                                                <button id="uw-a11y-alt-list-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false" aria-expanded="false">
-                                                    <svg class="feather feather-list" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                        <line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>
-                                                    </svg>
-                                                    <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
-                                                        <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                                    </svg>
-                                                    <span class="uw-a11y-btn-text">Show Alt Text List</span>
-                                                </button>
-                                                <button id="uw-a11y-alt-overlay-toggle" class="uw-a11y-btn uw-a11y-btn-secondary" aria-pressed="false">
-                                                    <svg class="feather feather-image" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                        <rect height="18" rx="2" ry="2" width="18" x="3" y="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-                                                    </svg>
-                                                    <svg class="feather feather-eye-off" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display: none;">
-                                                        <path d="M3 3l18 18M10.58 10.58A3 3 0 0012 15a3 3 0 002.42-4.42M9.88 4.24A10.94 10.94 0 0112 5c7 0 11 7 11 7a18.94 18.94 0 01-5.06 5.94M6.26 6.26A18.94 18.94 0 001 12s4 7 11 7a10.94 10.94 0 004.24-.88"/>
-                                                    </svg>
-                                                    <span class="uw-a11y-btn-text">Show Alt Text Overlays</span>
-                                                </button>
+                                            <div class="uw-a11y-inspector-section-header">
+                                                <h4>Alternative Text</h4>
                                                 <span id="uw-a11y-alt-count" class="uw-a11y-inspector-status" style="display: none;"></span>
+                                            </div>
+                                            <p>Every image, SVG, and image-role element on the page along with the alt text it exposes to assistive tech.</p>
+                                            <div class="uw-a11y-inspector-toggle-row uw-a11y-inspector-toggle-row--inline">
+                                                <div class="uw-a11y-inspector-toggle-main">
+                                                    <h4>Show overlays on the page</h4>
+                                                    <p>Draw each alt-text label on top of its image for a quick visual scan.</p>
+                                                </div>
+                                                <label class="uw-a11y-toggle" aria-label="Toggle alt-text overlays on the page">
+                                                    <input id="uw-a11y-alt-overlay-toggle" type="checkbox">
+                                                    <span class="uw-a11y-toggle-slider"></span>
+                                                </label>
                                             </div>
                                             <div id="uw-a11y-alt-content" class="uw-a11y-outline-tree" hidden aria-live="polite"></div>
                                         </div>
@@ -5674,8 +5628,8 @@
             background: #f8f9fa;
             border: 1px solid #e9ecef;
             border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
+            padding: 12px 14px;
+            margin-bottom: 8px;
         }
 
         .uw-a11y-inspector-tool-row-main {
@@ -5689,25 +5643,86 @@
         }
 
         .uw-a11y-inspector-tool-row h4 {
-            margin: 0 0 0.35rem 0;
+            margin: 0 0 4px 0;
             color: #333;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
         }
 
         .uw-a11y-inspector-tool-teaser {
-            margin: 0 0 0.35rem 0;
+            margin: 0 0 2px 0;
             color: #666;
-            font-size: 13px;
+            font-size: 12px;
             line-height: 1.4;
         }
 
         .uw-a11y-inspector-hub-status {
             margin: 0;
+            font-size: 11px;
+            line-height: 1.4;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        /* Compact slide-toggle row used for overlay tools (Tab Order, Focus
+           Indicators, Landmark Structure) and the alt-text overlay control.
+           Mirrors the Settings .uw-a11y-pref-row pattern. */
+        .uw-a11y-inspector-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+        }
+
+        .uw-a11y-inspector-toggle-row--inline {
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.08);
+            margin-top: 8px;
+            margin-bottom: 12px;
+        }
+
+        .uw-a11y-inspector-toggle-main {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .uw-a11y-inspector-toggle-main h4 {
+            margin: 0;
+            color: #333;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .uw-a11y-inspector-toggle-main p {
+            margin: 0;
+            color: #666;
             font-size: 12px;
             line-height: 1.4;
-            color: #495057;
-            font-weight: 500;
+        }
+
+        .uw-a11y-inspector-toggle-main .uw-a11y-inspector-status {
+            margin-top: 2px;
+        }
+
+        /* Compact section header for sub-page detail panels */
+        .uw-a11y-inspector-section-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+
+        .uw-a11y-inspector-section-header h4 {
+            margin: 0;
         }
 
         .uw-a11y-inspector-detail-header {
@@ -7744,50 +7759,32 @@
 
         // Initialize inspector tools event handlers
         initInspectorTools: function() {
-            // Tab order toggle button
+            // Overlay tool slide toggles. The toggle*Visualization functions
+            // flip internal state (isTabOrderActive, etc.) and show/hide the
+            // page overlay; we just hook the checkbox change event to them and
+            // sync each checkbox to the current state on init so re-entering
+            // the Inspector view reflects whatever's actually on the page.
             const tabOrderToggle = this.shadowRoot.getElementById('uw-a11y-tab-order-toggle');
             if (tabOrderToggle) {
-                tabOrderToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.toggleTabOrderVisualization();
-                });
+                tabOrderToggle.checked = !!this.isTabOrderActive;
+                tabOrderToggle.addEventListener('change', () => this.toggleTabOrderVisualization());
             }
 
-            // Focus indicators toggle button
             const focusIndicatorsToggle = this.shadowRoot.getElementById('uw-a11y-focus-indicators-toggle');
             if (focusIndicatorsToggle) {
-                focusIndicatorsToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.toggleFocusIndicatorsVisualization();
-                });
+                focusIndicatorsToggle.checked = !!this.isFocusIndicatorsActive;
+                focusIndicatorsToggle.addEventListener('change', () => this.toggleFocusIndicatorsVisualization());
             }
 
-            // Landmark structure toggle button
             const landmarkStructureToggle = this.shadowRoot.getElementById('uw-a11y-landmark-structure-toggle');
             if (landmarkStructureToggle) {
-                landmarkStructureToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.toggleLandmarkStructureVisualization();
-                });
+                landmarkStructureToggle.checked = !!this.isLandmarkStructureActive;
+                landmarkStructureToggle.addEventListener('change', () => this.toggleLandmarkStructureVisualization());
             }
 
-            // Outline view toggle button
-            const outlineToggle = this.shadowRoot.getElementById('uw-a11y-outline-toggle');
-            if (outlineToggle) {
-                outlineToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.toggleOutlineView();
-                });
-            }
-
-            // Links list toggle button
-            const linksToggle = this.shadowRoot.getElementById('uw-a11y-links-toggle');
-            if (linksToggle) {
-                linksToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.toggleLinksView();
-                });
-            }
+            // Outline / Links / Alt list — these sub-pages auto-show their list
+            // on entry (see _autoActivateInspectorDetailPanel) so there's no
+            // user-facing toggle for them anymore.
 
             // Color blindness simulation radio group
             const cvdList = this.shadowRoot.getElementById('uw-a11y-cvd-list');
@@ -7800,22 +7797,12 @@
                 });
             }
 
-            // Alt text list toggle
-            const altListToggle = this.shadowRoot.getElementById('uw-a11y-alt-list-toggle');
-            if (altListToggle) {
-                altListToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.toggleAltTextList();
-                });
-            }
-
-            // Alt text overlay toggle
+            // Alt-text overlays slide toggle (only the page-overlay variant
+            // remains as a user-facing control; the list itself auto-shows).
             const altOverlayToggle = this.shadowRoot.getElementById('uw-a11y-alt-overlay-toggle');
             if (altOverlayToggle) {
-                altOverlayToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.toggleAltTextOverlay();
-                });
+                altOverlayToggle.checked = !!this.isAltTextOverlayActive;
+                altOverlayToggle.addEventListener('change', () => this.toggleAltTextOverlay());
             }
 
             const openOutline = this.shadowRoot.getElementById('uw-a11y-inspector-open-outline');
@@ -11773,6 +11760,9 @@
                         this.checkedItems.add(uniqueId);
                     }
                     sessionStorage.setItem('uw-a11y-checked', JSON.stringify(Array.from(this.checkedItems)));
+                    // Keep the Advanced view's checkbox/label in lockstep so
+                    // flipping over to it reflects what the user just did.
+                    this.syncAdvancedRuleUI(ruleId);
                     this.updateScore();
                     this.playSound(wasVerified ? 'ui' : 'verify');
 
@@ -12443,11 +12433,11 @@
         toggleRuleVerification: function(ruleId) {
             const groupedIssues = this.groupIssuesByRule(this.issues);
             const issueGroup = groupedIssues[ruleId];
-            
+
             if (!issueGroup) return;
-            
+
             const isCurrentlyVerified = this.isRuleVerified(ruleId);
-            
+
             issueGroup.forEach(issue => {
                 if (issue.uniqueId) {
                     if (isCurrentlyVerified) {
@@ -12457,35 +12447,44 @@
                     }
                 }
             });
-            
-            // Update the UI
-            const sanitizedRuleId = this.sanitizeHtmlId(ruleId);
-            const checkbox = this.shadowRoot.getElementById(`check-${sanitizedRuleId}`);
-            const label = checkbox?.parentNode.querySelector('.uw-a11y-check-label');
-            const issueDiv = this.shadowRoot.getElementById(`issue-${sanitizedRuleId}`);
-            
-            const newVerificationState = this.isRuleVerified(ruleId);
-            
-            if (checkbox) checkbox.checked = newVerificationState;
-            if (label) {
-                label.textContent = newVerificationState 
-                    ? `All ${issueGroup.length} instances manually verified ✓` 
-                    : `Mark all ${issueGroup.length} instances as verified`;
-            }
-            if (issueDiv) {
-                if (newVerificationState) {
-                    issueDiv.classList.add('checked');
-                } else {
-                    issueDiv.classList.remove('checked');
-                }
-            }
-            
+
+            this.syncAdvancedRuleUI(ruleId);
+
             // Update score and save state
             this.updateScore();
             sessionStorage.setItem('uw-a11y-checked', JSON.stringify(Array.from(this.checkedItems)));
 
             // Sound feedback
+            const newVerificationState = this.isRuleVerified(ruleId);
             this.playSound(newVerificationState ? 'verify' : 'ui');
+        },
+
+        // Reflect the current verification state of a rule onto the Advanced
+        // view's existing DOM (checkbox, label, "checked" card class). Used by
+        // both bulk verification (toggleRuleVerification) and per-instance
+        // verification from the Guided walkthrough so the two views stay in
+        // sync without re-rendering the whole Advanced list.
+        syncAdvancedRuleUI: function(ruleId) {
+            const sanitizedRuleId = this.sanitizeHtmlId(ruleId);
+            const checkbox = this.shadowRoot.getElementById(`check-${sanitizedRuleId}`);
+            const label = checkbox && checkbox.parentNode && checkbox.parentNode.querySelector('.uw-a11y-check-label');
+            const issueDiv = this.shadowRoot.getElementById(`issue-${sanitizedRuleId}`);
+            const groupedIssues = this.groupIssuesByRule(this.issues);
+            const issueGroup = groupedIssues[ruleId];
+            if (!issueGroup) return;
+
+            const newVerificationState = this.isRuleVerified(ruleId);
+
+            if (checkbox) checkbox.checked = newVerificationState;
+            if (label) {
+                label.textContent = newVerificationState
+                    ? `All ${issueGroup.length} instances manually verified ✓`
+                    : `Mark all ${issueGroup.length} instances as verified`;
+            }
+            if (issueDiv) {
+                if (newVerificationState) issueDiv.classList.add('checked');
+                else issueDiv.classList.remove('checked');
+            }
         },
 
         // Toggle detailed information display
